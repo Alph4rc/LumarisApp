@@ -9,14 +9,15 @@ class PaymentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PaymentStore>();
-    
+
     return ClubCard(
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           child: Obx(() {
-            if (!controller.isLoading.value && controller.totalRecharge.value != 0) {
+            if (!controller.isLoading.value &&
+                controller.totalRecharge.value != 0) {
               final amount = controller.totalRecharge.value;
               final isLow = amount <= 10;
 
@@ -51,11 +52,11 @@ class PaymentTile extends StatelessWidget {
                                 : Colors.orange.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Hero(
+                          child: Hero(
                               tag: '饭卡',
                               child: Icon(
                                 Icons.monetization_on_outlined,
-                                color: Colors.orange,
+                                color: isLow ? Colors.red : Colors.orange,
                                 size: 24,
                               )),
                         ),

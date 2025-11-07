@@ -107,7 +107,8 @@ class SettingPage extends StatelessWidget {
                     Obx(() {
                       SettingsStore settingsStore = SettingsStore.to;
                       return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                           child: Row(
                             children: [
                               Icon(
@@ -264,75 +265,92 @@ class SettingPage extends StatelessWidget {
   }
 
   Widget _buildTeamTile(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Icon(
-            CupertinoIcons.person_2_fill,
-            size: 20,
-            color: CupertinoColors.systemOrange,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Get.toNamed('/Author');
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
               children: [
-                const Text(
-                  '制作团队',
-                  style: TextStyle(fontSize: 16),
+                Icon(
+                  CupertinoIcons.person_2_fill,
+                  size: 20,
+                  color: CupertinoColors.systemOrange,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'LuckyFish & zealous',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.5)
-                        : CupertinoColors.secondaryLabel,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '制作团队',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'iOS Club App 开发组',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : CupertinoColors.secondaryLabel,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildLicenseTile(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Icon(
-            CupertinoIcons.doc_text_fill,
-            size: 20,
-            color: CupertinoColors.systemGreen,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '开源协议',
-                  style: TextStyle(fontSize: 16),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Get.toNamed('/License');
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.doc_text_fill,
+                size: 20,
+                color: CupertinoColors.systemGreen,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '开源协议',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'MIT License',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'MIT License',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.5)
-                        : CupertinoColors.secondaryLabel,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -88,6 +88,7 @@ flutter:
     - assets/iconfont/iconfont.json
     - assets/iconfont/iconfont.ttf
     - .env
+    - LICENSE
 
   fonts:
     - family: IconFont
