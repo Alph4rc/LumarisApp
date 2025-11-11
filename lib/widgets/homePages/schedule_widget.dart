@@ -288,7 +288,6 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                 course.location,
                 style: TextStyle(
                   fontSize: isTablet ? 19 : 17,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
                   overflow: TextOverflow.ellipsis,
                 ),
                 maxLines: 2,
@@ -310,7 +309,6 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                 course.teacher,
                 style: TextStyle(
                   fontSize: isTablet ? 19 : 17,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
                   overflow: TextOverflow.ellipsis,
                 ),
                 maxLines: 2,
@@ -333,7 +331,6 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                 course.description,
                 style: TextStyle(
                   fontSize: isTablet ? 19 : 17,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
