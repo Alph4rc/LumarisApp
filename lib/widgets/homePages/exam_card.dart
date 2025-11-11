@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/PageModels/course_color_manager.dart';
 
 import '../../models/exam_model.dart';
 import '../../services/exam_service.dart';
 import '../club_card.dart';
+import '../club_modal_bottom_sheet.dart';
 import '../empty_widget.dart';
 
 class ExamCard extends StatefulWidget {
@@ -54,29 +56,30 @@ class _ExamCardState extends State<ExamCard> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '近期考试',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  '近期考试',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
-                    onPressed: () async {
-                      await getExam();
-                    },
-                    icon: const Icon(Icons.refresh))
+                  onPressed: () async {
+                    await getExam();
+                  },
+                  icon: const Icon(
+                    CupertinoIcons.refresh,
+                    size: 22,
+                  ),
+                )
               ],
             )),
         Padding(
-          padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
           child: examCard(),
         ),
       ],
@@ -84,32 +87,69 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Widget examWrap(ExamData exam) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Wrap(
+      spacing: 16,
+      runSpacing: 4,
       children: [
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
-            const SizedBox(width: 4),
-            Text(exam.time, style: TextStyle(color: Colors.grey[600])),
+            Icon(
+              CupertinoIcons.clock,
+              size: 16,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              exam.time,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.white70 : Colors.black87,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ],
         ),
-        if (exam.location.isNotEmpty) const SizedBox(width: 16),
         if (exam.location.isNotEmpty)
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-              const SizedBox(width: 4),
-              Text(exam.location, style: TextStyle(color: Colors.grey[600])),
+              Icon(
+                CupertinoIcons.placemark,
+                size: 16,
+                color: isDark ? Colors.white60 : Colors.black54,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                exam.location,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ],
           ),
-        if (exam.location.isNotEmpty) const SizedBox(width: 16),
-        if (exam.location.isNotEmpty)
+        if (exam.seat.isNotEmpty)
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.event_seat, size: 16, color: Colors.grey[600]),
-              const SizedBox(width: 4),
-              Text('座位号 ${exam.seat}',
-                  style: TextStyle(color: Colors.grey[600])),
+              Icon(
+                CupertinoIcons.calendar,
+                size: 16,
+                color: isDark ? Colors.white60 : Colors.black54,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '座位号 ${exam.seat}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ],
           ),
       ],
@@ -118,69 +158,170 @@ class _ExamCardState extends State<ExamCard> {
 
   Widget examCard() {
     if (isLoading) {
-      return const ClubCard(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Center(child: CircularProgressIndicator()),
-              SizedBox(height: 16),
-              Text('正在加载考试信息...'),
-            ],
-          ),
+      return ClubCard(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '正在加载考试信息...',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black87,
+              ),
+            ),
+          ],
         ),
       );
     }
 
     return examItems.isEmpty
-        ? const ClubCard(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  EmptyWidget(
-                    title: '最近没有考试',
-                    subtitle: '说不定刷新一下就有了',
-                    icon: Icons.videogame_asset_rounded,
-                  )
-                ],
-              ),
-            ))
-        : ListView.builder(
-            shrinkWrap: true,
-            // 让 ListView 根据内容自适应高度
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: examItems.length,
-            itemBuilder: (context, index) {
-              final exam = examItems[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                child: ListTile(
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                            title: Text(exam.title), content: examWrap(exam)));
-                  },
-                  leading: Container(
-                    width: 4,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: exam.color,
-                      borderRadius: BorderRadius.circular(2),
+        ? ClubCard(
+            padding: const EdgeInsets.all(20),
+            child: EmptyWidget(
+              title: '最近没有考试',
+              subtitle: '说不定刷新一下就有了',
+              icon: CupertinoIcons.hourglass,
+            ),
+          )
+        : ClubCard(
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: examItems.length,
+              itemBuilder: (context, index) {
+                final exam = examItems[index];
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+
+                return Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  child: InkWell(
+                    onTap: () {
+                      showClubModalBottomSheet(
+                        context,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              exam.title,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.clock,
+                                  size: 16,
+                                  color: isDark ? Colors.white60 : Colors.black54,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  exam.time,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? Colors.white70 : Colors.black87,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (exam.location.isNotEmpty) SizedBox(height: 10),
+                            if (exam.location.isNotEmpty)
+                              Row(
+                                children: [
+                                  Icon(
+                                    CupertinoIcons.placemark,
+                                    size: 16,
+                                    color: isDark ? Colors.white60 : Colors.black54,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    exam.location,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (exam.seat.isNotEmpty) SizedBox(height: 10),
+                            if (exam.seat.isNotEmpty)
+                              Row(
+                                children: [
+                                  Icon(
+                                    CupertinoIcons.calendar,
+                                    size: 16,
+                                    color: isDark ? Colors.white60 : Colors.black54,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '座位号 ${exam.seat}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 20),
+                          Container(
+                            width: 5,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: exam.color,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  exam.title,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: examWrap(exam),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  title: Text(
-                    exam.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: examWrap(exam),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
   }
 }

@@ -14,6 +14,7 @@ import 'package:ios_club_app/pageModels/course_color_manager.dart';
 
 import 'package:ios_club_app/system_services/notification_service.dart';
 import '../club_card.dart';
+import '../club_modal_bottom_sheet.dart';
 
 class ScheduleWidget extends StatefulWidget {
   const ScheduleWidget({super.key});
@@ -182,13 +183,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          // 对于这种简单的信息展示对话框，我们保留原来的 Material 风格
-          showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                    title: Text(item.title),
-                    content: buildCourse(item),
-                  ));
+          showClubModalBottomSheet(
+              context,
+              buildCourse(item),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -268,58 +266,81 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Text(
+          course.title,
+          style: TextStyle(
+            fontSize: isTablet ? 24 : 22,
+            fontWeight: FontWeight.w600,
+            color: CupertinoColors.label.resolveFrom(context),
+          ),
+        ),
+        SizedBox(height: isTablet ? 16 : 14),
         Row(
           children: [
-            const Icon(
-              Icons.location_on,
-              color: Color(0xFF007AFF),
-              size: 18,
+            Icon(
+              CupertinoIcons.placemark_fill,
+              color: CupertinoColors.systemBlue,
+              size: isTablet ? 22 : 20,
             ),
-            const SizedBox(width: 8),
-            Text(
-              course.location,
-              style: TextStyle(
-                fontSize: isTablet ? 17 : 15,
-                overflow: TextOverflow.ellipsis,
+            SizedBox(width: isTablet ? 12 : 10),
+            Expanded(
+              child: Text(
+                course.location,
+                style: TextStyle(
+                  fontSize: isTablet ? 19 : 17,
+                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                maxLines: 2,
               ),
-              maxLines: 2,
             ),
           ],
         ),
-        SizedBox(height: isTablet ? 12 : 10),
-        Row(children: [
-          const Icon(
-            Icons.people,
-            color: Color(0xFFFF3B30),
-            size: 18,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            course.teacher,
-            style: TextStyle(
-              fontSize: isTablet ? 17 : 15,
-              overflow: TextOverflow.ellipsis,
+        SizedBox(height: isTablet ? 16 : 14),
+        Row(
+          children: [
+            Icon(
+              CupertinoIcons.person_2_fill,
+              color: CupertinoColors.systemRed,
+              size: isTablet ? 22 : 20,
             ),
-            maxLines: 2,
-          )
-        ]),
-        SizedBox(height: isTablet ? 12 : 10),
-        Row(children: [
-          const Icon(
-            Icons.calendar_today,
-            color: Color(0xFF34C759),
-            size: 18,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            course.description,
-            style: TextStyle(
-              fontSize: isTablet ? 17 : 15,
+            SizedBox(width: isTablet ? 12 : 10),
+            Expanded(
+              child: Text(
+                course.teacher,
+                style: TextStyle(
+                  fontSize: isTablet ? 19 : 17,
+                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                maxLines: 2,
+              ),
             ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 3,
-          ),
-        ]),
+          ],
+        ),
+        SizedBox(height: isTablet ? 16 : 14),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              CupertinoIcons.calendar,
+              color: CupertinoColors.systemGreen,
+              size: isTablet ? 22 : 20,
+            ),
+            SizedBox(width: isTablet ? 12 : 10),
+            Expanded(
+              child: Text(
+                course.description,
+                style: TextStyle(
+                  fontSize: isTablet ? 19 : 17,
+                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
