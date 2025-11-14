@@ -74,6 +74,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // 判断是否为平板布局（宽度大于600）
+    final isTablet = screenWidth > 600;
+
     return Column(
       children: [
         Padding(
@@ -146,8 +150,9 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                           icon: Icons.school,
                           subtitle: '好好休息会儿吧，学一天累死个人'))
                   : Column(
-                      children:
-                          tempScheduleItems.map(_buildScheduleItem).toList(),
+                      children: tempScheduleItems
+                          .map((x) => _buildScheduleItem(x, isTablet))
+                          .toList(),
                     );
             }),
           ),
@@ -176,17 +181,25 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     return items;
   }
 
-  Widget _buildScheduleItem(ScheduleItem item) {
+  Widget _buildScheduleItem(ScheduleItem item, bool isTablet) {
     return Material(
       borderRadius: BorderRadius.circular(20),
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          showClubModalBottomSheet(
+          if (isTablet) {
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      content: buildCourse(item, isTablet),
+                    ));
+          } else {
+            showClubModalBottomSheet(
               context,
-              buildCourse(item),
-          );
+              buildCourse(item, isTablet),
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -218,8 +231,11 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.access_time,
-                            size: 18, color: Colors.grey[600],),
+                        Icon(
+                          Icons.access_time,
+                          size: 18,
+                          color: Colors.grey[600],
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           item.time,
@@ -235,8 +251,11 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                     ),
                     Row(
                       children: [
-                        Icon(Icons.location_on,
-                            size: 18, color: Colors.grey[600],),
+                        Icon(
+                          Icons.location_on,
+                          size: 18,
+                          color: Colors.grey[600],
+                        ),
                         const SizedBox(width: 6),
                         Text(item.location,
                             style: TextStyle(
@@ -257,11 +276,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     );
   }
 
-  Widget buildCourse(ScheduleItem course) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    // 判断是否为平板布局（宽度大于600）
-    final isTablet = screenWidth > 600;
-
+  Widget buildCourse(ScheduleItem course, bool isTablet) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

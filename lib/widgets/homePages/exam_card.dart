@@ -181,6 +181,10 @@ class _ExamCardState extends State<ExamCard> {
       );
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    // 判断是否为平板布局（宽度大于600）
+    final isTablet = screenWidth > 600;
+
     return examItems.isEmpty
         ? ClubCard(
             padding: const EdgeInsets.all(20),
@@ -203,10 +207,18 @@ class _ExamCardState extends State<ExamCard> {
                   borderRadius: BorderRadius.circular(20),
                   child: InkWell(
                     onTap: () {
-                      showClubModalBottomSheet(
-                        context,
-                        _buildExamTip(exam),
-                      );
+                      if (isTablet) {
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  content: _buildExamTip(exam),
+                                ));
+                      } else {
+                        showClubModalBottomSheet(
+                          context,
+                          _buildExamTip(exam),
+                        );
+                      }
                     },
                     borderRadius: BorderRadius.circular(20),
                     child: Padding(
@@ -216,7 +228,7 @@ class _ExamCardState extends State<ExamCard> {
                           const SizedBox(width: 20),
                           Container(
                             width: 5,
-                            height: 52,
+                            height: isTablet ? 42 : 52,
                             decoration: BoxDecoration(
                               color: exam.color,
                               borderRadius: BorderRadius.circular(3),
