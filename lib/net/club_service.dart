@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:ios_club_app/models/member_model.dart';
+import 'package:ios_club_app/clubServices/staff_service.dart';
+import 'package:ios_club_app/clubModels/member_model.dart';
 import 'package:ios_club_app/services/gzip_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/stores/prefs_keys.dart';
@@ -9,7 +10,14 @@ import 'package:ios_club_app/stores/prefs_keys.dart';
 import 'package:ios_club_app/models/link_model.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:ios_club_app/clubServices/auth_service.dart';
+import 'package:ios_club_app/clubServices/user_service.dart';
+import 'package:ios_club_app/clubServices/member_query_service.dart';
+
+/// 俱乐部服务类 - 为向后兼容而保留的接口
+/// 新代码应直接使用 clubServices 目录下的模块化服务
 class ClubService {
+  /// 获取链接分类
   static Future<List<CategoryModel>> getLinks() async {
     final List<CategoryModel> list = [];
     try {
@@ -19,7 +27,7 @@ class ClubService {
       };
 
       final response = await http.get(
-          Uri.parse('https://link.xauat.site/api/Link/GetCategory'),
+          Uri.parse('https://link.xauat.site/Category'),
           headers: finalHeaders);
 
       if (response.statusCode == 200) {
@@ -37,53 +45,14 @@ class ClubService {
     return list;
   }
 
+  /// 成员登录
+  /// 推荐使用 AuthService.login
   static Future<bool> loginMember(String username, String password) async {
-    try {
-      final Map<String, String> finalHeaders = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
-
-      var response =
-          await http.post(Uri.parse('https://www.xauat.site/api/Member/Login'),
-              headers: finalHeaders,
-              body: jsonEncode({
-                'Name': username,
-                'Id': password,
-              }));
-
-      if (response.statusCode == 200) {
-        if (kDebugMode) {
-          print('Login successful');
-        }
-
-        final jwt = response.body.replaceAll('"', '');
-
-        finalHeaders.addAll({'Authorization': 'Bearer $jwt'});
-
-        response = await http.get(
-            Uri.parse('https://www.xauat.site/api/Member/GetData'),
-            headers: finalHeaders);
-
-        if (response.statusCode == 200) {
-          if (kDebugMode) {
-            print('GetData successful');
-          }
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString(PrefsKeys.MEMBER_DATA, response.body);
-          await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
-          return true; // 李嘉俊
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
-      }
-    }
-
-    return false;
+    return await AuthService.login(username, password) != null;
   }
 
+  /// 获取成员信息
+  /// 推荐使用 UserService.getUserData
   static Future<Map<String, dynamic>> getMemberInfo() async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> data = {};
@@ -101,101 +70,30 @@ class ClubService {
     }
     data['memberData'] = memberData;
 
-    if (prefs.getString(PrefsKeys.MEMBER_JWT) != null) {
-      var jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-      Map<String, String> finalHeaders = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt'
-      };
-
-      try {
-        final response = await http.get(
-            Uri.parse('https://www.xauat.site/api/Member/GetInfo'),
-            headers: finalHeaders);
-
-        if (response.statusCode == 200) {
-          if (kDebugMode) {
-            print('GetInfo successful');
-          }
-          data['info'] = jsonDecode(response.body);
-        }
-        if (response.statusCode == 401) {
-          if (await loginMember(memberData['userName'], memberData['userId'])) {
-            jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-            finalHeaders['Authorization'] = 'Bearer $jwt';
-
-            final response = await http.get(
-                Uri.parse('https://www.xauat.site/api/Member/GetInfo'),
-                headers: finalHeaders);
-
-            if (response.statusCode == 200) {
-              if (kDebugMode) {
-                print('GetInfo successful');
-              }
-              data['info'] = jsonDecode(response.body);
-            }
-          }
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error fetching data: $e');
-        }
-      }
+    final userData = await UserService.getUserData();
+    if (userData != null) {
+      data['info'] = userData;
     }
 
     return data;
   }
 
+  /// 分页获取成员
+  /// 推荐使用 MemberQueryService.getMemberDataByPage
   static Future<MemberData> getMembersByPage(int pageNum, int pageSize) async {
-    final url =
-        'https://www.xauat.site/api/President/GetAllDataByPage?pageNum=$pageNum&pageSize=$pageSize';
-    final prefs = await SharedPreferences.getInstance();
-    final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
-
-    final memberData = jsonDecode(memberDataString ?? '{}');
-    var jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-    if (jwt == null) {
-      return MemberData(
-        data: [],
-        totalCount: 0,
-        totalPages: 0,
-      );
-    }
-
-    Map<String, String> finalHeaders = {
-      'Authorization': 'Bearer $jwt',
-      'Content-Type': 'application/json',
-    };
-
     try {
-      final response = await http.get(Uri.parse(url), headers: finalHeaders);
+      final result = await MemberQueryService.getMemberDataByPage(
+        pageNum: pageNum,
+        pageSize: pageSize,
+      );
 
-      if (response.statusCode == 200) {
-        var result = await GzipService.decompress(response.body);
-        return MemberData.fromJson(jsonDecode(result));
-      }
-      if (response.statusCode == 401) {
-        if (await ClubService.loginMember(
-            memberData['userName'], memberData['userId'])) {
-          jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-          finalHeaders['Authorization'] = 'Bearer $jwt';
-
-          final response =
-              await http.get(Uri.parse(url), headers: finalHeaders);
-
-          if (response.statusCode == 200) {
-            if (kDebugMode) {
-              print('GetAllDataByPage successful');
-            }
-            var result = await GzipService.decompress(response.body);
-            return MemberData.fromJson(jsonDecode(result));
-          }
-        }
+      if (result != null) {
+        final decompressed = await GzipService.decompress(result);
+        return MemberData.fromJson(jsonDecode(decompressed));
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        print('Error fetching members by page: $e');
       }
     }
 
@@ -206,55 +104,21 @@ class ClubService {
     );
   }
 
+  /// 分页获取员工
+  /// 推荐使用 StaffService.getStaffMembers
   static Future<MemberData> getStaffsByPage(int pageNum, int pageSize) async {
-    final url =
-        'https://www.xauat.site/api/President/GetStaffsByPage?pageNum=$pageNum&pageSize=$pageSize';
-    final prefs = await SharedPreferences.getInstance();
-    final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
-
-    final memberData = jsonDecode(memberDataString ?? '{}');
-    var jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-    if (jwt == null) {
-      return MemberData(
-        data: [],
-        totalCount: 0,
-        totalPages: 0,
-      );
-    }
-
-    Map<String, String> finalHeaders = {
-      'Authorization': 'Bearer $jwt',
-      'Content-Type': 'application/json',
-    };
-
     try {
-      final response = await http.get(Uri.parse(url), headers: finalHeaders);
-
-      if (response.statusCode == 200) {
-        var result = await GzipService.decompress(response.body);
-        return MemberData.fromJson(jsonDecode(result));
-      }
-      if (response.statusCode == 401) {
-        if (await ClubService.loginMember(
-            memberData['userName'], memberData['userId'])) {
-          jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-          finalHeaders['Authorization'] = 'Bearer $jwt';
-
-          final response =
-              await http.get(Uri.parse(url), headers: finalHeaders);
-
-          if (response.statusCode == 200) {
-            if (kDebugMode) {
-              print('GetStaffsByPage successful');
-            }
-            var result = await GzipService.decompress(response.body);
-            return MemberData.fromJson(jsonDecode(result));
-          }
-        }
+      final staffMembers = await StaffService.getStaffMembers();
+      if (staffMembers != null) {
+        return MemberData(
+          data: staffMembers.toList(),
+          totalCount: staffMembers.length,
+          totalPages: 1,
+        );
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        print('Error fetching staffs by page: $e');
       }
     }
 
@@ -263,5 +127,35 @@ class ClubService {
       totalCount: 0,
       totalPages: 0,
     );
+  }
+
+  /// 更改密码
+  /// 推荐使用 AuthService.changePassword
+  static Future<bool> changePassword(
+      String userId, String oldPassword, String newPassword) async {
+    return await AuthService.changePassword(userId, oldPassword, newPassword);
+  }
+
+  /// 获取所有成员数据
+  /// 推荐使用 MemberQueryService.getAllMemberData
+  static Future<List<MemberModel>> getAllMemberData() async {
+    try {
+      final result = await MemberQueryService.getAllMemberData();
+      if (result != null) {
+        final List<dynamic> jsonData = jsonDecode(result);
+        return jsonData.map((e) => MemberModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching all member data: $e');
+      }
+    }
+    return [];
+  }
+
+  /// 验证用户
+  /// 推荐使用 AuthService.validate
+  static Future<bool> validateUser(String userId) async {
+    return await AuthService.validate(userId);
   }
 }

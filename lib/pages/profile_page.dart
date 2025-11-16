@@ -51,16 +51,15 @@ class _ProfilePageState extends State<ProfilePage> {
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString(PrefsKeys.USERNAME);
     final iosName = prefs.getString(PrefsKeys.CLUB_NAME);
-    final clubId = prefs.getString(PrefsKeys.CLUB_ID);
 
     if (userStore.isLogin && username != null) {
       _username = username;
     }
     if (userStore.isLoginMember && iosName != null) {
-      if (username == clubId) {
+      if (username == iosName) {
         _username = iosName;
       } else if (username != null) {
-        _username = '$username & $clubId';
+        _username = '$username & $iosName';
       } else {
         _username = iosName;
       }
@@ -363,7 +362,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ? Colors.grey[300] // 暗色模式下的图标颜色
                             : Colors.grey[700] // 亮色模式下的图标颜色
                         ),
-                    hintText: _isOnlyLoginMember ? '姓名' : '学号',
+                    hintText: '学号',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -385,7 +384,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ? Colors.grey[300] // 暗色模式下的图标颜色
                             : Colors.grey[700] // 亮色模式下的图标颜色
                         ),
-                    hintText: _isOnlyLoginMember ? '学号' : '统一身份认证密码',
+                    hintText: _isOnlyLoginMember ? 'iMember 密码（初始值为手机号）' : '统一身份认证密码',
                     suffixIcon: IconButton(
                       icon: Icon(_obscureText
                           ? Icons.visibility_off

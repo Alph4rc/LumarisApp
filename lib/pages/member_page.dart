@@ -1,13 +1,123 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-import 'package:ios_club_app/net/club_service.dart';
+import 'package:flutter/material.dart';
+import 'package:ios_club_app/clubModels/resource_model.dart';
+import 'package:ios_club_app/clubServices/data_centre_service.dart';
+import 'package:ios_club_app/clubServices/department_service.dart';
+import 'package:ios_club_app/clubServices/project_service.dart';
+import 'package:ios_club_app/clubServices/resource_service.dart';
+import 'package:ios_club_app/clubServices/staff_service.dart';
+
 import 'package:ios_club_app/widgets/club_app_bar.dart';
 import 'package:ios_club_app/widgets/memberPages/member_data_page.dart';
 import 'package:ios_club_app/widgets/memberPages/staff_data_page.dart';
+
+// 新增导入
+import 'package:ios_club_app/widgets/memberPages/department_page.dart';
+import 'package:ios_club_app/widgets/memberPages/project_page.dart';
+import 'package:ios_club_app/widgets/memberPages/task_page.dart';
+import 'package:ios_club_app/widgets/memberPages/resource_page.dart';
+
+// 使用新的模块化服务
+import 'package:ios_club_app/clubServices/user_service.dart';
 import 'package:ios_club_app/widgets/platform_dialog.dart';
 
 class MemberPage extends StatelessWidget {
   const MemberPage({super.key});
+
+  // 新增方法：获取成员信息
+  Future<Map<String, dynamic>> _fetchMemberInfo() async {
+    // 使用新的 UserService 获取用户数据
+    final userData = await UserService.getUserData();
+
+    // 保持与原有方法兼容的返回格式
+    final data = <String, dynamic>{};
+
+    if (userData != null) {
+      // 根据MemberModel结构映射数据（注意API返回的是大写开头的字段）
+      data['memberData'] = {
+        'userName': userData.userName,
+        'userId': userData.userId,
+        'phoneNum': userData.phoneNum,
+        'academy': userData.academy,
+        'politicalLandscape': userData.politicalLandscape,
+        'gender': userData.gender,
+        'className': userData.className,
+        'joinTime': userData.joinTime,
+        'identity': userData.identity,
+      };
+
+      data['info'] = {
+        'userName': userData.userName,
+        'userId': userData.userId,
+        'phoneNum': userData.phoneNum,
+        'academy': userData.academy,
+        'politicalLandscape': userData.politicalLandscape,
+        'gender': userData.gender,
+        'className': userData.className,
+        'joinTime': userData.joinTime,
+        'identity': userData.identity,
+        // 添加默认值以避免页面错误
+        'tasks': [],
+        'projects': [],
+        'departments': [],
+        'total': 0,
+        'staffsCount': 0,
+        'resources': [],
+      };
+    } else {
+      // 如果没有用户数据，提供默认结构
+      data['memberData'] = {
+        'userName': '',
+        'userId': '',
+        'phoneNum': '',
+        'academy': '',
+        'politicalLandscape': '',
+        'gender': '',
+        'className': '',
+        'joinTime': '',
+        'identity': 'Member',
+      };
+
+      data['info'] = {
+        'userName': '',
+        'userId': '',
+        'phoneNum': '',
+        'academy': '',
+        'politicalLandscape': '',
+        'gender': '',
+        'className': '',
+        'joinTime': '',
+        'identity': 'Member',
+        'tasks': [],
+        'projects': [],
+        'departments': [],
+        'total': 0,
+        'staffsCount': 0,
+        'resources': [],
+      };
+    }
+
+    if (userData != null && userData.identity != 'Member') {
+      if (userData.identity != 'Department') {
+        data['info']['departments'] =
+            await DepartmentService.getAllDepartments();
+        final dataCentre = await DataCentreService.getData();
+        data['info']['total'] = dataCentre?.members ?? 0;
+        data['info']['staffsCount'] = dataCentre?.staffs ?? 0;
+        data['info']['resources'] = await ResourceService.getAllResources();
+        data['info']['projects'] = await ProjectService.getAllProjects();
+      } else {
+        final res = await StaffService.getStaffByUserId(userData.userId);
+        data['info']['projects'] = res?.projects ?? [];
+        data['info']['tasks'] = res?.tasks ?? [];
+      }
+    } else if (userData != null && userData.identity == 'Member') {
+      data['info']['tasks'] = await UserService.getUserTodos();
+    }
+
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +132,7 @@ class MemberPage extends StatelessWidget {
           // 主内容
           SliverToBoxAdapter(
             child: FutureBuilder(
-              future: ClubService.getMemberInfo(),
+              future: _fetchMemberInfo(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return SizedBox(
@@ -63,7 +173,8 @@ class MemberPage extends StatelessWidget {
                             '${snapshot.error}',
                             style: TextStyle(
                               fontSize: 15,
-                              color: isDarkMode ? Colors.white70 : Colors.black54,
+                              color:
+                                  isDarkMode ? Colors.white70 : Colors.black54,
                             ),
                           ),
                         ],
@@ -89,14 +200,14 @@ class MemberPage extends StatelessWidget {
 
                       if (identity != 'Member') ...[
                         const SizedBox(height: 20),
-                        _buildTaskSection(infoData, isDarkMode),
+                        _buildTaskSection(infoData, isDarkMode, context),
                         const SizedBox(height: 20),
-                        _buildProjectSection(infoData, isDarkMode),
+                        _buildProjectSection(infoData, isDarkMode, context),
                       ],
 
                       if (identity != 'Member' && identity != 'Department') ...[
                         const SizedBox(height: 20),
-                        _buildDepartmentSection(infoData, isDarkMode),
+                        _buildDepartmentSection(infoData, isDarkMode, context),
                         const SizedBox(height: 20),
                         _buildDataCenterSection(infoData, context, isDarkMode),
                         const SizedBox(height: 20),
@@ -125,7 +236,7 @@ class MemberPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode 
+            color: isDarkMode
                 ? const Color(0xFF101010).withValues(alpha: 0.3)
                 : const Color(0xFFA0A0A0).withValues(alpha: 0.1),
             blurRadius: 30,
@@ -190,8 +301,8 @@ class MemberPage extends StatelessWidget {
   }
 
   // 任务部分
-  Widget _buildTaskSection(Map infoData, bool isDarkMode) {
-    final tasks = infoData['tasks'] as List<dynamic>;
+  Widget _buildTaskSection(Map infoData, bool isDarkMode, context) {
+    final tasks = jsonDecode(jsonEncode(infoData['tasks']));
     return _buildSection(
       title: '我的任务',
       icon: Icons.check_circle_outline,
@@ -200,12 +311,19 @@ class MemberPage extends StatelessWidget {
       emptySubtitle: '可以好好休息了',
       items: tasks,
       isDarkMode: isDarkMode,
+      onTap: (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TaskPage()),
+        );
+      },
+      context: context,
     );
   }
 
   // 项目部分
-  Widget _buildProjectSection(Map infoData, bool isDarkMode) {
-    final projects = infoData['projects'] as List<dynamic>;
+  Widget _buildProjectSection(Map infoData, bool isDarkMode, context) {
+    final projects = jsonDecode(jsonEncode(infoData['projects']));
     return _buildSection(
       title: '我的项目',
       icon: Icons.folder_outlined,
@@ -214,12 +332,19 @@ class MemberPage extends StatelessWidget {
       emptySubtitle: '可以好好休息了',
       items: projects,
       isDarkMode: isDarkMode,
+      onTap: (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProjectPage()),
+        );
+      },
+      context: context,
     );
   }
 
   // 部门部分
-  Widget _buildDepartmentSection(Map infoData, bool isDarkMode) {
-    final departments = infoData['departments'] as List<dynamic>;
+  Widget _buildDepartmentSection(Map infoData, bool isDarkMode, context) {
+    final departments = jsonDecode(jsonEncode(infoData['departments']));
     return _buildSection(
       title: '社团部门',
       icon: Icons.group_outlined,
@@ -230,6 +355,13 @@ class MemberPage extends StatelessWidget {
               })
           .toList(),
       isDarkMode: isDarkMode,
+      onTap: (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DepartmentPage()),
+        );
+      },
+      context: context,
     );
   }
 
@@ -242,110 +374,122 @@ class MemberPage extends StatelessWidget {
     String? emptyMessage,
     String? emptySubtitle,
     required bool isDarkMode,
+    Function(BuildContext context)? onTap,
+    required BuildContext context,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode 
-                ? const Color(0xFF101010).withValues(alpha: 0.3)
-                : const Color(0xFFA0A0A0).withValues(alpha: 0.1),
-            blurRadius: 30,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: Colors.blue,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isDarkMode ? Colors.white : Colors.black,
+    return GestureDetector(
+      onTap: onTap != null ? () => onTap(context) : null,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: isDarkMode
+                  ? const Color(0xFF101010).withValues(alpha: 0.3)
+                  : const Color(0xFFA0A0A0).withValues(alpha: 0.1),
+              blurRadius: 30,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (onTap != null)
+                    Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: isDarkMode ? Colors.white54 : Colors.black38,
+                    ),
+                ],
+              ),
+            ),
+            if (isEmpty && emptyMessage != null)
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        size: 48,
+                        color: isDarkMode ? Colors.green : Colors.green,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        emptyMessage,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.white70 : Colors.black87,
+                        ),
+                      ),
+                      if (emptySubtitle != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          emptySubtitle,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          if (isEmpty && emptyMessage != null)
-            Padding(
-              padding: const EdgeInsets.all(32),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.check_circle,
-                      size: 48,
-                      color: isDarkMode ? Colors.green : Colors.green,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      emptyMessage,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white70 : Colors.black87,
+              )
+            else if (items.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.inbox_outlined,
+                        size: 48,
+                        color: isDarkMode ? Colors.white38 : Colors.black38,
                       ),
-                    ),
-                    if (emptySubtitle != null) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 16),
                       Text(
-                        emptySubtitle,
+                        '暂无内容',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.white54 : Colors.black54,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.white70 : Colors.black87,
                         ),
                       ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            )
-          else if (items.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(32),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.inbox_outlined,
-                      size: 48,
-                      color: isDarkMode ? Colors.white38 : Colors.black38,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '暂无内容',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white70 : Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            ...items.map((item) => _buildListItem(
-                  item['title'] ?? item['name'],
-                  item['description'],
-                  isDarkMode,
-                )),
-        ],
+              )
+            else
+              ...items.map((item) => _buildListItem(
+                    item['title'] ?? item['name'],
+                    item['description'],
+                    isDarkMode,
+                  )),
+          ],
+        ),
       ),
     );
   }
@@ -521,91 +665,105 @@ class MemberPage extends StatelessWidget {
   // 资源部分
   Widget _buildResourceSection(
       Map infoData, BuildContext context, bool isDarkMode) {
-    final resources = infoData['resources'] as List<dynamic>;
-    return Container(
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode 
-                ? const Color(0xFF101010).withValues(alpha: 0.3)
-                : const Color(0xFFA0A0A0).withValues(alpha: 0.1),
-            blurRadius: 30,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.inventory_2_outlined,
-                  color: Colors.blue,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '社团资源',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isDarkMode ? Colors.white : Colors.black,
+    final resources = infoData['resources'] as List<ResourceModel>;
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ResourcePage()),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: isDarkMode
+                  ? const Color(0xFF101010).withValues(alpha: 0.3)
+                  : const Color(0xFFA0A0A0).withValues(alpha: 0.1),
+              blurRadius: 30,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '社团资源',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: isDarkMode ? Colors.white54 : Colors.black38,
+                  ),
+                ],
+              ),
+            ),
+            if (resources.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.inventory_outlined,
+                        size: 48,
+                        color: isDarkMode ? Colors.white38 : Colors.black38,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '当前没有资源',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.white70 : Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '去添加一个',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white54 : Colors.black54,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          if (resources.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(32),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.inventory_outlined,
-                      size: 48,
-                      color: isDarkMode ? Colors.white38 : Colors.black38,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '当前没有资源',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white70 : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '去添加一个',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDarkMode ? Colors.white54 : Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            ...resources.map((resource) => _buildResourceItem(
-                  resource,
-                  context,
-                  isDarkMode,
-                )),
-        ],
+              )
+            else
+              ...resources.map((resource) => _buildResourceItem(
+                    resource,
+                    context,
+                    isDarkMode,
+                  )),
+          ],
+        ),
       ),
     );
   }
 
   // 资源项
   Widget _buildResourceItem(
-      Map resource, BuildContext context, bool isDarkMode) {
+      ResourceModel resource, BuildContext context, bool isDarkMode) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -619,7 +777,7 @@ class MemberPage extends StatelessWidget {
       ),
       child: ListTile(
         title: Text(
-          resource['name'],
+          resource.name,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -627,7 +785,7 @@ class MemberPage extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          resource['description'],
+          resource.description ?? '暂无描述',
           style: TextStyle(
             fontSize: 14,
             color: isDarkMode ? Colors.white70 : Colors.black54,
@@ -642,8 +800,8 @@ class MemberPage extends StatelessWidget {
           // 使用 PlatformDialog 显示跨平台对话框
           PlatformDialog.showConfirmDialog(
             context,
-            title: resource['name'],
-            content: resource['description'],
+            title: resource.name,
+            content: resource.description ?? '暂无描述',
             confirmText: '关闭',
           );
         },

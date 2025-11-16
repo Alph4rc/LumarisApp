@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/net/club_service.dart';
-import 'package:ios_club_app/models/member_model.dart';
+import 'package:ios_club_app/clubServices/member_query_service.dart';
+import 'package:ios_club_app/clubModels/member_model.dart';
+import 'package:ios_club_app/services/gzip_service.dart';
 import 'package:ios_club_app/widgets/club_app_bar.dart';
 import 'package:ios_club_app/widgets/club_card.dart';
+import 'dart:convert';
 
 class MemberDataPage extends StatefulWidget {
   const MemberDataPage({super.key});
@@ -32,13 +34,33 @@ class _MemberDataPageState extends State<MemberDataPage> {
       isLoading = true;
     });
 
-    final data = await ClubService.getMembersByPage(_pageNum, _pageSize);
+    try {
+      var result = await MemberQueryService.getMemberDataByPage(
+        pageNum: _pageNum,
+        pageSize: _pageSize,
+      );
 
-    setState(() {
-      _members = data.data;
-      _totalPages = data.totalPages;
-      isLoading = false;
-    });
+      if (result != null) {
+        // 移除首尾字符后再解压缩（模拟原来的 result[1..-1] 切片操作）
+        String trimmedResult = result.length > 2 ? result.substring(1, result.length - 1) : '';
+        result = await GzipService.decompress(trimmedResult);
+        // 解析数据
+        final jsonData = jsonDecode(result);
+        final data = MemberData.fromJson(jsonData);
+        
+        setState(() {
+          _members = data.data;
+          _totalPages = data.totalPages;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // 可以在这里添加错误处理
+      // print('Error loading members: $e');
+    }
   }
 
   @override

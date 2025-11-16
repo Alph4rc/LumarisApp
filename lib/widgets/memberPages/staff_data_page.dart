@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/net/club_service.dart';
-import 'package:ios_club_app/models/member_model.dart';
+import 'package:ios_club_app/clubServices/staff_service.dart';
+import 'package:ios_club_app/clubModels/member_model.dart';
 import 'package:ios_club_app/widgets/club_app_bar.dart';
 import 'package:ios_club_app/widgets/club_card.dart';
 
@@ -32,13 +32,35 @@ class _StaffDataPageState extends State<StaffDataPage> {
       isLoading = true;
     });
 
-    final data = await ClubService.getStaffsByPage(_pageNum, _pageSize);
+    try {
+      final result = await StaffService.getStaffMembers();
 
-    setState(() {
-      _members = data.data;
-      _totalPages = data.totalPages;
-      isLoading = false;
-    });
+      if (result != null) {
+        final members = result.toList();
+        setState(() {
+          _members = members;
+          _totalPages = (members.length / _pageSize).ceil();
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // 可以在这里添加错误处理
+      // print('Error loading staff members: $e');
+    }
+  }
+
+  List<MemberModel> _getCurrentPageMembers() {
+    if (_members.isEmpty) return [];
+    
+    final start = (_pageNum - 1) * _pageSize;
+    final end = start + _pageSize;
+    
+    if (start >= _members.length) return [];
+    
+    return _members.sublist(start, end > _members.length ? _members.length : end);
   }
 
   @override
@@ -62,10 +84,10 @@ class _StaffDataPageState extends State<StaffDataPage> {
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final member = _members[index];
+                    final member = _getCurrentPageMembers()[index];
                     return buildMemberCard(member);
                   },
-                  childCount: _members.length,
+                  childCount: _getCurrentPageMembers().length,
                 ),
               ),
             ),
@@ -290,7 +312,6 @@ class _StaffDataPageState extends State<StaffDataPage> {
                       setState(() {
                         _pageNum--;
                       });
-                      _getMembers();
                     }
                   : null,
               child: SizedBox(
@@ -326,7 +347,6 @@ class _StaffDataPageState extends State<StaffDataPage> {
                       setState(() {
                         _pageNum++;
                       });
-                      _getMembers();
                     }
                   : null,
               child: Container(
@@ -428,7 +448,13 @@ class _StaffDataPageState extends State<StaffDataPage> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // 重置到第一页
+                        setState(() {
+                          _pageNum = 1;
+                        });
+                      },
                       child: Text(
                         '完成',
                         style: TextStyle(
@@ -452,9 +478,9 @@ class _StaffDataPageState extends State<StaffDataPage> {
                     final options = [10, 20, 50];
                     setState(() {
                       _pageSize = options[index];
-                      _pageNum = 1;
+                      _totalPages = (_members.length / _pageSize).ceil();
+                      _pageNum = 1; // 重置到第一页
                     });
-                    _getMembers();
                   },
                   childDelegate: ListWheelChildBuilderDelegate(
                     childCount: 3,
