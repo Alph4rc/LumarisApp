@@ -239,31 +239,31 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                         horizontal: 16, vertical: 8),
                     child: Column(
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.add,
-                              size: 20,
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.5)
-                                  : CupertinoColors.tertiaryLabel,
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                '添加自定义课程',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.arrow_forward_ios),
-                              onPressed: () {
-                                Get.toNamed('/add_course');
-                              },
-                            ),
-                          ],
-                        ),
-                        Divider(),
+                        // Row(
+                        //   children: [
+                        //     Icon(
+                        //       CupertinoIcons.add,
+                        //       size: 20,
+                        //       color: isDark
+                        //           ? Colors.white.withValues(alpha: 0.5)
+                        //           : CupertinoColors.tertiaryLabel,
+                        //     ),
+                        //     const SizedBox(width: 12),
+                        //     const Expanded(
+                        //       child: Text(
+                        //         '添加自定义课程',
+                        //         style: TextStyle(fontSize: 16),
+                        //       ),
+                        //     ),
+                        //     IconButton(
+                        //       icon: Icon(Icons.arrow_forward_ios),
+                        //       onPressed: () {
+                        //         Get.toNamed('/add_course');
+                        //       },
+                        //     ),
+                        //   ],
+                        // ),
+                        // Divider(),
                         Row(
                           children: [
                             Icon(
