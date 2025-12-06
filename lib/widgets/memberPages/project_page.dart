@@ -90,8 +90,8 @@ class _ProjectPageState extends State<ProjectPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CupertinoColors.systemBlue.withOpacity(0.05),
-                    CupertinoColors.systemBlue.withOpacity(0.02),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.05),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.02)
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -282,7 +282,7 @@ class _ProjectPageState extends State<ProjectPage> {
   Widget _buildDivider() {
     return Container(
       height: 0.5,
-      color: CupertinoColors.separator.withOpacity(0.3),
+      color: CupertinoColors.separator.withValues(alpha: 0.3)
     );
   }
 

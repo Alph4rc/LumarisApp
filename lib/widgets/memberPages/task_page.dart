@@ -121,8 +121,8 @@ class _TaskPageState extends State<TaskPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CupertinoColors.systemBlue.withOpacity(0.05),
-                    CupertinoColors.systemBlue.withOpacity(0.02),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.05),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.02),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -306,8 +306,8 @@ class _TaskPageState extends State<TaskPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: isFinished
-                  ? CupertinoColors.systemGreen.withOpacity(0.2)
-                  : CupertinoColors.systemOrange.withOpacity(0.2),
+                  ? CupertinoColors.systemGreen.withValues(alpha: 0.2)
+                  : CupertinoColors.systemOrange.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -364,7 +364,7 @@ class _TaskPageState extends State<TaskPage> {
   Widget _buildDivider() {
     return Container(
       height: 0.5,
-      color: CupertinoColors.separator.withOpacity(0.3),
+      color: CupertinoColors.separator.withValues(alpha: 0.3),
     );
   }
 

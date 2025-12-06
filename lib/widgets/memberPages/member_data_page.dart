@@ -115,8 +115,8 @@ class _MemberDataPageState extends State<MemberDataPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CupertinoColors.systemBlue.withOpacity(0.05),
-                    CupertinoColors.systemBlue.withOpacity(0.02),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.05),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.02)
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -170,7 +170,7 @@ class _MemberDataPageState extends State<MemberDataPage> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: CupertinoColors.systemBlue.withOpacity(0.1),
+                            color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -293,7 +293,7 @@ class _MemberDataPageState extends State<MemberDataPage> {
   Widget _buildDivider() {
     return Container(
       height: 0.5,
-      color: CupertinoColors.separator.withOpacity(0.3),
+      color: CupertinoColors.separator.withValues(alpha: 0.3)
     );
   }
 

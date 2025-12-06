@@ -160,7 +160,12 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                                 if (await canLaunchUrl(uri)) {
                                   await launchUrl(uri);
                                 } else {
-                                  throw '无法打开日历应用';
+                                  if (context.mounted) {
+                                    showClubSnackBar(
+                                      context,
+                                      Text('无法打开日历应用'),
+                                    );
+                                  }
                                 }
                               },
                             ),
@@ -197,10 +202,12 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                           onPressed: () {
                             Clipboard.setData(
                                 ClipboardData(text: 'webcal$url'));
-                            showClubSnackBar(
-                              context,
-                              Text('复制成功!'),
-                            );
+                            if (context.mounted) {
+                              showClubSnackBar(
+                                context,
+                                Text('复制成功!'),
+                              );
+                            }
                           },
                         ),
                       ),

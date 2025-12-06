@@ -54,13 +54,14 @@ class _StaffDataPageState extends State<StaffDataPage> {
 
   List<MemberModel> _getCurrentPageMembers() {
     if (_members.isEmpty) return [];
-    
+
     final start = (_pageNum - 1) * _pageSize;
     final end = start + _pageSize;
-    
+
     if (start >= _members.length) return [];
-    
-    return _members.sublist(start, end > _members.length ? _members.length : end);
+
+    return _members.sublist(
+        start, end > _members.length ? _members.length : end);
   }
 
   @override
@@ -115,8 +116,8 @@ class _StaffDataPageState extends State<StaffDataPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CupertinoColors.systemBlue.withOpacity(0.05),
-                    CupertinoColors.systemBlue.withOpacity(0.02),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.05),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.02)
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -170,7 +171,8 @@ class _StaffDataPageState extends State<StaffDataPage> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: CupertinoColors.systemBlue.withOpacity(0.1),
+                            color: CupertinoColors.systemBlue
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -292,9 +294,7 @@ class _StaffDataPageState extends State<StaffDataPage> {
 
   Widget _buildDivider() {
     return Container(
-      height: 0.5,
-      color: CupertinoColors.separator.withOpacity(0.3),
-    );
+        height: 0.5, color: CupertinoColors.separator.withValues(alpha: 0.3));
   }
 
   Widget _buildPaginationWidget() {

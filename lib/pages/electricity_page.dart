@@ -85,7 +85,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: CupertinoColors.systemBlue.withOpacity(0.1),
+                    color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Hero(
@@ -237,7 +237,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
               enabled: false,
               touchTooltipData: BarTouchTooltipData(
                 getTooltipColor: (group) =>
-                    CupertinoColors.systemBlue.withOpacity(0.8),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.8),
                 tooltipPadding:
                 EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
@@ -289,7 +289,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                       toY: electricData.value,
                       gradient: LinearGradient(
                         colors: [
-                          CupertinoColors.systemBlue.withOpacity(0.3),
+                          CupertinoColors.systemBlue.withValues(alpha: 0.3),
                           CupertinoColors.systemBlue,
                         ],
                         begin: Alignment.bottomCenter,
