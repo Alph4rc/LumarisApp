@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/stores/settings_store.dart';
+import 'package:ios_club_app/state/settings_store.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({

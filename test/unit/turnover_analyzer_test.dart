@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/services/payment_analyzer.dart';
+import 'package:ios_club_app/core/services/payment_analyzer.dart';
 
 void main() {
   group('PaymentModel', () {

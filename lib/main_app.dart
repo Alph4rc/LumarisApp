@@ -5,19 +5,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/router.dart';
-import 'package:ios_club_app/system_services/android/download_service.dart';
-import 'package:ios_club_app/stores/prefs_keys.dart';
-import 'package:ios_club_app/utils/performance_monitor.dart';
+import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/platform/android/download_service.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ios_club_app/stores/settings_store.dart';
+import 'package:ios_club_app/state/settings_store.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'bottom_navigation.dart';
 import 'modern_sidebar.dart';
-import 'macOS/macos_ui_sidebar.dart';
-import 'net/git_service.dart';
-import 'system_services/check_update_manager.dart';
+import 'platform/macos/macos_ui_sidebar.dart';
+import 'core/services/git_service.dart';
+import 'features/system/check_update_manager.dart';
 import 'under_maintenance_screen.dart';
 
 class MainApp extends StatefulWidget {

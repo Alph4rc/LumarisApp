@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/widgets/empty_widget.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 void main() {
   group('EmptyWidget', () {

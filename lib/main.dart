@@ -4,12 +4,12 @@ import 'package:display_mode/display_mode.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ios_club_app/system_services/android/background_service.dart';
-import 'package:ios_club_app/stores/init.dart';
-import 'package:ios_club_app/system_services/check_update_manager.dart';
-import 'package:ios_club_app/system_services/ios/background_service.dart';
-import 'package:ios_club_app/utils/performance_monitor.dart';
-import 'package:ios_club_app/utils/request_cache.dart';
+import 'package:ios_club_app/platform/android/background_service.dart';
+import 'package:ios_club_app/state/init.dart';
+import 'package:ios_club_app/features/system/check_update_manager.dart';
+import 'package:ios_club_app/platform/ios/background_service.dart';
+import 'package:ios_club_app/core/utils/performance_monitor.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -17,7 +17,7 @@ import 'package:window_manager/window_manager.dart';
 import 'dart:io';
 
 import 'main_app.dart';
-import 'package:ios_club_app/stores/settings_store.dart';
+import 'package:ios_club_app/state/settings_store.dart';
 
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding

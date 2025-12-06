@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/net/xauat_login.dart';
+import 'package:ios_club_app/core/services/xauat_login.dart';
 
 void main() {
   group('XAUATLogin', () {

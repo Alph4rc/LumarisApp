@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/stores/course_store.dart';
+import 'package:ios_club_app/state/course_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

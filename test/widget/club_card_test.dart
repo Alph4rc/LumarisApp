@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/widgets/club_card.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
 
 void main() {
   group('ClubCard', () {
