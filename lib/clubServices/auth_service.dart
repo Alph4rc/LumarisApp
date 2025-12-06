@@ -16,7 +16,7 @@ class AuthService {
       };
 
       final response = await http.post(
-        Uri.parse('http://api.xauat.site/Auth/login?clientId=$clientId&scope=$scope'),
+        Uri.parse('https://api.xauat.site/Auth/login'),
         headers: finalHeaders,
         body: jsonEncode({
           'userId': userId,
@@ -61,7 +61,7 @@ class AuthService {
   /// 用户登出
   static Future<bool> logout(String userId, {String clientId = ''}) async {
     try {
-      final response = await ApiClient.post('/Auth/logout?userId=$userId&clientId=$clientId');
+      final response = await ApiClient.post('/Auth/logout?userId=$userId');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }

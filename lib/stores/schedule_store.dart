@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/services/time_service.dart';
 import 'package:ios_club_app/stores/settings_store.dart';
 
-import '../net/edu_service.dart';
+import 'package:ios_club_app/eduServices/edu_service.dart';
 
 class ScheduleStore extends GetxController {
   static ScheduleStore get to => Get.find();

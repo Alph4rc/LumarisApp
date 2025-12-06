@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/models/user_data.dart';
 import 'package:ios_club_app/services/data_service.dart';
-import 'package:ios_club_app/net/edu_service.dart';
+import 'package:ios_club_app/eduServices/edu_service.dart';
 import 'package:ios_club_app/widgets/club_card.dart';
 import 'package:ios_club_app/widgets/show_club_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ios_club_app/models/bus_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ios_club_app/net/edu_service.dart';
+import 'package:ios_club_app/eduServices/edu_service.dart';
 import 'package:ios_club_app/net/new_bus_api.dart';
 import 'package:ios_club_app/stores/prefs_keys.dart';
 

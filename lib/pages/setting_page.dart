@@ -7,7 +7,7 @@ import 'package:ios_club_app/stores/settings_store.dart';
 import 'package:ios_club_app/widgets/club_modal_bottom_sheet.dart';
 import 'package:android_intent_plus/android_intent.dart';
 
-import 'package:ios_club_app/net/edu_service.dart';
+import 'package:ios_club_app/eduServices/edu_service.dart';
 import 'package:ios_club_app/stores/user_store.dart';
 import 'package:ios_club_app/widgets/club_app_bar.dart';
 import 'package:ios_club_app/widgets/club_card.dart';

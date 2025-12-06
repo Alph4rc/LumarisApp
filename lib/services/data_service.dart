@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:ios_club_app/net/edu_service.dart';
+import 'package:ios_club_app/eduServices/edu_service.dart';
 import 'package:ios_club_app/models/info_model.dart';
 import 'package:ios_club_app/models/score_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
