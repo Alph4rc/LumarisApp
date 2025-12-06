@@ -15,26 +15,26 @@ class TilesWidget extends StatelessWidget {
         future: TileService.getTiles(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return SizedBox();
+            return const SizedBox();
           }
 
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             return Column(
               children: [
-                Padding(
-                    padding: const EdgeInsets.all(16.0),
+                const Padding(
+                    padding: EdgeInsets.all(16.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         '快捷功能',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     )),
                 Padding(
-                  padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                   child: GridView.custom(
                     gridDelegate: SliverQuiltedGridDelegate(
                       crossAxisCount: 2,
@@ -63,7 +63,7 @@ class TilesWidget extends StatelessWidget {
             );
           }
 
-          return SizedBox();
+          return const SizedBox();
         });
   }
 }

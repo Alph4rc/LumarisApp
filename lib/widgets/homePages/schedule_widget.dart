@@ -81,18 +81,18 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Obx(() => Text(
                   '${scheduleStore.showTomorrow ? '明' : '今'}日课表',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 )),
             IconButton(
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   showDialog(
                       context: context,
@@ -133,7 +133,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           ]),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
           child: ClubCard(
             child: Obx(() {
               // 使用 Obx 监听 ScheduleStore 中的变化
@@ -143,7 +143,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
 
               return tempScheduleItems.isEmpty
                   ? Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: EmptyWidget(
                           title:
                               '${scheduleStore.showTomorrow ? '明' : '今'}天没有课了',
@@ -231,10 +231,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.access_time,
                           size: 18,
-                          color: Colors.grey[600],
+                          color: Colors.grey,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -251,10 +251,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                     ),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.location_on,
                           size: 18,
-                          color: Colors.grey[600],
+                          color: Colors.grey,
                         ),
                         const SizedBox(width: 6),
                         Text(item.location,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import '../net/network_exception.dart';
 import 'edu_http_client.dart';
 
@@ -12,7 +13,8 @@ class ScoreApi {
         '/Score/Semester',
         queryParameters: {'studentId': studentId},
       );
-      return response.toString();
+      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
+      return response is Map || response is List ? jsonEncode(response) : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -29,7 +31,8 @@ class ScoreApi {
           'semester': semester,
         },
       );
-      return response.toString();
+      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
+      return response is Map || response is List ? jsonEncode(response) : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -42,7 +45,8 @@ class ScoreApi {
       final response = await _client.get(
         '/Score/ThisSemester',
       );
-      return response.toString();
+      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
+      return response is Map || response is List ? jsonEncode(response) : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import '../net/network_exception.dart';
 import 'edu_http_client.dart';
 
@@ -11,7 +12,8 @@ class BusApi {
       final response = await _client.get(
         '/Bus/${dayDate ?? ''}',
       );
-      return response.toString();
+      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
+      return response is Map || response is List ? jsonEncode(response) : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -23,9 +25,10 @@ class BusApi {
     try {
       final response = await _client.get(
         '/Bus/NewData/$time',
-        queryParameters: {'loc': loc},
+        queryParameters: {'loc': loc}, 
       );
-      return response.toString();
+      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
+      return response is Map || response is List ? jsonEncode(response) : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -39,7 +42,8 @@ class BusApi {
         '/Bus/OldData/$time',
         queryParameters: {'isShow': isShow},
       );
-      return response.toString();
+      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
+      return response is Map || response is List ? jsonEncode(response) : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;

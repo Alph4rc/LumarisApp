@@ -117,7 +117,7 @@ class _TodoWidgetState extends State<TodoWidget> {
                 final todos = snapshot.data!;
                 return ClubCard(
                     child: todos.isEmpty
-                        ? Padding(
+                        ? const Padding(
                             padding: EdgeInsets.all(16.0),
                             child: EmptyWidget(
                               title: '当前没有待办事务',
@@ -264,7 +264,7 @@ class _TodoWidgetState extends State<TodoWidget> {
     deadlineController.text = todo?.deadline ?? '';
 
     // 由于 PlatformDialog.showInputDialog 只返回字符串，我们需要使用自定义对话框
-    return showDialog<TodoItem?>(
+    final result = await showDialog<TodoItem?>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -359,5 +359,11 @@ class _TodoWidgetState extends State<TodoWidget> {
         );
       },
     );
+    
+    // 释放控制器资源
+    titleController.dispose();
+    deadlineController.dispose();
+    
+    return result;
   }
 }

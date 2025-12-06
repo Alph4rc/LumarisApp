@@ -62,7 +62,7 @@ class _ExamCardState extends State<ExamCard> {
               children: [
                 Text(
                   '近期考试',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -82,6 +82,7 @@ class _ExamCardState extends State<ExamCard> {
             examCard()
           ],
         ));
+    
   }
 
   Widget examWrap(ExamData exam) {
@@ -156,24 +157,22 @@ class _ExamCardState extends State<ExamCard> {
 
   Widget examCard() {
     if (isLoading) {
-      return ClubCard(
-        padding: const EdgeInsets.all(24),
+      return const ClubCard(
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               '正在加载考试信息...',
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white70
-                    : Colors.black87,
+                color: Colors.black87,
               ),
             ),
           ],
@@ -186,8 +185,8 @@ class _ExamCardState extends State<ExamCard> {
     final isTablet = screenWidth > 600;
 
     return examItems.isEmpty
-        ? ClubCard(
-            padding: const EdgeInsets.all(20),
+        ? const ClubCard(
+            padding: EdgeInsets.all(20),
             child: EmptyWidget(
               title: '最近没有考试',
               subtitle: '说不定刷新一下就有了',

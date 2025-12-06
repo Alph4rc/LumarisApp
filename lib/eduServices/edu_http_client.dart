@@ -35,7 +35,7 @@ class EduHttpClient {
         handler.next(options);
       },
       onError: (DioException e, handler) async {
-        if (e.response?.statusCode == 401) {
+        if (e.response?.statusCode != 200) {
           // 认证失败，尝试重登录
           if (await _reLogin()) {
             // 重登录成功，重新发送请求
@@ -115,6 +115,7 @@ class EduHttpClient {
         queryParameters: queryParameters,
         options: options,
       );
+      // 如果response.data已经是Map或List，直接返回，否则返回原始数据
       return response.data;
     } on DioException catch (e) {
       if (retryCount < _maxRetryCount) {
@@ -145,6 +146,7 @@ class EduHttpClient {
         queryParameters: queryParameters,
         options: options,
       );
+      // 如果response.data已经是Map或List，直接返回，否则返回原始数据
       return response.data;
     } on DioException catch (e) {
       if (retryCount < _maxRetryCount) {

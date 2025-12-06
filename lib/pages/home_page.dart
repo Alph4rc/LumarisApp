@@ -12,12 +12,12 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width - 250;
     final list = <Widget>[
-      ScheduleWidget(),
-      TilesWidget(),
+      const ScheduleWidget(),
+      const TilesWidget(),
       // 考试列表
-      ExamCard(),
+      const ExamCard(),
       // 待办事项
-      TodoWidget()
+      const TodoWidget()
     ];
     return Scaffold(
         body: SingleChildScrollView(
