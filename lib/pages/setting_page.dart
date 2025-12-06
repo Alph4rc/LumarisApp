@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/stores/settings_store.dart';
+import 'package:ios_club_app/utils/request_cache.dart';
 import 'package:ios_club_app/widgets/club_modal_bottom_sheet.dart';
 import 'package:android_intent_plus/android_intent.dart';
 
@@ -96,11 +97,12 @@ class SettingPage extends StatelessWidget {
                   _buildClubTile(context, isDark),
                 ]),
                 const SizedBox(height: 24),
-                // 关于我们
+                // 其他
                 _buildSectionTitle('其他', isDark),
                 const SizedBox(height: 12),
                 Obx(() {
                   return _buildSettingsGroup([
+                    _buildClearCacheTile(context, isDark),
                     if (userStore.isLogin) _buildLogoutTile(context, isDark),
                     if (userStore.isLoginMember)
                       _buildLogoutMemberTile(context, isDark),
@@ -647,6 +649,58 @@ class SettingPage extends StatelessWidget {
         _showWidgetInstructions(context, isDark);
       }
     }
+  }
+
+  Widget _buildClearCacheTile(BuildContext context, bool isDark) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () async {
+          final result = await PlatformDialog.showConfirmDialog(
+            context,
+            title: '确定清除缓存吗？',
+            content: '这将删除所有缓存的数据，下次打开应用需要重新加载数据',
+            confirmText: '清除缓存',
+            cancelText: '取消',
+          );
+          
+          if (result == true) {
+            showClubSnackBar(context, const Text('正在清除缓存...'));
+            await RequestCache.instance.clear();
+            if (context.mounted) {
+              showClubSnackBar(context, const Text('缓存清除成功'));
+            }
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.trash_fill,
+                size: 20,
+                color: CupertinoColors.systemRed,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  '清除缓存',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              Icon(
+                CupertinoIcons.chevron_right,
+                size: 18,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : CupertinoColors.tertiaryLabel,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _showWidgetInstructions(BuildContext context, bool isDark) {
