@@ -1,16 +1,58 @@
+/**
+ * 课程模型类
+ * 
+ * 用于表示课程的详细信息，包括课程名称、上课时间、地点、教师等。
+ * 是应用中核心的数据结构之一，用于课程表展示、查询和管理。
+ */
 class CourseModel {
+  /// 课程周次索引列表，例如：[1, 2, 3, 5, 6] 表示第1-3周和第5-6周上课
   List<int> weekIndexes = [];
+  
+  /// 授课教师列表
   List<String> teachers = [];
+  
+  /// 上课地点
   String room = '';
+  
+  /// 课程名称
   String courseName = '';
+  
+  /// 课程代码
   String courseCode = '';
+  
+  /// 星期几上课（0-6，0表示周一，6表示周日）
   int weekday = 0;
+  
+  /// 开始上课的节次（例如：1表示第1节课）
   int startUnit = 0;
+  
+  /// 结束上课的节次（例如：2表示第2节课结束）
   int endUnit = 0;
+  
+  /// 课程学分
   String credits = '';
+  
+  /// 课程ID
   String lessonId = '';
+  
+  /// 上课校区
   String campus = '';
 
+  /**
+   * 创建一个新的课程实例
+   * 
+   * @param weekIndexes 课程周次索引列表
+   * @param teachers 授课教师列表
+   * @param room 上课地点
+   * @param courseName 课程名称
+   * @param courseCode 课程代码
+   * @param weekday 星期几上课（0-6）
+   * @param startUnit 开始上课的节次
+   * @param endUnit 结束上课的节次
+   * @param credits 课程学分
+   * @param lessonId 课程ID
+   * @param campus 上课校区
+   */
   CourseModel({
     List<int>? weekIndexes,
     List<String>? teachers,
@@ -37,7 +79,12 @@ class CourseModel {
     this.campus = campus ?? '';
   }
 
-  // 如果需要从 JSON 创建对象
+  /**
+   * 从JSON数据创建课程实例
+   * 
+   * @param json JSON格式的课程数据
+   * @return 课程实例
+   */
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
       weekIndexes: List<int>.from(json['weekIndexes'] ?? []),
@@ -54,6 +101,14 @@ class CourseModel {
     );
   }
 
+  /**
+   * 格式化周次范围
+   * 
+   * 将周次列表转换为易读的范围字符串，例如：[1, 2, 3, 5, 6] 转换为 "1-3,5-6"
+   * 
+   * @param weeks 周次列表
+   * @return 格式化后的周次范围字符串
+   */
   static String formatWeekRanges(List<int> weeks) {
     if (weeks.isEmpty) return '';
     if (weeks.length == 1) return weeks.first.toString();

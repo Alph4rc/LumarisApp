@@ -6,8 +6,21 @@ import 'package:ios_club_app/stores/prefs_keys.dart';
 import 'package:ios_club_app/clubServices/api_client.dart';
 import 'package:ios_club_app/clubModels/student_model.dart';
 
+/// 认证服务类
+/// 
+/// 负责处理用户的登录、注册、登出、密码重置等认证相关功能。
+/// 与后端API交互，处理认证流程和用户凭据管理。
 class AuthService {
   /// 用户登录
+  /// 
+  /// 向服务器发送登录请求，验证用户凭据并获取JWT令牌。
+  /// 如果登录成功，将JWT令牌保存到本地存储。
+  /// 
+  /// @param userId 用户ID（通常是学号）
+  /// @param password 用户密码
+  /// @param clientId 客户端ID（可选，用于OAuth2认证）
+  /// @param scope 权限范围（可选，用于OAuth2认证）
+  /// @return 登录成功返回JWT令牌，失败返回null
   static Future<String?> login(String userId, String password, {String clientId = '', String scope = ''}) async {
     try {
       final Map<String, String> finalHeaders = {
@@ -44,6 +57,11 @@ class AuthService {
   }
 
   /// 用户注册
+  /// 
+  /// 向服务器发送注册请求，创建新用户账户。
+  /// 
+  /// @param studentData 学生数据模型，包含注册所需的用户信息
+  /// @return 注册成功返回true，失败返回false
   static Future<bool> signup(StudentModel studentData) async {
     try {
       final response = await ApiClient.post('/Auth/signup', body: studentData.toJson());
@@ -59,6 +77,12 @@ class AuthService {
   }
 
   /// 用户登出
+  /// 
+  /// 向服务器发送登出请求，清除用户的认证状态。
+  /// 
+  /// @param userId 用户ID
+  /// @param clientId 客户端ID（可选）
+  /// @return 登出成功返回true，失败返回false
   static Future<bool> logout(String userId, {String clientId = ''}) async {
     try {
       final response = await ApiClient.post('/Auth/logout?userId=$userId');
@@ -74,6 +98,11 @@ class AuthService {
   }
 
   /// 验证用户
+  /// 
+  /// 向服务器发送请求，验证用户是否存在或是否有效。
+  /// 
+  /// @param userId 用户ID
+  /// @return 验证成功返回true，失败返回false
   static Future<bool> validate(String userId) async {
     try {
       final response = await ApiClient.get('/Auth/validate?userId=$userId');
@@ -89,6 +118,13 @@ class AuthService {
   }
 
   /// 更改密码
+  /// 
+  /// 向服务器发送请求，更改用户密码。
+  /// 
+  /// @param userId 用户ID
+  /// @param oldPassword 旧密码
+  /// @param newPassword 新密码
+  /// @return 密码更改成功返回true，失败返回false
   static Future<bool> changePassword(String userId, String oldPassword, String newPassword) async {
     try {
       final response = await ApiClient.put(
@@ -105,6 +141,12 @@ class AuthService {
   }
 
   /// 请求密码重置
+  /// 
+  /// 向服务器发送请求，请求重置用户密码。
+  /// 通常会向用户注册的邮箱或手机发送验证码。
+  /// 
+  /// @param userId 用户ID
+  /// @return 请求成功返回true，失败返回false
   static Future<bool> requestPasswordReset(String userId) async {
     try {
       final response = await ApiClient.post('/Auth/request-password-reset?userId=$userId');
@@ -120,6 +162,14 @@ class AuthService {
   }
 
   /// 重置密码
+  /// 
+  /// 使用验证码重置用户密码。
+  /// 验证码通常通过请求密码重置时发送到用户的邮箱或手机。
+  /// 
+  /// @param userId 用户ID
+  /// @param code 验证码
+  /// @param newPassword 新密码
+  /// @return 密码重置成功返回true，失败返回false
   static Future<bool> resetPassword(String userId, String code, String newPassword) async {
     try {
       final response = await ApiClient.post(
