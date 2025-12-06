@@ -29,8 +29,8 @@ class ScoreModel {
       lessonName: json['lessonName'] ?? '',
       grade: json['grade'] ?? '',
       gpa: json['gpa'] ?? '',
-      gradeDetail: json['gradeDetail'] ?? 0,
-      credit: json['credit'] ?? 0,
+      gradeDetail: (json['gradeDetail'] ?? '').toString(),
+      credit: (json['credit'] ?? '').toString(),
       isMinor: json['isMinor'] ?? false,
     );
   }
