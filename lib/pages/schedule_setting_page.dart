@@ -386,7 +386,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         String filePath = result.files.single.path ?? result.files.single.name;
         settingsStore.setCustomBackgroundImage(filePath);
 
-        if (context.mounted) {
+        if (mounted) {
           showClubSnackBar(
             context,
             const Text('背景图片设置成功'),
@@ -394,7 +394,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         }
       }
     } catch (e) {
-      if (context.mounted) {
+      if (mounted) {
         showClubSnackBar(
           context,
           const Text('选择图片失败'),
@@ -455,12 +455,14 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                     ),
                     IconButton(
                       icon: const Icon(Icons.copy),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: httpsUrl));
-                        showClubSnackBar(
-                          context,
-                          const Text('链接已复制到剪贴板'),
-                        );
+                      onPressed: () async {
+                        await Clipboard.setData(ClipboardData(text: httpsUrl));
+                        if (context.mounted) {
+                          showClubSnackBar(
+                            context,
+                            const Text('链接已复制到剪贴板'),
+                          );
+                        }
                       },
                     ),
                   ],
