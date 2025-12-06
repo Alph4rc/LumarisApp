@@ -313,64 +313,112 @@ class EduService {
     final prefs = await SharedPreferences.getInstance();
     final String? jsonString = prefs.getString(PrefsKeys.ALL_SCORE_DATA);
     var now = DateTime.now().millisecondsSinceEpoch;
-
     final semesters = await DataService.getSemester();
-
-    final last = prefs.getInt(PrefsKeys.LAST_SCORE_TIME);
-    if (last != null && !isRefresh) {
-      if (now - prefs.getInt(PrefsKeys.LAST_SCORE_TIME)! < 1000 * 60 * 60) {
-        if (jsonString != null && jsonString.isNotEmpty) {
-          final List<ScoreList> list = [];
-          final Map<String, dynamic> jsonList = jsonDecode(jsonString);
-          jsonList.forEach((String key, value) {
-            final scoreList = jsonDecode(value);
-            list.add(ScoreList(
-              semester: semesters.firstWhere((x) => x.semester == key),
-              list: (scoreList as List)
-                  .map((e) => ScoreModel.fromJson(e))
-                  .toList(),
-            ));
-          });
-
-          return list;
-        }
-      }
-    }
+    final Map<String, dynamic> cachedScores = jsonString != null && jsonString.isNotEmpty 
+        ? jsonDecode(jsonString) 
+        : {};
 
     UserData? cookieData = await getUserData();
     if (cookieData == null) {
-      return [];
+      // 没有用户数据时，返回缓存数据（如果有）
+      return _buildScoreListFromCache(cachedScores, semesters);
     }
 
-    try {
-      final list = await DataService.getSemester();
-      final Map<String, String> json = {};
-      for (var item in list) {
-        final response = await EduApiClient.getScore(cookieData.studentId, item.semester);
-        json[item.semester] = response;
-      }
+    // 缓存检查和增量更新
+    final Map<String, String> updatedScores = {};
+    
+    // 获取每个学期的缓存时间戳
+    final String? scoreTimestampsString = prefs.getString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS');
+    final Map<String, int> scoreTimestamps = scoreTimestampsString != null 
+        ? Map<String, int>.from(jsonDecode(scoreTimestampsString)) 
+        : {};
+
+    // 确定需要更新的学期
+    final List<dynamic> semestersToUpdate = [];
+    
+    // 按学期排序，最新学期在前
+    final sortedSemesters = List.from(semesters);
+    sortedSemesters.sort((a, b) => b.semester.compareTo(a.semester));
+    
+    for (var semester in sortedSemesters) {
+      final lastUpdate = scoreTimestamps[semester.semester];
       
-      await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(json));
-
-      final List<ScoreList> scoreReturnList = [];
-      final Map<String, dynamic> jsonList = jsonDecode(jsonEncode(json));
-      jsonList.forEach((String key, value) {
-        final scoreList = jsonDecode(value);
-        scoreReturnList.add(ScoreList(
-          semester: semesters.firstWhere((x) => x.semester == key),
-          list: (scoreList as List).map((e) => ScoreModel.fromJson(e)).toList(),
-        ));
-      });
-
-      await prefs.setInt(PrefsKeys.LAST_SCORE_TIME, now);
-      return scoreReturnList;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching data: $e');
+      // 为不同学期设置不同的缓存过期时间
+      // 最新学期：1小时过期
+      // 其他学期：7天过期
+      final isLatestSemester = semester == sortedSemesters.first;
+      final expiryTime = isLatestSemester ? 1000 * 60 * 60 : 1000 * 60 * 60 * 24 * 7;
+      final isExpired = lastUpdate == null || now - lastUpdate > expiryTime;
+      
+      if (isRefresh || isExpired || !cachedScores.containsKey(semester.semester)) {
+        semestersToUpdate.add(semester);
       }
     }
 
-    return [];
+    // 只更新需要刷新的学期
+    if (semestersToUpdate.isNotEmpty) {
+      try {
+        for (var semester in semestersToUpdate) {
+          final response = await EduApiClient.getScore(cookieData.studentId, semester.semester);
+          updatedScores[semester.semester] = response;
+          // 更新时间戳
+          scoreTimestamps[semester.semester] = now;
+        }
+        
+        // 合并更新的数据到缓存
+        final Map<String, dynamic> mergedScores = Map.from(cachedScores);
+        mergedScores.addAll(updatedScores);
+        
+        // 保存更新后的数据和时间戳
+        await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(mergedScores));
+        await prefs.setString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS', jsonEncode(scoreTimestamps));
+        await prefs.setInt(PrefsKeys.LAST_SCORE_TIME, now);
+        
+        return _buildScoreListFromCache(mergedScores, semesters);
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error fetching data: $e');
+        }
+      }
+    }
+    
+    // 返回缓存数据
+    return _buildScoreListFromCache(cachedScores, semesters);
+  }
+
+  /// 从缓存数据构建成绩列表
+  ///
+  /// @param cachedScores 缓存的成绩数据
+  /// @param semesters 学期列表
+  /// @return List<ScoreList> 成绩列表
+  static List<ScoreList> _buildScoreListFromCache(
+      Map<String, dynamic> cachedScores, List<dynamic> semesters) {
+    final List<ScoreList> list = [];
+    cachedScores.forEach((String key, value) {
+      // 查找匹配的学期
+      final semesterMatch = semesters.firstWhere(
+        (x) => x.semester == key, 
+        orElse: () => null,
+      );
+      
+      // 如果找到了匹配的学期，使用它；否则创建一个临时的学期对象
+      final semester = semesterMatch ?? {
+        'semester': key,
+        'name': key,
+      };
+      
+      final scoreList = jsonDecode(value);
+      list.add(ScoreList(
+        semester: semester,
+        list: (scoreList as List)
+            .map((e) => ScoreModel.fromJson(e))
+            .toList(),
+      ));
+    });
+    
+    // 按学期顺序排序，最新学期在前
+    list.sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
+    return list;
   }
 
   /// 获取考试信息
