@@ -138,17 +138,23 @@ void requestPermissions() async {
 
   List<Permission> permissions = [
     Permission.notification,
+    Permission.backgroundRefresh,
+    Permission.storage,
+    Permission.requestInstallPackages,
   ];
 
-  // 只在非Web平台请求权限
-  if (!kIsWeb) {
-    permissions.addAll([
-      Permission.backgroundRefresh,
-      Permission.storage,
-      Permission.requestInstallPackages,
-    ]);
+  // 只请求尚未授予的权限
+  List<Permission> permissionsToRequest = [];
+  for (var permission in permissions) {
+    PermissionStatus status = await permission.status;
+    if (status != PermissionStatus.granted) {
+      permissionsToRequest.add(permission);
+    }
   }
-  await permissions.request();
+
+  if (permissionsToRequest.isNotEmpty) {
+    await permissionsToRequest.request();
+  }
 }
 
 class WindowPage extends StatefulWidget {
