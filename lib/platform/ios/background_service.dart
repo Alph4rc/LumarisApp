@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/features/system/task_executor.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 

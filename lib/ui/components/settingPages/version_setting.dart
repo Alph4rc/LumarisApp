@@ -10,7 +10,7 @@ import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import 'package:ios_club_app/features/system/check_update_manager.dart';
+import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 
 class VersionSetting extends StatefulWidget {
   const VersionSetting({super.key});

@@ -15,11 +15,17 @@ class CourseStore extends GetxController {
   /// 存储所有课程的响应式列表
   final _courses = <CourseModel>[].obs;
   
+  /// 存储自定义课程的响应式列表
+  final _customCourses = <CourseModel>[].obs;
+  
   /// 存储被忽略课程名称的响应式列表
   final _ignoreCourses = <String>[].obs;
 
   /// 获取所有课程的只读列表
   List<CourseModel> get courses => _courses.toList();
+  
+  /// 获取自定义课程的只读列表
+  List<CourseModel> get customCourses => _customCourses.toList();
   
   /// 获取被忽略课程的只读列表
   List<String> get ignoreCourses => _ignoreCourses.toList();
@@ -47,6 +53,33 @@ class CourseStore extends GetxController {
       } catch (e) {
         // 解析失败，清除数据
         await prefs.remove(PrefsKeys.COURSE_DATA);
+      }
+    }
+    
+    // 加载自定义课程
+    await loadCustomCourses();
+  }
+
+  /// 从本地存储加载自定义课程数据
+  /// 
+  /// 从SharedPreferences中读取自定义课程数据，解析为CourseModel列表并存储到响应式列表中。
+  /// 如果解析失败，会清除本地存储中的自定义课程数据。
+  Future<void> loadCustomCourses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
+    
+    if (jsonString != null) {
+      try {
+        final List<CourseModel> list = [];
+        var jsonList = jsonDecode(jsonString);
+        jsonList = jsonList["data"];
+        for (var json in jsonList) {
+          list.add(CourseModel.fromJson(json));
+        }
+        _customCourses.assignAll(list);
+      } catch (e) {
+        // 解析失败，清除数据
+        await prefs.remove(PrefsKeys.CUSTOM_COURSE_DATA);
       }
     }
   }
@@ -118,10 +151,55 @@ class CourseStore extends GetxController {
     }
   }
 
+  /// 添加自定义课程
+  /// 
+  /// 将自定义课程添加到响应式列表并保存到本地存储。
+  /// 
+  /// @param course 要添加的自定义课程
+  Future<void> addCustomCourse(CourseModel course) async {
+    _customCourses.add(course);
+    await _saveCustomCourses();
+  }
+
+  /// 删除自定义课程
+  /// 
+  /// 从响应式列表中移除自定义课程并保存到本地存储。
+  /// 
+  /// @param course 要删除的自定义课程
+  Future<void> deleteCustomCourse(CourseModel course) async {
+    _customCourses.remove(course);
+    await _saveCustomCourses();
+  }
+
+  /// 保存自定义课程到本地存储
+  /// 
+  /// 将当前自定义课程列表保存到SharedPreferences中。
+  Future<void> _saveCustomCourses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<Map<String, dynamic>> jsonList = _customCourses.map((course) {
+      return {
+        'weekIndexes': course.weekIndexes,
+        'teachers': course.teachers,
+        'room': course.room,
+        'courseName': course.courseName,
+        'courseCode': course.courseCode,
+        'weekday': course.weekday,
+        'startUnit': course.startUnit,
+        'endUnit': course.endUnit,
+        'credits': course.credits,
+        'lessonId': course.lessonId,
+        'campus': course.campus,
+      };
+    }).toList();
+    
+    await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, jsonEncode({'data': jsonList}));
+  }
+
   /// 清空所有课程数据
   /// 
   /// 清空响应式列表中的所有课程数据，但不影响本地存储。
   void clearCourseData() {
     _courses.clear();
+    _customCourses.clear();
   }
 }

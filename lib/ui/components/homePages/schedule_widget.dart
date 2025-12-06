@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 
-import 'package:ios_club_app/features/system/notification_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import '../club_card.dart';
 import '../club_modal_bottom_sheet.dart';
 

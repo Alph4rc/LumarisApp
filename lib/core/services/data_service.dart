@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/models/info_model.dart';
 import 'package:ios_club_app/core/models/score_model.dart';
@@ -14,12 +15,13 @@ import 'package:ios_club_app/core/services/time_service.dart';
 /// 包括课程、成绩、学期、时间等数据的获取和管理，是应用数据层的核心组件。
 /// 封装了与本地存储和网络请求相关的复杂逻辑，提供简洁的API供上层调用。
 class DataService {
-  /// 获取所有课程数据
+  /// 获取所有课程数据（包括服务器课程和自定义课程）
   /// 
-  /// 从本地存储获取课程数据，如果数据超过一周未更新，则自动从服务器刷新。
+  /// 从本地存储获取课程数据和自定义课程数据，并合并返回。
+  /// 如果服务器课程数据超过一周未更新，则自动从服务器刷新。
   /// 
   /// @param isNeedIgnore 是否需要忽略某些课程，默认为true
-  /// @return 课程模型列表
+  /// @return 合并后的课程模型列表
   static Future<List<CourseModel>> getAllCourse(
       {bool isNeedIgnore = true}) async {
     List<String> ig = [];
@@ -36,18 +38,83 @@ class DataService {
       await EduService.getCourse(isRefresh: true);
     }
     
-    final String? jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
-    final List<CourseModel> list = [];
-    if (jsonString != null) {
-      var jsonList = jsonDecode(jsonString);
-      jsonList = jsonList["data"];
-      for (var json in jsonList) {
-        var a = CourseModel.fromJson(json);
-        if (ig.isNotEmpty && ig.any((x) => x == a.courseName)) continue;
-        list.add(a);
+    final List<CourseModel> allCourses = [];
+    
+    // 加载服务器课程
+    final String? serverJsonString = prefs.getString(PrefsKeys.COURSE_DATA);
+    if (serverJsonString != null) {
+      try {
+        var serverJsonList = jsonDecode(serverJsonString);
+        serverJsonList = serverJsonList["data"];
+        for (var json in serverJsonList) {
+          var course = CourseModel.fromJson(json);
+          if (ig.isEmpty || !ig.any((x) => x == course.courseName)) {
+            allCourses.add(course);
+          }
+        }
+      } catch (e) {
+        debugPrint('解析服务器课程数据失败: $e');
       }
     }
+    
+    // 加载自定义课程
+    final List<CourseModel> customCourses = await getCustomCourses();
+    for (var course in customCourses) {
+      if (ig.isEmpty || !ig.any((x) => x == course.courseName)) {
+        allCourses.add(course);
+      }
+    }
+    
+    return allCourses;
+  }
+
+  /// 获取所有自定义课程数据
+  /// 
+  /// 从本地存储获取自定义课程数据，返回课程模型列表。
+  /// 
+  /// @return 自定义课程模型列表
+  static Future<List<CourseModel>> getCustomCourses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
+    final List<CourseModel> list = [];
+    
+    if (jsonString != null) {
+      try {
+        var jsonList = jsonDecode(jsonString);
+        jsonList = jsonList["data"];
+        for (var json in jsonList) {
+          list.add(CourseModel.fromJson(json));
+        }
+      } catch (e) {
+        debugPrint('解析自定义课程数据失败: $e');
+      }
+    }
+    
     return list;
+  }
+
+  /// 保存自定义课程数据到本地存储
+  /// 
+  /// @param courses 要保存的自定义课程列表
+  static Future<void> saveCustomCourses(List<CourseModel> courses) async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<Map<String, dynamic>> jsonList = courses.map((course) {
+      return {
+        'weekIndexes': course.weekIndexes,
+        'teachers': course.teachers,
+        'room': course.room,
+        'courseName': course.courseName,
+        'courseCode': course.courseCode,
+        'weekday': course.weekday,
+        'startUnit': course.startUnit,
+        'endUnit': course.endUnit,
+        'credits': course.credits,
+        'lessonId': course.lessonId,
+        'campus': course.campus,
+      };
+    }).toList();
+    
+    await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, jsonEncode({'data': jsonList}));
   }
 
   /// 获取所有课程名称

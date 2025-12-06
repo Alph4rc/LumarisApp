@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/features/system/notification_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class RemindSetting extends StatefulWidget {

@@ -17,7 +17,7 @@ import 'bottom_navigation.dart';
 import 'modern_sidebar.dart';
 import 'platform/macos/macos_ui_sidebar.dart';
 import 'core/services/git_service.dart';
-import 'features/system/check_update_manager.dart';
+import 'features/system/update/check_update_manager.dart';
 import 'under_maintenance_screen.dart';
 
 class MainApp extends StatefulWidget {

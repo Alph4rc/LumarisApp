@@ -6,7 +6,7 @@ import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/features/system/notification_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

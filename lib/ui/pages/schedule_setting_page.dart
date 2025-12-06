@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:get/get.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
@@ -226,7 +227,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
                     child: Text(
-                      '课表显示设置',
+                      '课表管理',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -234,34 +235,64 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                     ),
                   ),
                   ClubCard(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      child: Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.grid,
-                            size: 20,
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.5)
-                                : CupertinoColors.tertiaryLabel,
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Text(
-                              '显示课表网格线',
-                              style: TextStyle(fontSize: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              CupertinoIcons.add,
+                              size: 20,
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.5)
+                                  : CupertinoColors.tertiaryLabel,
                             ),
-                          ),
-                          CupertinoSwitch(
-                            value: settingsStore.showCourseGrid,
-                            onChanged: (value) {
-                              setState(() {
-                                settingsStore.setShowCourseGrid(value);
-                              });
-                            },
-                          ),
-                        ],
-                      )),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                '添加自定义课程',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_forward_ios),
+                              onPressed: () {
+                                Get.toNamed('/add_course');
+                              },
+                            ),
+                          ],
+                        ),
+                        Divider(),
+                        Row(
+                          children: [
+                            Icon(
+                              CupertinoIcons.grid,
+                              size: 20,
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.5)
+                                  : CupertinoColors.tertiaryLabel,
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                '显示课表网格线',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            CupertinoSwitch(
+                              value: settingsStore.showCourseGrid,
+                              onChanged: (value) {
+                                setState(() {
+                                  settingsStore.setShowCourseGrid(value);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 24),
                 ],
               ),

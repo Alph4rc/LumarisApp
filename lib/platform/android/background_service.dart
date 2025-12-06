@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:ios_club_app/features/system/task_executor.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 
 /// 后台任务回调函数
 @pragma('vm:entry-point')

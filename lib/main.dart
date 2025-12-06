@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/state/init.dart';
-import 'package:ios_club_app/features/system/check_update_manager.dart';
+import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';

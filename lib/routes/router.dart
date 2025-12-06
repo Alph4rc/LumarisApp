@@ -18,6 +18,7 @@ import '../ui/pages/schedule_list_page.dart';
 import '../ui/pages/schedule_setting_page.dart';
 import '../ui/pages/school_bus_page.dart';
 import '../ui/pages/score_page.dart';
+import '../ui/pages/add_course_page.dart';
 
 /// 应用路由配置类
 /// 
@@ -64,6 +65,11 @@ class AppRouter {
         GetPage(
           name: '/ScheduleSetting',
           page: () => PageRenderTimeMonitor(pageName: '课表设置页面', child: const ScheduleSettingPage()),
+        ),
+        /// 添加课程页面
+        GetPage(
+          name: '/add_course',
+          page: () => PageRenderTimeMonitor(pageName: '添加课程页面', child: const AddCoursePage()),
         ),
         /// 校车页面
         GetPage(
