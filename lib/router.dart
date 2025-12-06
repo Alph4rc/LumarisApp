@@ -18,20 +18,16 @@ import 'pages/schedule_setting_page.dart';
 import 'pages/school_bus_page.dart';
 import 'pages/score_page.dart';
 
-/**
- * 应用路由配置类
- * 
- * 管理应用中所有页面的路由信息，使用GetX框架进行路由管理。
- * 包含所有页面的路由名称和对应的页面组件。
- */
+/// 应用路由配置类
+/// 
+/// 管理应用中所有页面的路由信息，使用GetX框架进行路由管理。
+/// 包含所有页面的路由名称和对应的页面组件。
 class AppRouter {
-  /**
-   * 获取所有页面路由配置
-   * 
-   * 返回一个包含所有页面路由信息的列表，每个路由包含名称和对应的页面组件。
-   * 
-   * @return 页面路由配置列表
-   */
+  /// 获取所有页面路由配置
+  /// 
+  /// 返回一个包含所有页面路由信息的列表，每个路由包含名称和对应的页面组件。
+  /// 
+  /// @return 页面路由配置列表
   static List<GetPage> get getPages => [
         /// 首页
         GetPage(
