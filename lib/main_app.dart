@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/router.dart';
 import 'package:ios_club_app/system_services/android/download_service.dart';
 import 'package:ios_club_app/stores/prefs_keys.dart';
+import 'package:ios_club_app/utils/performance_monitor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/stores/settings_store.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -167,36 +168,39 @@ class _MainAppState extends State<MainApp> {
     6: '/Payment',
   };
 
-  Widget _app(bool isTablet) => GetMaterialApp(
-      title: 'iOS Club App',
-      debugShowCheckedModeBanner: false,
-      defaultTransition: (kIsWeb)
-          ? Transition.fadeIn
-          : isTablet
+  Widget _app(bool isTablet) => PerformanceMonitorWidget(
+        child: GetMaterialApp(
+          title: 'iOS Club App',
+          debugShowCheckedModeBanner: false,
+          defaultTransition: (kIsWeb)
               ? Transition.fadeIn
-              : Transition.native,
-      theme: ThemeData(
-        fontFamily: SettingsStore.to.fontFamily.isEmpty
-            ? (!kIsWeb && Platform.isWindows ? '微软雅黑' : null)
-            : SettingsStore.to.fontFamily,
-      ),
-      darkTheme: ThemeData(
-        fontFamily: SettingsStore.to.fontFamily.isEmpty
-            ? (!kIsWeb && Platform.isWindows ? '微软雅黑' : null)
-            : SettingsStore.to.fontFamily,
-        brightness: Brightness.dark,
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          foregroundColor: Colors.white,
-          elevation: 0,
+              : isTablet
+                  ? Transition.fadeIn
+                  : Transition.native,
+          theme: ThemeData(
+            fontFamily: SettingsStore.to.fontFamily.isEmpty
+                ? (!kIsWeb && Platform.isWindows ? '微软雅黑' : null)
+                : SettingsStore.to.fontFamily,
+          ),
+          darkTheme: ThemeData(
+            fontFamily: SettingsStore.to.fontFamily.isEmpty
+                ? (!kIsWeb && Platform.isWindows ? '微软雅黑' : null)
+                : SettingsStore.to.fontFamily,
+            brightness: Brightness.dark,
+            appBarTheme: const AppBarTheme(
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+              foregroundColor: Colors.white,
+              elevation: 0,
+            ),
+          ),
+          getPages: AppRouter.getPages,
+          onUnknownRoute: (settings) {
+            return MaterialPageRoute(
+              builder: (context) => UnderMaintenanceScreen(),
+            );
+          },
         ),
-      ),
-      getPages: AppRouter.getPages,
-      onUnknownRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (context) => UnderMaintenanceScreen(),
-        );
-      });
+      );
 
   @override
   Widget build(BuildContext context) {

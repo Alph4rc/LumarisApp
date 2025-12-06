@@ -4,24 +4,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/models/link_model.dart';
 import 'package:ios_club_app/pageModels/course_color_manager.dart';
+import 'package:ios_club_app/widgets/optimized_image.dart';
 
 class IconUtil {
   static Future<Widget> getIconFont(LinkModel model) async {
     if (model.icon == null || model.icon!.isEmpty) {
-      return Image.network(
-        'https://${model.url.replaceAll("https://", "").replaceAll("http://", "").split('/').first}/favicon.ico',
-        width: 40,
-        height: 40,
-      );
-    }
+        return LazyLoadImage.network(
+          'https://${model.url.replaceAll("https://", "").replaceAll("http://", "").split('/').first}/favicon.ico',
+          width: 40,
+          height: 40,
+        );
+      }
 
-    if (model.icon!.startsWith('http')) {
-      return Image.network(
-        model.icon!,
-        width: 40,
-        height: 40,
-      );
-    }
+      if (model.icon!.startsWith('http')) {
+        return LazyLoadImage.network(
+          model.icon!,
+          width: 40,
+          height: 40,
+        );
+      }
     final dateList =
         await rootBundle.loadString('assets/iconfont/iconfont.json');
     var iconMap = jsonDecode(dateList);

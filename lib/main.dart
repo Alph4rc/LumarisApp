@@ -8,6 +8,8 @@ import 'package:ios_club_app/system_services/android/background_service.dart';
 import 'package:ios_club_app/stores/init.dart';
 import 'package:ios_club_app/system_services/check_update_manager.dart';
 import 'package:ios_club_app/system_services/ios/background_service.dart';
+import 'package:ios_club_app/utils/performance_monitor.dart';
+import 'package:ios_club_app/utils/request_cache.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -20,6 +22,12 @@ import 'package:ios_club_app/stores/settings_store.dart';
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 初始化性能监控
+  PerformanceMonitor().initialize();
+  
+  // 初始化请求缓存
+  await RequestCache().initialize();
 
   // 初始化Stores
   initStores();

@@ -8,6 +8,7 @@ import 'package:ios_club_app/models/user_data.dart';
 import 'package:ios_club_app/services/data_service.dart';
 import 'package:ios_club_app/eduServices/edu_service.dart';
 import 'package:ios_club_app/widgets/club_card.dart';
+import 'package:ios_club_app/widgets/optimized_image.dart';
 import 'package:ios_club_app/widgets/show_club_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -344,7 +345,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
+                LazyLoadImage.assets(
                   'assets/icon.webp',
                   width: 160,
                   height: 160,
@@ -548,10 +549,10 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 Row(
                   children: [
-                    const Image(
+                    LazyLoadImage.assets(
+                      'assets/icon.webp',
                       width: 48,
                       height: 48,
-                      image: AssetImage('assets/icon.webp'),
                     ),
                     const SizedBox(width: 8),
                     Column(

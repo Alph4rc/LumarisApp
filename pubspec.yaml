@@ -65,6 +65,8 @@ dev_dependencies:
   mockito: ^5.6.1
   build_runner: ^2.10.4
   flutter_launcher_icons: ^0.14.4
+  leak_tracker: ^11.0.1
+  leak_tracker_flutter_testing: ^3.0.10
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

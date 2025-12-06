@@ -7,6 +7,7 @@ import 'package:ios_club_app/pages/net_page.dart';
 import 'package:ios_club_app/pages/electricity_page.dart';
 import 'package:ios_club_app/pages/payment_page.dart';
 import 'package:ios_club_app/pages/program_page.dart';
+import 'package:ios_club_app/utils/performance_monitor.dart';
 
 import 'pages/setting_page.dart';
 import 'pages/home_page.dart';
@@ -32,84 +33,84 @@ class AppRouter {
         /// 首页
         GetPage(
           name: '/',
-          page: () => const HomePage(),
+          page: () => PageRenderTimeMonitor(pageName: '首页', child: const HomePage()),
         ),
         /// 课表页面
         GetPage(
           name: '/Schedule',
-          page: () => const ScheduleListPage(),
+          page: () => PageRenderTimeMonitor(pageName: '课表页面', child: const ScheduleListPage()),
         ),
         /// 成绩页面
         GetPage(
           name: '/Score',
-          page: () => const ScorePage(),
+          page: () => PageRenderTimeMonitor(pageName: '成绩页面', child: const ScorePage()),
         ),
         /// 个人中心页面
         GetPage(
           name: '/Profile',
-          page: () => const ProfilePage(),
+          page: () => PageRenderTimeMonitor(pageName: '个人中心页面', child: const ProfilePage()),
         ),
         /// 链接页面
         GetPage(
           name: '/Link',
-          page: () => const LinkPage(),
+          page: () => PageRenderTimeMonitor(pageName: '链接页面', child: const LinkPage()),
         ),
         /// 设置页面
         GetPage(
           name: '/About',
-          page: () => const SettingPage(),
+          page: () => PageRenderTimeMonitor(pageName: '设置页面', child: const SettingPage()),
         ),
         /// 课表设置页面
         GetPage(
           name: '/ScheduleSetting',
-          page: () => const ScheduleSettingPage(),
+          page: () => PageRenderTimeMonitor(pageName: '课表设置页面', child: const ScheduleSettingPage()),
         ),
         /// 校车页面
         GetPage(
           name: '/SchoolBus',
-          page: () => const SchoolBusPage(),
+          page: () => PageRenderTimeMonitor(pageName: '校车页面', child: const SchoolBusPage()),
         ),
         /// 成员页面
         GetPage(
           name: '/iMember',
-          page: () => const MemberPage(),
+          page: () => PageRenderTimeMonitor(pageName: '成员页面', child: const MemberPage()),
         ),
         /// 培养方案页面
         GetPage(
           name: '/Program',
-          page: () => const ProgramPage(),
+          page: () => PageRenderTimeMonitor(pageName: '培养方案页面', child: const ProgramPage()),
         ),
         /// 电费页面
         GetPage(
           name: '/Electricity',
-          page: () => const ElectricityPage(),
+          page: () => PageRenderTimeMonitor(pageName: '电费页面', child: const ElectricityPage()),
         ),
         /// 饭卡页面
         GetPage(
           name: '/Payment',
-          page: () => PaymentPage(),
+          page: () => PageRenderTimeMonitor(pageName: '饭卡页面', child: PaymentPage()),
         ),
         /// 网络页面
         GetPage(
           name: '/Net',
-          page: () => const NetPage(),
+          page: () => PageRenderTimeMonitor(pageName: '网络页面', child: const NetPage()),
         ),
         /// 帮助页面
-        GetPage(name: '/Helper', page: () => HelperPage()),
+        GetPage(name: '/Helper', page: () => PageRenderTimeMonitor(pageName: '帮助页面', child: HelperPage())),
         /// 彩蛋页面
         GetPage(
           name: '/Egg',
-          page: () => const EasterEggPage(),
+          page: () => PageRenderTimeMonitor(pageName: '彩蛋页面', child: const EasterEggPage()),
         ),
         /// 许可证页面
         GetPage(
           name: '/License',
-          page: () => const LicensePage(),
+          page: () => PageRenderTimeMonitor(pageName: '许可证页面', child: const LicensePage()),
         ),
         /// 作者页面
         GetPage(
           name: '/Author',
-          page: () => const AuthorPage(),
+          page: () => PageRenderTimeMonitor(pageName: '作者页面', child: const AuthorPage()),
         ),
       ];
 }

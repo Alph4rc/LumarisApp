@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../stores/prefs_keys.dart';
+import '../../utils/request_cache.dart';
 import '../net/network_exception.dart';
 import 'login_service.dart';
 
@@ -23,7 +25,10 @@ class EduHttpClient {
       contentType: 'application/json',
     );
     
-    // 添加拦截器
+    // 添加缓存拦截器
+    _dio.interceptors.add(CacheInterceptor());
+    
+    // 添加认证拦截器
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         // 自动添加认证cookie
@@ -89,6 +94,8 @@ class EduHttpClient {
         return false;
       }
       
+      // 注意：LoginService是一个类，需要实例化或使用静态方法
+      // 这里假设LoginService.login是一个静态方法
       final loginResult = await LoginService.login(username, password);
       
       if (loginResult['success'] == true) {
@@ -98,6 +105,7 @@ class EduHttpClient {
       
       return false;
     } catch (e) {
+      debugPrint('重登录失败: $e');
       return false;
     }
   }

@@ -24,8 +24,6 @@ class ScheduleWidget extends StatefulWidget {
 }
 
 class _ScheduleWidgetState extends State<ScheduleWidget> {
-  final List<ScheduleItem> scheduleItems = [];
-  final List<CourseModel> courses = [];
   late bool isRemind = false;
   late ScheduleStore scheduleStore;
 
@@ -39,37 +37,16 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
 
   Future<void> _initializeData() async {
     try {
-      courses.addAll(scheduleStore.getTodayCourses());
-
       if (!mounted) return;
 
       setState(() {
         // 使用SettingsStore中的isRemind值
         isRemind = SettingsStore.to.isRemind;
-        changeScheduleItems(courses);
       });
     } catch (e) {
       debugPrint('初始化失败: $e');
       // 可添加错误处理逻辑（如显示错误提示）
     }
-  }
-
-  void changeScheduleItems(List<CourseModel> a) {
-    final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
-
-    scheduleItems.clear();
-    scheduleItems.addAll(a.map((course) {
-      final time = TimeService.getStartAndEnd(course);
-      return ScheduleItem(
-        title: course.courseName,
-        time:
-            '第${course.startUnit}节 ~ 第${course.endUnit}节 | ${time.start}~${time.end}',
-        location: course.room,
-        teacher: course.teachers.join(','),
-        description:
-            '${course.weekIndexes.first}-${course.weekIndexes.last}周 每周${weekdayName[course.weekday]} 第${course.startUnit}节 ~ 第${course.endUnit}节',
-      );
-    }));
   }
 
   @override
@@ -81,7 +58,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Obx(() => Text(
@@ -133,25 +110,33 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           ]),
         ),
         Padding(
-          padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
           child: ClubCard(
             child: Obx(() {
               // 使用 Obx 监听 ScheduleStore 中的变化
               final todayCourses = scheduleStore.getTodayCourses();
-              // 创建临时列表而不是直接修改状态
-              final tempScheduleItems = _generateScheduleItems(todayCourses);
-
-              return tempScheduleItems.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(16.0),
+              
+              return todayCourses.isEmpty
+                  ? const Padding(
+                      padding: EdgeInsets.all(16.0),
                       child: EmptyWidget(
-                          title:
-                              '${scheduleStore.showTomorrow ? '明' : '今'}天没有课了',
+                          title: '今天没有课了',
                           icon: Icons.school,
                           subtitle: '好好休息会儿吧，学一天累死个人'))
                   : Column(
-                      children: tempScheduleItems
-                          .map((x) => _buildScheduleItem(x, isTablet))
+                      children: todayCourses
+                          .map((course) {
+                            final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
+                            final time = TimeService.getStartAndEnd(course);
+                            return ScheduleItem(
+                              title: course.courseName,
+                              time: '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
+                              location: course.room,
+                              teacher: course.teachers.join(','),
+                              description: '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
+                            );
+                          })
+                          .map((item) => _buildScheduleItem(item, isTablet))
                           .toList(),
                     );
             }),
@@ -161,25 +146,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     );
   }
 
-  List<ScheduleItem> _generateScheduleItems(List<CourseModel> courses) {
-    final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
-    final items = <ScheduleItem>[];
 
-    for (var course in courses) {
-      final time = TimeService.getStartAndEnd(course);
-
-      items.add(ScheduleItem(
-        title: course.courseName,
-        time:
-            '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
-        location: course.room,
-        teacher: course.teachers.join(','),
-        description:
-            '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
-      ));
-    }
-    return items;
-  }
 
   Widget _buildScheduleItem(ScheduleItem item, bool isTablet) {
     return Material(
