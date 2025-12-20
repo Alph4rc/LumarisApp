@@ -27,28 +27,52 @@ class CourseStore extends GetxController {
   /// 获取被忽略课程的响应式列表
   RxList<String> get ignoreCoursesList => _ignoreCourses;
 
+  /// 获取自定义课程列表
+  List<CourseModel> get customCourses =>
+      _courses.where((course) => course.isCustom).toList();
+
   /// 从本地存储加载所有课程数据
   ///
   /// 从SharedPreferences中读取课程数据，解析为CourseModel列表并存储到响应式列表中。
+  /// 同时加载自定义课程数据并合并到课程列表中。
   /// 如果解析失败，会清除本地存储中的课程数据。
   Future<void> loadCourses() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
+    final List<CourseModel> allCourses = [];
 
-    if (jsonString != null) {
+    // 加载系统课程数据
+    final String? systemJsonString = prefs.getString(PrefsKeys.COURSE_DATA);
+    if (systemJsonString != null) {
       try {
-        final List<CourseModel> list = [];
-        var jsonList = jsonDecode(jsonString);
+        var jsonList = jsonDecode(systemJsonString);
         jsonList = jsonList["data"];
         for (var json in jsonList) {
-          list.add(CourseModel.fromJson(json));
+          allCourses.add(CourseModel.fromJson(json));
         }
-        _courses.assignAll(list);
       } catch (e) {
         // 解析失败，清除数据
         await prefs.remove(PrefsKeys.COURSE_DATA);
       }
     }
+
+    // 加载自定义课程数据
+    final String? customJsonString = prefs.getString('custom_courses');
+    if (customJsonString != null) {
+      try {
+        final List<dynamic> jsonList = jsonDecode(customJsonString);
+        for (var json in jsonList) {
+          final course = CourseModel.fromJson(json);
+          if (course.isCustom) {
+            allCourses.add(course);
+          }
+        }
+      } catch (e) {
+        // 解析失败，清除自定义课程数据
+        await prefs.remove('custom_courses');
+      }
+    }
+
+    _courses.assignAll(allCourses);
   }
 
   /// 从本地存储加载被忽略的课程数据

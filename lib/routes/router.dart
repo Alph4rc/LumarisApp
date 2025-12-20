@@ -16,6 +16,7 @@ import '../ui/pages/member_page.dart';
 import '../ui/pages/profile_page.dart';
 import '../ui/pages/schedule_list_page.dart';
 import '../ui/pages/schedule_setting_page.dart';
+import '../ui/pages/custom_course_manage_page.dart';
 import '../ui/pages/school_bus_page.dart';
 import '../ui/pages/score_page.dart';
 
@@ -77,6 +78,13 @@ class AppRouter {
           name: '/ScheduleSetting',
           page: () => PageRenderTimeMonitor(
               pageName: '课表设置页面', child: const ScheduleSettingPage()),
+        ),
+
+        /// 自定义课程管理页面
+        GetPage(
+          name: '/CustomCourseManage',
+          page: () => PageRenderTimeMonitor(
+              pageName: '自定义课程管理页面', child: const CustomCourseManagePage()),
         ),
 
         /// 校车页面

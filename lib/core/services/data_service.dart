@@ -57,6 +57,22 @@ class DataService {
       }
     }
 
+    // 加载自定义课程
+    final String? customJsonString = prefs.getString('custom_courses');
+    if (customJsonString != null) {
+      try {
+        final List<dynamic> customJsonList = jsonDecode(customJsonString);
+        for (var json in customJsonList) {
+          final course = CourseModel.fromJson(json);
+          if (course.isCustom) {
+            allCourses.add(course);
+          }
+        }
+      } catch (e) {
+        debugPrint('解析自定义课程数据失败: $e');
+      }
+    }
+
     return allCourses;
   }
 

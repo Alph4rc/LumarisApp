@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
@@ -237,31 +238,31 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       children: [
-                        // Row(
-                        //   children: [
-                        //     Icon(
-                        //       CupertinoIcons.add,
-                        //       size: 20,
-                        //       color: isDark
-                        //           ? Colors.white.withValues(alpha: 0.5)
-                        //           : CupertinoColors.tertiaryLabel,
-                        //     ),
-                        //     const SizedBox(width: 12),
-                        //     const Expanded(
-                        //       child: Text(
-                        //         '添加自定义课程',
-                        //         style: TextStyle(fontSize: 16),
-                        //       ),
-                        //     ),
-                        //     IconButton(
-                        //       icon: Icon(Icons.arrow_forward_ios),
-                        //       onPressed: () {
-                        //         Get.toNamed('/add_course');
-                        //       },
-                        //     ),
-                        //   ],
-                        // ),
-                        // Divider(),
+                        Row(
+                          children: [
+                            Icon(
+                              CupertinoIcons.add,
+                              size: 20,
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.5)
+                                  : CupertinoColors.tertiaryLabel,
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                '自定义课程管理',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_forward_ios),
+                              onPressed: () {
+                                Get.toNamed('/CustomCourseManage');
+                              },
+                            ),
+                          ],
+                        ),
+                        Divider(),
                         Row(
                           children: [
                             Icon(

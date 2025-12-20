@@ -63,7 +63,6 @@ class ScheduleStore extends GetxController {
       await getRemindCourses();
       await _loadCourses();
       await _loadPreferences();
-
     } catch (e) {
       // 错误处理
       debugPrint('初始化课表数据出错: $e');
@@ -84,8 +83,11 @@ class ScheduleStore extends GetxController {
 
   Future<void> refreshCourseData() async {
     List<CourseModel> courses = [];
-    for (var item in _allCoursesRemind){
-      if (CourseStore.to.ignoreCoursesList.isNotEmpty && CourseStore.to.ignoreCoursesList.any((x) => x == item.courseName)) continue;
+    for (var item in _allCoursesRemind) {
+      if (CourseStore.to.ignoreCoursesList.isNotEmpty &&
+          CourseStore.to.ignoreCoursesList.any((x) => x == item.courseName)) {
+        continue;
+      }
       courses.add(item);
     }
     _allCourses.value = List.generate(_maxWeek.value + 1, (i) {
@@ -133,6 +135,7 @@ class ScheduleStore extends GetxController {
     try {
       await EduService.getCourse(isRefresh: true);
       await getRemindCourses();
+      await CourseStore.to.loadCourses(); // 更新自定义课程数据
       await _loadCourses();
     } finally {
       _isLoading.value = false;

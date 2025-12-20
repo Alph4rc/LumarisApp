@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' show Platform, File;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -15,6 +16,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/dashed_separator.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/pages/custom_course_manage_page.dart';
 
 class ScheduleListPage extends StatefulWidget {
   const ScheduleListPage({super.key});
@@ -489,7 +491,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         ),
       );
     }
-    
+
     return SizedBox(
       height: 50,
       child: Row(
@@ -756,10 +758,19 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             borderRadius: BorderRadius.circular(8),
             color: CourseColorManager.generateSoftColor(course.courseName),
           ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
+          child: GestureDetector(
             onTap: () async {
-              await _showModalBottomSheetFromList(courses);
+              await _showModalBottomSheet(course);
+            },
+            onLongPress: () async {
+              if (course.isCustom) {
+                _showCustomCourseMenu(course, context);
+              }
+            },
+            onSecondaryTap: () async {
+              if (course.isCustom) {
+                _showCustomCourseMenu(course, context);
+              }
             },
             child: Padding(
               padding: EdgeInsets.all(isTablet ? 8 : 4),
@@ -928,6 +939,128 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             ),
           ),
         ));
+  }
+
+  void _showCustomCourseMenu(CourseModel course, BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('编辑课程'),
+            onTap: () {
+              Navigator.of(context).pop();
+              showDialog(
+                context: context,
+                builder: (context) => AddEditCourseDialog(
+                  course: course,
+                  onSave: (updatedCourse) async {
+                    // 保存更新的课程
+                    await _saveUpdatedCustomCourse(updatedCourse);
+                    if (context.mounted) {
+                      showClubSnackBar(context, const Text('课程修改成功'));
+                    }
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: const Text('删除课程', style: TextStyle(color: Colors.red)),
+            onTap: () async {
+              Navigator.of(context).pop();
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('确认删除'),
+                  content: Text('确定要删除课程"${course.courseName}"吗？'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('取消'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('删除'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                await _deleteCustomCourse(course);
+                if (context.mounted) {
+                  showClubSnackBar(context, const Text('课程删除成功'));
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveUpdatedCustomCourse(CourseModel updatedCourse) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? jsonString = prefs.getString('custom_courses');
+
+    if (jsonString != null) {
+      try {
+        final List<dynamic> jsonList = jsonDecode(jsonString);
+        final customCourses = jsonList
+            .map((json) => CourseModel.fromJson(json))
+            .where((course) => course.isCustom)
+            .toList();
+
+        // 更新课程
+        final index = customCourses
+            .indexWhere((c) => c.lessonId == updatedCourse.lessonId);
+        if (index != -1) {
+          customCourses[index] = updatedCourse;
+        }
+
+        // 保存
+        final updatedJsonString =
+            jsonEncode(customCourses.map((course) => course.toJson()).toList());
+        await prefs.setString('custom_courses', updatedJsonString);
+
+        // 刷新课表
+        await scheduleStore.refreshCourses();
+      } catch (e) {
+        // 处理错误
+      }
+    }
+  }
+
+  Future<void> _deleteCustomCourse(CourseModel course) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? jsonString = prefs.getString('custom_courses');
+
+    if (jsonString != null) {
+      try {
+        final List<dynamic> jsonList = jsonDecode(jsonString);
+        final customCourses = jsonList
+            .map((json) => CourseModel.fromJson(json))
+            .where((course) => course.isCustom)
+            .toList();
+
+        // 删除课程
+        customCourses.removeWhere((c) => c.lessonId == course.lessonId);
+
+        // 保存
+        final updatedJsonString =
+            jsonEncode(customCourses.map((course) => course.toJson()).toList());
+        await prefs.setString('custom_courses', updatedJsonString);
+
+        // 刷新课表
+        await scheduleStore.refreshCourses();
+      } catch (e) {
+        // 处理错误
+      }
+    }
   }
 
   Widget _buildTimeCell(
