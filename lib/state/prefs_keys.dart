@@ -8,7 +8,6 @@ class PrefsKeys {
 
   /// 课程相关
   static const String COURSE_DATA = 'course_data';
-  static const String CUSTOM_COURSE_DATA = 'custom_course_data';
   static const String IGNORE_DATA = 'ignore_data';
   static const String COURSE_LAST_FETCH_TIME = 'course_last_fetch_time';
 
@@ -61,19 +60,19 @@ class PrefsKeys {
 
   /// 页面相关
   static const String PAGE_DATA = 'page_data';
-  
+
   /// 校车相关
   static const String USE_NEW_BUS_API = 'use_new_bus_api';
-  
+
   /// 触觉反馈相关
   static const String ENABLE_HAPTIC_FEEDBACK = 'enable_haptic_feedback';
-  
+
   /// 字体设置相关
   static const String FONT_FAMILY = 'font_family';
-  
+
   /// 课表网格线显示相关
   static const String SHOW_COURSE_GRID = 'show_course_grid';
-  
+
   /// 待办事项提醒相关
   static const String TODO_REMIND_ENABLED = 'todo_remind_enabled';
   static const String SCHEDULE_BACKGROUND = 'schedule_background';

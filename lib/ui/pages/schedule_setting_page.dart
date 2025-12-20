@@ -1,7 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:get/get.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
@@ -93,8 +92,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final isDesktop =
-        !kIsWeb && (Platform.isWindows || Platform.isLinux);
+    final isDesktop = !kIsWeb && (Platform.isWindows || Platform.isLinux);
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -235,8 +233,8 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                     ),
                   ),
                   ClubCard(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       children: [
                         // Row(
@@ -331,7 +329,8 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                               _buildBackgroundOption('自定义图片', 'custom'),
                               if (settingsStore.scheduleBackground == 'custom')
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 16),
                                   child: Row(
                                     children: [
                                       Expanded(

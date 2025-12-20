@@ -11,35 +11,35 @@ import 'package:ios_club_app/core/models/semester_model.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 
 /// 数据服务类，负责处理应用程序的各种数据操作
-/// 
+///
 /// 包括课程、成绩、学期、时间等数据的获取和管理，是应用数据层的核心组件。
 /// 封装了与本地存储和网络请求相关的复杂逻辑，提供简洁的API供上层调用。
 class DataService {
-  /// 获取所有课程数据（包括服务器课程和自定义课程）
-  /// 
-  /// 从本地存储获取课程数据和自定义课程数据，并合并返回。
-  /// 如果服务器课程数据超过一周未更新，则自动从服务器刷新。
-  /// 
+  /// 获取所有课程数据
+  ///
+  /// 从本地存储获取课程数据，如果超过一周未更新，则自动从服务器刷新。
+  ///
   /// @param isNeedIgnore 是否需要忽略某些课程，默认为true
-  /// @return 合并后的课程模型列表
+  /// @return 课程模型列表
   static Future<List<CourseModel>> getAllCourse(
       {bool isNeedIgnore = true}) async {
     List<String> ig = [];
     if (isNeedIgnore) {
       ig = await getIgnore();
     }
-    
+
     final prefs = await SharedPreferences.getInstance();
     // 检查课程数据最后一次刷新时间，如果是一周前则刷新数据
     final courseLastFetchTime = prefs.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME);
     final now = DateTime.now().millisecondsSinceEpoch;
-    if (courseLastFetchTime == null || now - courseLastFetchTime > 1000 * 60 * 60 * 24 * 7) {
+    if (courseLastFetchTime == null ||
+        now - courseLastFetchTime > 1000 * 60 * 60 * 24 * 7) {
       // 课程数据最后一次刷新时间是一周前，调用刷新接口
       await EduService.getCourse(isRefresh: true);
     }
-    
+
     final List<CourseModel> allCourses = [];
-    
+
     // 加载服务器课程
     final String? serverJsonString = prefs.getString(PrefsKeys.COURSE_DATA);
     if (serverJsonString != null) {
@@ -56,71 +56,14 @@ class DataService {
         debugPrint('解析服务器课程数据失败: $e');
       }
     }
-    
-    // 加载自定义课程
-    final List<CourseModel> customCourses = await getCustomCourses();
-    for (var course in customCourses) {
-      if (ig.isEmpty || !ig.any((x) => x == course.courseName)) {
-        allCourses.add(course);
-      }
-    }
-    
+
     return allCourses;
   }
 
-  /// 获取所有自定义课程数据
-  /// 
-  /// 从本地存储获取自定义课程数据，返回课程模型列表。
-  /// 
-  /// @return 自定义课程模型列表
-  static Future<List<CourseModel>> getCustomCourses() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
-    final List<CourseModel> list = [];
-    
-    if (jsonString != null) {
-      try {
-        var jsonList = jsonDecode(jsonString);
-        jsonList = jsonList["data"];
-        for (var json in jsonList) {
-          list.add(CourseModel.fromJson(json));
-        }
-      } catch (e) {
-        debugPrint('解析自定义课程数据失败: $e');
-      }
-    }
-    
-    return list;
-  }
-
-  /// 保存自定义课程数据到本地存储
-  /// 
-  /// @param courses 要保存的自定义课程列表
-  static Future<void> saveCustomCourses(List<CourseModel> courses) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> jsonList = courses.map((course) {
-      return {
-        'weekIndexes': course.weekIndexes,
-        'teachers': course.teachers,
-        'room': course.room,
-        'courseName': course.courseName,
-        'courseCode': course.courseCode,
-        'weekday': course.weekday,
-        'startUnit': course.startUnit,
-        'endUnit': course.endUnit,
-        'credits': course.credits,
-        'lessonId': course.lessonId,
-        'campus': course.campus,
-      };
-    }).toList();
-    
-    await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, jsonEncode({'data': jsonList}));
-  }
-
   /// 获取所有课程名称
-  /// 
+  ///
   /// 从本地存储获取所有课程的名称，去除重复项。
-  /// 
+  ///
   /// @return 不重复的课程名称列表
   static Future<List<String>> getCourseName() async {
     final prefs = await SharedPreferences.getInstance();
@@ -139,9 +82,9 @@ class DataService {
   }
 
   /// 设置需要忽略的课程列表
-  /// 
+  ///
   /// 将需要忽略的课程名称列表保存到本地存储。
-  /// 
+  ///
   /// @param list 需要忽略的课程名称列表
   static Future<void> setIgnore(List<String> list) async {
     final prefs = await SharedPreferences.getInstance();
@@ -149,9 +92,9 @@ class DataService {
   }
 
   /// 获取被忽略的课程列表
-  /// 
+  ///
   /// 从本地存储获取被忽略的课程名称列表。
-  /// 
+  ///
   /// @return 被忽略的课程名称列表
   static Future<List<String>> getIgnore() async {
     final prefs = await SharedPreferences.getInstance();
@@ -168,9 +111,9 @@ class DataService {
   }
 
   /// 计算当前周数和总周数
-  /// 
+  ///
   /// 根据学期开始时间和结束时间计算当前是第几周以及学期总周数。
-  /// 
+  ///
   /// @return 包含当前周数(week)和最大周数(maxWeek)的Map
   static Future<Map<String, int>> getWeek() async {
     final time = await getTime();
@@ -210,9 +153,9 @@ class DataService {
   }
 
   /// 根据指定周数获取课程
-  /// 
+  ///
   /// 获取指定周数的所有课程，如果未指定周数，则获取当前周的课程。
-  /// 
+  ///
   /// @param week 指定的周数，如果为0则计算当前周数
   /// @return 指定周数的课程列表
   static Future<List<CourseModel>> getCourseByWeek({int week = 0}) async {
@@ -231,9 +174,9 @@ class DataService {
   }
 
   /// 获取当天或第二天的课程
-  /// 
+  ///
   /// 获取当天的课程，如果当天没有课程且isTomorrow为true，则获取第二天的课程。
-  /// 
+  ///
   /// @param isTomorrow 是否获取第二天的课程，默认为false（获取当天课程）
   /// @return 一个元组，第一个元素表示是否是明天的课程，第二个元素是课程列表
   static Future<(bool, List<CourseModel>)> getTodayOrTomorrowCourse(
@@ -291,31 +234,33 @@ class DataService {
   }
 
   /// 获取今天和明天的课程
-  /// 
+  ///
   /// 同时获取今天和明天的课程，并按开始节次排序。
-  /// 
+  ///
   /// @return 一个Map，包含今天(today)和明天(tomorrow)的课程列表
-  static Future<Map<String, List<CourseModel>>> getTodayAndTomorrowCourses() async {
+  static Future<Map<String, List<CourseModel>>>
+      getTodayAndTomorrowCourses() async {
     final allCourse = await getAllCourse();
     final time = await getTime();
     var now = DateTime.now();
-    
+
     if (time["startTime"] == null) {
       return {
         'today': List<CourseModel>.unmodifiable([]),
         'tomorrow': List<CourseModel>.unmodifiable([])
       };
     }
-    
+
     // 计算当前周数
-    var weekNow = now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
-    
+    var weekNow =
+        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+
     // 获取今天的课程
     var todayCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
     }).toList();
-    
+
     // 过滤掉已经结束的课程
     todayCourses = todayCourses.where((course) {
       final time = TimeService.getStartAndEnd(course);
@@ -324,42 +269,41 @@ class DataService {
           now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
       return now.isBefore(end);
     }).toList();
-    
+
     // 按开始节次排序
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-    
+
     // 计算明天日期和周数
     var weekTomorrow = weekNow;
     var tomorrowWeekday = now.weekday + 1;
-    
+
     // 处理跨周情况
-    if (tomorrowWeekday >= 7) { // 如果今天是周六或者周日
+    if (tomorrowWeekday >= 7) {
+      // 如果今天是周六或者周日
       weekTomorrow++; //周日是一周的第一天
     }
 
-    if (tomorrowWeekday > 7) { // 如果今天是周日
+    if (tomorrowWeekday > 7) {
+      // 如果今天是周日
       tomorrowWeekday = 1; // 明天为周一
     }
-    
+
     // 获取明天的课程
     var tomorrowCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekTomorrow) &&
           course.weekday == tomorrowWeekday;
     }).toList();
-    
+
     // 按开始节次排序
     tomorrowCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-    
-    return {
-      'today': todayCourses,
-      'tomorrow': tomorrowCourses
-    };
+
+    return {'today': todayCourses, 'tomorrow': tomorrowCourses};
   }
 
   /// 获取成绩数据
-  /// 
+  ///
   /// 从本地存储获取成绩数据，并按学期分组。
-  /// 
+  ///
   /// @return 按学期分组的成绩列表
   static Future<List<ScoreList>> getScore() async {
     final prefs = await SharedPreferences.getInstance();
@@ -381,9 +325,9 @@ class DataService {
   }
 
   /// 获取学期信息
-  /// 
+  ///
   /// 从本地存储获取学期信息，如果数据超过1小时未更新，则自动刷新。
-  /// 
+  ///
   /// @param isRefresh 是否强制刷新数据，默认为false
   /// @return 学期模型列表
   static Future<List<SemesterModel>> getSemester(
@@ -420,10 +364,10 @@ class DataService {
   }
 
   /// 获取时间信息
-  /// 
+  ///
   /// 从本地存储获取时间信息，包括学期开始时间、结束时间等。
   /// 如果数据超过24小时未更新，则自动从服务器刷新。
-  /// 
+  ///
   /// @return 包含时间信息的Map
   static Future<Map<String, String>> getTime() async {
     final prefs = await SharedPreferences.getInstance();
@@ -451,9 +395,9 @@ class DataService {
   }
 
   /// 获取信息列表
-  /// 
+  ///
   /// 从缓存或网络获取通知公告等信息。如果缓存数据超过3小时未更新，则从网络获取。
-  /// 
+  ///
   /// @return 信息模型列表
   static Future<List<InfoModel>> getInfoList() async {
     List<InfoModel> list = [];
@@ -491,9 +435,9 @@ class DataService {
   }
 
   /// 获取所有课程时间安排
-  /// 
+  ///
   /// 获取本周剩余天数的课程时间安排，按时间顺序排序。
-  /// 
+  ///
   /// @return 本周剩余天数的课程时间安排列表
   static Future<List<CourseTime>> getAllTime() async {
     final allCourse = await getAllCourse();
