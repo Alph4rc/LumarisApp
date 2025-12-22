@@ -162,12 +162,10 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDarkMode ? Colors.black : Colors.grey[50];
     final cardColor = isDarkMode ? Colors.grey[900] : Colors.white;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
       body: Column(
         children: [
           // 简约的顶部工具栏

@@ -94,11 +94,9 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark ? Colors.black : Colors.grey[50];
     final cardColor = isDark ? Colors.grey[900] : Colors.white;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
       body: Column(
         children: [
           // 简约的顶部工具栏
@@ -210,11 +208,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
               onPressed: () => _launchCalendar(context),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 56,
-            color: isDark ? Colors.grey[800] : Colors.grey[200],
-          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -308,11 +301,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () => Get.toNamed('/CustomCourseManage'),
           ),
-          Divider(
-            height: 1,
-            indent: 56,
-            color: isDark ? Colors.grey[800] : Colors.grey[200],
-          ),
           ListTile(
             leading: Icon(
               Icons.grid_on_outlined,
@@ -353,30 +341,10 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
       child: Column(
         children: [
           _buildBackgroundOption('无背景', '', isDark),
-          Divider(
-            height: 1,
-            indent: 56,
-            color: isDark ? Colors.grey[800] : Colors.grey[200],
-          ),
           _buildBackgroundOption('深蓝色渐变', 'gradient1', isDark),
-          Divider(
-            height: 1,
-            indent: 56,
-            color: isDark ? Colors.grey[800] : Colors.grey[200],
-          ),
           _buildBackgroundOption('粉红色渐变', 'gradient2', isDark),
-          Divider(
-            height: 1,
-            indent: 56,
-            color: isDark ? Colors.grey[800] : Colors.grey[200],
-          ),
           _buildBackgroundOption('自定义图片', 'custom', isDark),
           if (settingsStore.scheduleBackground == 'custom') ...[
-            Divider(
-              height: 1,
-              indent: 56,
-              color: isDark ? Colors.grey[800] : Colors.grey[200],
-            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(56, 12, 16, 12),
               child: Row(
@@ -448,19 +416,9 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         children: _ignores.asMap().entries.map((entry) {
           final index = entry.key;
           final ignore = entry.value;
-          return Column(
-            children: [
-              if (index > 0)
-                Divider(
-                  height: 1,
-                  indent: 56,
-                  color: isDark ? Colors.grey[800] : Colors.grey[200],
-                ),
-              CourseIgnoreItem(
-                ignore: ignore,
-                onChanged: _handleIgnoreChange,
-              ),
-            ],
+          return CourseIgnoreItem(
+            ignore: ignore,
+            onChanged: _handleIgnoreChange,
           );
         }).toList(),
       ),

@@ -37,8 +37,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   @override
   void initState() {
     super.initState();
-    _pageController =
-        PageController(initialPage: scheduleStore.currentPage);
+    _pageController = PageController(initialPage: scheduleStore.currentPage);
     _loadPreferences();
   }
 
@@ -74,7 +73,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.grey[50],
       body: Column(
         children: [
           // 顶部工具栏
@@ -106,14 +104,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   Widget _buildTopBar(BuildContext context, bool isDesktop, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
-          ),
-        ),
-      ),
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -242,7 +232,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: CupertinoSlidingSegmentedControl<CourseCardStyle>(
@@ -289,54 +278,40 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
 
     final weekStartDate = weekIndex == 0
         ? DateTime(now.year, 1, 1)
-        : now.subtract(
-            Duration(days: weekday + (scheduleStore.currentWeek - weekIndex) * 7));
+        : now.subtract(Duration(
+            days: weekday + (scheduleStore.currentWeek - weekIndex) * 7));
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[900]
-            : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 星期标题栏
-          WeekdayHeader(
-            weekStartDate: weekStartDate,
-            currentWeek: weekIndex == 0 ? null : weekIndex,
-            showDate: weekIndex > 0,
-            showGrid: settingsStore.showCourseGrid,
-          ),
-          // 课表网格
-          Expanded(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: scheduleStore.height * 12,
-                child: ScheduleGrid(
-                  courses: courses,
-                  cellHeight: scheduleStore.height,
-                  isYanTa: scheduleStore.isYanTa,
-                  cardStyle: _cardStyle,
-                  showGrid: settingsStore.showCourseGrid,
-                  onCourseTap: (course) => _showCourseDetail(course),
-                  onCourseLongPress: (course) {
-                    if (course.isCustom) {
-                      _showCourseActions(course);
-                    }
-                  },
-                ),
+    return Column(
+      children: [
+        // 星期标题栏
+        WeekdayHeader(
+          weekStartDate: weekStartDate,
+          currentWeek: weekIndex == 0 ? null : weekIndex,
+          showDate: weekIndex > 0,
+          showGrid: settingsStore.showCourseGrid,
+        ),
+        // 课表网格
+        Expanded(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: scheduleStore.height * 12,
+              child: ScheduleGrid(
+                courses: courses,
+                cellHeight: scheduleStore.height,
+                isYanTa: scheduleStore.isYanTa,
+                cardStyle: _cardStyle,
+                showGrid: settingsStore.showCourseGrid,
+                onCourseTap: (course) => _showCourseDetail(course),
+                onCourseLongPress: (course) {
+                  if (course.isCustom) {
+                    _showCourseActions(course);
+                  }
+                },
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -460,8 +435,8 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             .where((c) => c.isCustom)
             .toList();
 
-        final index =
-            customCourses.indexWhere((c) => c.lessonId == updatedCourse.lessonId);
+        final index = customCourses
+            .indexWhere((c) => c.lessonId == updatedCourse.lessonId);
         if (index != -1) {
           customCourses[index] = updatedCourse;
         }

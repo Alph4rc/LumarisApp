@@ -30,12 +30,17 @@ class WeekdayHeader extends StatelessWidget {
     final weekdays = ['日', '一', '二', '三', '四', '五', '六'];
 
     return Container(
+      decoration: showGrid
+          ? BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                  width: 0.5,
+                ),
+              ),
+            )
+          : null,
       height: showDate ? 60 : 44,
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.grey[900]
-            : Colors.white,
-      ),
       child: Row(
         children: [
           // 左侧占位（对应时间轴）
@@ -78,11 +83,13 @@ class WeekdayHeader extends StatelessWidget {
                     ? BoxDecoration(
                         border: Border(
                           left: BorderSide(
-                            color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                            color:
+                                isDark ? Colors.grey[700]! : Colors.grey[300]!,
                             width: 0.5,
                           ),
                           bottom: BorderSide(
-                            color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                            color:
+                                isDark ? Colors.grey[700]! : Colors.grey[300]!,
                             width: 0.5,
                           ),
                         ),
@@ -123,7 +130,9 @@ class WeekdayHeader extends StatelessWidget {
                                   isToday ? FontWeight.w600 : FontWeight.w400,
                               color: isToday
                                   ? Colors.white
-                                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                                  : (isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600]),
                             ),
                           ),
                         ),
