@@ -19,6 +19,10 @@ import 'dart:io';
 import 'main_app.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
+import 'package:mpflutter_core/mpflutter_core.dart';
+import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart';
+import 'package:mpflutter_core/mpjs/mpjs.dart' as mpjs;
+
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
@@ -106,7 +110,7 @@ void initApp() {
     return;
   }
 
-  runApp(MaterialApp(
+  runMPApp(MaterialApp(
     title: 'iOS Club App',
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
@@ -128,6 +132,17 @@ void initApp() {
     ),
     home: !kIsWeb && Platform.isWindows ? const WindowPage() : const MainApp(),
   ));
+
+  /**
+   * 务必保留这段代码，否则第一次调用 wx 接口会提示异常。
+   */
+  if (kIsMPFlutter) {
+    try {
+      wx.$$context$$;
+    } catch (e) {
+      //
+    }
+  }
 }
 
 void requestPermissions() async {

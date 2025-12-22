@@ -67,8 +67,14 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   leak_tracker: ^11.0.1
   leak_tracker_flutter_testing: ^3.0.10
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+  mpflutter_core: ^2.7.5
+  mpflutter_build_tools: ^2.7.5
+  mpflutter_wechat_api: ^2.2.3
+  mpflutter_wechat_mapview: ^0.0.3
+
+dependency_overrides:
+  web: ^1.1.0
+  window_manager: ^0.3.7
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -93,6 +99,13 @@ flutter:
     - family: IconFont
       fonts:
         - asset: assets/iconfont/iconfont.ttf
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Regular.ttf
+        - asset: fonts/Roboto-Bold.ttf
+    - family: Noto Sans SC
+      fonts:
+        - asset: fonts/NotoSansSC-Regular.ttf
 
 flutter_launcher_icons:
   android: "ic_launcher"
