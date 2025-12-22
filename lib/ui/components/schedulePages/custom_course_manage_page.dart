@@ -162,122 +162,47 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDarkMode ? Colors.grey[900] : Colors.grey[50];
-    final cardColor = isDarkMode ? Colors.grey[800] : Colors.white;
+    final backgroundColor = isDarkMode ? Colors.black : Colors.grey[50];
+    final cardColor = isDarkMode ? Colors.grey[900] : Colors.white;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: surfaceColor,
-      appBar: AppBar(
-        title: const Text(
-          '自定义课程管理',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 17,
-          ),
-        ),
-        backgroundColor: surfaceColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        centerTitle: true,
-        titleSpacing: 0,
-        iconTheme: IconThemeData(
-          color: isDarkMode ? Colors.white : Colors.black,
-        ),
-      ),
-      body: SafeArea(
-        child: isLoading
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ),
-                    ),
-                  ],
+      backgroundColor: backgroundColor,
+      body: Column(
+        children: [
+          // 简约的顶部工具栏
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[900] : Colors.white,
+              border: Border(
+                bottom: BorderSide(
+                  color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
                 ),
-              )
-            : customCourses.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(32),
-                            decoration: BoxDecoration(
-                              color: cardColor,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.03),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(24),
-                                  decoration: BoxDecoration(
-                                    color: primaryColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Icon(
-                                    Icons.event_available,
-                                    size: 48,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                const Text(
-                                  '暂无自定义课程',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '点击右下角按钮添加新课程',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: isDarkMode
-                                        ? Colors.grey[400]
-                                        : Colors.grey[600],
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: '返回',
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '自定义课程',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
                       ),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
+                      if (customCourses.isNotEmpty)
                         Text(
                           '${customCourses.length} 门课程',
                           style: TextStyle(
@@ -288,234 +213,218 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: ListView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: customCourses.length,
-                            itemBuilder: (context, index) {
-                              final course = customCourses[index];
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                decoration: BoxDecoration(
-                                  color: cardColor,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.04),
-                                      blurRadius: 15,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                    ],
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: _showAddCourseDialog,
+                    tooltip: '添加课程',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // 课程列表
+          Expanded(
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : customCourses.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Icon(
+                                Icons.event_available,
+                                size: 48,
+                                color: primaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              '暂无自定义课程',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '点击右上角 + 号添加课程',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: customCourses.length,
+                        itemBuilder: (context, index) {
+                          final course = customCourses[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: cardColor,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
                                 ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: () => _showEditCourseDialog(course),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                course.courseName,
-                                                style: const TextStyle(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: -0.3,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.blue
-                                                          .withValues(
-                                                              alpha: 0.1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.location_on,
-                                                          size: 14,
-                                                          color:
-                                                              Colors.blue[700],
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 4),
-                                                        Text(
-                                                          course.room.isEmpty
-                                                              ? '无地点'
-                                                              : course.room,
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .blue[700],
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.green
-                                                          .withValues(
-                                                              alpha: 0.1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.schedule,
-                                                          size: 14,
-                                                          color:
-                                                              Colors.green[700],
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 4),
-                                                        Text(
-                                                          _formatCourseTime(
-                                                              course),
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .green[700],
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        PopupMenuButton<String>(
-                                          icon: Icon(
-                                            Icons.more_horiz,
-                                            color: isDarkMode
-                                                ? Colors.grey[400]
-                                                : Colors.grey[600],
-                                          ),
-                                          color: cardColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          onSelected: (value) {
-                                            if (value == 'edit') {
-                                              _showEditCourseDialog(course);
-                                            } else if (value == 'delete') {
-                                              _deleteCourse(course);
-                                            }
-                                          },
-                                          itemBuilder: (context) => [
-                                            PopupMenuItem(
-                                              value: 'edit',
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.edit,
-                                                    size: 18,
-                                                    color: isDarkMode
-                                                        ? Colors.blue[300]
-                                                        : Colors.blue[600],
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                  const Text('编辑'),
-                                                ],
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () => _showEditCourseDialog(course),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              course.courseName,
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
-                                            PopupMenuItem(
-                                              value: 'delete',
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.delete,
-                                                    size: 18,
-                                                    color: Colors.red[600],
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                  const Text('删除'),
-                                                ],
-                                              ),
+                                            const SizedBox(height: 12),
+                                            Wrap(
+                                              spacing: 8,
+                                              runSpacing: 8,
+                                              children: [
+                                                _buildInfoChip(
+                                                  Icons.location_on_outlined,
+                                                  course.room.isEmpty
+                                                      ? '无地点'
+                                                      : course.room,
+                                                  Colors.blue,
+                                                  isDarkMode,
+                                                ),
+                                                _buildInfoChip(
+                                                  Icons.schedule_outlined,
+                                                  _formatCourseTime(course),
+                                                  Colors.green,
+                                                  isDarkMode,
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.more_horiz,
+                                          color: isDarkMode
+                                              ? Colors.grey[400]
+                                              : Colors.grey[600],
+                                        ),
+                                        onPressed: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            backgroundColor: cardColor,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                top: Radius.circular(20),
+                                              ),
+                                            ),
+                                            builder: (context) => SafeArea(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  ListTile(
+                                                    leading: Icon(
+                                                      Icons.edit_outlined,
+                                                      color: isDarkMode
+                                                          ? Colors.blue[300]
+                                                          : Colors.blue[600],
+                                                    ),
+                                                    title: const Text('编辑课程'),
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      _showEditCourseDialog(
+                                                          course);
+                                                    },
+                                                  ),
+                                                  ListTile(
+                                                    leading: Icon(
+                                                      Icons.delete_outline,
+                                                      color: Colors.red[600],
+                                                    ),
+                                                    title: const Text('删除课程'),
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      _deleteCourse(course);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: _showAddCourseDialog,
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          icon: const Icon(Icons.add, size: 20),
-          label: const Text(
-            '添加课程',
+    );
+  }
+
+  Widget _buildInfoChip(
+      IconData icon, String label, MaterialColor color, bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: isDarkMode ? color[300] : color[700],
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
             style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: isDarkMode ? color[300] : color[700],
+              fontWeight: FontWeight.w500,
             ),
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-        ),
+        ],
       ),
     );
   }
@@ -637,7 +546,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDarkMode ? Colors.grey[800] : Colors.white;
+    final cardColor = isDarkMode ? Colors.grey[900] : Colors.white;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Dialog(
@@ -649,12 +558,12 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
         ),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 30,
-              offset: const Offset(0, 20),
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
@@ -664,57 +573,29 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
             // Header
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                  ),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.course == null ? '添加自定义课程' : '编辑自定义课程',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Colors.grey[700]
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 18,
-                            color: isDarkMode
-                                ? Colors.grey[300]
-                                : Colors.grey[600],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                   Text(
-                    widget.course == null ? '填写课程信息以添加新的自定义课程' : '修改课程信息',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    widget.course == null ? '添加课程' : '编辑课程',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                    iconSize: 20,
                   ),
                 ],
               ),
@@ -723,39 +604,37 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
             // Content
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildModernTextField(
-                      '课程名称 *',
+                    _buildTextField(
+                      '课程名称',
                       _courseNameController,
                       '请输入课程名称',
-                      Icons.book,
+                      Icons.book_outlined,
+                      required: true,
                     ),
-                    const SizedBox(height: 20),
-
-                    _buildModernTextField(
+                    const SizedBox(height: 16),
+                    _buildTextField(
                       '上课地点',
                       _roomController,
                       '请输入上课地点',
-                      Icons.location_on,
+                      Icons.location_on_outlined,
                     ),
-                    const SizedBox(height: 20),
-
-                    _buildModernTextField(
+                    const SizedBox(height: 16),
+                    _buildTextField(
                       '授课教师',
                       _teacherController,
                       '多个教师用逗号分隔',
-                      Icons.person,
+                      Icons.person_outline,
                     ),
-                    const SizedBox(height: 20),
-
-                    _buildModernTextField(
+                    const SizedBox(height: 16),
+                    _buildTextField(
                       '学分',
                       _creditsController,
                       '请输入学分',
-                      Icons.school,
+                      Icons.school_outlined,
                     ),
                     const SizedBox(height: 20),
 
@@ -987,12 +866,13 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
             // Footer
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[850] : Colors.grey[50],
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+                color: cardColor,
+                border: Border(
+                  top: BorderSide(
+                    color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                  ),
                 ),
               ),
               child: Row(
@@ -1000,20 +880,10 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     child: Text(
                       '取消',
                       style: TextStyle(
                         color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -1028,15 +898,13 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                         vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       elevation: 0,
                     ),
                     child: const Text(
                       '保存',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -1048,23 +916,37 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
     );
   }
 
-  Widget _buildModernTextField(
+  Widget _buildTextField(
     String label,
     TextEditingController controller,
     String hint,
-    IconData icon,
-  ) {
+    IconData icon, {
+    bool required = false,
+  }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (required)
+              Text(
+                ' *',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red[600],
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         TextField(
@@ -1080,21 +962,17 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
               color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
             ),
             filled: true,
-            fillColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+            fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
-              ),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
-              ),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.primary,
                 width: 2,

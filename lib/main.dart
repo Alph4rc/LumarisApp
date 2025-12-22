@@ -144,10 +144,8 @@ void initApp() {
     runApp(MacosApp(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
-      // 亮色主题 - 使用 macOS 原生配色
       theme: MacosThemeData.light().copyWith(
         primaryColor: CupertinoColors.systemBlue,
-        // 使用 macOS 原生推送按钮样式
         pushButtonTheme: const PushButtonThemeData(
           color: CupertinoColors.systemBlue,
           secondaryColor: CupertinoColors.systemGrey,
@@ -157,16 +155,13 @@ void initApp() {
           color: CupertinoColors.systemBlue,
         ),
       ),
-      // 暗色主题 - 使用 macOS 原生暗色配色
       darkTheme: MacosThemeData.dark().copyWith(
         primaryColor: CupertinoColors.systemBlue,
         brightness: Brightness.dark,
-        // 暗色模式下的推送按钮样式
         pushButtonTheme: const PushButtonThemeData(
           color: CupertinoColors.systemBlue,
           secondaryColor: CupertinoColors.systemGrey,
         ),
-        // 暗色模式下的帮助按钮
         helpButtonTheme: const HelpButtonThemeData(
           color: CupertinoColors.systemBlue,
         ),

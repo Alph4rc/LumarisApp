@@ -7,13 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
 class ScheduleSettingPage extends StatefulWidget {
@@ -96,319 +94,423 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark ? Colors.black : Colors.grey[50];
+    final cardColor = isDark ? Colors.grey[900] : Colors.white;
+
     return Scaffold(
-        appBar: ClubAppBar(
-          title: '课程设置',
-        ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isDesktop)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                '将课程录入到日历',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.open_in_new),
-                              onPressed: () async {
-                                if (url == '') {
-                                  return;
-                                }
-                                // 尝试启动系统日历
-
-                                if (PlatformUtils.isAndroid) {
-                                  final intent = AndroidIntent(
-                                    action: 'android.intent.action.VIEW',
-                                    data: 'webcal$url',
-                                    type: 'text/calendar',
-                                  );
-                                  var result =
-                                      await intent.canResolveActivity();
-                                  if (result != null && result) {
-                                    await intent.launch();
-                                  } else {
-                                    // 如果没有找到可以处理该 Intent 的应用，则显示错误消息
-                                    if (context.mounted) {
-                                      showClubSnackBar(
-                                        context,
-                                        Text('没有找到日历应用，请手动导入'),
-                                      );
-                                    }
-                                  }
-                                  return;
-                                }
-
-                                final Uri uri = Uri.parse('webcal$url');
-
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri);
-                                } else {
-                                  if (context.mounted) {
-                                    showClubSnackBar(
-                                      context,
-                                      Text('无法打开日历应用'),
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                          ],
-                        )),
-                    Text(
-                      '没有用？试试手动录入',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    CupertinoTextField(
-                      controller: TextEditingController(text: 'https$url'),
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.grey[800] : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      suffix: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.copy,
-                            color: isDark ? Colors.grey[300] : Colors.grey[700],
-                          ),
-                          onPressed: () {
-                            Clipboard.setData(
-                                ClipboardData(text: 'webcal$url'));
-                            if (context.mounted) {
-                              showClubSnackBar(
-                                context,
-                                Text('复制成功!'),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    CupertinoButton.filled(
-                      onPressed: () => showCalendarGuidanceDialog(context),
-                      child: Text('我不会导入'),
-                    ),
-                    SizedBox(height: 24),
-                  ],
+      backgroundColor: backgroundColor,
+      body: Column(
+        children: [
+          // 简约的顶部工具栏
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[900] : Colors.white,
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
                 ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      '课表管理',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  ClubCard(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.add,
-                              size: 20,
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.5)
-                                  : CupertinoColors.tertiaryLabel,
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                '自定义课程管理',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.arrow_forward_ios),
-                              onPressed: () {
-                                Get.toNamed('/CustomCourseManage');
-                              },
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.grid,
-                              size: 20,
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.5)
-                                  : CupertinoColors.tertiaryLabel,
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                '显示课表网格线',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            CupertinoSwitch(
-                              value: settingsStore.showCourseGrid,
-                              onChanged: (value) {
-                                setState(() {
-                                  settingsStore.setShowCourseGrid(value);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Row(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      '课表背景设置',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: '返回',
                   ),
-                  ClubCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RadioGroup<String>(
-                          groupValue: settingsStore.scheduleBackground,
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                settingsStore.setScheduleBackground(newValue);
-                              });
-                            }
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildBackgroundOption('无背景', ''),
-                              _buildBackgroundOption('深蓝色渐变', 'gradient1'),
-                              _buildBackgroundOption('粉红色渐变', 'gradient2'),
-                              _buildBackgroundOption('自定义图片', 'custom'),
-                              if (settingsStore.scheduleBackground == 'custom')
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          settingsStore
-                                                  .customBackgroundImage.isEmpty
-                                              ? '未选择图片'
-                                              : settingsStore
-                                                  .customBackgroundImage,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.folder),
-                                        onPressed: _pickCustomBackgroundImage,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      '忽略课程',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  ClubCard(
-                    child: Column(
-                      children: _ignores
-                          .map((ignore) => CourseIgnoreItem(
-                                ignore: ignore,
-                                onChanged: _handleIgnoreChange,
-                              ))
-                          .toList(),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '课表设置',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ));
+          // 设置内容
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isDesktop) ...[
+                    _buildSectionTitle('日历订阅'),
+                    const SizedBox(height: 12),
+                    _buildCalendarSection(context, isDark, cardColor),
+                    const SizedBox(height: 24),
+                  ],
+                  _buildSectionTitle('课表管理'),
+                  const SizedBox(height: 12),
+                  _buildManagementSection(context, isDark, cardColor),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('课表背景'),
+                  const SizedBox(height: 12),
+                  _buildBackgroundSection(context, isDark, cardColor),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('忽略课程'),
+                  const SizedBox(height: 12),
+                  _buildIgnoreCourseSection(context, isDark, cardColor),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildBackgroundOption(String title, String value) {
-    return RadioListTile<String>(
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.3,
+      ),
+    );
+  }
+
+  Widget _buildCalendarSection(
+      BuildContext context, bool isDark, Color? cardColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.calendar_today_outlined,
+              color: isDark ? Colors.blue[300] : Colors.blue[600],
+            ),
+            title: const Text(
+              '导入到日历',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.open_in_new, size: 20),
+              onPressed: () => _launchCalendar(context),
+            ),
+          ),
+          Divider(
+            height: 1,
+            indent: 56,
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '订阅链接',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[800] : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'https$url',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                            fontFamily: 'monospace',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 18),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: 'webcal$url'));
+                          if (context.mounted) {
+                            showClubSnackBar(context, const Text('复制成功!'));
+                          }
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextButton.icon(
+                  onPressed: () => showCalendarGuidanceDialog(context),
+                  icon: const Icon(Icons.help_outline, size: 18),
+                  label: const Text('不会导入？'),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildManagementSection(
+      BuildContext context, bool isDark, Color? cardColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.edit_calendar_outlined,
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+            title: const Text(
+              '自定义课程管理',
+              style: TextStyle(fontSize: 16),
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => Get.toNamed('/CustomCourseManage'),
+          ),
+          Divider(
+            height: 1,
+            indent: 56,
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.grid_on_outlined,
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+            title: const Text(
+              '显示课表网格线',
+              style: TextStyle(fontSize: 16),
+            ),
+            trailing: CupertinoSwitch(
+              value: settingsStore.showCourseGrid,
+              onChanged: (value) {
+                setState(() {
+                  settingsStore.setShowCourseGrid(value);
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackgroundSection(
+      BuildContext context, bool isDark, Color? cardColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildBackgroundOption('无背景', '', isDark),
+          Divider(
+            height: 1,
+            indent: 56,
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          _buildBackgroundOption('深蓝色渐变', 'gradient1', isDark),
+          Divider(
+            height: 1,
+            indent: 56,
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          _buildBackgroundOption('粉红色渐变', 'gradient2', isDark),
+          Divider(
+            height: 1,
+            indent: 56,
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          _buildBackgroundOption('自定义图片', 'custom', isDark),
+          if (settingsStore.scheduleBackground == 'custom') ...[
+            Divider(
+              height: 1,
+              indent: 56,
+              color: isDark ? Colors.grey[800] : Colors.grey[200],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(56, 12, 16, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      settingsStore.customBackgroundImage.isEmpty
+                          ? '未选择图片'
+                          : settingsStore.customBackgroundImage,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.folder_outlined, size: 20),
+                    onPressed: _pickCustomBackgroundImage,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackgroundOption(String title, String value, bool isDark) {
+    final isSelected = settingsStore.scheduleBackground == value;
+    return ListTile(
+      leading: Icon(
+        isSelected ? Icons.check_circle : Icons.circle_outlined,
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary
+            : (isDark ? Colors.grey[600] : Colors.grey[400]),
+      ),
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        ),
       ),
-      value: value,
-      controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.symmetric(horizontal: 16),
+      onTap: () {
+        setState(() {
+          settingsStore.setScheduleBackground(value);
+        });
+      },
     );
+  }
+
+  Widget _buildIgnoreCourseSection(
+      BuildContext context, bool isDark, Color? cardColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: _ignores.asMap().entries.map((entry) {
+          final index = entry.key;
+          final ignore = entry.value;
+          return Column(
+            children: [
+              if (index > 0)
+                Divider(
+                  height: 1,
+                  indent: 56,
+                  color: isDark ? Colors.grey[800] : Colors.grey[200],
+                ),
+              CourseIgnoreItem(
+                ignore: ignore,
+                onChanged: _handleIgnoreChange,
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Future<void> _launchCalendar(BuildContext context) async {
+    if (url == '') {
+      return;
+    }
+
+    if (PlatformUtils.isAndroid) {
+      final intent = AndroidIntent(
+        action: 'android.intent.action.VIEW',
+        data: 'webcal$url',
+        type: 'text/calendar',
+      );
+      var result = await intent.canResolveActivity();
+      if (result != null && result) {
+        await intent.launch();
+      } else {
+        if (context.mounted) {
+          showClubSnackBar(
+            context,
+            const Text('没有找到日历应用，请手动导入'),
+          );
+        }
+      }
+      return;
+    }
+
+    final Uri uri = Uri.parse('webcal$url');
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (context.mounted) {
+        showClubSnackBar(
+          context,
+          const Text('无法打开日历应用'),
+        );
+      }
+    }
   }
 
   Future<void> _pickCustomBackgroundImage() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.image,
-        withData: false, // 不直接读取数据，只获取路径
+        withData: false,
       );
 
       if (result != null) {
@@ -442,7 +544,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         ignoreList.remove(ignore.title);
       }
 
-      // 使用CourseStore更新忽略的课程
       courseStore.setIgnoreCourses(ignoreList);
       return DataService.setIgnore(ignoreList);
     });
@@ -451,7 +552,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   void showCalendarGuidanceDialog(BuildContext context) {
     final httpsUrl = 'webcal$url';
 
-    // 对于这种复杂的说明性对话框，我们保留原来的 Material 风格
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -525,29 +625,19 @@ class CourseIgnoreItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Row(
-              children: [
-                Checkbox(
-                  value: ignore.isCompleted,
-                  onChanged: (v) => onChanged(ignore, v!),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    ignore.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            )),
-        onTap: () => onChanged(ignore, !ignore.isCompleted),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ListTile(
+      leading: Icon(
+        ignore.isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+        color: ignore.isCompleted
+            ? Theme.of(context).colorScheme.primary
+            : (isDark ? Colors.grey[600] : Colors.grey[400]),
       ),
+      title: Text(
+        ignore.title,
+        style: const TextStyle(fontSize: 16),
+      ),
+      onTap: () => onChanged(ignore, !ignore.isCompleted),
     );
   }
 }
