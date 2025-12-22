@@ -1,24 +1,24 @@
 import 'package:get/get.dart';
-import 'package:ios_club_app/ui/../ui/pages/author_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/easter_egg_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/helper_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/license_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/net_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/electricity_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/payment_page.dart';
-import 'package:ios_club_app/ui/../ui/pages/program_page.dart';
+import 'package:ios_club_app/ui/pages/author_page.dart';
+import 'package:ios_club_app/ui/pages/easter_egg_page.dart';
+import 'package:ios_club_app/ui/pages/helper_page.dart';
+import 'package:ios_club_app/ui/pages/license_page.dart';
+import 'package:ios_club_app/ui/pages/net_page.dart';
+import 'package:ios_club_app/ui/pages/electricity_page.dart';
+import 'package:ios_club_app/ui/pages/payment_page.dart';
+import 'package:ios_club_app/ui/pages/program_page.dart';
 import 'package:ios_club_app/core/utils/performance_monitor.dart';
 
-import '../ui/pages/setting_page.dart';
-import '../ui/pages/home_page.dart';
-import '../ui/pages/link_page.dart';
-import '../ui/pages/member_page.dart';
-import '../ui/pages/profile_page.dart';
-import '../ui/pages/schedule_list_page.dart';
-import '../ui/pages/schedule/pages/schedule_setting_page.dart';
-import '../ui/pages/schedule/pages/custom_course_manage_page.dart';
-import '../ui/pages/school_bus_page.dart';
-import '../ui/pages/score_page.dart';
+import 'package:ios_club_app/ui/pages/setting_page.dart';
+import 'package:ios_club_app/ui/pages/home_page.dart';
+import 'package:ios_club_app/ui/pages/link_page.dart';
+import 'package:ios_club_app/ui/pages/member_page.dart';
+import 'package:ios_club_app/ui/pages/profile_page.dart';
+import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
+import 'package:ios_club_app/ui/components/schedulePages/schedule_setting_page.dart';
+import 'package:ios_club_app/ui/components/schedulePages/custom_course_manage_page.dart';
+import 'package:ios_club_app/ui/pages/school_bus_page.dart';
+import 'package:ios_club_app/ui/pages/score_page.dart';
 
 /// 应用路由配置类
 ///
