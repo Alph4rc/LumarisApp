@@ -261,7 +261,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                             ),
                           ],
                         ),
-                        Divider(),
                         Row(
                           children: [
                             Icon(

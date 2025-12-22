@@ -15,8 +15,8 @@ import '../ui/pages/link_page.dart';
 import '../ui/pages/member_page.dart';
 import '../ui/pages/profile_page.dart';
 import '../ui/pages/schedule_list_page.dart';
-import '../ui/pages/schedule_setting_page.dart';
-import '../ui/pages/custom_course_manage_page.dart';
+import '../ui/pages/schedule/pages/schedule_setting_page.dart';
+import '../ui/pages/schedule/pages/custom_course_manage_page.dart';
 import '../ui/pages/school_bus_page.dart';
 import '../ui/pages/score_page.dart';
 

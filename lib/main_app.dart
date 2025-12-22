@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -201,6 +199,25 @@ class _MainAppState extends State<MainApp> {
             return MaterialPageRoute(
               builder: (context) => UnderMaintenanceScreen(),
             );
+          },
+          // 添加路由监听，确保索引与路由同步
+          routingCallback: (routing) {
+            if (routing?.current != null) {
+              final route = routing!.current;
+              final index = _routeMap.entries
+                  .firstWhere((entry) => entry.value == route,
+                      orElse: () => const MapEntry(0, '/'))
+                  .key;
+              if (_currentIndex != index) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  }
+                });
+              }
+            }
           },
         ),
       );

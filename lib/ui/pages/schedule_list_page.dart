@@ -16,7 +16,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/dashed_separator.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/pages/custom_course_manage_page.dart';
+import 'package:ios_club_app/ui/pages/schedule/pages/custom_course_manage_page.dart';
 
 class ScheduleListPage extends StatefulWidget {
   const ScheduleListPage({super.key});
