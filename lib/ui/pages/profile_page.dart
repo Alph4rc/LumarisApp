@@ -535,91 +535,243 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfileContent() {
     final screenWidth = MediaQuery.of(context).size.width;
-    // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
     return SingleChildScrollView(
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    LazyLoadImage.assets(
-                      'assets/icon.webp',
-                      width: 48,
-                      height: 48,
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _username.isNotEmpty ? _username : '未登录',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        Text(
-                          userStore.isLogin && userStore.isLoginMember
-                              ? '教务系统账号 & iMember账号'
-                              : userStore.isLogin
-                                  ? '教务系统账号'
-                                  : userStore.isLoginMember
-                                      ? 'iMember账号'
-                                      : '游客',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          ClubCard(
-            margin: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-            child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: isTablet ? 6 : 3,
-                  ),
-                  itemBuilder: (context, index) {
-                    return Center(
-                      child: profileButtonItems[index].build(),
-                    );
-                  },
-                  itemCount: profileButtonItems.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                )),
-          ),
-          if (userStore.isLogin) const SizedBox(height: 16),
-          if (userStore.isLogin)
-            FutureBuilder(
-                future: DataService.getInfoList(),
-                builder: (context, snapshot) => snapshot.hasData
-                    ? ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: snapshot.data?.length,
-                        itemBuilder: (context, index) =>
-                            StudyCreditCard(data: snapshot.data![index]))
-                    : const CircularProgressIndicator()),
+          SizedBox(height: isTablet ? 32 : 16),
+          _buildUserInfoCard(),
+          const SizedBox(height: 16),
+          _buildActionsGrid(),
+          const SizedBox(height: 16),
+          if (userStore.isLogin) _buildStudyCredits(),
+          const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+
+  // 用户信息卡片
+  Widget _buildUserInfoCard() {
+    return ClubCard(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            _buildUserAvatar(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 头像和用户名区域
+  Widget _buildUserAvatar() {
+    return Row(
+      children: [
+        // 头像容器
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: LazyLoadImage.assets(
+              'assets/icon.webp',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        // 用户名和学号
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _username.isNotEmpty ? _username : '游客模式',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              _buildAccountTags()
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 账号类型标签
+  Widget _buildAccountTags() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        if (userStore.isLogin)
+          _buildTag('教务系统', Icons.school, Colors.blue),
+        if (userStore.isLoginMember)
+          _buildTag('iMember', Icons.apple, Colors.grey[800]!),
+        if (!userStore.isLogin && !userStore.isLoginMember)
+          _buildTag('游客', Icons.person_outline, Colors.grey),
+      ],
+    );
+  }
+
+  // 单个标签组件
+  Widget _buildTag(String label, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 功能按钮网格
+  Widget _buildActionsGrid() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
+    return ClubCard(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: isTablet ? 6 : 3,
+            childAspectRatio: 1.0,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: profileButtonItems.length,
+          itemBuilder: (context, index) {
+            return _buildActionItem(profileButtonItems[index]);
+          },
+        ),
+      ),
+    );
+  }
+
+  // 单个功能按钮项
+  Widget _buildActionItem(ProfileButtonItem item) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final color =
+        CourseColorManager.generateSoftColor(item.title, isDark: isDark);
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          if (item.route.isNotEmpty) {
+            Get.toNamed(item.route);
+          } else {
+            item.onPressed?.call();
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 图标容器
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  item.icon,
+                  size: 28,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // 文字标签
+              Text(
+                item.title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 学分卡片区域
+  Widget _buildStudyCredits() {
+    return FutureBuilder(
+      future: DataService.getInfoList(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: snapshot.data!.map((data) {
+            return StudyCreditCard(data: data);
+          }).toList(),
+        );
+      },
     );
   }
 
@@ -637,46 +789,10 @@ class ProfileButtonItem {
   String route = '';
   Function? onPressed;
 
-  ProfileButtonItem(
-      {required this.title,
-      required this.icon,
-      this.route = '',
-      this.onPressed});
-
-  Widget build() {
-    return Material(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Hero(
-                    tag: title,
-                    child: Icon(icon,
-                        size: 32,
-                        color: CourseColorManager.generateSoftColor(title,
-                            isDark: true))),
-                Text(
-                  title,
-                  style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),
-                )
-              ],
-            ),
-          ),
-          onTap: () {
-            if (route.isEmpty) {
-              onPressed?.call();
-            } else {
-              Get.toNamed(route);
-            }
-          },
-        ));
-  }
+  ProfileButtonItem({
+    required this.title,
+    required this.icon,
+    this.route = '',
+    this.onPressed,
+  });
 }
