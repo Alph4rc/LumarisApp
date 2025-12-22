@@ -1,23 +1,24 @@
 import 'dart:convert';
-import 'dart:io' show File;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
-import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/components/dashed_separator.dart';
+import 'package:ios_club_app/ui/components/schedule/course_card.dart';
+import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
+import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
+import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedule/pages/custom_course_manage_page.dart';
 
+/// 课表列表页面
+///
+/// 简约的苹果风格设计，展示完整的课程表
 class ScheduleListPage extends StatefulWidget {
   const ScheduleListPage({super.key});
 
@@ -26,917 +27,337 @@ class ScheduleListPage extends StatefulWidget {
 }
 
 class _ScheduleListPageState extends State<ScheduleListPage> {
-  late PageController pageController = PageController();
-  CourseStyle courseStyle = CourseStyle.normal;
-  bool isStyle = false;
-  bool isYanTa = false;
-  final SettingsStore settingsStore = SettingsStore.to;
+  late PageController _pageController;
   final ScheduleStore scheduleStore = ScheduleStore.to;
+  final SettingsStore settingsStore = SettingsStore.to;
 
-  void jumpToPage(int page) {
-    scheduleStore.jumpToPage(page);
-    pageController.jumpToPage(scheduleStore.currentPage);
-  }
-
-  @override
-  void dispose() {
-    pageController.dispose();
-    super.dispose();
-  }
+  CourseCardStyle _cardStyle = CourseCardStyle.normal;
+  bool _showStyleSelector = false;
 
   @override
   void initState() {
     super.initState();
-    pageController = PageController(initialPage: scheduleStore.currentPage);
+    _pageController =
+        PageController(initialPage: scheduleStore.currentPage);
     _loadPreferences();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final courseSize = prefs.getDouble('course_size');
+    final courseSize = prefs.getDouble('course_size') ?? 55;
 
-    if (courseSize != null && courseSize != 0) {
-      setState(() {
-        courseStyle = _determineCourseStyle(courseSize);
-      });
-    }
+    setState(() {
+      _cardStyle = _determineCourseStyle(courseSize);
+    });
   }
 
-  CourseStyle _determineCourseStyle(double size) {
-    if (size == 50) return CourseStyle.small;
-    if (size == 55) return CourseStyle.normal;
-    return CourseStyle.large;
+  CourseCardStyle _determineCourseStyle(double size) {
+    if (size == 50) return CourseCardStyle.small;
+    if (size == 60) return CourseCardStyle.large;
+    return CourseCardStyle.normal;
+  }
+
+  void _jumpToPage(int page) {
+    scheduleStore.jumpToPage(page);
+    _pageController.jumpToPage(scheduleStore.currentPage);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = PlatformUtils.isDesktop;
-
-    // 构建背景装饰
-    Widget backgroundDecoration = const SizedBox.shrink();
-    switch (settingsStore.scheduleBackground) {
-      case 'gradient1':
-        backgroundDecoration = Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF667eea),
-                Color(0xFF764ba2),
-              ],
-            ),
-          ),
-        );
-        break;
-      case 'gradient2':
-        backgroundDecoration = Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFf093fb),
-                Color(0xFFf5576c),
-              ],
-            ),
-          ),
-        );
-        break;
-      case 'custom':
-        if (settingsStore.customBackgroundImage.isNotEmpty) {
-          // 检查文件是否存在
-          final file = File(settingsStore.customBackgroundImage);
-          if (file.existsSync()) {
-            backgroundDecoration = Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: FileImage(file),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            );
-          } else {
-            // 文件不存在时显示默认背景
-            backgroundDecoration = Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFa8edea),
-                    Color(0xFFfed6e3),
-                  ],
-                ),
-              ),
-            );
-
-            // 显示提示信息
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              showClubSnackBar(
-                context,
-                const Text('自定义背景图片不存在，请重新选择'),
-              );
-            });
-          }
-        } else {
-          // 无自定义背景时显示默认背景
-          backgroundDecoration = const SizedBox.shrink();
-        }
-        break;
-      default:
-        // 无背景，保持默认
-        backgroundDecoration = const SizedBox.shrink();
-    }
-
-    final setting = Row(
-      children: [
-        IconButton(
-            onPressed: () {
-              setState(() {
-                isStyle = !isStyle;
-              });
-            },
-            icon: const Icon(Icons.style)),
-        IconButton(
-            onPressed: () async {
-              showClubSnackBar(context, Text('正在进行更新，请稍后'));
-              await scheduleStore.refreshCourses();
-              if (context.mounted) {
-                showClubSnackBar(context, Text('更新完成'));
-              }
-            },
-            icon: const Icon(Icons.refresh)),
-        IconButton(
-            onPressed: () {
-              Get.toNamed('/ScheduleSetting');
-            },
-            icon: const Icon(Icons.settings))
-      ],
-    );
-    final animatedSlide = AnimatedSlide(
-        duration: const Duration(milliseconds: 300), // 动画持续时间，可以根据需要调整
-        curve: Curves.easeInOut,
-        offset: Offset(0, isStyle ? 0 : -0.1),
-        child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            opacity: isStyle ? 1.0 : 0.0,
-            child: isStyle
-                ? Container(
-                    padding: EdgeInsets.all(4),
-                    width: double.infinity,
-                    child: CupertinoSlidingSegmentedControl<CourseStyle>(
-                      groupValue: courseStyle,
-                      // Callback that sets the selected segmented control.
-                      onValueChanged: (CourseStyle? value) async {
-                        if (value != null) {
-                          final a = courseStyle;
-                          setState(() {
-                            courseStyle = value;
-                          });
-                          double height = 55;
-                          if (value == CourseStyle.small) {
-                            if (a == CourseStyle.fool) {
-                              await scheduleStore.refreshCourses();
-                            }
-                            height = 50;
-                          } else if (value == CourseStyle.normal) {
-                            if (a == CourseStyle.fool) {
-                              await scheduleStore.refreshCourses();
-                            }
-                            height = 55;
-                          } else if (value == CourseStyle.large) {
-                            if (a == CourseStyle.fool) {
-                              await scheduleStore.refreshCourses();
-                            }
-                            height = 60;
-                          } else if (value == CourseStyle.fool) {
-                            scheduleStore.clean();
-                            showClubSnackBar(context, Text('是的，我没有课了'));
-                            return;
-                          }
-                          await scheduleStore.setCourseHeight(height);
-                        }
-                      },
-                      children: {
-                        CourseStyle.small: Text('较小'),
-                        CourseStyle.normal: Text('默认'),
-                        CourseStyle.large: Text('较大'),
-                        CourseStyle.fool: Text('愚人节'),
-                      },
-                    ),
-                  )
-                : Container()));
-
-    final weekText = scheduleStore.currentWeek <= 0
-        ? '距离开学还有${-scheduleStore.currentWeek + 1}周'
-        : '当前为第${scheduleStore.currentWeek}周';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: Stack(
+      backgroundColor: isDark ? Colors.black : Colors.grey[50],
+      body: Column(
         children: [
-          // 背景层
-          Positioned.fill(
-            child: backgroundDecoration,
-          ),
-          // 内容层
-          Column(
-            children: [
-              Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: isDesktop
-                      ? Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: TextButton(
-                                        onPressed: () => jumpToPage(
-                                            (scheduleStore.currentPage - 1)
-                                                .ceil()),
-                                        child: const Text('上一周'))),
-                                Expanded(
-                                    child: Center(
-                                  child: Obx(() => Text(
-                                        scheduleStore.currentPage <= 0
-                                            ? '全部课表'
-                                            : '第 ${scheduleStore.currentPage} 周 ${scheduleStore.currentPage == scheduleStore.currentWeek ? "(本周)" : ""}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                        ),
-                                      )),
-                                )),
-                                Expanded(
-                                    child: TextButton(
-                                        onPressed: () => jumpToPage(
-                                            (pageController.page! + 1).ceil()),
-                                        child: const Text('下一周'))),
-                              ],
-                            ),
-                            Row(children: [
-                              Expanded(child: const SizedBox()),
-                              Expanded(child: animatedSlide),
-                              Expanded(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [setting],
-                              ))
-                            ])
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
-                              child: Row(children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      DateFormat('yyyy年M月d日')
-                                          .format(DateTime.now()),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    Padding(
-                                        padding: const EdgeInsets.only(top: 4),
-                                        child: InkWell(
-                                            onTap: () {
-                                              jumpToPage(
-                                                  scheduleStore.currentWeek);
-                                            },
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                            child: Obx(
-                                              () {
-                                                return Text(
-                                                  scheduleStore.currentPage ==
-                                                          scheduleStore
-                                                              .currentWeek
-                                                      ? weekText
-                                                      : scheduleStore
-                                                                  .currentPage <=
-                                                              0
-                                                          ? '全部课表 $weekText'
-                                                          : '第${scheduleStore.currentPage}周 $weekText',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .primary,
-                                                  ),
-                                                );
-                                              },
-                                            ))),
-                                  ],
-                                )
-                              ]),
-                            ),
-                            setting
-                          ],
-                        )),
-              if (!isDesktop) animatedSlide,
-              Obx(() => scheduleStore.isLoading
-                  ? const Expanded(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  : Expanded(
-                      child: PageView.builder(
-                        controller: pageController,
-                        onPageChanged: (index) {
-                          scheduleStore.setCurrentPage(index);
-                        },
-                        itemCount: scheduleStore.allCourses.length,
-                        itemBuilder: (BuildContext context, int i) {
-                          final courses = scheduleStore.allCourses[i];
-                          return Column(
-                            children: [
-                              _buildWeekHeader(i),
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  // 添加垂直方向的滚动
-                                  scrollDirection: Axis.vertical,
-                                  child: SizedBox(
-                                    // 设置固定高度确保内容可以完整显示
-                                    height:
-                                        scheduleStore.height * 12, // 12节课的总高度
-                                    child: _buildScheduleGrid(courses),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ))
-            ],
+          // 顶部工具栏
+          _buildTopBar(context, isDesktop, isDark),
+          // 课表内容
+          Expanded(
+            child: Obx(() {
+              if (scheduleStore.isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  scheduleStore.setCurrentPage(index);
+                },
+                itemCount: scheduleStore.allCourses.length,
+                itemBuilder: (context, index) {
+                  return _buildSchedulePage(context, index);
+                },
+              );
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildWeekHeader(int i) {
-    final a = ['日', '一', '二', '三', '四', '五', '六'];
-    final weekDays = [];
-    if (i == 0) {
-      for (int i1 = 0; i1 < 7; i1++) {
-        weekDays.add(Expanded(
-          child: Stack(
+  Widget _buildTopBar(BuildContext context, bool isDesktop, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                // 左侧：周次导航
+                if (!isDesktop) _buildWeekInfo(context, isDark),
+                if (isDesktop) _buildDesktopWeekNav(context),
+                const Spacer(),
+                // 右侧：操作按钮
+                _buildActionButtons(context, isDark),
+              ],
+            ),
+            // 样式选择器
+            if (_showStyleSelector) ...[
+              const SizedBox(height: 12),
+              _buildStyleSelector(),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekInfo(BuildContext context, bool isDark) {
+    return Obx(() {
+      final weekText = scheduleStore.currentWeek <= 0
+          ? '距离开学还有${-scheduleStore.currentWeek + 1}周'
+          : '当前为第${scheduleStore.currentWeek}周';
+
+      return InkWell(
+        onTap: () => _jumpToPage(scheduleStore.currentWeek),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 添加网格线
-              if (settingsStore.showCourseGrid)
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: DashedSeparator(
-                      axis: Axis.horizontal,
-                      thickness: 0.5,
-                      color: Theme.of(context).dividerColor,
-                    ),
-                  ),
+              Text(
+                scheduleStore.currentPage <= 0
+                    ? '全部课表'
+                    : '第 ${scheduleStore.currentPage} 周',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
-              Center(
-                child: Text(
-                  a[i1],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                weekText,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-        ));
-      }
-      return SizedBox(
-        height: 50,
-        child: Row(
-          children: [
-            _buildTimeCell(''),
-            ...weekDays,
-          ],
         ),
       );
-    }
+    });
+  }
 
+  Widget _buildDesktopWeekNav(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () => _jumpToPage((scheduleStore.currentPage - 1).ceil()),
+          tooltip: '上一周',
+        ),
+        const SizedBox(width: 8),
+        Obx(() => Text(
+              scheduleStore.currentPage <= 0
+                  ? '全部课表'
+                  : '第 ${scheduleStore.currentPage} 周'
+                      '${scheduleStore.currentPage == scheduleStore.currentWeek ? " (本周)" : ""}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            )),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.chevron_right),
+          onPressed: () => _jumpToPage((_pageController.page! + 1).ceil()),
+          tooltip: '下一周',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, bool isDark) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 样式切换
+        IconButton(
+          icon: const Icon(Icons.palette_outlined),
+          onPressed: () {
+            setState(() {
+              _showStyleSelector = !_showStyleSelector;
+            });
+          },
+          tooltip: '切换样式',
+        ),
+        // 刷新
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: _handleRefresh,
+          tooltip: '刷新课表',
+        ),
+        // 设置
+        IconButton(
+          icon: const Icon(Icons.settings_outlined),
+          onPressed: () => Get.toNamed('/ScheduleSetting'),
+          tooltip: '课表设置',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStyleSelector() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: CupertinoSlidingSegmentedControl<CourseCardStyle>(
+        groupValue: _cardStyle,
+        onValueChanged: (CourseCardStyle? value) async {
+          if (value != null) {
+            setState(() {
+              _cardStyle = value;
+            });
+
+            double height = 55;
+            if (value == CourseCardStyle.small) {
+              height = 50;
+            } else if (value == CourseCardStyle.large) {
+              height = 60;
+            }
+
+            await scheduleStore.setCourseHeight(height);
+          }
+        },
+        children: const {
+          CourseCardStyle.small: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('紧凑'),
+          ),
+          CourseCardStyle.normal: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('标准'),
+          ),
+          CourseCardStyle.large: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('宽松'),
+          ),
+        },
+      ),
+    );
+  }
+
+  Widget _buildSchedulePage(BuildContext context, int weekIndex) {
+    final courses = scheduleStore.allCourses[weekIndex];
     final now = DateTime.now();
     int weekday = now.weekday;
     if (weekday == 7) weekday = 0;
-    final w = now.subtract(Duration(
-        days: weekday + (scheduleStore.currentWeek - i) * 7)); // 每周第一天（周日）
-    for (int i1 = 0; i1 < 7; i1++) {
-      weekDays.add(
-        Expanded(
-          child: Stack(
-            children: [
-              // 添加网格线
-              if (settingsStore.showCourseGrid)
-                Positioned.fill(
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: DashedSeparator(
-                          axis: Axis.horizontal,
-                          thickness: 0.5,
-                          color: Theme.of(context).dividerColor,
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: DashedSeparator(
-                          axis: Axis.vertical,
-                          thickness: 0.5,
-                          color: Theme.of(context).dividerColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              SizedBox(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      a[i1],
-                      style: TextStyle(
-                        fontWeight:
-                            i1 == weekday && scheduleStore.currentWeek - i == 0
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                      ),
-                    ),
-                    Text(
-                      DateFormat('M/d').format(w.add(Duration(days: i1))),
-                      style: TextStyle(
-                        fontWeight:
-                            i1 == weekday && scheduleStore.currentWeek - i == 0
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                        fontSize: 13,
-                      ),
-                    )
-                  ],
+
+    final weekStartDate = weekIndex == 0
+        ? DateTime(now.year, 1, 1)
+        : now.subtract(
+            Duration(days: weekday + (scheduleStore.currentWeek - weekIndex) * 7));
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[900]
+            : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 星期标题栏
+          WeekdayHeader(
+            weekStartDate: weekStartDate,
+            currentWeek: weekIndex == 0 ? null : weekIndex,
+            showDate: weekIndex > 0,
+            showGrid: settingsStore.showCourseGrid,
+          ),
+          // 课表网格
+          Expanded(
+            child: SingleChildScrollView(
+              child: SizedBox(
+                height: scheduleStore.height * 12,
+                child: ScheduleGrid(
+                  courses: courses,
+                  cellHeight: scheduleStore.height,
+                  isYanTa: scheduleStore.isYanTa,
+                  cardStyle: _cardStyle,
+                  showGrid: settingsStore.showCourseGrid,
+                  onCourseTap: (course) => _showCourseDetail(course),
+                  onCourseLongPress: (course) {
+                    if (course.isCustom) {
+                      _showCourseActions(course);
+                    }
+                  },
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 50,
-      child: Row(
-        children: [
-          _buildTimeCell('${w.month}月',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          ...weekDays,
         ],
       ),
     );
   }
 
-  Widget _buildScheduleGrid(List<CourseModel> courses) {
-    return Row(
-      children: [
-        _buildTimeLine(),
-        ...List.generate(7, (index) {
-          if (index == 0) index = 7;
-          return _buildDayColumn(index, courses);
-        }),
-      ],
+  Future<void> _handleRefresh() async {
+    showClubSnackBar(context, const Text('正在更新课表...'));
+    await scheduleStore.refreshCourses();
+    if (mounted) {
+      showClubSnackBar(context, const Text('更新完成'));
+    }
+  }
+
+  void _showCourseDetail(CourseModel course) {
+    CourseDetailSheet.show(
+      context,
+      course,
+      onEdit: course.isCustom ? () => _editCustomCourse(course) : null,
+      onDelete: course.isCustom ? () => _deleteCustomCourse(course) : null,
     );
   }
 
-  Widget _buildTimeLine() {
-    return Column(
-      children: List.generate(
-        12,
-        (index) => SizedBox(
-          height: scheduleStore.height,
-          width: 50,
-          child: Stack(
-            children: [
-              // 添加网格线
-              if (settingsStore.showCourseGrid)
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: DashedSeparator(
-                      axis: Axis.horizontal,
-                      thickness: 0.5,
-                      color: Theme.of(context).dividerColor,
-                    ),
-                  ),
-                ),
-              Center(
-                child: _buildTimeCellForPeriod(index + 1),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimeCellForPeriod(int period) {
-    final index = period - 1;
-    String startTime = "";
-    String endTime = "";
-
-    // 根据当前日期和季节选择时间表
-    final now = DateTime.now();
-    final isSummer = now.month >= 5 && now.month < 10;
-
-    // 确保索引在有效范围内
-    if (index + 1 < TimeService.CanTangTimeStart.length) {
-      // 默认使用草堂时间
-      startTime = TimeService.CanTangTimeStart[index + 1];
-      endTime = TimeService.CanTangTimeEnd[index + 1];
-
-      // 根据季节选择雁塔时间
-      if (scheduleStore.isYanTa) {
-        if (isSummer) {
-          if (index + 1 < TimeService.YanTaXiaStart.length) {
-            startTime = TimeService.YanTaXiaStart[index + 1];
-            endTime = TimeService.YanTaXiaEnd[index + 1];
-          }
-        } else {
-          if (index + 1 < TimeService.YanTaDongStart.length) {
-            startTime = TimeService.YanTaDongStart[index + 1];
-            endTime = TimeService.YanTaDongEnd[index + 1];
-          }
-        }
-      }
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('$period',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            )),
-        Text(
-          startTime,
-          style: const TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 8,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          endTime,
-          style: const TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 8,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDayColumn(int weekDay, List<CourseModel> courses) {
-    return Expanded(
-      child: Stack(
-        children: [
-          // 添加网格线
-          if (settingsStore.showCourseGrid) ...[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: DashedSeparator(
-                axis: Axis.vertical,
-                thickness: 0.5,
-                color: Theme.of(context).dividerColor,
-              ),
-            ),
-            ...List.generate(
-              12,
-              (index) => Positioned(
-                top: (index + 1) * scheduleStore.height,
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: DashedSeparator(
-                    axis: Axis.horizontal,
-                    thickness: 0.5,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                ),
-              ),
-            ),
-          ],
-          Column(
-            children: List.generate(
-              12,
-              (index) => Container(
-                height: scheduleStore.height,
-              ),
-            ),
-          ),
-          ..._buildConflictAwareCourseCards(weekDay, courses),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _buildConflictAwareCourseCards(
-      int weekDay, List<CourseModel> courses) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    // 获取当天的课程
-    final dayCourses =
-        courses.where((course) => course.weekday == weekDay).toList();
-
-    // 按开始时间排序
-    dayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-
-    // 处理冲突的课程
-    final conflictGroups = _groupConflictingCourses(dayCourses);
-
-    // 构建课程卡片
-    final widgets = <Widget>[];
-    for (final group in conflictGroups) {
-      if (group.length == 1) {
-        // 没有冲突的课程
-        widgets.add(_buildCourseCard(group.first, screenWidth));
-      } else {
-        // 有冲突的课程，需要分开展示
-        widgets.addAll(_buildConflictingCourseCards(group, screenWidth));
-      }
-    }
-
-    return widgets;
-  }
-
-  List<List<CourseModel>> _groupConflictingCourses(List<CourseModel> courses) {
-    final groups = <List<CourseModel>>[];
-    final used = List<bool>.filled(courses.length, false);
-
-    for (int i = 0; i < courses.length; i++) {
-      if (used[i]) continue;
-
-      final group = <CourseModel>[courses[i]];
-      used[i] = true;
-
-      for (int j = i + 1; j < courses.length; j++) {
-        if (used[j]) continue;
-
-        // 检查是否有时间冲突
-        if (_hasTimeConflict(courses[i], courses[j])) {
-          group.add(courses[j]);
-          used[j] = true;
-        }
-      }
-
-      groups.add(group);
-    }
-
-    return groups;
-  }
-
-  bool _hasTimeConflict(CourseModel a, CourseModel b) {
-    // 检查两个课程是否有时间重叠
-    return (a.startUnit <= b.endUnit && a.endUnit >= b.startUnit);
-  }
-
-  List<Widget> _buildConflictingCourseCards(
-      List<CourseModel> conflictingCourses, double screenWidth) {
-    if (screenWidth < 600) {
-      return [
-        _buildConflictingCourse(conflictingCourses, screenWidth),
-      ];
-    }
-
-    final widgets = <Widget>[];
-    final cardCount = conflictingCourses.length;
-
-    for (int i = 0; i < cardCount; i++) {
-      widgets.add(_buildConflictingCourseCard(
-          conflictingCourses[i], i, cardCount, screenWidth));
-    }
-
-    return widgets;
-  }
-
-  Widget _buildConflictingCourse(
-      List<CourseModel> courses, double screenWidth) {
-    // 判断是否为平板布局（宽度大于600）
-    final isTablet = screenWidth > 600;
-    var top = 200;
-    var end = 0;
-    for (var course in courses) {
-      if (course.endUnit > end) {
-        end = course.endUnit;
-      }
-      if (course.startUnit < top) {
-        top = course.startUnit;
-      }
-    }
-
-    final course = courses.first;
-
-    return Positioned(
-        top: (top - 1) * scheduleStore.height,
-        left: 0,
-        right: 0,
-        height: (end - top + 1) * scheduleStore.height,
-        child: Container(
-          margin: EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: CourseColorManager.generateSoftColor(course.courseName),
-          ),
-          child: GestureDetector(
-            onTap: () async {
-              await _showModalBottomSheet(course);
-            },
-            onLongPress: () async {
-              if (course.isCustom) {
-                _showCustomCourseMenu(course, context);
-              }
-            },
-            onSecondaryTap: () async {
-              if (course.isCustom) {
-                _showCustomCourseMenu(course, context);
-              }
-            },
-            child: Padding(
-              padding: EdgeInsets.all(isTablet ? 8 : 4),
-              child: Center(
-                child: Text('当前时间存在多个冲突课程',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white70,
-                      fontWeight: FontWeight.bold,
-                    )),
-              ),
-            ),
-          ),
-        ));
-  }
-
-  Widget _buildConflictingCourseCard(
-      CourseModel course, int index, int totalCount, double screenWidth) {
-    final isTablet = screenWidth > 600;
-
-    var width = screenWidth;
-    if (isTablet && (PlatformUtils.isAndroid || PlatformUtils.isIOS || PlatformUtils.isWindows || PlatformUtils.isWeb)) {
-      width = screenWidth - 300;
-    } else if (PlatformUtils.isMacOS && screenWidth > 500) {
-      width = screenWidth - 250;
-    } else {
-      width = screenWidth - 60;
-    }
-
-    double addNum = 0.4;
-    if (courseStyle == CourseStyle.normal) {
-      addNum = 0.9;
-    }
-    if (courseStyle == CourseStyle.large) {
-      addNum = 1.3;
-    }
-
-    // 计算每个日期列的宽度
-    final dayColumnWidth = width / 7;
-
-    return Positioned(
-        top: (course.startUnit - 1) * scheduleStore.height,
-        left: index * (dayColumnWidth / totalCount),
-        right: (totalCount - index - 1) * (dayColumnWidth / totalCount),
-        height: (course.endUnit - course.startUnit + 1) * scheduleStore.height,
-        child: Container(
-          margin: EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: CourseColorManager.generateSoftColor(course.courseName),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () async {
-              await _showModalBottomSheet(course);
-            },
-            child: Padding(
-              padding: EdgeInsets.all(isTablet ? 8 : 4),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      course.courseName,
-                      style: TextStyle(
-                        fontSize: (isTablet ? 12 : 10) + addNum,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white70,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      maxLines: 3,
-                    ),
-                    Text(
-                      course.room,
-                      style: TextStyle(
-                        fontSize: (isTablet ? 10 : 9) + addNum,
-                        overflow: TextOverflow.ellipsis,
-                        color: Colors.white70,
-                      ),
-                      maxLines: 2,
-                    ),
-                    Text(
-                      course.teachers.join(', '),
-                      style: TextStyle(
-                        fontSize: (isTablet ? 10 : 8) + addNum,
-                        overflow: TextOverflow.ellipsis,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ));
-  }
-
-  Widget _buildCourseCard(CourseModel course, double screenWidth) {
-    // 判断是否为平板布局（宽度大于600）
-    final isTablet = screenWidth > 600;
-
-    double addNum = 0.4;
-    if (courseStyle == CourseStyle.normal) {
-      addNum = 0.9;
-    }
-    if (courseStyle == CourseStyle.large) {
-      addNum = 1.3;
-    }
-
-    return Positioned(
-        top: (course.startUnit - 1) * scheduleStore.height,
-        left: 0,
-        right: 0,
-        height: (course.endUnit - course.startUnit + 1) * scheduleStore.height,
-        child: Container(
-          margin: EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: CourseColorManager.generateSoftColor(course.courseName),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () async {
-              await _showModalBottomSheet(course);
-            },
-            child: Padding(
-              padding: EdgeInsets.all(isTablet ? 8 : 4),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      course.courseName,
-                      style: TextStyle(
-                        fontSize: (isTablet ? 12 : 10) + addNum,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white70,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      maxLines: 3,
-                    ),
-                    Text(
-                      course.room,
-                      style: TextStyle(
-                        fontSize: (isTablet ? 10 : 9) + addNum,
-                        overflow: TextOverflow.ellipsis,
-                        color: Colors.white70,
-                      ),
-                      maxLines: 2,
-                    ),
-                    Text(
-                      course.teachers.join(', '),
-                      style: TextStyle(
-                        fontSize: (isTablet ? 10 : 8) + addNum,
-                        overflow: TextOverflow.ellipsis,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ));
-  }
-
-  void _showCustomCourseMenu(CourseModel course, BuildContext context) {
+  void _showCourseActions(CourseModel course) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Column(
@@ -946,382 +367,112 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             leading: const Icon(Icons.edit),
             title: const Text('编辑课程'),
             onTap: () {
-              Navigator.of(context).pop();
-              showDialog(
-                context: context,
-                builder: (context) => AddEditCourseDialog(
-                  course: course,
-                  onSave: (updatedCourse) async {
-                    // 保存更新的课程
-                    await _saveUpdatedCustomCourse(updatedCourse);
-                    if (context.mounted) {
-                      showClubSnackBar(context, const Text('课程修改成功'));
-                    }
-                  },
-                ),
-              );
+              Navigator.pop(context);
+              _editCustomCourse(course);
             },
           ),
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
             title: const Text('删除课程', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              Navigator.of(context).pop();
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('确认删除'),
-                  content: Text('确定要删除课程"${course.courseName}"吗？'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('取消'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('删除'),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm == true) {
-                await _deleteCustomCourse(course);
-                if (context.mounted) {
-                  showClubSnackBar(context, const Text('课程删除成功'));
-                }
-              }
+            onTap: () {
+              Navigator.pop(context);
+              _deleteCustomCourse(course);
             },
           ),
         ],
       ),
     );
+  }
+
+  void _editCustomCourse(CourseModel course) {
+    showDialog(
+      context: context,
+      builder: (context) => AddEditCourseDialog(
+        course: course,
+        onSave: (updatedCourse) async {
+          await _saveUpdatedCustomCourse(updatedCourse);
+          if (mounted) {
+            showClubSnackBar(context, const Text('课程修改成功'));
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> _deleteCustomCourse(CourseModel course) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('确认删除'),
+        content: Text('确定要删除课程"${course.courseName}"吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString('custom_courses');
+
+      if (jsonString != null) {
+        try {
+          final jsonList = jsonDecode(jsonString) as List<dynamic>;
+          final customCourses = jsonList
+              .map((json) => CourseModel.fromJson(json as Map<String, dynamic>))
+              .where((c) => c.isCustom && c.lessonId != course.lessonId)
+              .toList();
+
+          final updatedJsonString =
+              jsonEncode(customCourses.map((c) => c.toJson()).toList());
+          await prefs.setString('custom_courses', updatedJsonString);
+          await scheduleStore.refreshCourses();
+
+          if (mounted) {
+            showClubSnackBar(context, const Text('课程删除成功'));
+          }
+        } catch (e) {
+          if (mounted) {
+            showClubSnackBar(context, const Text('删除失败'));
+          }
+        }
+      }
+    }
   }
 
   Future<void> _saveUpdatedCustomCourse(CourseModel updatedCourse) async {
     final prefs = await SharedPreferences.getInstance();
-    final String? jsonString = prefs.getString('custom_courses');
+    final jsonString = prefs.getString('custom_courses');
 
     if (jsonString != null) {
       try {
-        final List<dynamic> jsonList = jsonDecode(jsonString);
+        final jsonList = jsonDecode(jsonString) as List<dynamic>;
         final customCourses = jsonList
-            .map((json) => CourseModel.fromJson(json))
-            .where((course) => course.isCustom)
+            .map((json) => CourseModel.fromJson(json as Map<String, dynamic>))
+            .where((c) => c.isCustom)
             .toList();
 
-        // 更新课程
-        final index = customCourses
-            .indexWhere((c) => c.lessonId == updatedCourse.lessonId);
+        final index =
+            customCourses.indexWhere((c) => c.lessonId == updatedCourse.lessonId);
         if (index != -1) {
           customCourses[index] = updatedCourse;
         }
 
-        // 保存
         final updatedJsonString =
-            jsonEncode(customCourses.map((course) => course.toJson()).toList());
+            jsonEncode(customCourses.map((c) => c.toJson()).toList());
         await prefs.setString('custom_courses', updatedJsonString);
-
-        // 刷新课表
         await scheduleStore.refreshCourses();
       } catch (e) {
         // 处理错误
       }
     }
   }
-
-  Future<void> _deleteCustomCourse(CourseModel course) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? jsonString = prefs.getString('custom_courses');
-
-    if (jsonString != null) {
-      try {
-        final List<dynamic> jsonList = jsonDecode(jsonString);
-        final customCourses = jsonList
-            .map((json) => CourseModel.fromJson(json))
-            .where((course) => course.isCustom)
-            .toList();
-
-        // 删除课程
-        customCourses.removeWhere((c) => c.lessonId == course.lessonId);
-
-        // 保存
-        final updatedJsonString =
-            jsonEncode(customCourses.map((course) => course.toJson()).toList());
-        await prefs.setString('custom_courses', updatedJsonString);
-
-        // 刷新课表
-        await scheduleStore.refreshCourses();
-      } catch (e) {
-        // 处理错误
-      }
-    }
-  }
-
-  Widget _buildTimeCell(
-    String text, {
-    TextStyle style = const TextStyle(),
-  }) {
-    return SizedBox(
-      width: 50,
-      child: Stack(
-        children: [
-          // 添加网格线
-          if (settingsStore.showCourseGrid)
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: DashedSeparator(
-                  axis: Axis.horizontal,
-                  thickness: 0.5,
-                  color: Theme.of(context).dividerColor,
-                ),
-              ),
-            ),
-          Center(
-            child: Text(
-              text,
-              style: style,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showModalBottomSheet(CourseModel course) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    // 判断是否为平板布局（宽度大于600）
-    final isTablet = screenWidth > 600;
-    final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    var content = Padding(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: isTablet ? 16 : 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            course.courseName,
-            style: TextStyle(
-              fontSize: isTablet ? 18 : 20,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.3,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: isTablet ? 16 : 18),
-          buildAppleInfoRow(
-            Icons.location_on_outlined,
-            course.room,
-            isDarkMode,
-          ),
-          SizedBox(height: isTablet ? 12 : 14),
-          buildAppleInfoRow(
-            course.teachers.length > 1 ? Icons.people : Icons.person_outline,
-            course.teachers.join(', '),
-            isDarkMode,
-          ),
-          SizedBox(height: isTablet ? 12 : 14),
-          buildAppleInfoRow(
-            Icons.calendar_today_outlined,
-            '${CourseModel.formatWeekRanges(course.weekIndexes)}周 '
-            '每周${weekdayName[course.weekday]} '
-            '第${course.startUnit}-${course.endUnit}节',
-            isDarkMode,
-          ),
-        ],
-      ),
-    );
-
-    if (isTablet) {
-      return showDialog<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return SimpleDialog(
-              children: [content],
-            );
-          });
-    }
-
-    return showClubModalBottomSheet(context, content);
-  }
-
-  Future<void> _showModalBottomSheetFromList(List<CourseModel> courses) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-    final weekdayName = ['日', '一', '二', '三', '四', '五', '六'];
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    var content = Padding(
-      padding: EdgeInsets.only(
-        bottom: isTablet ? 32 : 20,
-        left: isTablet ? 28 : 16,
-        right: isTablet ? 28 : 16,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '冲突课程',
-            style: TextStyle(
-              fontSize: isTablet ? 24 : 28,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.5,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-          Text(
-            '如果有不需要上的课，可以在课程设置（本页面右上角设置按钮）中进行课程忽略',
-            style: TextStyle(
-              fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            ),
-          ),
-          SizedBox(height: isTablet ? 24 : 28),
-          ListView.separated(
-            itemCount: courses.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            separatorBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Container(
-                height: 1,
-                color: isDarkMode ? Colors.grey[200] : Colors.grey[800],
-              ),
-            ),
-            itemBuilder: (context, index) {
-              var course = courses[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      course.courseName,
-                      style: TextStyle(
-                        fontSize: isTablet ? 18 : 20,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.3,
-                        color: isDarkMode ? Colors.white : Colors.black,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: isTablet ? 16 : 18),
-                    buildAppleInfoRow(
-                      Icons.location_on_outlined,
-                      course.room,
-                      isDarkMode,
-                    ),
-                    SizedBox(height: isTablet ? 12 : 14),
-                    buildAppleInfoRow(
-                      course.teachers.length > 1
-                          ? Icons.people
-                          : Icons.person_outline,
-                      course.teachers.join(', '),
-                      isDarkMode,
-                    ),
-                    SizedBox(height: isTablet ? 12 : 14),
-                    buildAppleInfoRow(
-                      Icons.calendar_today_outlined,
-                      '${CourseModel.formatWeekRanges(course.weekIndexes)}周 '
-                      '每周${weekdayName[course.weekday]} '
-                      '第${course.startUnit}-${course.endUnit}节',
-                      isDarkMode,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-
-    return showClubModalBottomSheet(
-      context,
-      content,
-    );
-  }
-}
-
-enum CourseStyle {
-  normal,
-  small,
-  large,
-  fool,
-}
-
-Widget buildAppleInfoRow(IconData icon, String text, bool isDarkMode,
-    {Color? iconColor, String? label}) {
-  // 为不同类型的图标设置颜色
-  Color getIconColor() {
-    if (iconColor != null) return iconColor;
-
-    if (icon == Icons.location_on_outlined) {
-      return isDarkMode ? const Color(0xFF64B5F6) : const Color(0xFF2196F3);
-    } else if (icon == Icons.person_outline || icon == Icons.people) {
-      return isDarkMode ? const Color(0xFFBA68C8) : const Color(0xFF9C27B0);
-    } else if (icon == Icons.calendar_today_outlined) {
-      return isDarkMode ? const Color(0xFFEF5350) : const Color(0xFFE53935);
-    }
-    return isDarkMode ? Colors.grey[400]! : Colors.grey[500]!;
-  }
-
-  final Color finalIconColor = getIconColor();
-  final Color backgroundColor = isDarkMode
-      ? finalIconColor.withValues(alpha: 0.15)
-      : finalIconColor.withValues(alpha: 0.1);
-
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // 彩色图标容器
-      Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        child: Icon(
-          icon,
-          size: 18,
-          color: finalIconColor,
-        ),
-      ),
-      const SizedBox(width: 12),
-      // 标签和内容
-      Expanded(
-        child: Column(
-          mainAxisAlignment: (label == null || label.isNotEmpty)
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (label != null && label.isNotEmpty)
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
-                  letterSpacing: -0.2,
-                ),
-              ),
-            const SizedBox(height: 4),
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
 }

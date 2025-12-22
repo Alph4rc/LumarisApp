@@ -1,0 +1,268 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
+
+/// 课程详情弹窗组件
+///
+/// 简约的苹果风格设计，用于展示课程的完整信息
+class CourseDetailSheet extends StatelessWidget {
+  const CourseDetailSheet({
+    super.key,
+    required this.course,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  final CourseModel course;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+    final isDesktop = isTablet && !PlatformUtils.isAndroid && !PlatformUtils.isIOS;
+
+    return Container(
+      padding: EdgeInsets.all(isTablet ? 24 : 20),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: isDesktop
+            ? BorderRadius.circular(20)
+            : const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题栏
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  course.courseName,
+                  style: TextStyle(
+                    fontSize: isTablet ? 24 : 22,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (course.isCustom && (onEdit != null || onDelete != null))
+                _buildActionMenu(context, isDark),
+            ],
+          ),
+          SizedBox(height: isTablet ? 24 : 20),
+
+          // 课程信息列表
+          _buildInfoRow(
+            context,
+            icon: CupertinoIcons.location_solid,
+            label: '上课地点',
+            content: course.room,
+            color: const Color(0xFF007AFF),
+            isDark: isDark,
+          ),
+          SizedBox(height: isTablet ? 16 : 14),
+
+          _buildInfoRow(
+            context,
+            icon: course.teachers.length > 1
+                ? CupertinoIcons.person_2_fill
+                : CupertinoIcons.person_fill,
+            label: '授课教师',
+            content: course.teachers.join(', '),
+            color: const Color(0xFFFF3B30),
+            isDark: isDark,
+          ),
+          SizedBox(height: isTablet ? 16 : 14),
+
+          _buildInfoRow(
+            context,
+            icon: CupertinoIcons.calendar,
+            label: '上课时间',
+            content: _formatScheduleInfo(),
+            color: const Color(0xFF34C759),
+            isDark: isDark,
+          ),
+
+          if (course.campus.isNotEmpty) ...[
+            SizedBox(height: isTablet ? 16 : 14),
+            _buildInfoRow(
+              context,
+              icon: CupertinoIcons.building_2_fill,
+              label: '上课校区',
+              content: course.campus,
+              color: const Color(0xFFFF9500),
+              isDark: isDark,
+            ),
+          ],
+
+          if (course.credits.isNotEmpty) ...[
+            SizedBox(height: isTablet ? 16 : 14),
+            _buildInfoRow(
+              context,
+              icon: CupertinoIcons.star_fill,
+              label: '课程学分',
+              content: course.credits,
+              color: const Color(0xFFFFCC00),
+              isDark: isDark,
+            ),
+          ],
+
+          SizedBox(height: isTablet ? 24 : 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionMenu(BuildContext context, bool isDark) {
+    return PopupMenuButton(
+      icon: Icon(
+        Icons.more_horiz,
+        color: isDark ? Colors.grey[400] : Colors.grey[600],
+      ),
+      itemBuilder: (context) => [
+        if (onEdit != null)
+          PopupMenuItem(
+            value: 'edit',
+            child: const Row(
+              children: [
+                Icon(Icons.edit, size: 20),
+                SizedBox(width: 12),
+                Text('编辑课程'),
+              ],
+            ),
+          ),
+        if (onDelete != null)
+          PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete, size: 20, color: Colors.red[400]),
+                const SizedBox(width: 12),
+                Text('删除课程', style: TextStyle(color: Colors.red[400])),
+              ],
+            ),
+          ),
+      ],
+      onSelected: (value) {
+        Navigator.of(context).pop();
+        if (value == 'edit' && onEdit != null) {
+          onEdit!();
+        } else if (value == 'delete' && onDelete != null) {
+          onDelete!();
+        }
+      },
+    );
+  }
+
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String content,
+    required Color color,
+    required bool isDark,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 图标容器
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: color,
+          ),
+        ),
+        const SizedBox(width: 14),
+        // 文本内容
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                content,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatScheduleInfo() {
+    final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
+    return '${CourseModel.formatWeekRanges(course.weekIndexes)}周 '
+        '每周${weekdayName[course.weekday]} '
+        '第${course.startUnit}-${course.endUnit}节';
+  }
+
+  /// 显示课程详情弹窗
+  static Future<void> show(
+    BuildContext context,
+    CourseModel course, {
+    VoidCallback? onEdit,
+    VoidCallback? onDelete,
+  }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
+    if (isTablet && !PlatformUtils.isAndroid && !PlatformUtils.isIOS) {
+      // 桌面平台使用对话框
+      return showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: CourseDetailSheet(
+              course: course,
+              onEdit: onEdit,
+              onDelete: onDelete,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // 移动平台使用底部弹窗
+      return showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => CourseDetailSheet(
+          course: course,
+          onEdit: onEdit,
+          onDelete: onDelete,
+        ),
+      );
+    }
+  }
+}
