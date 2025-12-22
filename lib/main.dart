@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:display_mode/display_mode.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
@@ -54,18 +55,39 @@ void main() async {
     // 初始化 window_manager
     await windowManager.ensureInitialized();
 
-    // 配置窗口选项
-    WindowOptions windowOptions = const WindowOptions(
-      center: true,
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal,
-    );
+    // 根据平台配置不同的窗口选项
+    if (PlatformUtils.isMacOS) {
+      // macOS 专用窗口配置
+      WindowOptions windowOptions = const WindowOptions(
+        size: Size(1200, 800),
+        minimumSize: Size(900, 600),
+        center: true,
+        backgroundColor: Colors.transparent,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.hidden, // 隐藏标题栏以使用原生macOS样式
+        title: 'iOS Club App',
+      );
 
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    } else {
+      // 其他桌面平台的窗口配置
+      WindowOptions windowOptions = const WindowOptions(
+        size: Size(1200, 800),
+        minimumSize: Size(900, 600),
+        center: true,
+        backgroundColor: Colors.transparent,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.normal,
+      );
+
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
   } else if (PlatformUtils.isAndroid) {
     // 只在Android平台调用FlutterDisplayMode
     await FlutterDisplayMode.setHighRefreshRate();
@@ -122,10 +144,36 @@ void initApp() {
     runApp(MacosApp(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
-      theme: MacosThemeData.light(),
-      darkTheme: MacosThemeData.dark(),
+      // 亮色主题 - 使用 macOS 原生配色
+      theme: MacosThemeData.light().copyWith(
+        primaryColor: CupertinoColors.systemBlue,
+        // 使用 macOS 原生推送按钮样式
+        pushButtonTheme: const PushButtonThemeData(
+          color: CupertinoColors.systemBlue,
+          secondaryColor: CupertinoColors.systemGrey,
+        ),
+        // 帮助按钮主题
+        helpButtonTheme: const HelpButtonThemeData(
+          color: CupertinoColors.systemBlue,
+        ),
+      ),
+      // 暗色主题 - 使用 macOS 原生暗色配色
+      darkTheme: MacosThemeData.dark().copyWith(
+        primaryColor: CupertinoColors.systemBlue,
+        brightness: Brightness.dark,
+        // 暗色模式下的推送按钮样式
+        pushButtonTheme: const PushButtonThemeData(
+          color: CupertinoColors.systemBlue,
+          secondaryColor: CupertinoColors.systemGrey,
+        ),
+        // 暗色模式下的帮助按钮
+        helpButtonTheme: const HelpButtonThemeData(
+          color: CupertinoColors.systemBlue,
+        ),
+      ),
+      // 跟随系统设置自动切换亮暗模式
       themeMode: ThemeMode.system,
-      home: MainApp(),
+      home: const MainApp(),
     ));
     return;
   }

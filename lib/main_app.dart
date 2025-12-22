@@ -244,7 +244,15 @@ class _MainAppState extends State<MainApp> {
                     Get.toNamed(_routeMap[index] ?? '/');
                   },
                 ),
-                child: _app(isTablet || isMacOS))
+                // 添加 macOS 原生标题栏
+                titleBar: TitleBar(
+                  title: const Text('iOS Club App'),
+                  decoration: BoxDecoration(
+                    color: MacosTheme.of(context).canvasColor,
+                  ),
+                ),
+                child: _app(isTablet || isMacOS),
+              )
             : Scaffold(
                 body: SafeArea(
                     child: Row(

@@ -86,7 +86,7 @@ bool _platformIsMacOS() {
   // 使用 external 来延迟绑定
   try {
     // ignore: undefined_prefixed_name
-    return identical(0, 0x0) ? false : _checkPlatform('macos');
+    return _checkPlatform('macos');
   } catch (e) {
     return false;
   }
@@ -124,12 +124,23 @@ bool _platformIsIOS() {
   }
 }
 
-// 使用字符串比较来检查平台，避免直接引用 Platform
+// 使用 Flutter 的 TargetPlatform 枚举来准确判断平台
 bool _checkPlatform(String platform) {
   if (kIsWeb) return false;
 
-  // 使用 defaultTargetPlatform 来检测平台
-  // 这在所有环境中都可用
-  final targetPlatform = defaultTargetPlatform.toString().toLowerCase();
-  return targetPlatform.contains(platform);
+  // 直接使用 Flutter 的 defaultTargetPlatform 枚举进行平台判断
+  switch (platform) {
+    case 'macos':
+      return defaultTargetPlatform == TargetPlatform.macOS;
+    case 'windows':
+      return defaultTargetPlatform == TargetPlatform.windows;
+    case 'linux':
+      return defaultTargetPlatform == TargetPlatform.linux;
+    case 'android':
+      return defaultTargetPlatform == TargetPlatform.android;
+    case 'ios':
+      return defaultTargetPlatform == TargetPlatform.iOS;
+    default:
+      return false;
+  }
 }

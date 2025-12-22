@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -12,113 +11,127 @@ Sidebar macosUISidebar({
   required List<SidebarDestination> items,
   required int selectedIndex,
   required Function(int) onItemSelected,
-  double width = 200,
+  double width = 220,
 }) {
-  final searchFieldController = TextEditingController();
-
   return Sidebar(
-    snapToStartBuffer: width * 0.05,
-    minWidth: width * 0.9,
-    maxWidth: width * 1.1,
-    top: MacosSearchField(
-      placeholder: '搜索',
-      controller: searchFieldController,
-      onResultSelected: (result) {
-        // 根据搜索结果导航到对应页面
-        final routeMap = {
-          '首页': '/',
-          '课表': '/Schedule',
-          '成绩': '/Score',
-          '我的': '/Profile',
-          '电费': '/Electricity',
-          '校车': '/SchoolBus',
-          '饭卡': '/Payment',
-          '网络': '/Net',
-          '成员': '/iMember',
-          '链接': '/Link',
-          '关于': '/About',
-        };
-
-        if (routeMap.containsKey(result.searchKey)) {
-          Get.toNamed(routeMap[result.searchKey]!);
-          // 清空搜索框
-          searchFieldController.clear();
-        }
-      },
-      results: const [
-        SearchResultItem('首页'),
-        SearchResultItem('课表'),
-        SearchResultItem('成绩'),
-        SearchResultItem('我的'),
-        SearchResultItem('电费'),
-        SearchResultItem('校车'),
-        SearchResultItem('饭卡'),
-        SearchResultItem('网络'),
-        SearchResultItem('链接'),
-        SearchResultItem('关于'),
-      ],
-    ),
+    // 启用可调整大小的侧边栏，更符合 macOS 原生体验
+    isResizable: true,
+    minWidth: 180,
+    maxWidth: 280,
+    startWidth: width,
     builder: (context, scrollController) {
-      return SidebarItems(
-        currentIndex: selectedIndex,
-        scrollController: scrollController,
-        itemSize: SidebarItemSize.large,
-        onChanged: (index) {
-          onItemSelected(index);
-        },
-        items: items.map((destination) {
-          return SidebarItem(
-            label: Text(destination.label),
-            leading: MacosIcon(
-              selectedIndex == items.indexOf(destination)
-                  ? destination.selectedIcon
-                  : destination.icon,
-            ),
-          );
-        }).toList(),
-      );
-    },
-    bottom: Obx(() {
-      final UserStore userStore = UserStore.to;
+      // 在 builder 内部获取主题颜色
+      final separatorColor = CupertinoColors.separator.resolveFrom(context);
 
-      return MacosListTile(
-        onClick: () {
-          Get.toNamed('/Profile');
-        },
-        leading: MacosIcon(
-          CupertinoIcons.profile_circled,
-          size: 28,
-        ),
-        title: FutureBuilder(
-            future: _getUsername(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
-                  snapshot.data!,
-                  style: TextStyle(
-                    fontSize: 16,
-                    overflow: TextOverflow.ellipsis,
+      // 添加顶部内边距，为标题栏和交通灯按钮留出空间
+      return Column(
+        children: [
+          const SizedBox(height: 8),
+          // 侧边栏导航项
+          Expanded(
+            child: SidebarItems(
+              currentIndex: selectedIndex,
+              scrollController: scrollController,
+              itemSize: SidebarItemSize.large,
+              onChanged: (index) {
+                onItemSelected(index);
+              },
+              items: items.map((destination) {
+                final isSelected = selectedIndex == items.indexOf(destination);
+                return SidebarItem(
+                  label: Text(
+                    destination.label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                  leading: MacosIcon(
+                    isSelected ? destination.selectedIcon : destination.icon,
+                    size: 20,
                   ),
                 );
-              }
-              return Text('');
-            }),
-        subtitle: Text(
-          userStore.isLogin && userStore.isLoginMember
-              ? '教务系统账号 & iMember账号'
-              : userStore.isLogin
-                  ? '教务系统账号'
-                  : userStore.isLoginMember
-                      ? 'iMember账号'
-                      : '未登录',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-            overflow: TextOverflow.ellipsis,
+              }).toList(),
+            ),
           ),
-        ),
+        ],
       );
-    }),
+    },
+    // 底部用户信息卡片
+    bottom: Builder(
+      builder: (context) {
+        return Obx(() {
+          final UserStore userStore = UserStore.to;
+
+          return Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: CupertinoColors.separator.resolveFrom(context),
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: MacosListTile(
+              onClick: () {
+                Get.toNamed('/Profile');
+              },
+              leading: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: CupertinoColors.systemBlue.resolveFrom(context),
+                  shape: BoxShape.circle,
+                ),
+                child: const MacosIcon(
+                  CupertinoIcons.person_fill,
+                  size: 20,
+                  color: CupertinoColors.white,
+                ),
+              ),
+              title: FutureBuilder(
+                future: _getUsername(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    return Text(
+                      snapshot.data!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
+                    );
+                  }
+                  return const Text(
+                    '未登录',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  );
+                },
+              ),
+              subtitle: Text(
+                userStore.isLogin && userStore.isLoginMember
+                    ? '已登录两个账号'
+                    : userStore.isLogin
+                        ? '教务系统'
+                        : userStore.isLoginMember
+                            ? 'iMember'
+                            : '点击登录',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                maxLines: 1,
+              ),
+            ),
+          );
+        });
+      },
+    ),
   );
 }
 
