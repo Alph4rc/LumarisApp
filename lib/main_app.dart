@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -35,7 +36,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
 
-    if (!kIsWeb && Platform.isAndroid) {
+    if (PlatformUtils.isAndroid) {
       CheckUpdateManager.checkForUpdates().then((result) async {
         if (result.$1) {
           showUpdateDialog(result.$2);
@@ -179,13 +180,15 @@ class _MainAppState extends State<MainApp> {
                   : Transition.native,
           theme: ThemeData(
             fontFamily: SettingsStore.to.fontFamily.isEmpty
-                ? (!kIsWeb && Platform.isWindows ? '微软雅黑' : null)
-                : SettingsStore.to.fontFamily,
+                ? PlatformUtils.getWindowsFontFamily()
+                : PlatformUtils.getDesktopFontFamily(
+                    SettingsStore.to.fontFamily),
           ),
           darkTheme: ThemeData(
             fontFamily: SettingsStore.to.fontFamily.isEmpty
-                ? (!kIsWeb && Platform.isWindows ? '微软雅黑' : null)
-                : SettingsStore.to.fontFamily,
+                ? PlatformUtils.getWindowsFontFamily()
+                : PlatformUtils.getDesktopFontFamily(
+                    SettingsStore.to.fontFamily),
             brightness: Brightness.dark,
             appBarTheme: const AppBarTheme(
               systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -209,7 +212,7 @@ class _MainAppState extends State<MainApp> {
     final isTablet = screenWidth > 600;
 
     // 检测是否为 macOS 平台
-    final isMacOS = !kIsWeb && Platform.isMacOS;
+    final isMacOS = PlatformUtils.isMacOS;
 
     return (isTablet || isMacOS)
         ? isMacOS

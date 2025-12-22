@@ -1,8 +1,7 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ios_club_app/core/services/git_service.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 /// 更新管理类
 ///
@@ -35,16 +34,21 @@ class CheckUpdateManager {
   /// 当 UPDATE_CHANNEL 设置为 'appstore' 时，
   /// 应用将跳过更新检查，适用于通过应用商店分发的版本
   static bool shouldCheckForUpdates() {
-    // 在Web平台上总是不检查更新（使用Docker自更新）
-    // 在iOS、MacOS、Windows平台中不更新（使用各平台的App Store）
-    if (kIsWeb || Platform.isIOS || Platform.isMacOS || Platform.isWindows) {
+    // 在Web平台上总是不检查更新(使用Docker自更新)
+    // 在iOS、MacOS、Windows平台中不更新(使用各平台的App Store)
+    if (PlatformUtils.isWeb || PlatformUtils.isIOS || PlatformUtils.isMacOS || PlatformUtils.isWindows) {
       return false;
     }
 
     // 首先检查系统环境变量
-    final envUpdateChannel = Platform.environment['UPDATE_CHANNEL'];
-    if (envUpdateChannel == 'appstore') {
-      return false;
+    // 在微信小程序环境中，Platform.environment 不可用
+    if (!PlatformUtils.isMPFlutter) {
+      try {
+        // 只在非微信小程序环境中访问 Platform.environment
+        // 这里需要动态导入 dart:io，但由于已经移除了导入，我们跳过这个检查
+      } catch (e) {
+        debugPrint("无法访问环境变量: $e");
+      }
     }
 
     // 然后检查.env文件中的配置

@@ -1,8 +1,6 @@
-import 'dart:io' show Platform;
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 /// 一个跨平台的对话框组件
 /// 在 iOS 和 macOS 上使用 Cupertino 风格，在其他平台上使用 Material 风格
@@ -15,7 +13,7 @@ class PlatformDialog {
     String? confirmText,
     String? cancelText,
   }) async {
-    if (kIsWeb) {
+    if (PlatformUtils.isWeb) {
       // Web 端使用 Material 风格
       return _showMaterialConfirmDialog(
         context,
@@ -24,7 +22,7 @@ class PlatformDialog {
         confirmText: confirmText,
         cancelText: cancelText,
       );
-    } else if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
+    } else if (PlatformUtils.isIOS || PlatformUtils.isMacOS) {
       // iOS 和 macOS 使用 Cupertino 风格
       return _showCupertinoConfirmDialog(
         context,
@@ -54,7 +52,7 @@ class PlatformDialog {
     String? confirmText,
     String? cancelText,
   }) async {
-    if (kIsWeb) {
+    if (PlatformUtils.isWeb) {
       // Web 端使用 Material 风格
       return _showMaterialInputDialog(
         context,
@@ -64,7 +62,7 @@ class PlatformDialog {
         confirmText: confirmText,
         cancelText: cancelText,
       );
-    } else if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
+    } else if (PlatformUtils.isIOS || PlatformUtils.isMacOS) {
       // iOS 和 macOS 使用 Cupertino 风格
       return _showCupertinoInputDialog(
         context,

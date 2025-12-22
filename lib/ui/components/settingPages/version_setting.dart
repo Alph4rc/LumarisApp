@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/git_service.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
@@ -34,7 +32,7 @@ class _VersionSettingState extends State<VersionSetting> {
     PackageInfo.fromPlatform().then((packageInfo) {
       setState(() {
         version = packageInfo.version;
-        if (!kIsWeb && Platform.isAndroid) {
+        if (PlatformUtils.isAndroid) {
           CheckUpdateManager.checkForUpdates().then((res) {
             isNeedUpdate = res.$1;
             if (res.$1) {

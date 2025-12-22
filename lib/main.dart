@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:display_mode/display_mode.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/state/init.dart';
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
@@ -14,17 +14,27 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
-import 'dart:io';
 
 import 'main_app.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
-import 'package:mpflutter_core/mpflutter_core.dart' show kIsMPFlutter, runMPApp;
+import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
 import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
 
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 在微信小程序环境中，跳过大部分平台特定的初始化
+  if (PlatformUtils.isMPFlutter) {
+    // 只初始化必要的 Stores
+    initStores();
+    // 直接启动应用
+    initApp();
+    return;
+  }
+
+  // 以下代码只在非微信小程序环境中执行
 
   // 初始化性能监控
   PerformanceMonitor().initialize();
@@ -35,12 +45,12 @@ void main() async {
   // 初始化Stores
   initStores();
 
-  // 只在非 macOS 平台上请求权限，因为 macOS 上 permission_handler 有兼容性问题
-  if (!kIsWeb && !Platform.isMacOS) {
+  // 平台特定初始化 - 使用统一的平台判断
+  if (!PlatformUtils.isMacOS) {
     requestPermissions();
   }
 
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
+  if (PlatformUtils.isDesktop) {
     // 初始化 window_manager
     await windowManager.ensureInitialized();
 
@@ -56,19 +66,17 @@ void main() async {
       await windowManager.show();
       await windowManager.focus();
     });
-  } else if (!kIsWeb) {
-    if (Platform.isAndroid) {
-      // 只在Android平台调用FlutterDisplayMode
-      await FlutterDisplayMode.setHighRefreshRate();
-      await BackgroundService.initializeService();
-      await BackgroundService.startService();
-    } else if (Platform.isIOS) {
-      await IOSBackgroundService.initializeService();
-      await IOSBackgroundService.startService();
-    }
+  } else if (PlatformUtils.isAndroid) {
+    // 只在Android平台调用FlutterDisplayMode
+    await FlutterDisplayMode.setHighRefreshRate();
+    await BackgroundService.initializeService();
+    await BackgroundService.startService();
+  } else if (PlatformUtils.isIOS) {
+    await IOSBackgroundService.initializeService();
+    await IOSBackgroundService.startService();
   }
 
-  if (!kIsWeb && Platform.isMacOS) {
+  if (PlatformUtils.isMacOS) {
     await _configureMacosWindowUtils();
   }
 
@@ -85,19 +93,32 @@ Future<void> _configureMacosWindowUtils() async {
 }
 
 String? _getFontFamily() {
-  // 检查是否为桌面平台
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
+  if (PlatformUtils.isDesktop) {
     // 获取设置存储实例
     final settingsStore = SettingsStore.to;
     // 如果设置了自定义字体，则使用自定义字体，否则使用系统默认字体
-    return settingsStore.fontFamily.isEmpty ? null : settingsStore.fontFamily;
+    return PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
   }
-  // 非桌面平台保持原有逻辑
-  return !kIsWeb && Platform.isWindows ? '微软雅黑' : null;
+  // Windows 平台返回默认字体
+  return PlatformUtils.getWindowsFontFamily();
+}
+
+Widget _getHomePage() {
+  // 在微信小程序环境中，直接返回 MainApp
+  if (PlatformUtils.isMPFlutter) {
+    return const MainApp();
+  }
+
+  // Windows 平台返回 WindowPage
+  if (PlatformUtils.isWindows) {
+    return const WindowPage();
+  }
+
+  return const MainApp();
 }
 
 void initApp() {
-  if (!kIsWeb && (Platform.isMacOS)) {
+  if (PlatformUtils.isMacOS) {
     runApp(MacosApp(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
@@ -109,37 +130,18 @@ void initApp() {
     return;
   }
 
-  if (kIsMPFlutter) {
+  if (PlatformUtils.isMPFlutter) {
     try {
       wx.$$context$$;
+      runMPApp(MaterialApp(
+        title: 'iOS Club App',
+        debugShowCheckedModeBanner: false,
+        home: const MainApp(),
+      ));
+      return;
     } catch (e) {
       //
     }
-  }
-
-  if (kIsMPFlutter) {
-    runMPApp(MaterialApp(
-      title: 'iOS Club App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
-      home:
-          !kIsWeb && Platform.isWindows ? const WindowPage() : const MainApp(),
-    ));
-    return;
   }
 
   runApp(MaterialApp(
@@ -162,13 +164,15 @@ void initApp() {
         elevation: 0,
       ),
     ),
-    home: !kIsWeb && Platform.isWindows ? const WindowPage() : const MainApp(),
+    home: _getHomePage(),
   ));
 }
 
 void requestPermissions() async {
-  // 在 macOS 平台上不请求权限，避免 MissingPluginException
-  if (kIsWeb || Platform.isMacOS) {
+  // 在 Web、微信小程序和 macOS 平台中不请求权限，避免 MissingPluginException
+  if (PlatformUtils.isWeb ||
+      PlatformUtils.isMPFlutter ||
+      PlatformUtils.isMacOS) {
     return;
   }
 
@@ -223,7 +227,7 @@ class _WindowPageState extends State<WindowPage>
     await windowManager.setPreventClose(true);
 
     await trayManager.setIcon(
-      !kIsWeb && Platform.isWindows ? 'assets/icon.ico' : 'assets/icon.webp',
+      PlatformUtils.isWindows ? 'assets/icon.ico' : 'assets/icon.webp',
     );
   }
 
@@ -231,7 +235,8 @@ class _WindowPageState extends State<WindowPage>
   Future<void> _exitApp() async {
     _isPreventClose = false;
     await windowManager.setPreventClose(false);
-    exit(0);
+    // 使用 window_manager 的 destroy 方法代替 exit
+    await windowManager.destroy();
   }
 
   @override

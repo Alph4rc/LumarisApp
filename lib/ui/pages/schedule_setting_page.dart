@@ -1,12 +1,11 @@
-import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -93,7 +92,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final isDesktop = !kIsWeb && (Platform.isWindows || Platform.isLinux);
+    final isDesktop = PlatformUtils.isDesktop;
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -133,7 +132,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                                 }
                                 // 尝试启动系统日历
 
-                                if (!kIsWeb && Platform.isAndroid) {
+                                if (PlatformUtils.isAndroid) {
                                   final intent = AndroidIntent(
                                     action: 'android.intent.action.VIEW',
                                     data: 'webcal$url',

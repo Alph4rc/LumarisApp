@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:get/get.dart';
@@ -89,8 +87,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                                                   .toggleShowTomorrow();
                                               _initializeData(); // 重新加载数据
                                             }))),
-                                    if (!kIsWeb &&
-                                        (Platform.isIOS || Platform.isAndroid))
+                                    if (PlatformUtils.isIOS || PlatformUtils.isAndroid)
                                       ListTile(
                                         title: const Text('课程通知'),
                                         trailing: Obx(() => CupertinoSwitch(

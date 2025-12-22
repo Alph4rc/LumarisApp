@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:android_intent_plus/android_intent.dart';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/settingPages/version_setting.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -58,14 +59,13 @@ class SettingPage extends StatelessWidget {
                 _buildSettingsGroup([
                   _buildRefreshTile(context, isDark),
                   const ShowTomorrowSetting(),
-                  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
-                    const RemindSetting(),
+                  if (PlatformUtils.isMobile) const RemindSetting(),
                   const TodoListSetting(),
                   const TodoRemindSetting(), // 添加待办提醒设置
                   const HomePageSetting(),
-                  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+                  if (PlatformUtils.isMobile)
                     const HapticFeedbackSetting(), // 添加触觉反馈设置
-                  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+                  if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
                     const FontFamilySetting(), // 添加字体设置
                 ]),
                 const SizedBox(height: 24),
@@ -76,17 +76,14 @@ class SettingPage extends StatelessWidget {
                   const VersionSetting(),
                 ]),
                 const SizedBox(height: 24),
-                // 安卓小组件
-                if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
-                  _buildSectionTitle('小组件', isDark),
-                if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
-                  const SizedBox(height: 12),
-                if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+                // 移动端小组件
+                if (PlatformUtils.isMobile) _buildSectionTitle('小组件', isDark),
+                if (PlatformUtils.isMobile) const SizedBox(height: 12),
+                if (PlatformUtils.isMobile)
                   _buildSettingsGroup([
                     _buildWidgetTile(context, isDark),
                   ]),
-                if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
-                  const SizedBox(height: 24),
+                if (PlatformUtils.isMobile) const SizedBox(height: 24),
                 // 关于我们
                 _buildSectionTitle('关于', isDark),
                 const SizedBox(height: 12),
@@ -634,7 +631,7 @@ class SettingPage extends StatelessWidget {
   void _openWidgetSettings(BuildContext context) async {
     try {
       // 尝试直接打开小组件设置页面
-      if (Platform.isAndroid) {
+      if (PlatformUtils.isAndroid) {
         final intent = AndroidIntent(
           action: 'android.settings.ACTION_APPLICATION_DETAILS_SETTINGS',
           data: Uri.encodeFull('package: com.example.ios_club_app'),
@@ -663,7 +660,7 @@ class SettingPage extends StatelessWidget {
             confirmText: '清除缓存',
             cancelText: '取消',
           );
-          
+
           if (result == true) {
             showClubSnackBar(context, const Text('正在清除缓存...'));
             await RequestCache.instance.clear();

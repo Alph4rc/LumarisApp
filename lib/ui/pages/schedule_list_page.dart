@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'dart:io' show Platform, File;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show File;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -70,8 +70,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop =
-        !kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux);
+    final isDesktop = PlatformUtils.isDesktop;
 
     // 构建背景装饰
     Widget backgroundDecoration = const SizedBox.shrink();
@@ -792,13 +791,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     final isTablet = screenWidth > 600;
 
     var width = screenWidth;
-    if (isTablet &&
-        (kIsWeb ||
-            Platform.isAndroid ||
-            Platform.isIOS ||
-            Platform.isWindows)) {
+    if (isTablet && (PlatformUtils.isAndroid || PlatformUtils.isIOS || PlatformUtils.isWindows || PlatformUtils.isWeb)) {
       width = screenWidth - 300;
-    } else if (!kIsWeb && Platform.isMacOS && screenWidth > 500) {
+    } else if (PlatformUtils.isMacOS && screenWidth > 500) {
       width = screenWidth - 250;
     } else {
       width = screenWidth - 60;
