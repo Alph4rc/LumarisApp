@@ -109,7 +109,40 @@ void initApp() {
     return;
   }
 
-  runMPApp(MaterialApp(
+  if (kIsMPFlutter) {
+    try {
+      wx.$$context$$;
+    } catch (e) {
+      //
+    }
+  }
+
+  if (kIsMPFlutter) {
+    runMPApp(MaterialApp(
+      title: 'iOS Club App',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+      ),
+      home:
+          !kIsWeb && Platform.isWindows ? const WindowPage() : const MainApp(),
+    ));
+    return;
+  }
+
+  runApp(MaterialApp(
     title: 'iOS Club App',
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
@@ -131,17 +164,6 @@ void initApp() {
     ),
     home: !kIsWeb && Platform.isWindows ? const WindowPage() : const MainApp(),
   ));
-
-  /**
-   * 务必保留这段代码，否则第一次调用 wx 接口会提示异常。
-   */
-  if (kIsMPFlutter) {
-    try {
-      wx.$$context$$;
-    } catch (e) {
-      //
-    }
-  }
 }
 
 void requestPermissions() async {
