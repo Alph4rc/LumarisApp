@@ -19,9 +19,8 @@ import 'dart:io';
 import 'main_app.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
-import 'package:mpflutter_core/mpflutter_core.dart';
-import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart';
-import 'package:mpflutter_core/mpjs/mpjs.dart' as mpjs;
+import 'package:mpflutter_core/mpflutter_core.dart' show kIsMPFlutter, runMPApp;
+import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
 
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
@@ -29,7 +28,7 @@ void main() async {
 
   // 初始化性能监控
   PerformanceMonitor().initialize();
-  
+
   // 初始化请求缓存
   await RequestCache().initialize();
 
