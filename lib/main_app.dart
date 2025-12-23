@@ -15,6 +15,8 @@ import 'package:macos_ui/macos_ui.dart';
 import 'bottom_navigation.dart';
 import 'modern_sidebar.dart';
 import 'platform/macos/macos_ui_sidebar.dart';
+import 'platform/windows/windows_sidebar.dart';
+import 'platform/tablet/tablet_navigation.dart';
 import 'core/services/git_service.dart';
 import 'features/system/update/check_update_manager.dart';
 import 'under_maintenance_screen.dart';
@@ -225,77 +227,122 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // 判断是否为平板布局（宽度大于600）
-    final isTablet = screenWidth > 600;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    // 检测是否为 macOS 平台
+    // 判断设备类型
     final isMacOS = PlatformUtils.isMacOS;
+    final isWindows = PlatformUtils.isWindows;
+    final isLinux = !isMacOS && !isWindows && PlatformUtils.isDesktop;
 
-    return (isTablet || isMacOS)
-        ? isMacOS
-            ? MacosWindow(
-                sidebar: macosUISidebar(
-                  items: _destinations,
-                  selectedIndex: _currentIndex,
-                  onItemSelected: (int index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                    Get.toNamed(_routeMap[index] ?? '/');
-                  },
-                ),
-                // 添加 macOS 原生标题栏
-                titleBar: TitleBar(
-                  title: const Text('iOS Club App'),
-                  decoration: BoxDecoration(
-                    color: MacosTheme.of(context).canvasColor,
-                  ),
-                ),
-                child: _app(isTablet || isMacOS),
-              )
-            : Scaffold(
-                body: SafeArea(
-                    child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DesktopSidebar(
-                      items: _destinations,
-                      selectedIndex: _currentIndex,
-                      onItemSelected: (int index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                        Get.toNamed(_routeMap[index] ?? '/');
-                      },
-                    ),
-                    Expanded(
-                      child: _app(isTablet || isMacOS),
-                    ),
-                  ],
-                )),
-              )
-        : Scaffold(
-            body: SafeArea(child: _app(isTablet)),
-            bottomNavigationBar: BottomNavigation(
-              destinations: _destinations.sublist(0, 4).map((destination) {
-                return NavigationDestination(
-                  icon: Icon(destination.icon),
-                  selectedIcon: Icon(destination.selectedIcon),
-                  label: destination.label,
-                );
-              }).toList(),
-              selectedIndex: _currentIndex,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                Get.toNamed(_routeMap[index] ?? '/');
-              },
-              backgroundColor: Theme.of(context)
-                  .scaffoldBackgroundColor
-                  .withValues(alpha: 0.95),
-            ) // 不显示底部导航,
-            );
+    // 平板判断：宽度 > 600 且不是桌面平台
+    final isTablet = screenWidth > 600 && !PlatformUtils.isDesktop;
+
+    // 平板横屏判断（使用 NavigationRail）
+    final isTabletLandscape = isTablet && screenWidth > screenHeight;
+
+    // 平板竖屏判断（使用 Drawer）
+    final isTabletPortrait = isTablet && screenWidth <= screenHeight;
+
+    // macOS - 使用原生 macOS UI
+    if (isMacOS) {
+      return MacosWindow(
+        sidebar: macosUISidebar(
+          items: _destinations,
+          selectedIndex: _currentIndex,
+          onItemSelected: (int index) {
+            setState(() {
+              _currentIndex = index;
+            });
+            Get.toNamed(_routeMap[index] ?? '/');
+          },
+        ),
+        titleBar: TitleBar(
+          title: const Text('iOS Club App'),
+          decoration: BoxDecoration(
+            color: MacosTheme.of(context).canvasColor,
+          ),
+        ),
+        child: _app(true),
+      );
+    }
+
+    // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
+    if (isWindows || isLinux) {
+      return Scaffold(
+        body: SafeArea(
+          child: Row(
+            children: [
+              WindowsSidebar(
+                items: _destinations,
+                selectedIndex: _currentIndex,
+                onItemSelected: (int index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  Get.toNamed(_routeMap[index] ?? '/');
+                },
+              ),
+              Expanded(
+                child: _app(true),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // 平板横屏 - 使用 NavigationRail
+    if (isTabletLandscape) {
+      return TabletNavigation(
+        items: _destinations,
+        selectedIndex: _currentIndex,
+        onItemSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          Get.toNamed(_routeMap[index] ?? '/');
+        },
+        child: _app(true),
+      );
+    }
+
+    // 平板竖屏 - 使用 Drawer
+    if (isTabletPortrait) {
+      return TabletDrawerNavigation(
+        items: _destinations,
+        selectedIndex: _currentIndex,
+        onItemSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          Get.toNamed(_routeMap[index] ?? '/');
+        },
+        child: _app(true),
+      );
+    }
+
+    // 手机 - 使用底部导航栏
+    return Scaffold(
+      body: SafeArea(child: _app(false)),
+      bottomNavigationBar: BottomNavigation(
+        destinations: _destinations.sublist(0, 4).map((destination) {
+          return NavigationDestination(
+            icon: Icon(destination.icon),
+            selectedIcon: Icon(destination.selectedIcon),
+            label: destination.label,
+          );
+        }).toList(),
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          Get.toNamed(_routeMap[index] ?? '/');
+        },
+        backgroundColor: Theme.of(context)
+            .scaffoldBackgroundColor
+            .withValues(alpha: 0.95),
+      ),
+    );
   }
 }
