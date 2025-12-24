@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:display_mode/display_mode.dart';
 import 'package:flutter/cupertino.dart';
@@ -59,12 +60,12 @@ void main() async {
     if (PlatformUtils.isMacOS) {
       // macOS 专用窗口配置
       WindowOptions windowOptions = const WindowOptions(
-        size: Size(1200, 800),
-        minimumSize: Size(900, 600),
+        minimumSize: Size(800, 600),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
-        titleBarStyle: TitleBarStyle.hidden, // 隐藏标题栏以使用原生macOS样式
+        titleBarStyle: TitleBarStyle.hidden,
+        // 隐藏标题栏以使用原生macOS样式
         title: 'iOS Club App',
       );
 
@@ -75,8 +76,7 @@ void main() async {
     } else {
       // 其他桌面平台的窗口配置
       WindowOptions windowOptions = const WindowOptions(
-        size: Size(1200, 800),
-        minimumSize: Size(900, 600),
+        minimumSize: Size(800, 600),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
@@ -279,7 +279,7 @@ class _WindowPageState extends State<WindowPage>
     _isPreventClose = false;
     await windowManager.setPreventClose(false);
     // 使用 window_manager 的 destroy 方法代替 exit
-    await windowManager.destroy();
+    exit(0);
   }
 
   @override

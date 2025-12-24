@@ -64,19 +64,8 @@ class _HomePageState extends State<HomePage> {
           }
         }
       },
-      child: Scaffold(
-          body: SingleChildScrollView(
-              child: (width < 600)
-                  ? Column(children: list)
-                  : Wrap(
-                      children: List.generate(
-                          list.length,
-                          (index) => SizedBox(
-                              width: width > 750
-                                  ? (((width) /
-                                      ((index + 1) % 4 < 2 ? 3 : (1.5))))
-                                  : ((width) / 2),
-                              child: list[index]))))),
+      child:
+          Scaffold(body: SingleChildScrollView(child: Column(children: list))),
     );
   }
 }
