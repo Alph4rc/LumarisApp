@@ -19,6 +19,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/components/modal_components.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -748,8 +749,7 @@ class _ScorePageState extends State<ScorePage>
           children: [
             Icon(CupertinoIcons.time, size: 16, color: Colors.grey[600]),
             const SizedBox(width: 4),
-            Text('${item.credit}学分',
-                style: TextStyle(color: Colors.grey[600]))
+            Text('${item.credit}学分', style: TextStyle(color: Colors.grey[600]))
           ],
         ),
         Row(
@@ -757,8 +757,7 @@ class _ScorePageState extends State<ScorePage>
           children: [
             Icon(CupertinoIcons.location, size: 16, color: Colors.grey[600]),
             const SizedBox(width: 4),
-            Text('成绩 ${item.grade}',
-                style: TextStyle(color: Colors.grey[600]))
+            Text('成绩 ${item.grade}', style: TextStyle(color: Colors.grey[600]))
           ],
         ),
         Row(
@@ -766,8 +765,7 @@ class _ScorePageState extends State<ScorePage>
           children: [
             Icon(CupertinoIcons.star, size: 16, color: Colors.grey[600]),
             const SizedBox(width: 4),
-            Text('绩点 ${item.gpa}',
-                style: TextStyle(color: Colors.grey[600]))
+            Text('绩点 ${item.gpa}', style: TextStyle(color: Colors.grey[600]))
           ],
         ),
       ],
@@ -789,71 +787,43 @@ class _ScorePageState extends State<ScorePage>
   }
 
   Widget _buildScoreDetailsContent(ScoreModel score, bool isTablet) {
-    return Container(
-      padding: const EdgeInsets.all(20),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            score.name,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              height: 1.3,
-            ),
+          ModalHeader(
+            title: score.name,
+            subtitle: score.isMinor ? '辅修课程' : null,
           ),
-          const SizedBox(height: 20),
-          _buildDetailRow(
-              CupertinoIcons.time, Colors.blue, '${score.credit} 学分', isTablet),
-          _buildDetailRow(CupertinoIcons.location, Colors.redAccent,
-              '成绩 ${score.grade}', isTablet),
-          _buildDetailRow(
-              CupertinoIcons.star, Colors.green, '绩点 ${score.gpa}', isTablet),
-          _buildDetailRow(
-            CupertinoIcons.doc_text,
-            Colors.grey,
-            score.gradeDetail,
-            isTablet,
-            expanded: true,
+          ModalInfoRow(
+            icon: CupertinoIcons.star_fill,
+            label: '课程学分',
+            content: '${score.credit} 学分',
+            color: const Color(0xFFFFCC00),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(
-    IconData icon,
-    Color color,
-    String text,
-    bool isTablet, {
-    bool expanded = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Icon(icon, 
-              color: color, 
-              size: 18,
-            ),
+          const ModalSpacing(),
+          ModalInfoRow(
+            icon: CupertinoIcons.chart_bar_fill,
+            label: '课程成绩',
+            content: score.grade,
+            color: const Color(0xFFFF3B30),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
-              ),
-              softWrap: true,
-              maxLines: expanded ? 5 : 1,
-              overflow: expanded ? TextOverflow.ellipsis : null,
-            ),
+          const ModalSpacing(),
+          ModalInfoRow(
+            icon: CupertinoIcons.star_circle_fill,
+            label: '课程绩点',
+            content: score.gpa,
+            color: const Color(0xFF34C759),
+          ),
+          const ModalSpacing(),
+          ModalInfoRow(
+            icon: CupertinoIcons.doc_text_fill,
+            label: '成绩详情',
+            content: score.gradeDetail,
+            color: const Color(0xFF007AFF),
+            maxLines: 5,
           ),
         ],
       ),

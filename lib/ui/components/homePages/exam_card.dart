@@ -7,6 +7,7 @@ import 'package:ios_club_app/core/services/exam_service.dart';
 import '../club_card.dart';
 import '../club_modal_bottom_sheet.dart';
 import '../empty_widget.dart';
+import '../modal_components.dart';
 
 class ExamCard extends StatefulWidget {
   const ExamCard({super.key});
@@ -268,69 +269,31 @@ class _ExamCardState extends State<ExamCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          exam.title,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+        ModalHeader(title: exam.title),
+        ModalInfoRow(
+          icon: CupertinoIcons.clock,
+          label: '考试时间',
+          content: exam.time,
+          color: const Color(0xFF34C759),
         ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Icon(
-              CupertinoIcons.clock,
-              size: 22,
-              color: CupertinoColors.activeGreen,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              exam.time,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ],
-        ),
-        if (exam.location.isNotEmpty) SizedBox(height: 10),
-        if (exam.location.isNotEmpty)
-          Row(
-            children: [
-              Icon(
-                CupertinoIcons.placemark,
-                size: 22,
-                color: CupertinoColors.activeOrange,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                exam.location,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
+        if (exam.location.isNotEmpty) ...[
+          const ModalSpacing(),
+          ModalInfoRow(
+            icon: CupertinoIcons.placemark,
+            label: '考试地点',
+            content: exam.location,
+            color: const Color(0xFFFF9500),
           ),
-        if (exam.seat.isNotEmpty) SizedBox(height: 10),
-        if (exam.seat.isNotEmpty)
-          Row(
-            children: [
-              Icon(
-                CupertinoIcons.calendar,
-                size: 22,
-                color: CupertinoColors.destructiveRed,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '座位号 ${exam.seat}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
+        ],
+        if (exam.seat.isNotEmpty) ...[
+          const ModalSpacing(),
+          ModalInfoRow(
+            icon: CupertinoIcons.calendar,
+            label: '座位号',
+            content: exam.seat,
+            color: const Color(0xFFFF3B30),
           ),
+        ],
       ],
     );
   }

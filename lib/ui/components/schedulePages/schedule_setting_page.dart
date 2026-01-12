@@ -113,13 +113,14 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
             child: SafeArea(
               bottom: false,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios),
                     onPressed: () => Navigator.of(context).pop(),
                     tooltip: '返回',
                   ),
-                  const SizedBox(width: 8),
                   const Text(
                     '课表设置',
                     style: TextStyle(
@@ -127,6 +128,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                       fontWeight: FontWeight.w700,
                     ),
                   ),
+                  SizedBox(width: 40,)
                 ],
               ),
             ),
@@ -341,8 +343,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
       child: Column(
         children: [
           _buildBackgroundOption('无背景', '', isDark),
-          _buildBackgroundOption('深蓝色渐变', 'gradient1', isDark),
-          _buildBackgroundOption('粉红色渐变', 'gradient2', isDark),
           _buildBackgroundOption('自定义图片', 'custom', isDark),
           if (settingsStore.scheduleBackground == 'custom') ...[
             Padding(
@@ -414,7 +414,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
       ),
       child: Column(
         children: _ignores.asMap().entries.map((entry) {
-          final index = entry.key;
           final ignore = entry.value;
           return CourseIgnoreItem(
             ignore: ignore,

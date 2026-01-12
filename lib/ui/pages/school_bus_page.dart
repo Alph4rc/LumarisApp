@@ -7,6 +7,7 @@ import 'package:ios_club_app/core/models/bus_model.dart' show BusItem;
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/modal_components.dart';
 
 class SchoolBusPage extends StatelessWidget {
   const SchoolBusPage({super.key});
@@ -225,98 +226,55 @@ class SchoolBusPage extends StatelessWidget {
 
   Future<void> _showModalBottomSheet(BuildContext context, BusItem bus) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
-    var content = Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              bus.lineName,
-              style: const TextStyle(
-                fontSize: 20,
-                overflow: TextOverflow.ellipsis,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: isTablet ? 10 : 18),
-            Row(
-              children: [
-                const Icon(
-                  Icons.access_time,
-                  color: Colors.blue,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '出发时间: ${bus.runTime}',
-                  style: TextStyle(
-                    fontSize: isTablet ? 17 : 15,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: isTablet ? 10 : 18),
-            Row(children: [
-              const Icon(
-                Icons.location_on,
-                color: Colors.redAccent,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '终点: ${bus.arrivalStation}',
-                style: TextStyle(
-                  fontSize: isTablet ? 17 : 15,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              )
-            ]),
-            SizedBox(height: isTablet ? 10 : 18),
-            Row(children: [
-              const Icon(
-                Icons.grade,
-                color: Colors.green,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '预计时间: ${bus.arrivalStationTime}',
-                style: TextStyle(
-                  fontSize: isTablet ? 17 : 15,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ]),
-            SizedBox(height: isTablet ? 10 : 18),
-            Row(children: [
-              const Icon(
-                Icons.details,
-                color: Colors.green,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                // 添加 Expanded
-                child: Text(
-                  '校车信息: ${bus.description}',
-                  softWrap: true,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis, // 添加省略号
-                  style: TextStyle(
-                    fontSize: isTablet ? 17 : 15,
-                  ),
-                ),
-              ),
-            ]),
-          ],
-        ));
+    var content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ModalHeader(title: bus.lineName),
+        ModalInfoRow(
+          icon: Icons.access_time,
+          label: '出发时间',
+          content: bus.runTime,
+          color: const Color(0xFF007AFF),
+        ),
+        const ModalSpacing(),
+        ModalInfoRow(
+          icon: Icons.location_on,
+          label: '终点站',
+          content: bus.arrivalStation,
+          color: const Color(0xFFFF3B30),
+        ),
+        const ModalSpacing(),
+        ModalInfoRow(
+          icon: Icons.schedule,
+          label: '预计到达',
+          content: bus.arrivalStationTime,
+          color: const Color(0xFF34C759),
+        ),
+        const ModalSpacing(),
+        ModalInfoRow(
+          icon: Icons.info_outline,
+          label: '校车信息',
+          content: bus.description,
+          color: const Color(0xFFFF9500),
+          maxLines: 3,
+        ),
+      ],
+    );
 
     if (isTablet) {
       return showDialog<void>(
           context: context,
           builder: (BuildContext context) {
             return SimpleDialog(
-              children: <Widget>[content],
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: content,
+                )
+              ],
             );
           });
     }
