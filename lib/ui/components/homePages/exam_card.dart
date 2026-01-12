@@ -173,7 +173,6 @@ class _ExamCardState extends State<ExamCard> {
               '正在加载考试信息...',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.black87,
               ),
             ),
           ],
