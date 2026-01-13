@@ -375,14 +375,17 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
           ),
         ],
       ),
-      child: Column(
-        children: _ignores.asMap().entries.map((entry) {
-          final ignore = entry.value;
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _ignores.length,
+        itemBuilder: (context, index) {
+          final ignore = _ignores[index];
           return CourseIgnoreItem(
             ignore: ignore,
             onChanged: _handleIgnoreChange,
           );
-        }).toList(),
+        },
       ),
     );
   }

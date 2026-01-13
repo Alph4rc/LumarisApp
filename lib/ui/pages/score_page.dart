@@ -678,7 +678,15 @@ class _ScorePageState extends State<ScorePage>
                 ),
               ),
               const SizedBox(height: 16),
-              ...score.list.map(_buildScoreItem),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: score.list.length,
+                itemBuilder: (context, index) => AnimatedListItem(
+                  index: index,
+                  child: _buildScoreItem(score.list[index]),
+                ),
+              ),
             ],
           ),
         ),

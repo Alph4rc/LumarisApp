@@ -488,11 +488,19 @@ class MemberPage extends StatelessWidget {
                 ),
               )
             else
-              ...items.map((item) => _buildListItem(
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return _buildListItem(
                     item['title'] ?? item['name'],
                     item['description'],
                     isDarkMode,
-                  )),
+                  );
+                },
+              ),
           ],
         ),
       ),
