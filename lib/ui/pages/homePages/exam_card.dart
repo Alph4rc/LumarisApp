@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
-import 'package:ios_club_app/core/models/exam_model.dart';
+import 'package:ios_club_app/core/models/exam_result.dart';
 import 'package:ios_club_app/core/services/exam_service.dart';
 
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -19,6 +19,8 @@ class ExamCard extends StatefulWidget {
 class _ExamCardState extends State<ExamCard> {
   List<ExamData> examItems = [];
   bool isLoading = true;
+  String? errorMessage;
+  bool isNetworkError = false;
 
   @override
   void initState() {
@@ -29,17 +31,25 @@ class _ExamCardState extends State<ExamCard> {
     ExamService.getExam().then((result) => setExam(result));
   }
 
-  void setExam(List<ExamItem> result) {
+  void setExam(ExamResult result) {
     setState(() {
-      examItems = result
-          .map((course) => ExamData(
-                title: course.name,
-                time: course.examTime,
-                location: course.room,
-                color: CourseColorManager.generateSoftColor(course),
-                seat: course.seatNo,
-              ))
-          .toList();
+      if (result.isSuccess) {
+        examItems = result.exams
+            .map((course) => ExamData(
+                  title: course.name,
+                  time: course.examTime,
+                  location: course.room,
+                  color: CourseColorManager.generateSoftColor(course),
+                  seat: course.seatNo,
+                ))
+            .toList();
+        errorMessage = null;
+        isNetworkError = false;
+      } else {
+        examItems = [];
+        errorMessage = result.errorMessage;
+        isNetworkError = result.isNetworkError;
+      }
       isLoading = false;
     });
   }
@@ -47,6 +57,7 @@ class _ExamCardState extends State<ExamCard> {
   Future<void> getExam() async {
     setState(() {
       isLoading = true;
+      errorMessage = null;
     });
     final result = await ExamService.getExam(isRefresh: true);
     setExam(result);
@@ -83,7 +94,6 @@ class _ExamCardState extends State<ExamCard> {
             examCard()
           ],
         ));
-    
   }
 
   Widget examWrap(ExamData exam) {
@@ -176,6 +186,20 @@ class _ExamCardState extends State<ExamCard> {
               ),
             ),
           ],
+        ),
+      );
+    }
+
+    // 显示错误信息
+    if (errorMessage != null) {
+      return ClubCard(
+        padding: const EdgeInsets.all(20),
+        child: EmptyWidget(
+          title: isNetworkError ? '网络连接失败' : '加载失败',
+          subtitle: errorMessage!,
+          icon: isNetworkError
+              ? CupertinoIcons.wifi_slash
+              : CupertinoIcons.exclamationmark_triangle,
         ),
       );
     }
