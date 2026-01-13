@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/resource_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ResourceService {
   /// 获取所有资源
@@ -15,7 +16,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all resources: $e');
+        AppLogger.error('Error fetching all resources: $e');
       }
       return null;
     }
@@ -32,7 +33,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating resource: $e');
+        AppLogger.error('Error creating resource: $e');
       }
       return null;
     }
@@ -48,7 +49,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating resource: $e');
+        AppLogger.error('Error updating resource: $e');
       }
       return false;
     }
@@ -65,7 +66,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching resource by ID: $e');
+        AppLogger.error('Error fetching resource by ID: $e');
       }
       return null;
     }
@@ -81,7 +82,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting resource: $e');
+        AppLogger.error('Error deleting resource: $e');
       }
       return false;
     }
@@ -98,7 +99,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching resources by tag: $e');
+        AppLogger.error('Error fetching resources by tag: $e');
       }
       return null;
     }
@@ -115,7 +116,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error searching resources by name: $e');
+        AppLogger.error('Error searching resources by name: $e');
       }
       return null;
     }
@@ -135,7 +136,7 @@ class ResourceService {
       return null;
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all tags: $e');
+        AppLogger.error('Error fetching all tags: $e');
       }
       return null;
     }
@@ -151,7 +152,7 @@ class ResourceService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching resource statistics: $e');
+        AppLogger.error('Error fetching resource statistics: $e');
       }
       return false;
     }

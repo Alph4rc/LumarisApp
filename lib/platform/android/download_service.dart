@@ -8,6 +8,7 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 Future<void> updateApp(
   String name, {
@@ -39,12 +40,12 @@ Future<void> updateApp(
       await OpenFile.open(filePath);
     } catch (e) {
       if (kDebugMode) {
-        print('无法打开APK: $e');
+        AppLogger.debug('无法打开APK: $e');
       }
     }
 
     if (kDebugMode) {
-      print('APK下载成功: $filePath');
+      AppLogger.debug('APK下载成功: $filePath');
     }
   }
 }

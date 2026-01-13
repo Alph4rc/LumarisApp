@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ios_club_app/core/services/git_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 更新管理类
 ///
@@ -21,7 +21,7 @@ class CheckUpdateManager {
       await dotenv.load(fileName: ".env");
     } catch (e) {
       // 如果.env文件不存在，则忽略错误
-      debugPrint("未找到.env文件: $e");
+      AppLogger.debug("未找到.env文件: $e");
     }
   }
 
@@ -47,7 +47,7 @@ class CheckUpdateManager {
         // 只在非微信小程序环境中访问 Platform.environment
         // 这里需要动态导入 dart:io，但由于已经移除了导入，我们跳过这个检查
       } catch (e) {
-        debugPrint("无法访问环境变量: $e");
+        AppLogger.debug("无法访问环境变量: $e");
       }
     }
 
@@ -60,7 +60,7 @@ class CheckUpdateManager {
       }
     } catch (e) {
       // 如果 dotenv 未初始化则忽略
-      debugPrint("DotEnv 未初始化: $e");
+      AppLogger.debug("DotEnv 未初始化: $e");
     }
 
     // 默认情况下检查更新

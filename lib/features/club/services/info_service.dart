@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class InfoService {
   /// 获取学院信息
@@ -13,7 +14,7 @@ class InfoService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching academies: $e');
+        AppLogger.error('Error fetching academies: $e');
       }
     }
     return null;
@@ -29,7 +30,7 @@ class InfoService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching user info: $e');
+        AppLogger.error('Error fetching user info: $e');
       }
     }
     return null;

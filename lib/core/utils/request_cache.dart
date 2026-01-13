@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 缓存策略配置
 class CachePolicy {
@@ -121,7 +121,7 @@ class RequestCache {
       }
       return null;
     } catch (e) {
-      debugPrint('解析缓存数据失败: $e');
+      AppLogger.debug('解析缓存数据失败: $e');
       return null;
     }
   }
@@ -179,7 +179,7 @@ class RequestCache {
               await _prefs?.remove('${key}_expiry');
             }
           } catch (e) {
-            debugPrint('解析缓存键失败: $e');
+            AppLogger.debug('解析缓存键失败: $e');
           }
         }
       }

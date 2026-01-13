@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
@@ -8,6 +7,7 @@ import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
 import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ScheduleStore extends GetxController {
   static ScheduleStore get to => Get.find();
@@ -65,7 +65,7 @@ class ScheduleStore extends GetxController {
       await _loadPreferences();
     } catch (e) {
       // 错误处理
-      debugPrint('初始化课表数据出错: $e');
+      AppLogger.debug('初始化课表数据出错: $e');
     }
   }
 

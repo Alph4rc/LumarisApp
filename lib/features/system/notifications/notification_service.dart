@@ -11,6 +11,7 @@ import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
@@ -97,7 +98,7 @@ class NotificationService {
         courseTime.subtract(Duration(minutes: notificationTime));
 
     if (reminderTime.isBefore(now)) {
-      debugPrint('Cannot schedule notification for past reminder time');
+      AppLogger.debug('Cannot schedule notification for past reminder time');
       return;
     }
 
@@ -109,12 +110,12 @@ class NotificationService {
     if (android != null) {
       final canScheduleExact = await android.canScheduleExactNotifications();
       if (canScheduleExact == null || !canScheduleExact) {
-        debugPrint('Exact alarm scheduling not allowed');
+        AppLogger.debug('Exact alarm scheduling not allowed');
         return;
       }
     }
 
-    debugPrint('Scheduling notification at $tzDateTime with id=$id');
+    AppLogger.debug('Scheduling notification at $tzDateTime with id=$id');
 
     try {
       await notifications.zonedSchedule(
@@ -141,7 +142,7 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (e) {
-      debugPrint('Error scheduling notification: $e');
+      AppLogger.debug('Error scheduling notification: $e');
     }
   }
 
@@ -220,7 +221,7 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (e) {
-      debugPrint('Error scheduling todo notification: $e');
+      AppLogger.debug('Error scheduling todo notification: $e');
     }
   }
 

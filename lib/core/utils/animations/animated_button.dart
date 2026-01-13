@@ -8,7 +8,7 @@ import 'package:ios_club_app/core/utils/animations/app_animations.dart';
 /// 示例：
 /// ```dart
 /// AnimatedButton(
-///   onTap: () => print('Tapped'),
+///   onTap: () => AppLogger.debug('Tapped'),
 ///   child: YourButtonWidget(),
 /// )
 /// ```

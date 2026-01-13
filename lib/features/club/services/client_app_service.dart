@@ -5,6 +5,7 @@ import 'package:ios_club_app/features/club/models/client_application.dart';
 import 'package:ios_club_app/features/club/models/create_client_app_model.dart';
 import 'package:ios_club_app/features/club/models/update_client_app_model.dart';
 import 'package:ios_club_app/features/club/models/regenerate_secret_result.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ClientAppService {
   /// 获取所有客户端应用
@@ -17,7 +18,7 @@ class ClientAppService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all client apps: $e');
+        AppLogger.error('Error fetching all client apps: $e');
       }
     }
     return null;
@@ -33,7 +34,7 @@ class ClientAppService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating client app: $e');
+        AppLogger.error('Error creating client app: $e');
       }
     }
     return null;
@@ -49,7 +50,7 @@ class ClientAppService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching client app by ID: $e');
+        AppLogger.error('Error fetching client app by ID: $e');
       }
     }
     return null;
@@ -62,7 +63,7 @@ class ClientAppService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating client app: $e');
+        AppLogger.error('Error updating client app: $e');
       }
     }
     return false;
@@ -75,7 +76,7 @@ class ClientAppService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting client app: $e');
+        AppLogger.error('Error deleting client app: $e');
       }
     }
     return false;
@@ -91,7 +92,7 @@ class ClientAppService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error regenerating client secret: $e');
+        AppLogger.error('Error regenerating client secret: $e');
       }
     }
     return null;

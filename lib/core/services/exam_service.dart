@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/features/education/services/exam_api.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
@@ -9,6 +8,7 @@ import 'package:ios_club_app/core/models/exam_result.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 考试服务类，负责处理考试相关信息的获取和管理
 /// 包括从服务器获取考试数据、缓存管理、数据解析等功能
@@ -102,10 +102,10 @@ class ExamService {
 
       return (true, mergedData, ExamResult.empty());
     } on NetworkException catch (e) {
-      debugPrint('Network error: $e');
+      AppLogger.debug('Network error: $e');
       return await _retryWithNewLogin(cookieData, now, isNetworkError: true);
     } catch (e) {
-      debugPrint('Initial request failed: $e');
+      AppLogger.debug('Initial request failed: $e');
       return await _retryWithNewLogin(cookieData, now, isNetworkError: false);
     }
   }
@@ -135,7 +135,7 @@ class ExamService {
       // 使用ExamApi重新获取考试数据
       final response = await ExamApi.getExam(newCookie.studentId);
 
-      debugPrint('数据获取成功');
+      AppLogger.debug('数据获取成功');
 
       final prefs = await SharedPreferences.getInstance();
       final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
@@ -144,10 +144,10 @@ class ExamService {
       final mergedData = _mergeExamData(existingData, response, now);
       return (true, mergedData, ExamResult.empty());
     } on NetworkException catch (e) {
-      debugPrint('重试请求失败 - 网络错误: $e');
+      AppLogger.debug('重试请求失败 - 网络错误: $e');
       return (false, '', ExamResult.networkError(e.message));
     } catch (e) {
-      debugPrint('重试请求失败: $e');
+      AppLogger.debug('重试请求失败: $e');
       final errorMsg = isNetworkError ? '网络连接失败，请检查网络设置' : '获取考试信息失败: $e';
       return (
         false,
@@ -202,15 +202,15 @@ class ExamService {
             list.add(item);
           }
         } catch (e) {
-          debugPrint('时间解析失败: $e');
+          AppLogger.debug('时间解析失败: $e');
           continue;
         }
       }
     } catch (e) {
-      debugPrint('JSON解析失败: $e');
+      AppLogger.debug('JSON解析失败: $e');
     }
 
-    debugPrint('解析完成，找到${list.length}个有效考试');
+    AppLogger.debug('解析完成，找到${list.length}个有效考试');
     return list;
   }
 
@@ -279,7 +279,7 @@ class ExamService {
 
       return jsonEncode(mergedJson);
     } catch (e) {
-      debugPrint('合并考试数据失败: $e');
+      AppLogger.debug('合并考试数据失败: $e');
       // 合并失败时返回新数据
       return newExams;
     }
@@ -317,7 +317,7 @@ class ExamService {
 
       return DateTime(year, month, day, hour, minute);
     } catch (e) {
-      debugPrint('时间格式错误: $e');
+      AppLogger.debug('时间格式错误: $e');
       return null;
     }
   }

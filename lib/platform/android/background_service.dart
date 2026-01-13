@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 后台任务回调函数
 @pragma('vm:entry-point')
@@ -24,7 +25,7 @@ class BackgroundService {
     // 初始化 Android Alarm Manager
     await AndroidAlarmManager.initialize();
 
-    debugPrint('Android Alarm Manager 初始化完成');
+    AppLogger.debug('Android Alarm Manager 初始化完成');
   }
 
   /// 启动服务
@@ -54,14 +55,14 @@ class BackgroundService {
       TaskExecutor.updateWidget();
     });
 
-    debugPrint('周期性任务已注册');
+    AppLogger.debug('周期性任务已注册');
   }
 
   /// 停止服务
   static Future<void> stopService() async {
     await AndroidAlarmManager.cancel(_reminderAlarmId);
     await AndroidAlarmManager.cancel(_widgetAlarmId);
-    debugPrint('所有后台任务已取消');
+    AppLogger.debug('所有后台任务已取消');
   }
 
   /// 手动触发课程提醒检查

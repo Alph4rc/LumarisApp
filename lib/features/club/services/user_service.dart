@@ -4,6 +4,7 @@ import 'package:ios_club_app/features/club/models/member_model.dart';
 import 'package:ios_club_app/features/club/models/todo_model.dart';
 import 'package:ios_club_app/features/club/models/student_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class UserService {
   /// 获取用户数据
@@ -17,7 +18,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching user data: $e');
+        AppLogger.error('Error fetching user data: $e');
       }
       return null;
     }
@@ -34,7 +35,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching user todos: $e');
+        AppLogger.error('Error fetching user todos: $e');
       }
       return null;
     }
@@ -51,7 +52,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating user todo: $e');
+        AppLogger.error('Error creating user todo: $e');
       }
       return null;
     }
@@ -67,7 +68,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating user todo: $e');
+        AppLogger.error('Error updating user todo: $e');
       }
       return false;
     }
@@ -83,7 +84,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting user todo: $e');
+        AppLogger.error('Error deleting user todo: $e');
       }
       return false;
     }
@@ -100,7 +101,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching todo by id: $e');
+        AppLogger.error('Error fetching todo by id: $e');
       }
       return null;
     }
@@ -116,7 +117,7 @@ class UserService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating user profile: $e');
+        AppLogger.error('Error updating user profile: $e');
       }
       return false;
     }

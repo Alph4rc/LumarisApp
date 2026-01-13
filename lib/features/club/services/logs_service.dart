@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 日志服务类
 ///
@@ -48,7 +49,7 @@ class LogsService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching logs: $e');
+        AppLogger.error('Error fetching logs: $e');
       }
     }
     return null;
@@ -66,7 +67,7 @@ class LogsService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching log statistics: $e');
+        AppLogger.error('Error fetching log statistics: $e');
       }
     }
     return null;
@@ -85,7 +86,7 @@ class LogsService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error cleaning up logs: $e');
+        AppLogger.error('Error cleaning up logs: $e');
       }
     }
     return null;
@@ -104,7 +105,7 @@ class LogsService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching log distribution: $e');
+        AppLogger.error('Error fetching log distribution: $e');
       }
     }
     return null;

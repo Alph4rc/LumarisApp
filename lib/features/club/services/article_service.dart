@@ -4,6 +4,7 @@ import 'package:ios_club_app/features/club/models/article_model.dart';
 import 'package:ios_club_app/features/club/models/article_create_dto.dart';
 import 'package:ios_club_app/features/club/models/article_update_dto.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ArticleService {
   /// 获取所有文章
@@ -17,7 +18,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching articles: $e');
+        AppLogger.error('Error fetching articles: $e');
       }
       return null;
     }
@@ -34,7 +35,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating article: $e');
+        AppLogger.error('Error creating article: $e');
       }
       return null;
     }
@@ -51,7 +52,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching article by path: $e');
+        AppLogger.error('Error fetching article by path: $e');
       }
       return null;
     }
@@ -67,7 +68,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating article: $e');
+        AppLogger.error('Error updating article: $e');
       }
       return false;
     }
@@ -83,7 +84,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting article: $e');
+        AppLogger.error('Error deleting article: $e');
       }
       return false;
     }
@@ -99,7 +100,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error searching articles with highlights: $e');
+        AppLogger.error('Error searching articles with highlights: $e');
       }
       return null;
     }
@@ -115,7 +116,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching categories: $e');
+        AppLogger.error('Error fetching categories: $e');
       }
       return null;
     }
@@ -133,7 +134,7 @@ class ArticleService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating article orders: $e');
+        AppLogger.error('Error updating article orders: $e');
       }
       return false;
     }

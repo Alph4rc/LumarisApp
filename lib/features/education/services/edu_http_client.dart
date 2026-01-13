@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +6,7 @@ import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/network_exception.dart';
 import 'login_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class EduHttpClient {
   static const String baseUrl = 'https://xauatapi.xauat.site';
@@ -105,7 +105,7 @@ class EduHttpClient {
       
       return false;
     } catch (e) {
-      debugPrint('重登录失败: $e');
+      AppLogger.debug('重登录失败: $e');
       return false;
     }
   }

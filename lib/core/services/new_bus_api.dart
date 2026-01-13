@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import '../models/bus_model.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 新数据平台
 ///
@@ -106,7 +106,7 @@ Future<BusModel> getBusFromNewData({
     return BusModel(records: records, total: records.length);
   } catch (e) {
     // 发生错误时返回空数据或调用备用接口
-    debugPrint('获取班车数据失败: $e');
+    AppLogger.debug('获取班车数据失败: $e');
     return BusModel(records: [], total: 0);
   }
 }

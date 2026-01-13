@@ -6,6 +6,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/student_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 认证服务类
 /// 
@@ -49,7 +50,7 @@ class AuthService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error during login: $e');
+        AppLogger.error('Error during login: $e');
       }
     }
     return null;
@@ -70,7 +71,7 @@ class AuthService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error during signup: $e');
+        AppLogger.error('Error during signup: $e');
       }
       return false;
     }
@@ -92,7 +93,7 @@ class AuthService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error during logout: $e');
+        AppLogger.error('Error during logout: $e');
       }
       return false;
     }
@@ -113,7 +114,7 @@ class AuthService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error during validation: $e');
+        AppLogger.error('Error during validation: $e');
       }
       return false;
     }
@@ -137,7 +138,7 @@ class AuthService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error changing password: $e');
+        AppLogger.error('Error changing password: $e');
       }
       return false;
     }
@@ -159,7 +160,7 @@ class AuthService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error requesting password reset: $e');
+        AppLogger.error('Error requesting password reset: $e');
       }
       return false;
     }
@@ -184,7 +185,7 @@ class AuthService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error resetting password: $e');
+        AppLogger.error('Error resetting password: $e');
       }
       return false;
     }
@@ -214,7 +215,7 @@ class AuthService {
       return jwt;
     } catch (e) {
       if (kDebugMode) {
-        print('Error refreshing token: $e');
+        AppLogger.error('Error refreshing token: $e');
       }
       return null;
     }

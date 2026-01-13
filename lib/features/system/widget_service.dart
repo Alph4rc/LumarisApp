@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class WidgetService {
   // 更新小组件数据
@@ -23,7 +22,7 @@ class WidgetService {
     await HomeWidget.saveWidgetData<String>(
         'flutter.courses', jsonEncode(todayCourses));
 
-    debugPrint('小组件数据更新完成');
+    AppLogger.debug('小组件数据更新完成');
 
     // 刷新小组件
     await HomeWidget.updateWidget(
@@ -43,7 +42,7 @@ class WidgetService {
     await HomeWidget.saveWidgetData<String>(
         'flutter.tomorrow.tomorrowCourses', jsonEncode(courses['tomorrow']));
 
-    debugPrint('小组件数据更新完成');
+    AppLogger.debug('小组件数据更新完成');
 
     // 刷新小组件
     await HomeWidget.updateWidget(

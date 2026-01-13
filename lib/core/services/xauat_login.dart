@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' hide Key;
 import 'package:html/parser.dart' as html_parser;
 import 'package:encrypt/encrypt.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 登录令牌模型
 class LoginTokenModel {
@@ -69,7 +69,7 @@ class XAUATLogin {
 
       return encrypted.base64;
     } catch (e) {
-      debugPrint('加密失败: $e');
+      AppLogger.debug('加密失败: $e');
       return plaintext;
     }
   }
@@ -83,7 +83,7 @@ class XAUATLogin {
     try {
       return _encryptAes(password, _encryptSalt!);
     } catch (e) {
-      debugPrint('密码加密失败，使用明文密码: $e');
+      AppLogger.debug('密码加密失败，使用明文密码: $e');
       return password;
     }
   }
@@ -120,7 +120,7 @@ class XAUATLogin {
   /// 获取登录参数
   Future<Map<String, String>> _getLoginParams() async {
     try {
-      debugPrint('正在获取登录参数...');
+      AppLogger.debug('正在获取登录参数...');
 
       final uri = Uri.parse(loginUrl).replace(
         queryParameters: {'service': serviceUrl},
@@ -194,7 +194,7 @@ class XAUATLogin {
         'rememberMe': 'true',
       };
 
-      debugPrint('正在发送登录请求...');
+      AppLogger.debug('正在发送登录请求...');
 
       final uri = Uri.parse(loginUrl).replace(
         queryParameters: {'service': serviceUrl},
@@ -218,7 +218,7 @@ class XAUATLogin {
 
       // 处理登录响应
       if (response.statusCode == 302 || response.statusCode == 200) {
-        debugPrint('正在处理登录重定向...');
+        AppLogger.debug('正在处理登录重定向...');
 
         // 提取SSO Cookies
         final ssoCookies = _extractCookies(response.headers.map);
@@ -311,7 +311,7 @@ class XAUATLogin {
       }
 
       final eduCookieString = _buildCookieString(eduCookies);
-      debugPrint('SSO登录成功，获取eduCookie');
+      AppLogger.debug('SSO登录成功，获取eduCookie');
 
       return LoginTokenModel(
         eduCookie: eduCookieString,
@@ -345,11 +345,11 @@ void main() async {
   final result = await loginClient.login('2211030217', 'LIjiajun123456');
 
   if (result.success) {
-    debugPrint('登录成功！');
-    debugPrint('EDU Cookie: ${result.eduCookie}');
-    debugPrint('SSO Cookie: ${result.ssoCookie}');
+    AppLogger.debug('登录成功！');
+    AppLogger.debug('EDU Cookie: ${result.eduCookie}');
+    AppLogger.debug('SSO Cookie: ${result.ssoCookie}');
   } else {
-    debugPrint('登录失败: ${result.message}');
+    AppLogger.debug('登录失败: ${result.message}');
   }
 
   // 示例2：使用SSO Cookie登录

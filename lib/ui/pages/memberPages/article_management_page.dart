@@ -9,6 +9,7 @@ import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 文章管理页面
 /// 支持文章的增删改查
@@ -68,7 +69,7 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
         });
       }
     } catch (e) {
-      debugPrint('加载分类失败: $e');
+      AppLogger.debug('加载分类失败: $e');
     }
   }
 

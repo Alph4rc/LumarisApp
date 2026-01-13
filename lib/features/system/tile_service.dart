@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class TileService {
   static Future<double?> getTextAfterKeyword({String? url}) async {
@@ -52,7 +53,7 @@ class TileService {
       return null;
     } catch (e) {
       if (kDebugMode) {
-        print('请求失败: $e');
+        AppLogger.error('请求失败: $e');
       }
       return null;
     }

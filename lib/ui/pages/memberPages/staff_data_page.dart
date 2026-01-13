@@ -48,7 +48,7 @@ class _StaffDataPageState extends State<StaffDataPage> {
         isLoading = false;
       });
       // 可以在这里添加错误处理
-      // print('Error loading staff members: $e');
+      // AppLogger.error('Error loading staff members: $e');
     }
   }
 

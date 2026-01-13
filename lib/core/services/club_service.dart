@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:ios_club_app/features/club/services/auth_service.dart';
 import 'package:ios_club_app/features/club/services/user_service.dart';
 import 'package:ios_club_app/features/club/services/member_query_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 俱乐部服务类 - 为向后兼容而保留的接口
 /// 新代码应直接使用 clubServices 目录下的模块化服务
@@ -37,7 +38,7 @@ class ClubService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
 
@@ -63,7 +64,7 @@ class ClubService {
       data['memberData'] = memberData;
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
       prefs.setString(PrefsKeys.MEMBER_DATA, '');
       return {};
@@ -93,7 +94,7 @@ class ClubService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching members by page: $e');
+        AppLogger.error('Error fetching members by page: $e');
       }
     }
 
@@ -118,7 +119,7 @@ class ClubService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching staffs by page: $e');
+        AppLogger.error('Error fetching staffs by page: $e');
       }
     }
 
@@ -147,7 +148,7 @@ class ClubService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all member data: $e');
+        AppLogger.error('Error fetching all member data: $e');
       }
     }
     return [];

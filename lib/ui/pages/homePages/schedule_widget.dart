@@ -14,6 +14,7 @@ import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ScheduleWidget extends StatefulWidget {
   const ScheduleWidget({super.key});
@@ -43,7 +44,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
         isRemind = SettingsStore.to.isRemind;
       });
     } catch (e) {
-      debugPrint('初始化失败: $e');
+      AppLogger.debug('初始化失败: $e');
       // 可添加错误处理逻辑（如显示错误提示）
     }
   }

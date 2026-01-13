@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 分类服务类
 ///
@@ -16,7 +17,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all categories: $e');
+        AppLogger.error('Error fetching all categories: $e');
       }
       return null;
     }
@@ -32,7 +33,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching category by name: $e');
+        AppLogger.error('Error fetching category by name: $e');
       }
       return null;
     }
@@ -48,7 +49,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching category by id: $e');
+        AppLogger.error('Error fetching category by id: $e');
       }
       return null;
     }
@@ -64,7 +65,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching articles by category: $e');
+        AppLogger.error('Error fetching articles by category: $e');
       }
       return null;
     }
@@ -80,7 +81,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating or updating category: $e');
+        AppLogger.error('Error creating or updating category: $e');
       }
       return null;
     }
@@ -96,7 +97,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting category: $e');
+        AppLogger.error('Error deleting category: $e');
       }
       return null;
     }
@@ -112,7 +113,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating category order: $e');
+        AppLogger.error('Error updating category order: $e');
       }
       return null;
     }
@@ -130,7 +131,7 @@ class CategoryService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating category orders: $e');
+        AppLogger.error('Error updating category orders: $e');
       }
       return null;
     }

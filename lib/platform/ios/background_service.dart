@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// iOS后台任务回调函数
 @pragma('vm:entry-point')
@@ -21,14 +22,14 @@ class IOSBackgroundService {
   /// 初始化后台服务
   static Future<void> initializeService() async {
     // iOS平台不需要特殊的初始化
-    debugPrint('iOS Background Service 初始化完成');
+    AppLogger.debug('iOS Background Service 初始化完成');
   }
 
   /// 启动服务
   static Future<void> startService() async {
     // iOS平台使用不同的后台执行机制
     // 在iOS上，我们依赖系统提供的后台执行时间
-    debugPrint('iOS Background Service 已启动');
+    AppLogger.debug('iOS Background Service 已启动');
 
     // 启动定时更新
     _startPeriodicUpdate();
@@ -37,7 +38,7 @@ class IOSBackgroundService {
   /// 停止服务
   static Future<void> stopService() async {
     // iOS平台不需要特殊的停止操作
-    debugPrint('iOS Background Service 已停止');
+    AppLogger.debug('iOS Background Service 已停止');
 
     // 停止定时更新
     _stopPeriodicUpdate();
@@ -51,19 +52,19 @@ class IOSBackgroundService {
     _timer = Timer.periodic(
       const Duration(seconds: _updateInterval),
       (timer) async {
-        debugPrint('执行定时数据更新任务');
+        AppLogger.debug('执行定时数据更新任务');
         await performPeriodicUpdate();
       },
     );
 
-    debugPrint('定时数据更新已启动，间隔: $_updateInterval 秒');
+    AppLogger.debug('定时数据更新已启动，间隔: $_updateInterval 秒');
   }
 
   /// 执行定期更新任务
   @pragma('vm:entry-point')
   static Future<void> performPeriodicUpdate() async {
     try {
-      debugPrint('开始执行定期数据更新任务');
+      AppLogger.debug('开始执行定期数据更新任务');
 
       // 更新今日课程小组件
       await TaskExecutor.updateWidget();
@@ -71,9 +72,9 @@ class IOSBackgroundService {
       // 可以在这里添加其他需要定期更新的任务
       // 例如：更新用户数据、检查通知等
 
-      debugPrint('定期数据更新任务完成');
+      AppLogger.debug('定期数据更新任务完成');
     } catch (e) {
-      debugPrint('定期数据更新任务失败: $e');
+      AppLogger.debug('定期数据更新任务失败: $e');
     }
   }
 
@@ -81,7 +82,7 @@ class IOSBackgroundService {
   static void _stopPeriodicUpdate() {
     _timer?.cancel();
     _timer = null;
-    debugPrint('定时数据更新已停止');
+    AppLogger.debug('定时数据更新已停止');
   }
 
   /// 手动触发课程提醒检查

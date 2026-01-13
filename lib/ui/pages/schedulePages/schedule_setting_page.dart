@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ScheduleSettingPage extends StatefulWidget {
   const ScheduleSettingPage({super.key});
@@ -58,7 +59,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         });
       }
     } catch (e) {
-      debugPrint('Failed to load credentials: $e');
+      AppLogger.debug('Failed to load credentials: $e');
     }
   }
 
@@ -81,7 +82,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         _ignores = ignores;
       });
     } catch (e) {
-      debugPrint('Failed to load course data: $e');
+      AppLogger.debug('Failed to load course data: $e');
     }
   }
 
@@ -454,7 +455,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
           const Text('选择图片失败'),
         );
       }
-      debugPrint('选择背景图片失败: $e');
+      AppLogger.debug('选择背景图片失败: $e');
     }
   }
 

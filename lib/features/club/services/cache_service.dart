@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 缓存服务类
 ///
@@ -19,7 +20,7 @@ class CacheService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error cleaning cache: $e');
+        AppLogger.error('Error cleaning cache: $e');
       }
     }
     return null;

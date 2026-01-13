@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:ios_club_app/features/club/models/api_response.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// API 响应辅助工具类
 ///
@@ -27,13 +28,13 @@ class ApiResponseHelper {
           return fromJson(apiResponse.data!);
         } else {
           if (kDebugMode) {
-            print('$errorMessage: ${apiResponse.errorMessage}');
+            AppLogger.error('$errorMessage: ${apiResponse.errorMessage}');
           }
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('$errorMessage: $e');
+        AppLogger.error('$errorMessage: $e');
       }
     }
     return null;
@@ -61,13 +62,13 @@ class ApiResponseHelper {
               .toList();
         } else {
           if (kDebugMode) {
-            print('$errorMessage: ${apiResponse.errorMessage}');
+            AppLogger.error('$errorMessage: ${apiResponse.errorMessage}');
           }
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('$errorMessage: $e');
+        AppLogger.error('$errorMessage: $e');
       }
     }
     return null;
@@ -91,13 +92,13 @@ class ApiResponseHelper {
           return apiResponse.data;
         } else {
           if (kDebugMode) {
-            print('$errorMessage: ${apiResponse.errorMessage}');
+            AppLogger.error('$errorMessage: ${apiResponse.errorMessage}');
           }
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('$errorMessage: $e');
+        AppLogger.error('$errorMessage: $e');
       }
     }
     return null;
@@ -121,13 +122,13 @@ class ApiResponseHelper {
           return apiResponse.data ?? false;
         } else {
           if (kDebugMode) {
-            print('$errorMessage: ${apiResponse.errorMessage}');
+            AppLogger.error('$errorMessage: ${apiResponse.errorMessage}');
           }
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('$errorMessage: $e');
+        AppLogger.error('$errorMessage: $e');
       }
     }
     return false;
@@ -151,13 +152,13 @@ class ApiResponseHelper {
           return apiResponse.data;
         } else {
           if (kDebugMode) {
-            print('$errorMessage: ${apiResponse.errorMessage}');
+            AppLogger.error('$errorMessage: ${apiResponse.errorMessage}');
           }
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('$errorMessage: $e');
+        AppLogger.error('$errorMessage: $e');
       }
     }
     return null;
@@ -180,7 +181,7 @@ class ApiResponseHelper {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting ApiResponse: $e');
+        AppLogger.error('Error getting ApiResponse: $e');
       }
     }
     return null;

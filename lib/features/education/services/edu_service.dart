@@ -15,6 +15,7 @@ import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/models/plan_course.dart';
 import 'edu_api_client.dart';
 import 'login_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 教务系统服务类
 /// 提供与教务系统相关的所有操作，包括数据刷新、登录、信息获取等
@@ -45,7 +46,7 @@ class EduService {
       return true;
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
 
@@ -106,7 +107,7 @@ class EduService {
       final preNow = DateTime.now().millisecondsSinceEpoch;
       final response = await LoginService.login(username, password);
       if (kDebugMode) {
-        print('登录用时: ${DateTime.now().millisecondsSinceEpoch - preNow}');
+        AppLogger.debug('登录用时: ${DateTime.now().millisecondsSinceEpoch - preNow}');
       }
 
       if (response["success"] == true) {
@@ -118,7 +119,7 @@ class EduService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
 
@@ -168,7 +169,7 @@ class EduService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error reading local data: $e');
+        AppLogger.error('Error reading local data: $e');
       }
     }
     return null;
@@ -186,7 +187,7 @@ class EduService {
       await prefs.setString(PrefsKeys.THIS_SEMESTER_DATA, response);
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -211,7 +212,7 @@ class EduService {
       await prefs.setInt(PrefsKeys.SEMESTER_TIME, now);
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -271,7 +272,7 @@ class EduService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -298,7 +299,7 @@ class EduService {
       await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(json));
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -377,7 +378,7 @@ class EduService {
         return _buildScoreListFromCache(mergedScores, semesters);
       } catch (e) {
         if (kDebugMode) {
-          print('Error fetching data: $e');
+          AppLogger.error('Error fetching data: $e');
         }
       }
     }
@@ -439,7 +440,7 @@ class EduService {
           PrefsKeys.EXAM_DATA, jsonEncode(jsonDecode(response)));
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -459,7 +460,7 @@ class EduService {
       await prefs.setInt(PrefsKeys.TIME_LAST_UPDATED, now);
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -482,7 +483,7 @@ class EduService {
           PrefsKeys.INFO_DATA, jsonEncode(jsonDecode(response)));
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
   }
@@ -517,7 +518,7 @@ class EduService {
       return result;
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
 
@@ -538,12 +539,12 @@ class EduService {
       final response = await EduApiClient.getProgram(cookieData.studentId);
       var result = jsonDecode(response);
       if (kDebugMode) {
-        print('找到了培养方案：${result.length}');
+        AppLogger.debug('找到了培养方案：${result.length}');
       }
       return result.map<PlanCourse>((e) => PlanCourse.fromJson(e)).toList();
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
 
@@ -564,7 +565,7 @@ class EduService {
       final response = await EduApiClient.getProgramDic(cookieData.studentId);
       var result = jsonDecode(response);
       if (kDebugMode) {
-        print('找到了培养方案：${result.length}');
+        AppLogger.debug('找到了培养方案：${result.length}');
       }
       return result.entries
           .map<PlanCourseList>(
@@ -572,7 +573,7 @@ class EduService {
           .toList();
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data: $e');
+        AppLogger.error('Error fetching data: $e');
       }
     }
 

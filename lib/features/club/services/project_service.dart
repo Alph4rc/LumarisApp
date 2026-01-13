@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/project_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ProjectService {
   /// 获取所有项目
@@ -15,7 +16,7 @@ class ProjectService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all projects: $e');
+        AppLogger.error('Error fetching all projects: $e');
       }
       return null;
     }
@@ -32,7 +33,7 @@ class ProjectService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating project: $e');
+        AppLogger.error('Error creating project: $e');
       }
       return null;
     }
@@ -49,7 +50,7 @@ class ProjectService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching user projects: $e');
+        AppLogger.error('Error fetching user projects: $e');
       }
       return null;
     }
@@ -65,7 +66,7 @@ class ProjectService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting project: $e');
+        AppLogger.error('Error deleting project: $e');
       }
       return false;
     }
@@ -81,7 +82,7 @@ class ProjectService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error changing project member: $e');
+        AppLogger.error('Error changing project member: $e');
       }
       return false;
     }

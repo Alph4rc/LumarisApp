@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// IP黑名单服务类
 ///
@@ -18,7 +19,7 @@ class IpBlacklistService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching blacklist stats: $e');
+        AppLogger.error('Error fetching blacklist stats: $e');
       }
     }
     return null;
@@ -45,7 +46,7 @@ class IpBlacklistService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error adding IP to blacklist: $e');
+        AppLogger.error('Error adding IP to blacklist: $e');
       }
     }
     return null;
@@ -72,7 +73,7 @@ class IpBlacklistService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error removing IP from blacklist: $e');
+        AppLogger.error('Error removing IP from blacklist: $e');
       }
     }
     return null;
@@ -90,7 +91,7 @@ class IpBlacklistService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error refreshing blacklist: $e');
+        AppLogger.error('Error refreshing blacklist: $e');
       }
     }
     return null;
@@ -109,7 +110,7 @@ class IpBlacklistService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error checking IP: $e');
+        AppLogger.error('Error checking IP: $e');
       }
     }
     return null;

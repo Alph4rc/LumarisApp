@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/state/init.dart';
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
@@ -26,6 +27,9 @@ import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 日志系统已就绪（AppLogger 是静态类，无需初始化）
+  AppLogger.info('iOS Club App 启动中...');
 
   // 在微信小程序环境中，跳过大部分平台特定的初始化
   if (PlatformUtils.isMPFlutter) {

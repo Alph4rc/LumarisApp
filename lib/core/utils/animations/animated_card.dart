@@ -59,7 +59,7 @@ class AnimatedCard extends StatelessWidget {
 /// 示例：
 /// ```dart
 /// InteractiveCard(
-///   onTap: () => print('Tapped'),
+///   onTap: () => AppLogger.debug('Tapped'),
 ///   child: YourCardContent(),
 /// )
 /// ```
@@ -226,7 +226,7 @@ class _HoverCardState extends State<HoverCard>
 /// ```dart
 /// AnimatedInteractiveCard(
 ///   delay: Duration(milliseconds: 100),
-///   onTap: () => print('Tapped'),
+///   onTap: () => AppLogger.debug('Tapped'),
 ///   child: YourCardContent(),
 /// )
 /// ```

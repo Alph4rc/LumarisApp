@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/models/info_model.dart';
 import 'package:ios_club_app/core/models/score_model.dart';
@@ -9,6 +8,7 @@ import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/course_time.dart';
 import 'package:ios_club_app/core/models/semester_model.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 数据服务类，负责处理应用程序的各种数据操作
 ///
@@ -53,7 +53,7 @@ class DataService {
           }
         }
       } catch (e) {
-        debugPrint('解析服务器课程数据失败: $e');
+        AppLogger.debug('解析服务器课程数据失败: $e');
       }
     }
 
@@ -69,7 +69,7 @@ class DataService {
           }
         }
       } catch (e) {
-        debugPrint('解析自定义课程数据失败: $e');
+        AppLogger.debug('解析自定义课程数据失败: $e');
       }
     }
 

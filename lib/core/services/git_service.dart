@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class GiteeService {
   static Future<ReleaseModel> getReleases() async {
@@ -92,12 +93,12 @@ class GiteeService {
             await OpenFile.open(filePath);
           } catch (e) {
             if (kDebugMode) {
-              print('无法打开APK: $e');
+              AppLogger.debug('无法打开APK: $e');
             }
           }
 
           if (kDebugMode) {
-            print('APK下载成功: $filePath');
+            AppLogger.debug('APK下载成功: $filePath');
           }
           // 可在此处添加安装APK的逻辑
         } else {

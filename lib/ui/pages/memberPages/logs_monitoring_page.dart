@@ -6,6 +6,7 @@ import 'package:ios_club_app/features/club/services/ip_blacklist_service.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 日志监控页面
 /// 整合系统日志、性能监控和IP黑名单管理
@@ -120,7 +121,7 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
         setState(() => _statistics = stats);
       }
     } catch (e) {
-      debugPrint('加载统计失败: $e');
+      AppLogger.debug('加载统计失败: $e');
     }
   }
 

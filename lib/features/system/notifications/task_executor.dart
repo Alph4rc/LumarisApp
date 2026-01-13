@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
@@ -9,6 +8,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 任务执行器 - 实际的业务逻辑
 @pragma('vm:entry-point')
@@ -21,7 +21,7 @@ class TaskExecutor {
       // 检查是否启用提醒
       final isReminderEnabled = prefs.getBool(PrefsKeys.IS_REMIND) ?? false;
       if (!isReminderEnabled) {
-        debugPrint('课程提醒未启用');
+        AppLogger.debug('课程提醒未启用');
         return;
       }
 
@@ -33,11 +33,11 @@ class TaskExecutor {
         try {
           final lastRemindDate = DateTime.parse(lastRemindTimeStr);
           if (_isSameDay(now, lastRemindDate)) {
-            debugPrint('今天已经提醒过了');
+            AppLogger.debug('今天已经提醒过了');
             return;
           }
         } catch (e) {
-          debugPrint('解析上次提醒时间失败: $e');
+          AppLogger.debug('解析上次提醒时间失败: $e');
         }
       }
 
@@ -56,15 +56,15 @@ class TaskExecutor {
           // 记录提醒时间（使用ISO格式字符串）
           await prefs.setString(
               PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
-          debugPrint('课程提醒发送成功: ${now.toIso8601String()}');
+          AppLogger.debug('课程提醒发送成功: ${now.toIso8601String()}');
         } else {
-          debugPrint('没有需要提醒的课程');
+          AppLogger.debug('没有需要提醒的课程');
         }
       } catch (e) {
-        debugPrint('获取课程或发送提醒失败: $e');
+        AppLogger.debug('获取课程或发送提醒失败: $e');
       }
     } catch (e) {
-      debugPrint('课程提醒检查失败: $e');
+      AppLogger.debug('课程提醒检查失败: $e');
     }
   }
 
@@ -74,7 +74,7 @@ class TaskExecutor {
       await updateTodayWidget();
       await updateTodayAndTomorrowWidget();
     } catch (e) {
-      debugPrint('更新小组件失败: $e');
+      AppLogger.debug('更新小组件失败: $e');
     }
   }
 
@@ -95,14 +95,14 @@ class TaskExecutor {
       if (courses.isNotEmpty) {
         final scheduleItems = _convertToScheduleItems(courses);
         await WidgetService.updateTodayCourses(scheduleItems);
-        debugPrint('小组件更新成功: ${DateTime.now().toIso8601String()}');
+        AppLogger.debug('小组件更新成功: ${DateTime.now().toIso8601String()}');
       } else {
         // 没有课程也要更新小组件显示"今日无课"
         await WidgetService.updateTodayCourses([]);
-        debugPrint('今日无课，小组件已更新');
+        AppLogger.debug('今日无课，小组件已更新');
       }
     } catch (e) {
-      debugPrint('更新小组件失败: $e');
+      AppLogger.debug('更新小组件失败: $e');
     }
   }
 
@@ -123,15 +123,15 @@ class TaskExecutor {
         scheduleItems['tomorrow'] =
             _convertToScheduleItems(courses['tomorrow']!);
         await WidgetService.updateTodayAndTomorrowCourses(scheduleItems);
-        debugPrint('小组件更新成功: ${DateTime.now().toIso8601String()}');
+        AppLogger.debug('小组件更新成功: ${DateTime.now().toIso8601String()}');
       } else {
         // 没有课程也要更新小组件显示"今日无课"
         await WidgetService.updateTodayAndTomorrowCourses(
             {'today': [], 'tomorrow': []});
-        debugPrint('今日无课，小组件已更新');
+        AppLogger.debug('今日无课，小组件已更新');
       }
     } catch (e) {
-      debugPrint('更新小组件失败: $e');
+      AppLogger.debug('更新小组件失败: $e');
     }
   }
 
@@ -151,7 +151,7 @@ class TaskExecutor {
           teacher: course.teachers.join(','),
         ));
       } catch (e) {
-        debugPrint('转换课程 ${course.courseName} 失败: $e');
+        AppLogger.debug('转换课程 ${course.courseName} 失败: $e');
         // 即使单个课程转换失败，也继续处理其他课程
         continue;
       }

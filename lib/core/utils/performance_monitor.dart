@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 性能监控工具类
 class PerformanceMonitor {
@@ -28,7 +29,7 @@ class PerformanceMonitor {
   /// 初始化性能监控
   void initialize() {
     _startTime = DateTime.now();
-    debugPrint('性能监控初始化完成，启动时间: $_startTime');
+    AppLogger.debug('性能监控初始化完成，启动时间: $_startTime');
     
     // 定期记录性能指标
     if (kDebugMode) {
@@ -57,7 +58,7 @@ class PerformanceMonitor {
     final cpuUsage = 10 + Random().nextDouble() * 30;
     _cpuUsage.add(cpuUsage);
     
-    debugPrint('性能指标 - 内存: ${memoryUsage.toStringAsFixed(2)} MB, CPU: ${cpuUsage.toStringAsFixed(2)}%');
+    AppLogger.debug('性能指标 - 内存: ${memoryUsage.toStringAsFixed(2)} MB, CPU: ${cpuUsage.toStringAsFixed(2)}%');
   }
 
   /// 记录页面渲染时间
@@ -67,7 +68,7 @@ class PerformanceMonitor {
     }
     _pageRenderTimes[pageName]!.add(renderTime);
     
-    debugPrint('页面渲染时间 - $pageName: $renderTime ms');
+    AppLogger.debug('页面渲染时间 - $pageName: $renderTime ms');
   }
 
   /// 获取应用启动时间

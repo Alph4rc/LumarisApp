@@ -22,6 +22,7 @@ import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({super.key});
@@ -119,7 +120,7 @@ class _ScorePageState extends State<ScorePage>
         return jsonList.map((value) => ScoreList.fromJson(value)).toList();
       } catch (e) {
         if (kDebugMode) {
-          print('Error parsing cached data: $e');
+          AppLogger.error('Error parsing cached data: $e');
         }
       }
     }
@@ -183,7 +184,7 @@ class _ScorePageState extends State<ScorePage>
       if (mounted) {
         showClubSnackBar(context, Text('获取数据失败: ${e.toString()}'));
       }
-      debugPrint('Error fetching data: $e');
+      AppLogger.debug('Error fetching data: $e');
     } finally {
       _isFool = false;
     }
@@ -224,7 +225,7 @@ class _ScorePageState extends State<ScorePage>
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching semester scores: $e');
+        AppLogger.error('Error fetching semester scores: $e');
       }
       return null;
     }

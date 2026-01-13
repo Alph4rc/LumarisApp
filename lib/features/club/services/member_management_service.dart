@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/student_model.dart';
 import 'package:ios_club_app/features/club/models/reset_password_data.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class MemberManagementService {
   /// 删除成员
@@ -12,7 +13,7 @@ class MemberManagementService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting member: $e');
+        AppLogger.error('Error deleting member: $e');
       }
     }
     return false;
@@ -28,7 +29,7 @@ class MemberManagementService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating many members: $e');
+        AppLogger.error('Error updating many members: $e');
       }
     }
     return false;
@@ -41,7 +42,7 @@ class MemberManagementService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating member: $e');
+        AppLogger.error('Error updating member: $e');
       }
     }
     return false;
@@ -54,7 +55,7 @@ class MemberManagementService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error resetting password: $e');
+        AppLogger.error('Error resetting password: $e');
       }
     }
     return false;

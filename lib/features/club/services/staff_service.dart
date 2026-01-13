@@ -3,6 +3,7 @@ import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/staff_model.dart';
 import 'package:ios_club_app/features/club/models/member_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class StaffService {
   /// 获取所有员工
@@ -16,7 +17,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all staff: $e');
+        AppLogger.error('Error fetching all staff: $e');
       }
       return null;
     }
@@ -33,7 +34,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching staff members: $e');
+        AppLogger.error('Error fetching staff members: $e');
       }
       return null;
     }
@@ -50,7 +51,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching staff by user ID: $e');
+        AppLogger.error('Error fetching staff by user ID: $e');
       }
       return null;
     }
@@ -66,7 +67,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating staff: $e');
+        AppLogger.error('Error creating staff: $e');
       }
       return false;
     }
@@ -82,7 +83,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating staff: $e');
+        AppLogger.error('Error updating staff: $e');
       }
       return false;
     }
@@ -98,7 +99,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting staff: $e');
+        AppLogger.error('Error deleting staff: $e');
       }
       return false;
     }
@@ -115,7 +116,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching staff by identity: $e');
+        AppLogger.error('Error fetching staff by identity: $e');
       }
       return null;
     }
@@ -131,7 +132,7 @@ class StaffService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error changing staff department: $e');
+        AppLogger.error('Error changing staff department: $e');
       }
       return false;
     }

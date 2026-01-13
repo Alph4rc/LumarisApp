@@ -6,6 +6,7 @@ import 'package:ios_club_app/features/club/models/academy_count.dart';
 import 'package:ios_club_app/features/club/models/landscape_count.dart';
 import 'package:ios_club_app/features/club/models/gender_count.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class DataCentreService {
   /// 获取年份统计
@@ -19,7 +20,7 @@ class DataCentreService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching year statistics: $e');
+        AppLogger.error('Error fetching year statistics: $e');
       }
       return null;
     }
@@ -36,7 +37,7 @@ class DataCentreService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching academy statistics: $e');
+        AppLogger.error('Error fetching academy statistics: $e');
       }
       return null;
     }
@@ -53,7 +54,7 @@ class DataCentreService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching grade statistics: $e');
+        AppLogger.error('Error fetching grade statistics: $e');
       }
       return null;
     }
@@ -70,7 +71,7 @@ class DataCentreService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching landscape statistics: $e');
+        AppLogger.error('Error fetching landscape statistics: $e');
       }
       return null;
     }
@@ -87,7 +88,7 @@ class DataCentreService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching gender statistics: $e');
+        AppLogger.error('Error fetching gender statistics: $e');
       }
       return null;
     }
@@ -101,7 +102,7 @@ class DataCentreService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating from JSON: $e');
+        AppLogger.error('Error updating from JSON: $e');
       }
     }
     return false;
@@ -118,7 +119,7 @@ class DataCentreService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error getting data: $e');
+        AppLogger.error('Error getting data: $e');
       }
       return null;
     }
@@ -131,7 +132,7 @@ class DataCentreService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error exporting to JSON: $e');
+        AppLogger.error('Error exporting to JSON: $e');
       }
     }
     return false;
@@ -144,7 +145,7 @@ class DataCentreService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error cleaning data: $e');
+        AppLogger.error('Error cleaning data: $e');
       }
     }
     return false;

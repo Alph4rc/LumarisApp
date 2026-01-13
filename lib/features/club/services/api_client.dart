@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ApiClient {
   static const String _baseUrl = 'https://api.xauat.site';
@@ -34,7 +35,7 @@ class ApiClient {
       final cachedData = await _cache.get(uri.toString());
       if (cachedData != null) {
         if (kDebugMode) {
-          print('GET $uri (from cache)');
+          AppLogger.debug('GET $uri (from cache)');
         }
         // 返回缓存数据作为http.Response
         return http.Response(
@@ -48,7 +49,7 @@ class ApiClient {
     // 缓存不存在或不使用缓存，发起网络请求
     final headers = await getHeaders(withAuth: withAuth);
     if (kDebugMode) {
-      print('GET $uri');
+      AppLogger.debug('GET $uri');
     }
     final response = await http.get(uri, headers: headers);
     
@@ -59,7 +60,7 @@ class ApiClient {
         await _cache.set(uri.toString(), data);
       } catch (e) {
         if (kDebugMode) {
-          print('Failed to cache response: $e');
+          AppLogger.error('Failed to cache response: $e');
         }
       }
     }
@@ -72,9 +73,9 @@ class ApiClient {
     final uri = Uri.parse('$_baseUrl$path');
     final encodedBody = body != null ? jsonEncode(body) : null;
     if (kDebugMode) {
-      print('POST $uri');
+      AppLogger.debug('POST $uri');
       if (encodedBody != null) {
-        print('Body: $encodedBody');
+        AppLogger.debug('Body: $encodedBody');
       }
     }
     return http.post(uri, headers: headers, body: encodedBody);
@@ -85,9 +86,9 @@ class ApiClient {
     final uri = Uri.parse('$_baseUrl$path');
     final encodedBody = body != null ? jsonEncode(body) : null;
     if (kDebugMode) {
-      print('PUT $uri');
+      AppLogger.debug('PUT $uri');
       if (encodedBody != null) {
-        print('Body: $encodedBody');
+        AppLogger.debug('Body: $encodedBody');
       }
     }
     return http.put(uri, headers: headers, body: encodedBody);
@@ -97,7 +98,7 @@ class ApiClient {
     final headers = await getHeaders(withAuth: withAuth);
     final uri = Uri.parse('$_baseUrl$path');
     if (kDebugMode) {
-      print('DELETE $uri');
+      AppLogger.debug('DELETE $uri');
     }
     return http.delete(uri, headers: headers);
   }

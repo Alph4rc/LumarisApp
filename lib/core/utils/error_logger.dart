@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 统一的错误日志系统
 ///
@@ -30,7 +31,7 @@ class ErrorLogger {
           }
         }
       } catch (e) {
-        debugPrint('Failed to initialize error logger: $e');
+        AppLogger.debug('Failed to initialize error logger: $e');
       }
     }
   }
@@ -57,9 +58,9 @@ class ErrorLogger {
 
     // 开发环境：输出到控制台
     if (kDebugMode) {
-      debugPrint(logMessage);
+      AppLogger.debug(logMessage);
       if (stackTrace != null) {
-        debugPrint('StackTrace: $stackTrace');
+        AppLogger.debug('StackTrace: $stackTrace');
       }
     }
 
@@ -85,7 +86,7 @@ class ErrorLogger {
         mode: FileMode.append,
       );
     } catch (e) {
-      debugPrint('Failed to write log: $e');
+      AppLogger.debug('Failed to write log: $e');
     }
   }
 
@@ -103,7 +104,7 @@ class ErrorLogger {
       try {
         return await _logFile!.readAsString();
       } catch (e) {
-        debugPrint('Failed to read logs: $e');
+        AppLogger.debug('Failed to read logs: $e');
         return null;
       }
     }
@@ -117,7 +118,7 @@ class ErrorLogger {
         await _logFile!.writeAsString('');
         logInfo('Logs cleared');
       } catch (e) {
-        debugPrint('Failed to clear logs: $e');
+        AppLogger.debug('Failed to clear logs: $e');
       }
     }
   }

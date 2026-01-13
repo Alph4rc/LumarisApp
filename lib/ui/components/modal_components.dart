@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 ///           title: '详细信息',
 ///           subtitle: '可选的副标题',
 ///           actions: ModalActionMenu(
-///             onEdit: () => print('编辑'),
+///             onEdit: () => AppLogger.debug('编辑'),
 ///             onDelete: () => print('删除'),
 ///           ),
 ///         ),

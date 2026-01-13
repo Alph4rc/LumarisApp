@@ -59,7 +59,7 @@ class _MemberDataPageState extends State<MemberDataPage> {
         isLoading = false;
       });
       // 可以在这里添加错误处理
-      // print('Error loading members: $e');
+      // AppLogger.error('Error loading members: $e');
     }
   }
 

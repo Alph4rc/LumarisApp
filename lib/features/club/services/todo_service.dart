@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/todo_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class TodoService {
   /// 获取所有待办事项
@@ -15,7 +16,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all todos: $e');
+        AppLogger.error('Error fetching all todos: $e');
       }
       return null;
     }
@@ -31,7 +32,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating todo: $e');
+        AppLogger.error('Error creating todo: $e');
       }
       return null;
     }
@@ -47,7 +48,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating todo: $e');
+        AppLogger.error('Error updating todo: $e');
       }
       return false;
     }
@@ -63,7 +64,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching todo statistics: $e');
+        AppLogger.error('Error fetching todo statistics: $e');
       }
       return false;
     }
@@ -80,7 +81,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching todo by ID: $e');
+        AppLogger.error('Error fetching todo by ID: $e');
       }
       return null;
     }
@@ -96,7 +97,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting todo: $e');
+        AppLogger.error('Error deleting todo: $e');
       }
       return false;
     }
@@ -113,7 +114,7 @@ class TodoService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching todos by page: $e');
+        AppLogger.error('Error fetching todos by page: $e');
       }
       return null;
     }

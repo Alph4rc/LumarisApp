@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class MemberQueryService {
   /// 获取所有成员数据
@@ -11,7 +12,7 @@ class MemberQueryService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all member data: $e');
+        AppLogger.error('Error fetching all member data: $e');
       }
     }
     return null;
@@ -39,7 +40,7 @@ class MemberQueryService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching member data by page: $e');
+        AppLogger.error('Error fetching member data by page: $e');
       }
     }
     return null;
@@ -53,7 +54,7 @@ class MemberQueryService {
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
-        print('Error searching member data: $e');
+        AppLogger.error('Error searching member data: $e');
       }
     }
     return false;

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/department_model.dart';
 import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class DepartmentService {
   /// 根据名称获取部门
@@ -15,7 +16,7 @@ class DepartmentService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching department by name: $e');
+        AppLogger.error('Error fetching department by name: $e');
       }
       return null;
     }
@@ -32,7 +33,7 @@ class DepartmentService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching all departments: $e');
+        AppLogger.error('Error fetching all departments: $e');
       }
       return null;
     }
@@ -48,7 +49,7 @@ class DepartmentService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error updating department: $e');
+        AppLogger.error('Error updating department: $e');
       }
       return false;
     }
@@ -64,7 +65,7 @@ class DepartmentService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating department: $e');
+        AppLogger.error('Error creating department: $e');
       }
       return false;
     }
@@ -80,7 +81,7 @@ class DepartmentService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting department: $e');
+        AppLogger.error('Error deleting department: $e');
       }
       return false;
     }
@@ -96,7 +97,7 @@ class DepartmentService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error exporting departments to JSON: $e');
+        AppLogger.error('Error exporting departments to JSON: $e');
       }
       return false;
     }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 监控服务类
 ///
@@ -18,7 +19,7 @@ class MonitoringService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching performance data: $e');
+        AppLogger.error('Error fetching performance data: $e');
       }
     }
     return null;
@@ -36,7 +37,7 @@ class MonitoringService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching HTTP stats: $e');
+        AppLogger.error('Error fetching HTTP stats: $e');
       }
     }
     return null;
@@ -71,7 +72,7 @@ class MonitoringService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data access stats: $e');
+        AppLogger.error('Error fetching data access stats: $e');
       }
     }
     return null;
@@ -106,7 +107,7 @@ class MonitoringService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching data change stats: $e');
+        AppLogger.error('Error fetching data change stats: $e');
       }
     }
     return null;
@@ -129,7 +130,7 @@ class MonitoringService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error resetting data stats: $e');
+        AppLogger.error('Error resetting data stats: $e');
       }
     }
     return false;
