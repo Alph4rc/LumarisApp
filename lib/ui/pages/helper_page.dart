@@ -104,12 +104,6 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '主要功能模块',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
           const SizedBox(height: 20),
           ClubCard(
             padding: const EdgeInsets.all(16),
@@ -233,12 +227,6 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '使用说明',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
           const SizedBox(height: 20),
           ClubCard(
             padding: const EdgeInsets.all(16),
@@ -297,12 +285,6 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '注意事项',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
           const SizedBox(height: 20),
           ClubCard(
             padding: const EdgeInsets.all(20),
@@ -353,52 +335,8 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '关于应用',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
           const SizedBox(height: 20),
           // 应用信息卡片
-          ClubCard(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Icon(
-                  CupertinoIcons.app_badge,
-                  size: 64,
-                  color: const Color(0xFF007AFF),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'iOS Club App',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '版本 $_version',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '西安建筑科技大学 iOS Club 官方应用',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 16),
           // 平台支持卡片
           ClubCard(

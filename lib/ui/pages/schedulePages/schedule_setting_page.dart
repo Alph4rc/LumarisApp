@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -97,72 +98,34 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     final cardColor = isDark ? Colors.grey[900] : Colors.white;
 
     return Scaffold(
-      body: Column(
-        children: [
-          // 简约的顶部工具栏
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[900] : Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
-                ),
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios),
-                    onPressed: () => Navigator.of(context).pop(),
-                    tooltip: '返回',
-                  ),
-                  const Text(
-                    '课表设置',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(width: 40,)
-                ],
-              ),
-            ),
-          ),
-          // 设置内容
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!isDesktop) ...[
-                    _buildSectionTitle('日历订阅'),
-                    const SizedBox(height: 12),
-                    _buildCalendarSection(context, isDark, cardColor),
-                    const SizedBox(height: 24),
-                  ],
-                  _buildSectionTitle('课表管理'),
-                  const SizedBox(height: 12),
-                  _buildManagementSection(context, isDark, cardColor),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('课表背景'),
-                  const SizedBox(height: 12),
-                  _buildBackgroundSection(context, isDark, cardColor),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('忽略课程'),
-                  const SizedBox(height: 12),
-                  _buildIgnoreCourseSection(context, isDark, cardColor),
-                ],
-              ),
-            ),
-          ),
-        ],
+      appBar: ClubAppBar(
+        title: '课表设置',
       ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!isDesktop) ...[
+              _buildSectionTitle('日历订阅'),
+              const SizedBox(height: 12),
+              _buildCalendarSection(context, isDark, cardColor),
+              const SizedBox(height: 24),
+            ],
+            _buildSectionTitle('课表管理'),
+            const SizedBox(height: 12),
+            _buildManagementSection(context, isDark, cardColor),
+            const SizedBox(height: 24),
+            _buildSectionTitle('课表背景'),
+            const SizedBox(height: 12),
+            _buildBackgroundSection(context, isDark, cardColor),
+            const SizedBox(height: 24),
+            _buildSectionTitle('忽略课程'),
+            const SizedBox(height: 12),
+            _buildIgnoreCourseSection(context, isDark, cardColor),
+          ],
+        ),
+      )
     );
   }
 
