@@ -225,7 +225,7 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _levelFilter,
+                    initialValue: _levelFilter,
                     decoration: const InputDecoration(
                       labelText: '日志级别',
                       isDense: true,
@@ -248,7 +248,7 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
                 const SizedBox(width: 16),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _timeRange,
+                    initialValue: _timeRange,
                     decoration: const InputDecoration(
                       labelText: '时间范围',
                       isDense: true,
@@ -411,7 +411,7 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -790,7 +790,7 @@ class _DataStatsTabState extends State<_DataStatsTab>
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: DropdownButtonFormField<String>(
-              value: _entityType,
+              initialValue: _entityType,
               decoration: const InputDecoration(labelText: '数据类型'),
               items: const [
                 DropdownMenuItem(value: 'Article', child: Text('文章')),

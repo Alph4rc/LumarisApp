@@ -238,7 +238,7 @@ class AdminPortalPage extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(isDarkMode ? 0.3 : 0.1),
+                  color: color.withValues(alpha: isDarkMode ? 0.3 : 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -290,7 +290,7 @@ class AdminPortalPage extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(isDarkMode ? 0.3 : 0.1),
+                  color: color.withValues(alpha: isDarkMode ? 0.3 : 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 32),
@@ -337,12 +337,12 @@ class AdminPortalPage extends StatelessWidget {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    Colors.blue.withOpacity(0.3),
-                    Colors.purple.withOpacity(0.3),
+                    Colors.blue.withValues(alpha: 0.3),
+                    Colors.purple.withValues(alpha: 0.3),
                   ]
                 : [
-                    Colors.blue.withOpacity(0.1),
-                    Colors.purple.withOpacity(0.1),
+                    Colors.blue.withValues(alpha: 0.1),
+                    Colors.purple.withValues(alpha: 0.1),
                   ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

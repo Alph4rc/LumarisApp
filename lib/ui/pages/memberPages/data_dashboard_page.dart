@@ -406,7 +406,7 @@ class _DataDashboardPageState extends State<DataDashboardPage>
                                     height: 100,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.blue.withOpacity(0.2),
+                                      color: Colors.blue.withValues(alpha: 0.2),
                                     ),
                                     child: Center(
                                       child: Column(
@@ -441,7 +441,7 @@ class _DataDashboardPageState extends State<DataDashboardPage>
                                     height: 100,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.pink.withOpacity(0.2),
+                                      color: Colors.pink.withValues(alpha: 0.2),
                                     ),
                                     child: Center(
                                       child: Column(
@@ -535,8 +535,8 @@ class _DataDashboardPageState extends State<DataDashboardPage>
               height: 48,
               decoration: BoxDecoration(
                 color: isDarkMode
-                    ? Colors.blue.withOpacity(0.2)
-                    : Colors.blue.withOpacity(0.1),
+                    ? Colors.blue.withValues(alpha: 0.2)
+                    : Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon,

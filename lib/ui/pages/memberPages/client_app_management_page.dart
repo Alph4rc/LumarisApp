@@ -115,7 +115,7 @@ class _ClientAppManagementPageState extends State<ClientAppManagementPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SelectableText(
@@ -322,8 +322,8 @@ class _ClientAppManagementPageState extends State<ClientAppManagementPage> {
                     ),
                     decoration: BoxDecoration(
                       color: app.isActive == true
-                          ? Colors.green.withOpacity(0.2)
-                          : Colors.red.withOpacity(0.2),
+                          ? Colors.green.withValues(alpha: 0.2)
+                          : Colors.red.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -402,7 +402,7 @@ class _ClientAppManagementPageState extends State<ClientAppManagementPage> {
                   if (app.supportsPkce == true)
                     Chip(
                       label: const Text('支持PKCE'),
-                      backgroundColor: Colors.blue.withOpacity(0.2),
+                      backgroundColor: Colors.blue.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         fontSize: 11,
                         color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
@@ -411,7 +411,7 @@ class _ClientAppManagementPageState extends State<ClientAppManagementPage> {
                   if (app.isNeedEMail == true)
                     Chip(
                       label: const Text('需要邮箱'),
-                      backgroundColor: Colors.orange.withOpacity(0.2),
+                      backgroundColor: Colors.orange.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         fontSize: 11,
                         color: isDarkMode
@@ -433,7 +433,7 @@ class _ClientAppManagementPageState extends State<ClientAppManagementPage> {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.2),
+        color: Colors.blue.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: const Icon(Icons.apps, color: Colors.blue),
@@ -720,7 +720,7 @@ class _AppFormDialogState extends State<_AppFormDialog> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                  bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
               ),
               child: Row(
@@ -820,7 +820,7 @@ class _AppFormDialogState extends State<_AppFormDialog> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                  top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
               ),
               child: Row(

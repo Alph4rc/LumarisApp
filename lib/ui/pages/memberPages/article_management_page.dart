@@ -280,8 +280,8 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
                   Chip(
                     label: Text(categoryName),
                     backgroundColor: isDarkMode
-                        ? Colors.blue.withOpacity(0.2)
-                        : Colors.blue.withOpacity(0.1),
+                        ? Colors.blue.withValues(alpha: 0.2)
+                        : Colors.blue.withValues(alpha: 0.1),
                     labelStyle: TextStyle(
                       fontSize: 12,
                       color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
@@ -291,8 +291,8 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
                     Chip(
                       label: Text('发布者: ${article.identity}'),
                       backgroundColor: isDarkMode
-                          ? Colors.green.withOpacity(0.2)
-                          : Colors.green.withOpacity(0.1),
+                          ? Colors.green.withValues(alpha: 0.2)
+                          : Colors.green.withValues(alpha: 0.1),
                       labelStyle: TextStyle(
                         fontSize: 12,
                         color:
@@ -514,7 +514,7 @@ class _ArticleFormDialogState extends State<_ArticleFormDialog> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                  bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
               ),
               child: Row(
@@ -601,7 +601,7 @@ class _ArticleFormDialogState extends State<_ArticleFormDialog> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _selectedCategoryId,
+                        initialValue: _selectedCategoryId,
                         decoration: const InputDecoration(
                           labelText: '分类',
                         ),
@@ -615,7 +615,7 @@ class _ArticleFormDialogState extends State<_ArticleFormDialog> {
                               value: category.id,
                               child: Text(category.name),
                             );
-                          }).toList(),
+                          }),
                         ],
                         onChanged: (value) {
                           setState(() => _selectedCategoryId = value);
@@ -643,7 +643,7 @@ class _ArticleFormDialogState extends State<_ArticleFormDialog> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                  top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
               ),
               child: Row(

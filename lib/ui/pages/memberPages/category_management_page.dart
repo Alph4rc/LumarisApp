@@ -219,8 +219,8 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
               height: 40,
               decoration: BoxDecoration(
                 color: isDarkMode
-                    ? Colors.blue.withOpacity(0.2)
-                    : Colors.blue.withOpacity(0.1),
+                    ? Colors.blue.withValues(alpha: 0.2)
+                    : Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(

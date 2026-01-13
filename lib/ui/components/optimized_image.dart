@@ -30,6 +30,7 @@ class OptimizedImage extends StatelessWidget {
   const OptimizedImage.assets(
     this.imageUrl,
     {
+      super.key,
       this.width,
       this.height,
       this.fit = BoxFit.cover,
@@ -42,6 +43,7 @@ class OptimizedImage extends StatelessWidget {
   const OptimizedImage.network(
     this.imageUrl,
     {
+      super.key,
       this.width,
       this.height,
       this.fit = BoxFit.cover,
@@ -54,6 +56,7 @@ class OptimizedImage extends StatelessWidget {
   const OptimizedImage(
     this.imageUrl,
     {
+      super.key,
       this.width,
       this.height,
       this.fit = BoxFit.cover,
@@ -142,6 +145,7 @@ class LazyLoadImage extends StatefulWidget {
   const LazyLoadImage.assets(
     this.imageUrl,
     {
+      super.key,
       this.width,
       this.height,
       this.fit = BoxFit.cover,
@@ -151,6 +155,7 @@ class LazyLoadImage extends StatefulWidget {
   const LazyLoadImage.network(
     this.imageUrl,
     {
+      super.key,
       this.width,
       this.height,
       this.fit = BoxFit.cover,
