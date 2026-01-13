@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 
 import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
@@ -51,8 +52,10 @@ class TilesWidget extends StatelessWidget {
                       ],
                     ),
                     childrenDelegate: SliverChildBuilderDelegate(
-                      (context, index) =>
-                          buildTile(snapshot.data![index], context),
+                      (context, index) => AnimatedCard(
+                        delay: Duration(milliseconds: 100 * index),
+                        child: buildTile(snapshot.data![index], context),
+                      ),
                       childCount: snapshot.data!.length,
                     ),
                     physics: const NeverScrollableScrollPhysics(),

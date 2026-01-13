@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:ios_club_app/core/models/semester_model.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/utils/animations/animated_card.dart';
+import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
@@ -631,8 +633,10 @@ class _ScorePageState extends State<ScorePage>
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: score.list.length,
-                itemBuilder: (context, index) =>
-                    _buildScoreItem(score.list[index]),
+                itemBuilder: (context, index) => AnimatedListItem(
+                  index: index,
+                  child: _buildScoreItem(score.list[index]),
+                ),
               )
             ])));
   }
@@ -659,22 +663,24 @@ class _ScorePageState extends State<ScorePage>
 
   Widget _buildSemesterCard(ScoreList score) {
     final semesterNames = score.semester.name.split('-');
-    return ClubCard(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Column(
-          children: [
-            Text(
-              '${semesterNames[0]}至${semesterNames[1]}年 第${semesterNames[2]}学期',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+    return AnimatedCard(
+      child: ClubCard(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Column(
+            children: [
+              Text(
+                '${semesterNames[0]}至${semesterNames[1]}年 第${semesterNames[2]}学期',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ...score.list.map(_buildScoreItem),
-          ],
+              const SizedBox(height: 16),
+              ...score.list.map(_buildScoreItem),
+            ],
+          ),
         ),
       ),
     );

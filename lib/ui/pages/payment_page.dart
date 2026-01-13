@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';
+import 'package:ios_club_app/core/utils/animations/animated_button.dart';
+import 'package:ios_club_app/core/utils/animations/animated_card.dart';
+import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 
 import 'package:ios_club_app/state/payment_store.dart';
@@ -80,55 +83,57 @@ class PaymentPage extends StatelessWidget {
     IconData icon,
     Color color,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(10),
+    return AnimatedCard(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Hero(tag: '饭卡', child: Icon(icon, color: color, size: 24)),
             ),
-            child: Hero(tag: '饭卡', child: Icon(icon, color: color, size: 24)),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Obx(() => controller.totalRecharge.value == 0
-                    ? const Text(
-                        '暂无数据',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : Text(
-                        '¥${amount.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-              ],
+                  const SizedBox(height: 4),
+                  Obx(() => controller.totalRecharge.value == 0
+                      ? const Text(
+                          '暂无数据',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : Text(
+                          '¥${amount.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -155,15 +160,20 @@ class PaymentPage extends StatelessWidget {
               ),
             )
           else
-            ClubCard(
-              child: Padding(
-                padding: EdgeInsets.all(8),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: recentRecords.length.clamp(0, 5),
-                  itemBuilder: (context, index) =>
-                      _buildTransactionItem(recentRecords[index]),
+            AnimatedCard(
+              delay: const Duration(milliseconds: 150),
+              child: ClubCard(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: recentRecords.length.clamp(0, 5),
+                    itemBuilder: (context, index) => AnimatedListItem(
+                      index: index,
+                      child: _buildTransactionItem(recentRecords[index]),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -228,26 +238,30 @@ class PaymentPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              CupertinoButton(
-                color: CupertinoColors.activeBlue,
-                borderRadius: BorderRadius.circular(8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: const Text(
-                  '绑定饭卡卡号',
-                  style: TextStyle(
-                    color: CupertinoColors.white,
-                    fontSize: 16,
-                  ),
-                ),
-                onPressed: () {
+              AnimatedButton(
+                onTap: () {
                   // 显示设置对话框让用户输入卡号
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     _showSettingDialog(Get.context!);
                   });
                 },
+                child: CupertinoButton(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  onPressed: null,
+                  // 由AnimatedButton处理
+                  child: const Text(
+                    '绑定饭卡卡号',
+                    style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -311,7 +325,7 @@ class PaymentPage extends StatelessWidget {
         }
         return;
       }
-      
+
       await controller.setPayment(result);
     }
   }
