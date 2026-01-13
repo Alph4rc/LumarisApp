@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/student_model.dart';
+import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
 
 /// 认证服务类
 /// 
@@ -37,16 +38,14 @@ class AuthService {
         }),
       );
 
-      if (response.statusCode == 200) {
-        final jwt = response.body.replaceAll('"', '');
+      final jwt = await ApiResponseHelper.parseString(
+        response,
+        errorMessage: 'Login failed',
+      );
+      if (jwt != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
         return jwt;
-      } else {
-        if (kDebugMode) {
-          print('Login failed with status: ${response.statusCode}');
-          print('Response body: ${response.body}');
-        }
       }
     } catch (e) {
       if (kDebugMode) {
@@ -57,70 +56,73 @@ class AuthService {
   }
 
   /// 用户注册
-  /// 
+  ///
   /// 向服务器发送注册请求，创建新用户账户。
-  /// 
+  ///
   /// @param studentData 学生数据模型，包含注册所需的用户信息
   /// @return 注册成功返回true，失败返回false
   static Future<bool> signup(StudentModel studentData) async {
     try {
       final response = await ApiClient.post('/Auth/signup', body: studentData.toJson());
-      if (response.statusCode == 200) {
-        return true;
-      }
+      return await ApiResponseHelper.parseBool(
+        response,
+        errorMessage: 'Error during signup',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error during signup: $e');
       }
+      return false;
     }
-    return false;
   }
 
   /// 用户登出
-  /// 
+  ///
   /// 向服务器发送登出请求，清除用户的认证状态。
-  /// 
+  ///
   /// @param userId 用户ID
   /// @param clientId 客户端ID（可选）
   /// @return 登出成功返回true，失败返回false
   static Future<bool> logout(String userId, {String clientId = ''}) async {
     try {
       final response = await ApiClient.post('/Auth/logout?userId=$userId');
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
+      return await ApiResponseHelper.parseBool(
+        response,
+        errorMessage: 'Error during logout',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error during logout: $e');
       }
+      return false;
     }
-    return false;
   }
 
   /// 验证用户
-  /// 
+  ///
   /// 向服务器发送请求，验证用户是否存在或是否有效。
-  /// 
+  ///
   /// @param userId 用户ID
   /// @return 验证成功返回true，失败返回false
   static Future<bool> validate(String userId) async {
     try {
       final response = await ApiClient.get('/Auth/validate?userId=$userId');
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
+      return await ApiResponseHelper.parseBool(
+        response,
+        errorMessage: 'Error during validation',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error during validation: $e');
       }
+      return false;
     }
-    return false;
   }
 
   /// 更改密码
-  /// 
+  ///
   /// 向服务器发送请求，更改用户密码。
-  /// 
+  ///
   /// @param userId 用户ID
   /// @param oldPassword 旧密码
   /// @param newPassword 新密码
@@ -129,36 +131,38 @@ class AuthService {
     try {
       final response = await ApiClient.put(
         '/Auth/change-password?userId=$userId&oldPassword=$oldPassword&newPassword=$newPassword');
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
+      return await ApiResponseHelper.parseBool(
+        response,
+        errorMessage: 'Error changing password',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error changing password: $e');
       }
+      return false;
     }
-    return false;
   }
 
   /// 请求密码重置
-  /// 
+  ///
   /// 向服务器发送请求，请求重置用户密码。
   /// 通常会向用户注册的邮箱或手机发送验证码。
-  /// 
+  ///
   /// @param userId 用户ID
   /// @return 请求成功返回true，失败返回false
   static Future<bool> requestPasswordReset(String userId) async {
     try {
       final response = await ApiClient.post('/Auth/request-password-reset?userId=$userId');
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
+      return await ApiResponseHelper.parseBool(
+        response,
+        errorMessage: 'Error requesting password reset',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error requesting password reset: $e');
       }
+      return false;
     }
-    return false;
   }
 
   /// 重置密码
@@ -174,15 +178,16 @@ class AuthService {
     try {
       final response = await ApiClient.post(
         '/Auth/reset-password?userId=$userId&code=$code&newPassword=$newPassword');
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
+      return await ApiResponseHelper.parseBool(
+        response,
+        errorMessage: 'Error resetting password',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error resetting password: $e');
       }
+      return false;
     }
-    return false;
   }
 
   /// 刷新令牌
@@ -198,20 +203,20 @@ class AuthService {
     try {
       final response = await ApiClient.post(
         '/Auth/refresh-token?userId=$userId&refreshToken=$refreshToken&clientId=$clientId&scope=$scope');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        final String? jwt = apiResponse['data'];
-        if (jwt != null) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
-        }
-        return jwt;
+      final jwt = await ApiResponseHelper.parseString(
+        response,
+        errorMessage: 'Error refreshing token',
+      );
+      if (jwt != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
       }
+      return jwt;
     } catch (e) {
       if (kDebugMode) {
         print('Error refreshing token: $e');
       }
+      return null;
     }
-    return null;
   }
 }

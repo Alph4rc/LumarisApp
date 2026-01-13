@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
 
 /// 分类服务类
 ///
@@ -10,112 +10,112 @@ class CategoryService {
   static Future<List<dynamic>?> getAllCategories() async {
     try {
       final response = await ApiClient.get('/Category/all');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseRaw<List<dynamic>>(
+        response,
+        errorMessage: 'Error fetching all categories',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching all categories: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 根据名称获取分类
   static Future<Map<String, dynamic>?> getCategoryByName(String name) async {
     try {
       final response = await ApiClient.get('/Category/$name');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseRaw<Map<String, dynamic>>(
+        response,
+        errorMessage: 'Error fetching category by name',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching category by name: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 根据ID获取分类
   static Future<Map<String, dynamic>?> getCategoryById(String id) async {
     try {
       final response = await ApiClient.get('/Category/byId/$id');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseRaw<Map<String, dynamic>>(
+        response,
+        errorMessage: 'Error fetching category by id',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching category by id: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 获取分类下的所有文章
   static Future<List<dynamic>?> getArticlesByCategory(String categoryId) async {
     try {
       final response = await ApiClient.get('/Category/articles/$categoryId');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseRaw<List<dynamic>>(
+        response,
+        errorMessage: 'Error fetching articles by category',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching articles by category: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 创建或更新分类
   static Future<String?> createOrUpdateCategory(Map<String, dynamic> categoryData) async {
     try {
       final response = await ApiClient.post('/Category/CreateOrUpdate', body: categoryData);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseString(
+        response,
+        errorMessage: 'Error creating or updating category',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error creating or updating category: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 删除分类
   static Future<String?> deleteCategory(String name) async {
     try {
       final response = await ApiClient.get('/Category/Delete/$name');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseString(
+        response,
+        errorMessage: 'Error deleting category',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error deleting category: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 更新分类顺序
   static Future<String?> updateCategoryOrder(String name, int order) async {
     try {
       final response = await ApiClient.post('/Category/UpdateOrder/$name/$order');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseString(
+        response,
+        errorMessage: 'Error updating category order',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error updating category order: $e');
       }
+      return null;
     }
-    return null;
   }
 
   /// 批量更新分类顺序
@@ -124,15 +124,15 @@ class CategoryService {
   static Future<String?> updateCategoryOrders(Map<String, int> orders) async {
     try {
       final response = await ApiClient.post('/Category/UpdateOrders', body: orders);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
-      }
+      return await ApiResponseHelper.parseString(
+        response,
+        errorMessage: 'Error updating category orders',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('Error updating category orders: $e');
       }
+      return null;
     }
-    return null;
   }
 }
