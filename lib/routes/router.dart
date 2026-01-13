@@ -15,10 +15,16 @@ import 'package:ios_club_app/ui/pages/link_page.dart';
 import 'package:ios_club_app/ui/pages/member_page.dart';
 import 'package:ios_club_app/ui/pages/profile_page.dart';
 import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
-import 'package:ios_club_app/ui/components/schedulePages/schedule_setting_page.dart';
-import 'package:ios_club_app/ui/components/schedulePages/custom_course_manage_page.dart';
+import 'package:ios_club_app/ui/pages/schedulePages/schedule_setting_page.dart';
+import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 import 'package:ios_club_app/ui/pages/school_bus_page.dart';
 import 'package:ios_club_app/ui/pages/score_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/admin_portal_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/article_management_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/category_management_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/data_dashboard_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/logs_monitoring_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/client_app_management_page.dart';
 
 /// 应用路由配置类
 ///
@@ -154,6 +160,48 @@ class AppRouter {
           name: '/Author',
           page: () => PageRenderTimeMonitor(
               pageName: '作者页面', child: const AuthorPage()),
+        ),
+
+        /// 社团管理主入口
+        GetPage(
+          name: '/AdminPortal',
+          page: () => PageRenderTimeMonitor(
+              pageName: '社团管理中心', child: const AdminPortalPage()),
+        ),
+
+        /// 文章管理页面
+        GetPage(
+          name: '/ArticleManagement',
+          page: () => PageRenderTimeMonitor(
+              pageName: '文章管理', child: const ArticleManagementPage()),
+        ),
+
+        /// 分类管理页面
+        GetPage(
+          name: '/CategoryManagement',
+          page: () => PageRenderTimeMonitor(
+              pageName: '分类管理', child: const CategoryManagementPage()),
+        ),
+
+        /// 数据统计仪表板
+        GetPage(
+          name: '/DataDashboard',
+          page: () => PageRenderTimeMonitor(
+              pageName: '数据统计', child: const DataDashboardPage()),
+        ),
+
+        /// 日志监控页面
+        GetPage(
+          name: '/LogsMonitoring',
+          page: () => PageRenderTimeMonitor(
+              pageName: '系统监控', child: const LogsMonitoringPage()),
+        ),
+
+        /// 客户端应用管理
+        GetPage(
+          name: '/ClientAppManagement',
+          page: () => PageRenderTimeMonitor(
+              pageName: '客户端应用管理', child: const ClientAppManagementPage()),
         ),
       ];
 }

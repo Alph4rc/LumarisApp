@@ -4,10 +4,10 @@ import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/models/exam_model.dart';
 import 'package:ios_club_app/core/services/exam_service.dart';
 
-import '../club_card.dart';
-import '../club_modal_bottom_sheet.dart';
-import '../empty_widget.dart';
-import '../modal_components.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/modal_components.dart';
 
 class ExamCard extends StatefulWidget {
   const ExamCard({super.key});

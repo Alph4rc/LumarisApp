@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/components/settingPages/version_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/version_setting.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:ios_club_app/state/user_store.dart';
@@ -17,15 +17,15 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
-import '../components/settingPages/show_tomorrow_setting.dart';
-import '../components/settingPages/remind_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/show_tomorrow_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 
-import '../components/settingPages/todo_list_setting.dart';
-import '../components/settingPages/home_page_setting.dart';
-import '../components/settingPages/gradient_icon.dart';
-import '../components/settingPages/haptic_feedback_setting.dart';
-import '../components/settingPages/font_family_setting.dart';
-import '../components/settingPages/todo_remind_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/todo_list_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/gradient_icon.dart';
+import 'package:ios_club_app/ui/pages/settingPages/haptic_feedback_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
+import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});

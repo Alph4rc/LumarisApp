@@ -9,14 +9,14 @@ import 'package:ios_club_app/features/club/services/resource_service.dart';
 import 'package:ios_club_app/features/club/services/staff_service.dart';
 
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/memberPages/member_data_page.dart';
-import 'package:ios_club_app/ui/components/memberPages/staff_data_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/member_data_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/staff_data_page.dart';
 
 // 新增导入
-import 'package:ios_club_app/ui/components/memberPages/department_page.dart';
-import 'package:ios_club_app/ui/components/memberPages/project_page.dart';
-import 'package:ios_club_app/ui/components/memberPages/task_page.dart';
-import 'package:ios_club_app/ui/components/memberPages/resource_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/department_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/project_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/task_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/resource_page.dart';
 
 // 使用新的模块化服务
 import 'package:ios_club_app/features/club/services/user_service.dart';

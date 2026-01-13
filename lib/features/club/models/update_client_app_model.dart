@@ -5,6 +5,8 @@ class UpdateClientAppModel {
   final List<String>? redirectUris;
   final String? logoUrl;
   final bool? isActive;
+  final bool? isNeedEMail;
+  final bool? supportsPkce;
 
   UpdateClientAppModel({
     this.applicationName,
@@ -13,6 +15,8 @@ class UpdateClientAppModel {
     this.redirectUris,
     this.logoUrl,
     this.isActive,
+    this.isNeedEMail,
+    this.supportsPkce,
   });
 
   factory UpdateClientAppModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,8 @@ class UpdateClientAppModel {
       redirectUris: (json['redirectUris'] as List?)?.map((e) => e as String).toList(),
       logoUrl: json['logoUrl'] as String?,
       isActive: json['isActive'] as bool?,
+      isNeedEMail: json['isNeedEMail'] as bool?,
+      supportsPkce: json['supportsPkce'] as bool?,
     );
   }
 
@@ -34,6 +40,8 @@ class UpdateClientAppModel {
       'redirectUris': redirectUris,
       'logoUrl': logoUrl,
       'isActive': isActive,
+      'isNeedEMail': isNeedEMail,
+      'supportsPkce': supportsPkce,
     };
   }
 }

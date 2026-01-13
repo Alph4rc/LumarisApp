@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 
-import '../tiles/bus_tile.dart';
-import '../tiles/electricity_tile.dart';
-import '../tiles/payment_tile.dart';
+import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
+import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
+import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
 
 class TilesWidget extends StatelessWidget {
   const TilesWidget({super.key});

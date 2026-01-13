@@ -14,7 +14,7 @@ import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/components/schedulePages/custom_course_manage_page.dart';
+import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
 /// 课表列表页面
 ///

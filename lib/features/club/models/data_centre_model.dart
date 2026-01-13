@@ -41,3 +41,24 @@ class DataCentreModel {
     };
   }
 }
+
+class GradeCount {
+  final String? grade;
+  final int? value;
+
+  GradeCount({this.grade, this.value});
+
+  factory GradeCount.fromJson(Map<String, dynamic> json) {
+    return GradeCount(
+      grade: json['grade'] as String?,
+      value: json['value'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'grade': grade,
+      'value': value,
+    };
+  }
+}
