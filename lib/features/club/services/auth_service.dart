@@ -162,10 +162,10 @@ class AuthService {
   }
 
   /// 重置密码
-  /// 
+  ///
   /// 使用验证码重置用户密码。
   /// 验证码通常通过请求密码重置时发送到用户的邮箱或手机。
-  /// 
+  ///
   /// @param userId 用户ID
   /// @param code 验证码
   /// @param newPassword 新密码
@@ -183,5 +183,35 @@ class AuthService {
       }
     }
     return false;
+  }
+
+  /// 刷新令牌
+  ///
+  /// 使用刷新令牌获取新的访问令牌。
+  ///
+  /// @param userId 用户ID
+  /// @param refreshToken 刷新令牌
+  /// @param clientId 客户端ID（可选）
+  /// @param scope 权限范围（可选）
+  /// @return 刷新成功返回新的JWT令牌，失败返回null
+  static Future<String?> refreshToken(String userId, String refreshToken, {String clientId = '', String scope = ''}) async {
+    try {
+      final response = await ApiClient.post(
+        '/Auth/refresh-token?userId=$userId&refreshToken=$refreshToken&clientId=$clientId&scope=$scope');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
+        final String? jwt = apiResponse['data'];
+        if (jwt != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
+        }
+        return jwt;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing token: $e');
+      }
+    }
+    return null;
   }
 }
