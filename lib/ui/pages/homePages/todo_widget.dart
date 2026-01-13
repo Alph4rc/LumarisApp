@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 
 import 'package:ios_club_app/core/models/todo_item.dart';
+import 'package:ios_club_app/core/utils/animations/animations.dart';
 
 import 'package:ios_club_app/core/services/todo_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
@@ -41,11 +42,13 @@ class _TodoWidgetState extends State<TodoWidget> {
   }
 
   Future<void> scheduleTodoNotification(TodoItem todo) async {
-    await NotificationService.instance.scheduleTodoNotification(todo, settingsStore.todoRemindEnabled);
+    await NotificationService.instance
+        .scheduleTodoNotification(todo, settingsStore.todoRemindEnabled);
   }
 
   Future<void> updateTodoNotification(TodoItem todo) async {
-    await NotificationService.instance.updateTodoNotification(todo, settingsStore.todoRemindEnabled);
+    await NotificationService.instance
+        .updateTodoNotification(todo, settingsStore.todoRemindEnabled);
   }
 
   Future<void> _refreshTodos() {
@@ -154,84 +157,90 @@ class _TodoWidgetState extends State<TodoWidget> {
                               final now = DateTime.now();
                               final isBefore = deadline?.isBefore(now) ?? false;
 
-                              return ListTile(
-                                leading: Checkbox(
-                                  value: todo.isCompleted,
-                                  onChanged: (value) async {
-                                    final updatedTodo = TodoItem(
-                                      title: todo.title,
-                                      deadline: todo.deadline,
-                                      id: todo.id,
-                                      isCompleted: value!,
-                                    );
+                              return AnimatedListItem(
+                                index: index,
+                                child: ListTile(
+                                  leading: Checkbox(
+                                    value: todo.isCompleted,
+                                    onChanged: (value) async {
+                                      final updatedTodo = TodoItem(
+                                        title: todo.title,
+                                        deadline: todo.deadline,
+                                        id: todo.id,
+                                        isCompleted: value!,
+                                      );
 
-                                    // 更新本地存储
-                                    final updatedTodos =
-                                        List<TodoItem>.from(todos);
-                                    updatedTodos[index] = updatedTodo;
-                                    await TodoService.setTodoList(updatedTodos);
+                                      // 更新本地存储
+                                      final updatedTodos =
+                                          List<TodoItem>.from(todos);
+                                      updatedTodos[index] = updatedTodo;
+                                      await TodoService.setTodoList(
+                                          updatedTodos);
 
-                                    // 更新提醒状态
-                                    await updateTodoNotification(updatedTodo);
+                                      // 更新提醒状态
+                                      await updateTodoNotification(updatedTodo);
 
-                                    // 刷新列表
-                                    await _refreshTodos();
-                                  },
-                                ),
-                                title: Text(
-                                  todo.title,
-                                  style: TextStyle(
-                                    decoration: todo.isCompleted
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                                    fontWeight: FontWeight.bold,
+                                      // 刷新列表
+                                      await _refreshTodos();
+                                    },
                                   ),
-                                ),
-                                subtitle: Text(
-                                    '截止日期: ${deadline == null ? '无' : DateFormat('yyyy-MM-dd HH:mm').format(deadline)}',
+                                  title: Text(
+                                    todo.title,
                                     style: TextStyle(
-                                      decoration: isBefore
+                                      decoration: todo.isCompleted
                                           ? TextDecoration.lineThrough
                                           : TextDecoration.none,
-                                    )),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete_outline),
-                                  onPressed: () async {
-                                    // 从列表中移除
-                                    final updatedTodos =
-                                        List<TodoItem>.from(todos)
-                                          ..removeAt(index);
-                                    await TodoService.setTodoList(updatedTodos);
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                      '截止日期: ${deadline == null ? '无' : DateFormat('yyyy-MM-dd HH:mm').format(deadline)}',
+                                      style: TextStyle(
+                                        decoration: isBefore
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                      )),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete_outline),
+                                    onPressed: () async {
+                                      // 从列表中移除
+                                      final updatedTodos =
+                                          List<TodoItem>.from(todos)
+                                            ..removeAt(index);
+                                      await TodoService.setTodoList(
+                                          updatedTodos);
 
-                                    // 删除时取消提醒
-                                    await NotificationService
-                                        .instance.notifications
-                                        .cancel(todo.id.hashCode);
+                                      // 删除时取消提醒
+                                      await NotificationService
+                                          .instance.notifications
+                                          .cancel(todo.id.hashCode);
 
-                                    // 刷新列表
-                                    await _refreshTodos();
+                                      // 刷新列表
+                                      await _refreshTodos();
+                                    },
+                                  ),
+                                  onTap: () async {
+                                    var result = await showAddTodoDialog(
+                                      context,
+                                      todo: todo,
+                                    );
+
+                                    if (result != null) {
+                                      // 更新待办事项
+                                      final updatedTodos =
+                                          List<TodoItem>.from(todos);
+                                      updatedTodos[index] = result;
+                                      await TodoService.setTodoList(
+                                          updatedTodos);
+
+                                      // 编辑时更新提醒
+                                      await updateTodoNotification(result);
+
+                                      // 刷新列表
+                                      await _refreshTodos();
+                                    }
                                   },
                                 ),
-                                onTap: () async {
-                                  var result = await showAddTodoDialog(
-                                    context,
-                                    todo: todo,
-                                  );
-
-                                  if (result != null) {
-                                    // 更新待办事项
-                                    final updatedTodos =
-                                        List<TodoItem>.from(todos);
-                                    updatedTodos[index] = result;
-                                    await TodoService.setTodoList(updatedTodos);
-
-                                    // 编辑时更新提醒
-                                    await updateTodoNotification(result);
-
-                                    // 刷新列表
-                                    await _refreshTodos();
-                                  }
-                                },
                               );
                             },
                           ));
@@ -359,11 +368,11 @@ class _TodoWidgetState extends State<TodoWidget> {
         );
       },
     );
-    
+
     // 释放控制器资源
     titleController.dispose();
     deadlineController.dispose();
-    
+
     return result;
   }
 }

@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 
+import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/core/models/electric_data.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -74,137 +75,142 @@ class _ElectricityPageState extends State<ElectricityPage> {
   }
 
   Widget _buildCurrentElectricityCard() {
-    return ClubCard(
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+    return AnimatedCard(
+      child: ClubCard(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Hero(
+                        tag: '电费',
+                        child: Icon(
+                          CupertinoIcons.bolt_fill,
+                          color: CupertinoColors.systemBlue,
+                          size: 24,
+                        )),
                   ),
-                  child: Hero(
-                      tag: '电费',
-                      child: Icon(
-                        CupertinoIcons.bolt_fill,
-                        color: CupertinoColors.systemBlue,
-                        size: 24,
+                  SizedBox(width: 12),
+                  Text(
+                    '当前电费',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(() => CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: _handleElectricityAction,
+                        child: Icon(
+                          controller.hasData.value
+                              ? CupertinoIcons.refresh
+                              : CupertinoIcons.add,
+                          color: CupertinoColors.systemBlue,
+                        ),
                       )),
-                ),
-                SizedBox(width: 12),
-                Text(
-                  '当前电费',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Spacer(),
-                Obx(() => CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: _handleElectricityAction,
-                      child: Icon(
-                        controller.hasData.value
-                            ? CupertinoIcons.refresh
-                            : CupertinoIcons.add,
-                        color: CupertinoColors.systemBlue,
-                      ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Obx(() => controller.hasData.value
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '¥${controller.electricity.value.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          controller.electricity.value <= 10 ? '余额不足' : '余额充足',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: controller.electricity.value <= 10
+                                ? CupertinoColors.systemRed
+                                : CupertinoColors.systemGreen,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '暂无数据',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '点击右上角添加电费数据',
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     )),
-              ],
-            ),
-            SizedBox(height: 16),
-            Obx(() => controller.hasData.value
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '¥${controller.electricity.value.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        controller.electricity.value <= 10 ? '余额不足' : '余额充足',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: controller.electricity.value <= 10
-                              ? CupertinoColors.systemRed
-                              : CupertinoColors.systemGreen,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '暂无数据',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        '点击右上角添加电费数据',
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  )),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildChartCard() {
-    return ClubCard(
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  '用电趋势',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+    return AnimatedCard(
+      delay: const Duration(milliseconds: 150),
+      child: ClubCard(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '用电趋势',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Spacer(),
-                Text(
-                  '今日',
-                  style: TextStyle(
-                    fontSize: 14,
+                  Spacer(),
+                  Text(
+                    '今日',
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            SizedBox(
-              height: 200,
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                }
-                return _buildChart(controller.weeklyData);
-              }),
-            ),
-          ],
+                ],
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                height: 200,
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return Center(
+                      child: CupertinoActivityIndicator(),
+                    );
+                  }
+                  return _buildChart(controller.weeklyData);
+                }),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -239,7 +245,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                 getTooltipColor: (group) =>
                     CupertinoColors.systemBlue.withValues(alpha: 0.8),
                 tooltipPadding:
-                EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   return BarTooltipItem(
                     '${rod.toY.toStringAsFixed(1)}元',
@@ -274,34 +280,34 @@ class _ElectricityPageState extends State<ElectricityPage> {
               leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
-              AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             borderData: FlBorderData(show: false),
             barGroups: data
                 .asMap()
                 .map((index, electricData) {
-              return MapEntry(
-                index,
-                BarChartGroupData(
-                  x: index,
-                  barRods: [
-                    BarChartRodData(
-                      toY: electricData.value,
-                      gradient: LinearGradient(
-                        colors: [
-                          CupertinoColors.systemBlue.withValues(alpha: 0.3),
-                          CupertinoColors.systemBlue,
-                        ],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
-                      width: 16,
-                      borderRadius: BorderRadius.circular(4),
+                  return MapEntry(
+                    index,
+                    BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: electricData.value,
+                          gradient: LinearGradient(
+                            colors: [
+                              CupertinoColors.systemBlue.withValues(alpha: 0.3),
+                              CupertinoColors.systemBlue,
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                          ),
+                          width: 16,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            })
+                  );
+                })
                 .values
                 .toList(),
             gridData: FlGridData(show: false),
@@ -314,40 +320,43 @@ class _ElectricityPageState extends State<ElectricityPage> {
   }
 
   Widget _buildSettingsSection() {
-    return ClubCard(
-      child: Column(
-        children: [
-          Obx(() => controller.hasData.value
-              ? Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.home),
-                      title: Text('添加到首页'),
-                      subtitle: Text('在首页显示电费磁贴'),
-                      trailing: Obx(() => CupertinoSwitch(
-                            value: controller.tiles.contains('电费'),
-                            onChanged: (value) async {
-                              controller.toggleTile('电费', value);
-                              await TileService.setTiles(controller.tiles);
-                            },
-                          )),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.monetization_on_outlined),
-                      title: Text('电费充值'),
-                      subtitle: Text('跳转至微信进行电费充值'),
-                      onTap: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        var url =
-                            prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
-                        url = url.replaceAll('wxAccount', 'wxCharge');
-                        await TileService.openInWeChat(url);
-                      },
-                    )
-                  ],
-                )
-              : Container()),
-        ],
+    return AnimatedCard(
+      delay: const Duration(milliseconds: 300),
+      child: ClubCard(
+        child: Column(
+          children: [
+            Obx(() => controller.hasData.value
+                ? Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.home),
+                        title: Text('添加到首页'),
+                        subtitle: Text('在首页显示电费磁贴'),
+                        trailing: Obx(() => CupertinoSwitch(
+                              value: controller.tiles.contains('电费'),
+                              onChanged: (value) async {
+                                controller.toggleTile('电费', value);
+                                await TileService.setTiles(controller.tiles);
+                              },
+                            )),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.monetization_on_outlined),
+                        title: Text('电费充值'),
+                        subtitle: Text('跳转至微信进行电费充值'),
+                        onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          var url =
+                              prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
+                          url = url.replaceAll('wxAccount', 'wxCharge');
+                          await TileService.openInWeChat(url);
+                        },
+                      )
+                    ],
+                  )
+                : Container()),
+          ],
+        ),
       ),
     );
   }

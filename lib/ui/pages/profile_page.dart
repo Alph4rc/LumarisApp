@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
@@ -588,23 +589,29 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
           ),
-          ClubCard(
-            margin: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-            child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: isTablet ? 6 : 3,
-                  ),
-                  itemBuilder: (context, index) {
-                    return Center(
-                      child: profileButtonItems[index].build(),
-                    );
-                  },
-                  itemCount: profileButtonItems.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                )),
+          AnimatedCard(
+            delay: const Duration(milliseconds: 100),
+            child: ClubCard(
+              margin: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+              child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: isTablet ? 6 : 3,
+                    ),
+                    itemBuilder: (context, index) {
+                      return AnimatedCard(
+                        delay: Duration(milliseconds: 50 * index),
+                        child: Center(
+                          child: profileButtonItems[index].build(),
+                        ),
+                      );
+                    },
+                    itemCount: profileButtonItems.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                  )),
+            ),
           ),
           if (userStore.isLogin) const SizedBox(height: 16),
           if (userStore.isLogin)

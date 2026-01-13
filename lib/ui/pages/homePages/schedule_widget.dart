@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
@@ -108,35 +109,44 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-          child: ClubCard(
-            child: Obx(() {
-              // 使用 Obx 监听 ScheduleStore 中的变化
-              final todayCourses = scheduleStore.getTodayCourses();
-              
-              return todayCourses.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: EmptyWidget(
-                          title: '今天没有课了',
-                          icon: Icons.school,
-                          subtitle: '好好休息会儿吧，学一天累死个人'))
-                  : Column(
-                      children: todayCourses
-                          .map((course) {
-                            final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
-                            final time = TimeService.getStartAndEnd(course);
-                            return ScheduleItem(
-                              title: course.courseName,
-                              time: '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
-                              location: course.room,
-                              teacher: course.teachers.join(','),
-                              description: '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
-                            );
-                          })
-                          .map((item) => _buildScheduleItem(item, isTablet))
-                          .toList(),
-                    );
-            }),
+          child: AnimatedCard(
+            child: ClubCard(
+              child: Obx(() {
+                // 使用 Obx 监听 ScheduleStore 中的变化
+                final todayCourses = scheduleStore.getTodayCourses();
+
+                return todayCourses.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: EmptyWidget(
+                            title: '今天没有课了',
+                            icon: Icons.school,
+                            subtitle: '好好休息会儿吧，学一天累死个人'))
+                    : Column(
+                        children: todayCourses
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                              final index = entry.key;
+                              final course = entry.value;
+                              final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
+                              final time = TimeService.getStartAndEnd(course);
+                              final item = ScheduleItem(
+                                title: course.courseName,
+                                time: '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
+                                location: course.room,
+                                teacher: course.teachers.join(','),
+                                description: '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
+                              );
+                              return AnimatedListItem(
+                                index: index,
+                                child: _buildScheduleItem(item, isTablet),
+                              );
+                            })
+                            .toList(),
+                      );
+              }),
+            ),
           ),
         ),
       ],

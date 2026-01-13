@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/models/exam_result.dart';
 import 'package:ios_club_app/core/services/exam_service.dart';
+import 'package:ios_club_app/core/utils/animations/animations.dart';
 
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -168,38 +169,86 @@ class _ExamCardState extends State<ExamCard> {
 
   Widget examCard() {
     if (isLoading) {
-      return const ClubCard(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
+      return AnimatedCard(
+        child: ShimmerLoading(
+          isLoading: true,
+          skeleton: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    const SkeletonBox(width: 4, height: 40),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonLine(width: 120, height: 14),
+                          const SizedBox(height: 6),
+                          SkeletonLine(width: 80, height: 10),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const SkeletonBox(width: 4, height: 40),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonLine(width: 100, height: 14),
+                          const SizedBox(height: 6),
+                          SkeletonLine(width: 90, height: 10),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            Text(
-              '正在加载考试信息...',
-              style: TextStyle(
-                fontSize: 16,
-              ),
+          ),
+          child: const ClubCard(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  '正在加载考试信息...',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }
 
     // 显示错误信息
     if (errorMessage != null) {
-      return ClubCard(
-        padding: const EdgeInsets.all(20),
-        child: EmptyWidget(
-          title: isNetworkError ? '网络连接失败' : '加载失败',
-          subtitle: errorMessage!,
-          icon: isNetworkError
-              ? CupertinoIcons.wifi_slash
-              : CupertinoIcons.exclamationmark_triangle,
+      return AnimatedCard(
+        child: ClubCard(
+          padding: const EdgeInsets.all(20),
+          child: EmptyWidget(
+            title: isNetworkError ? '网络连接失败' : '加载失败',
+            subtitle: errorMessage!,
+            icon: isNetworkError
+                ? CupertinoIcons.wifi_slash
+                : CupertinoIcons.exclamationmark_triangle,
+          ),
         ),
       );
     }
@@ -209,23 +258,28 @@ class _ExamCardState extends State<ExamCard> {
     final isTablet = screenWidth > 600;
 
     return examItems.isEmpty
-        ? const ClubCard(
-            padding: EdgeInsets.all(20),
-            child: EmptyWidget(
-              title: '最近没有考试',
-              subtitle: '说不定刷新一下就有了',
-              icon: CupertinoIcons.hourglass,
+        ? AnimatedCard(
+            child: const ClubCard(
+              padding: EdgeInsets.all(20),
+              child: EmptyWidget(
+                title: '最近没有考试',
+                subtitle: '说不定刷新一下就有了',
+                icon: CupertinoIcons.hourglass,
+              ),
             ),
           )
-        : ClubCard(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: examItems.length,
-              itemBuilder: (context, index) {
-                final exam = examItems[index];
+        : AnimatedCard(
+            child: ClubCard(
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: examItems.length,
+                itemBuilder: (context, index) {
+                  final exam = examItems[index];
 
-                return Material(
+                  return AnimatedListItem(
+                    index: index,
+                    child: Material(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   child: InkWell(
@@ -280,9 +334,11 @@ class _ExamCardState extends State<ExamCard> {
                         ],
                       ),
                     ),
+                    ),
                   ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           );
   }
