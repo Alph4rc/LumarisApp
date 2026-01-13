@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/features/club/models/resource_model.dart';
 import 'package:ios_club_app/features/club/services/data_centre_service.dart';
 import 'package:ios_club_app/features/club/services/department_service.dart';
 import 'package:ios_club_app/features/club/services/project_service.dart';
@@ -9,18 +8,24 @@ import 'package:ios_club_app/features/club/services/resource_service.dart';
 import 'package:ios_club_app/features/club/services/staff_service.dart';
 
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/pages/memberPages/member_data_page.dart';
 import 'package:ios_club_app/ui/pages/memberPages/staff_data_page.dart';
 
-// 新增导入
+// 新增导入 - 所有管理页面
 import 'package:ios_club_app/ui/pages/memberPages/department_page.dart';
 import 'package:ios_club_app/ui/pages/memberPages/project_page.dart';
 import 'package:ios_club_app/ui/pages/memberPages/task_page.dart';
 import 'package:ios_club_app/ui/pages/memberPages/resource_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/article_management_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/category_management_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/data_dashboard_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/logs_monitoring_page.dart';
+import 'package:ios_club_app/ui/pages/memberPages/client_app_management_page.dart';
 
 // 使用新的模块化服务
 import 'package:ios_club_app/features/club/services/user_service.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:get/get.dart';
 
 class MemberPage extends StatelessWidget {
   const MemberPage({super.key});
@@ -126,7 +131,7 @@ class MemberPage extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: ClubAppBar(title: '社团详情'),
+      appBar: ClubAppBar(title: '社团管理'),
       body: CustomScrollView(
         slivers: [
           // 主内容
@@ -211,7 +216,7 @@ class MemberPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         _buildDataCenterSection(infoData, context, isDarkMode),
                         const SizedBox(height: 20),
-                        _buildResourceSection(infoData, context, isDarkMode),
+                        _buildManagementSection(context, isDarkMode),
                       ],
 
                       const SizedBox(height: 40),
@@ -662,149 +667,368 @@ class MemberPage extends StatelessWidget {
     );
   }
 
-  // 资源部分
-  Widget _buildResourceSection(
-      Map infoData, BuildContext context, bool isDarkMode) {
-    final resources = infoData['resources'] as List<ResourceModel>;
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ResourcePage()),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF1C1C1E) : Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode
-                  ? const Color(0xFF101010).withValues(alpha: 0.3)
-                  : const Color(0xFFA0A0A0).withValues(alpha: 0.1),
-              blurRadius: 30,
-              offset: const Offset(0, 4),
+  // 管理功能部分 - 采用网格式卡片布局
+  Widget _buildManagementSection(BuildContext context, bool isDarkMode) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 核心管理模块
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Icon(
+                Icons.settings,
+                size: 20,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '核心管理',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '成员管理',
+                subtitle: '查看和管理社团成员',
+                icon: Icons.people,
+                color: Colors.blue,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const MemberDataPage()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '部门管理',
+                subtitle: '组织架构与部门',
+                icon: Icons.business,
+                color: Colors.green,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const DepartmentPage()),
+              ),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        const SizedBox(height: 12),
+        Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.inventory_2_outlined,
-                    color: Colors.blue,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '社团资源',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 20,
-                    color: isDarkMode ? Colors.white54 : Colors.black38,
-                  ),
-                ],
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '项目管理',
+                subtitle: '社团项目与任务',
+                icon: Icons.work,
+                color: Colors.orange,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const ProjectPage()),
               ),
             ),
-            if (resources.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.inventory_outlined,
-                        size: 48,
-                        color: isDarkMode ? Colors.white38 : Colors.black38,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '当前没有资源',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: isDarkMode ? Colors.white70 : Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '去添加一个',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.white54 : Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              ...resources.map((resource) => _buildResourceItem(
-                    resource,
-                    context,
-                    isDarkMode,
-                  )),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '部员管理',
+                subtitle: '部门成员信息',
+                icon: Icons.person,
+                color: Colors.purple,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const StaffDataPage()),
+              ),
+            ),
           ],
+        ),
+        const SizedBox(height: 24),
+
+        // 内容管理模块
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Icon(
+                Icons.article,
+                size: 20,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '内容管理',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '文章管理',
+                subtitle: '发布和管理文章',
+                icon: Icons.description,
+                color: Colors.teal,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const ArticleManagementPage()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '分类管理',
+                subtitle: '文章分类与排序',
+                icon: Icons.category,
+                color: Colors.indigo,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const CategoryManagementPage()),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '资源管理',
+                subtitle: '社团资源库',
+                icon: Icons.folder,
+                color: Colors.amber,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const ResourcePage()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '任务管理',
+                subtitle: '待办事项',
+                icon: Icons.task_alt,
+                color: Colors.pink,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const TaskPage()),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // 数据分析模块
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Icon(
+                Icons.analytics,
+                size: 20,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '数据分析',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+        _buildWideManagementCard(
+          context,
+          title: '数据统计仪表板',
+          subtitle: '成员数据可视化分析',
+          icon: Icons.dashboard,
+          color: Colors.deepPurple,
+          isDarkMode: isDarkMode,
+          onTap: () => Get.to(() => const DataDashboardPage()),
+        ),
+        const SizedBox(height: 24),
+
+        // 系统管理模块
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Icon(
+                Icons.admin_panel_settings,
+                size: 20,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '系统管理',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '日志监控',
+                subtitle: '系统日志与性能',
+                icon: Icons.monitor_heart,
+                color: Colors.red,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const LogsMonitoringPage()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildManagementCard(
+                context,
+                title: '客户端应用',
+                subtitle: 'OAuth应用管理',
+                icon: Icons.apps,
+                color: Colors.cyan,
+                isDarkMode: isDarkMode,
+                onTap: () => Get.to(() => const ClientAppManagementPage()),
+              ),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+
+  // 管理卡片（网格式）
+  Widget _buildManagementCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required bool isDarkMode,
+    required VoidCallback onTap,
+  }) {
+    return ClubCard(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: isDarkMode ? 0.3 : 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // 资源项
-  Widget _buildResourceItem(
-      ResourceModel resource, BuildContext context, bool isDarkMode) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: isDarkMode
-                ? Colors.white.withValues(alpha: 0.1)
-                : const Color(0xFFE5E5E5),
-            width: 0.5,
+  // 宽管理卡片（全宽）
+  Widget _buildWideManagementCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required bool isDarkMode,
+    required VoidCallback onTap,
+  }) {
+    return ClubCard(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: isDarkMode ? 0.3 : 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 32),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ],
           ),
         ),
-      ),
-      child: ListTile(
-        title: Text(
-          resource.name,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        subtitle: Text(
-          resource.description ?? '暂无描述',
-          style: TextStyle(
-            fontSize: 14,
-            color: isDarkMode ? Colors.white70 : Colors.black54,
-          ),
-        ),
-        trailing: Icon(
-          Icons.open_in_new_outlined,
-          size: 20,
-          color: Colors.blue,
-        ),
-        onTap: () {
-          // 使用 PlatformDialog 显示跨平台对话框
-          PlatformDialog.showConfirmDialog(
-            context,
-            title: resource.name,
-            content: resource.description ?? '暂无描述',
-            confirmText: '关闭',
-          );
-        },
       ),
     );
   }
