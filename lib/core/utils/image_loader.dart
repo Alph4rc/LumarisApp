@@ -12,7 +12,7 @@ class ImageLoader {
   ImageLoader._internal();
 
   /// 根据设备分辨率加载合适大小的图片
-  /// 
+  ///
   /// [assetName] 图片资源名称
   /// [context] BuildContext
   /// [fit] 图片缩放模式
@@ -20,19 +20,15 @@ class ImageLoader {
   /// [height] 图片高度
   Image loadImage(
     String assetName,
-    BuildContext context,
-    {
-      BoxFit fit = BoxFit.cover,
-      double? width,
-      double? height,
-    }
-  ) {
-    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    
+    BuildContext context, {
+    BoxFit fit = BoxFit.cover,
+    double? width,
+    double? height,
+  }) {
     // 根据设备像素比选择合适的图片分辨率
     // 这里我们使用cacheWidth和cacheHeight来优化图片加载
     // 实际项目中，可以根据不同分辨率准备不同大小的图片资源
-    
+
     return Image(
       image: AssetImage(assetName),
       fit: fit,
@@ -42,7 +38,7 @@ class ImageLoader {
   }
 
   /// 加载网络图片
-  /// 
+  ///
   /// [url] 图片URL
   /// [context] BuildContext
   /// [fit] 图片缩放模式
@@ -50,15 +46,11 @@ class ImageLoader {
   /// [height] 图片高度
   Image loadNetworkImage(
     String url,
-    BuildContext context,
-    {
-      BoxFit fit = BoxFit.cover,
-      double? width,
-      double? height,
-    }
-  ) {
-    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    
+    BuildContext context, {
+    BoxFit fit = BoxFit.cover,
+    double? width,
+    double? height,
+  }) {
     return Image(
       image: NetworkImage(url),
       fit: fit,
@@ -68,21 +60,18 @@ class ImageLoader {
   }
 
   /// 获取适合当前设备的图片路径
-  /// 
+  ///
   /// [basePath] 图片基础路径（不包含扩展名）
   /// [context] BuildContext
   /// [extension] 图片扩展名
-  String getDeviceSpecificImagePath(
-    String basePath,
-    BuildContext context,
-    {String extension = 'webp'}
-  ) {
+  String getDeviceSpecificImagePath(String basePath, BuildContext context,
+      {String extension = 'webp'}) {
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    
+
     // 根据设备像素比选择合适的图片分辨率
     // 实际项目中，应该根据不同分辨率准备不同大小的图片资源
     // 例如：assets/icon@1x.webp, assets/icon@2x.webp, assets/icon@3x.webp
-    
+
     if (devicePixelRatio >= 3.0) {
       return '$basePath@3x.$extension';
     } else if (devicePixelRatio >= 2.0) {
@@ -93,20 +82,28 @@ class ImageLoader {
   }
 
   /// 预加载图片
-  /// 
+  ///
   /// [assetNames] 图片资源名称列表
-  Future<void> preloadImages(List<String> assetNames) async {
+  /// [context] BuildContext，用于预加载图片
+  Future<void> preloadImages(
+    List<String> assetNames,
+    BuildContext context,
+  ) async {
     for (final assetName in assetNames) {
-      await precacheImage(AssetImage(assetName), null as BuildContext);
+      await precacheImage(AssetImage(assetName), context);
     }
   }
 
   /// 预加载网络图片
-  /// 
+  ///
   /// [urls] 图片URL列表
-  Future<void> preloadNetworkImages(List<String> urls) async {
+  /// [context] BuildContext，用于预加载图片
+  Future<void> preloadNetworkImages(
+    List<String> urls,
+    BuildContext context,
+  ) async {
     for (final url in urls) {
-      await precacheImage(NetworkImage(url), null as BuildContext);
+      await precacheImage(NetworkImage(url), context);
     }
   }
 }

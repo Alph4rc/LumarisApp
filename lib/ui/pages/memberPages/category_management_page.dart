@@ -241,7 +241,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    category.name ?? '未命名',
+                    category.name,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -303,8 +303,8 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
               onSelected: (value) {
                 if (value == 'edit') {
                   _showCategoryFormDialog(category);
-                } else if (value == 'delete' && category.name != null) {
-                  _deleteCategory(category.name!);
+                } else if (value == 'delete') {
+                  _deleteCategory(category.name);
                 }
               },
             ),
@@ -369,7 +369,9 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
       Get.snackbar('成功', widget.category == null ? '分类已创建' : '分类已更新',
           snackPosition: SnackPosition.BOTTOM);
       widget.onSaved();
-      Navigator.pop(context);
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       Get.snackbar('错误', '保存失败: $e', snackPosition: SnackPosition.BOTTOM);
     } finally {
@@ -538,8 +540,8 @@ class _ReorderCategoriesDialogState extends State<_ReorderCategoriesDialog> {
                   return ListTile(
                     key: ValueKey(category.id),
                     leading: const Icon(Icons.drag_handle),
-                    title: Text(category.name ?? '未命名'),
-                    subtitle: category.description != null
+                    title: Text(category.name),
+                    subtitle: category.description != null && category.description!.isNotEmpty
                         ? Text(category.description!)
                         : null,
                   );

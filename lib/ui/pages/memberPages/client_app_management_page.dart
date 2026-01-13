@@ -654,7 +654,9 @@ class _AppFormDialogState extends State<_AppFormDialog> {
         await ClientAppService.updateClientApp(widget.app!.clientId!, model);
         Get.snackbar('成功', '应用已更新', snackPosition: SnackPosition.BOTTOM);
         widget.onSaved();
-        Navigator.pop(context);
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       Get.snackbar('错误', '保存失败: $e', snackPosition: SnackPosition.BOTTOM);

@@ -20,9 +20,6 @@ Sidebar macosUISidebar({
     maxWidth: 280,
     startWidth: width,
     builder: (context, scrollController) {
-      // 在 builder 内部获取主题颜色
-      final separatorColor = CupertinoColors.separator.resolveFrom(context);
-
       // 添加顶部内边距，为标题栏和交通灯按钮留出空间
       return Column(
         children: [

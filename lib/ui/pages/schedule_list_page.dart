@@ -366,7 +366,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         course: course,
         onSave: (updatedCourse) async {
           await _saveUpdatedCustomCourse(updatedCourse);
-          if (mounted) {
+          if (mounted && context.mounted) {
             showClubSnackBar(context, const Text('课程修改成功'));
           }
         },

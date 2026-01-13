@@ -100,10 +100,7 @@ class RequestCache {
     // 检查缓存是否过期
     final expiryTime = DateTime.parse(expiryTimeStr);
     final now = DateTime.now();
-    
-    // 使用指定的maxAge或根据URL获取默认策略
-    final effectiveMaxAge = maxAge ?? _getCachePolicyForUrl(url).maxAge;
-    
+
     if (now.isAfter(expiryTime)) {
       // 缓存过期，删除缓存
       await _prefs?.remove(cacheKey);
@@ -280,8 +277,7 @@ class CacheInterceptor extends Interceptor {
             err.requestOptions.uri.toString(),
             params: err.requestOptions.queryParameters,
           );
-          final expiryKey = _cache._generateExpiryKey(cacheKey);
-          
+
           // 直接获取缓存，不检查过期时间
           final cachedData = _cache._prefs?.getString(cacheKey);
           if (cachedData != null) {

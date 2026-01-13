@@ -13,7 +13,6 @@ class HelperPage extends StatefulWidget {
 class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
-  String _version = '';
 
   final List<String> _tabs = [
     '功能介绍',
@@ -36,10 +35,8 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   }
 
   Future<void> _loadVersionInfo() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    setState(() {
-      _version = '${packageInfo.version}+${packageInfo.buildNumber}';
-    });
+    // 加载版本信息，以便在需要时使用
+    await PackageInfo.fromPlatform();
   }
 
   void _handleTabChange() {

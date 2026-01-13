@@ -84,7 +84,7 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
     if (confirmed == true) {
       try {
         final result = await ArticleService.deleteArticle(path);
-        if (result != null) {
+        if (result) {
           Get.snackbar('成功', '文章已删除', snackPosition: SnackPosition.BOTTOM);
           _loadArticles();
         }
@@ -230,7 +230,7 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      article.title ?? '无标题',
+                      article.title,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -267,7 +267,7 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
                       if (value == 'edit') {
                         _showEditArticleDialog(article);
                       } else if (value == 'delete') {
-                        _deleteArticle(article.path ?? '');
+                        _deleteArticle(article.path);
                       }
                     },
                   ),
@@ -303,7 +303,7 @@ class _ArticleManagementPageState extends State<ArticleManagementPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                article.content ?? '',
+                article.content,
                 style: TextStyle(
                   color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   height: 1.5,
@@ -378,7 +378,7 @@ class _ArticleDetailSheet extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        article.title ?? '无标题',
+                        article.title,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -396,7 +396,7 @@ class _ArticleDetailSheet extends StatelessWidget {
               Expanded(
                 child: Markdown(
                   controller: scrollController,
-                  data: article.content ?? '',
+                  data: article.content,
                   selectable: true,
                 ),
               ),
@@ -482,13 +482,15 @@ class _ArticleFormDialogState extends State<_ArticleFormDialog> {
           category: _selectedCategoryId,
           articleOrder: _articleOrder,
         );
-        await ArticleService.updateArticle(widget.article!.path!, dto);
+        await ArticleService.updateArticle(widget.article!.path, dto);
       }
 
       Get.snackbar('成功', widget.article == null ? '文章已创建' : '文章已更新',
           snackPosition: SnackPosition.BOTTOM);
       widget.onSaved();
-      Navigator.pop(context);
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       Get.snackbar('错误', '保存失败: $e', snackPosition: SnackPosition.BOTTOM);
     } finally {

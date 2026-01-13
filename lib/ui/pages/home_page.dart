@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width - 250;
     final list = <Widget>[
       const ScheduleWidget(),
       const TilesWidget(),

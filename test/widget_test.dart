@@ -1,6 +1,5 @@
 // This is the main test file that runs all tests in the project.
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 import 'all_tests.dart' as all_tests;
 

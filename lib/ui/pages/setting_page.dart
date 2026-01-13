@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
@@ -662,7 +659,9 @@ class SettingPage extends StatelessWidget {
           );
 
           if (result == true) {
-            showClubSnackBar(context, const Text('正在清除缓存...'));
+            if (context.mounted) {
+              showClubSnackBar(context, const Text('正在清除缓存...'));
+            }
             await RequestCache.instance.clear();
             if (context.mounted) {
               showClubSnackBar(context, const Text('缓存清除成功'));
