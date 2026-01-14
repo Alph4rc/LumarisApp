@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,9 @@ import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
+
+// 条件导入 dart:io，仅在非 Web 环境中使用
+import 'dart:io' if (dart.library.html) 'dart:html' as io;
 
 /// 课表列表页面
 ///
@@ -281,37 +285,103 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         : now.subtract(Duration(
             days: weekday + (scheduleStore.currentWeek - weekIndex) * 7));
 
-    return Column(
-      children: [
-        // 星期标题栏
-        WeekdayHeader(
-          weekStartDate: weekStartDate,
-          currentWeek: weekIndex == 0 ? null : weekIndex,
-          showDate: weekIndex > 0,
-          showGrid: settingsStore.showCourseGrid,
-        ),
-        // 课表网格
-        Expanded(
-          child: SingleChildScrollView(
-            child: SizedBox(
-              height: scheduleStore.height * 12,
-              child: ScheduleGrid(
-                courses: courses,
-                cellHeight: scheduleStore.height,
-                isYanTa: scheduleStore.isYanTa,
-                cardStyle: _cardStyle,
-                showGrid: settingsStore.showCourseGrid,
-                onCourseTap: (course) => _showCourseDetail(course),
-                onCourseLongPress: (course) {
-                  if (course.isCustom) {
-                    _showCourseActions(course);
-                  }
-                },
+    return Obx(() {
+      final scheduleContent = Column(
+        children: [
+          // 星期标题栏
+          WeekdayHeader(
+            weekStartDate: weekStartDate,
+            currentWeek: weekIndex == 0 ? null : weekIndex,
+            showDate: weekIndex > 0,
+            showGrid: settingsStore.showCourseGrid,
+          ),
+          // 课表网格
+          Expanded(
+            child: SingleChildScrollView(
+              child: SizedBox(
+                height: scheduleStore.height * 12,
+                child: ScheduleGrid(
+                  courses: courses,
+                  cellHeight: scheduleStore.height,
+                  isYanTa: scheduleStore.isYanTa,
+                  cardStyle: _cardStyle,
+                  showGrid: settingsStore.showCourseGrid,
+                  onCourseTap: (course) => _showCourseDetail(course),
+                  onCourseLongPress: (course) {
+                    if (course.isCustom) {
+                      _showCourseActions(course);
+                    }
+                  },
+                ),
               ),
             ),
           ),
-        ),
+        ],
+      );
+
+      // 如果设置了自定义背景，则添加背景图片
+      if (settingsStore.scheduleBackground == 'custom' &&
+          settingsStore.customBackgroundImage.isNotEmpty) {
+        return _buildScheduleWithBackground(scheduleContent);
+      }
+
+      return scheduleContent;
+    });
+  }
+
+  /// 构建带背景图片的课表
+  Widget _buildScheduleWithBackground(Widget child) {
+    final imagePath = settingsStore.customBackgroundImage;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // 背景图片
+        _buildBackgroundImage(imagePath),
+        // 课表内容
+        child,
       ],
+    );
+  }
+
+  /// 构建背景图片
+  Widget _buildBackgroundImage(String imagePath) {
+    // 检查是否为网络图片
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+          );
+        },
+      );
+    }
+
+    // 本地文件图片（仅在非 Web 环境中支持）
+    if (!kIsWeb) {
+      try {
+        final file = io.File(imagePath);
+        if (file.existsSync()) {
+          return Image.file(
+            file,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+              );
+            },
+          );
+        }
+      } catch (e) {
+        // 文件访问失败，返回默认背景
+      }
+    }
+
+    // 如果图片加载失败或在 Web 环境中，返回默认背景
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 
