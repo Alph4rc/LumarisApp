@@ -99,35 +99,34 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     final cardColor = isDark ? Colors.grey[900] : Colors.white;
 
     return Scaffold(
-      appBar: ClubAppBar(
-        title: '课表设置',
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (!isDesktop) ...[
-              _buildSectionTitle('日历订阅'),
-              const SizedBox(height: 12),
-              _buildCalendarSection(context, isDark, cardColor),
-              const SizedBox(height: 24),
-            ],
-            _buildSectionTitle('课表管理'),
-            const SizedBox(height: 12),
-            _buildManagementSection(context, isDark, cardColor),
-            const SizedBox(height: 24),
-            _buildSectionTitle('课表背景'),
-            const SizedBox(height: 12),
-            _buildBackgroundSection(context, isDark, cardColor),
-            const SizedBox(height: 24),
-            _buildSectionTitle('忽略课程'),
-            const SizedBox(height: 12),
-            _buildIgnoreCourseSection(context, isDark, cardColor),
-          ],
+        appBar: ClubAppBar(
+          title: '课表设置',
         ),
-      )
-    );
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isDesktop) ...[
+                _buildSectionTitle('日历订阅'),
+                const SizedBox(height: 12),
+                _buildCalendarSection(context, isDark, cardColor),
+                const SizedBox(height: 24),
+              ],
+              _buildSectionTitle('课表管理'),
+              const SizedBox(height: 12),
+              _buildManagementSection(context, isDark, cardColor),
+              const SizedBox(height: 24),
+              _buildSectionTitle('课表背景'),
+              const SizedBox(height: 12),
+              _buildBackgroundSection(context, isDark, cardColor),
+              const SizedBox(height: 24),
+              _buildSectionTitle('忽略课程'),
+              const SizedBox(height: 12),
+              _buildIgnoreCourseSection(context, isDark, cardColor),
+            ],
+          ),
+        ));
   }
 
   Widget _buildSectionTitle(String title) {
@@ -340,25 +339,41 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Widget _buildBackgroundOption(String title, String value, bool isDark) {
     final isSelected = settingsStore.scheduleBackground == value;
-    return ListTile(
-      leading: Icon(
-        isSelected ? Icons.check_circle : Icons.circle_outlined,
-        color: isSelected
-            ? Theme.of(context).colorScheme.primary
-            : (isDark ? Colors.grey[600] : Colors.grey[400]),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+    return Material(
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          setState(() {
+            settingsStore.setScheduleBackground(value);
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isSelected ? Icons.check_circle : Icons.circle_outlined,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : (isDark ? Colors.grey[600] : Colors.grey[400]),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      onTap: () {
-        setState(() {
-          settingsStore.setScheduleBackground(value);
-        });
-      },
     );
   }
 
