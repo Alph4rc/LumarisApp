@@ -77,4 +77,7 @@ class PrefsKeys {
   static const String TODO_REMIND_ENABLED = 'todo_remind_enabled';
   static const String SCHEDULE_BACKGROUND = 'schedule_background';
   static const String CUSTOM_BACKGROUND_IMAGE = 'custom_background_image';
+
+  /// 学校配置相关
+  static const String SCHOOL_ID = 'school_id';
 }

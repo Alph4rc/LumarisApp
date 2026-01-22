@@ -1,15 +1,13 @@
 import 'dart:convert';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client.dart';
+import 'edu_http_client_manager.dart';
 
 /// Score相关API
 class ScoreApi {
-  static final EduHttpClient _client = EduHttpClient();
-
   /// 获取学期信息
   static Future<String> getSemester(String studentId) async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Score/Semester',
         queryParameters: {'studentId': studentId},
       );
@@ -24,7 +22,7 @@ class ScoreApi {
   /// 获取成绩信息
   static Future<String> getScore(String studentId, String semester) async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Score',
         queryParameters: {
           'studentId': studentId,
@@ -42,7 +40,7 @@ class ScoreApi {
   /// 获取本学期成绩
   static Future<String> getThisSemester() async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Score/ThisSemester',
       );
       // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串

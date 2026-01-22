@@ -5,21 +5,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/network_exception.dart';
+import '../../../core/config/api_config.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class EduHttpClient {
-  static const String baseUrl = 'https://xauatapi.xauat.site';
   final Dio _dio;
   final int _maxRetryCount = 3;
-  
-  EduHttpClient({Dio? dio}) : _dio = dio ?? Dio() {
+  String _baseUrl;
+
+  EduHttpClient({Dio? dio, String? baseUrl})
+      : _dio = dio ?? Dio(),
+        _baseUrl = baseUrl ?? ApiConfig.getDefaultSchool().eduApiBaseUrl {
     _setupDio();
   }
 
   void _setupDio() {
     _dio.options = BaseOptions(
-      baseUrl: baseUrl,
+      baseUrl: _baseUrl,
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 5),
       contentType: 'application/json',
@@ -72,6 +75,17 @@ class EduHttpClient {
         handler.next(e);
       },
     ));
+  }
+
+  /// 获取当前基础 URL
+  String get baseUrl => _baseUrl;
+
+  /// 更新基础 URL
+  ///
+  /// 用于切换学校时更新 API 地址
+  void updateBaseUrl(String newBaseUrl) {
+    _baseUrl = newBaseUrl;
+    _dio.options.baseUrl = newBaseUrl;
   }
 
   Future<String?> _getCookie() async {

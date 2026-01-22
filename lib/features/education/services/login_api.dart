@@ -1,16 +1,14 @@
 import 'dart:convert';
 
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client.dart';
+import 'edu_http_client_manager.dart';
 
 /// Login相关API
 class LoginApi {
-  static final EduHttpClient _client = EduHttpClient();
-
   /// 登录
   static Future<Map<String, dynamic>> login(String username, String password) async {
     try {
-      final response = await _client.post(
+      final response = await EduHttpClientManager.instance.post(
         '/Login',
         data: {
           'username': username,

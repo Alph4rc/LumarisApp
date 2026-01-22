@@ -1,15 +1,13 @@
 import 'dart:convert';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client.dart';
+import 'edu_http_client_manager.dart';
 
 /// Exam相关API
 class ExamApi {
-  static final EduHttpClient _client = EduHttpClient();
-
   /// 获取考试信息
   static Future<String> getExam(String studentId) async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Exam',
         queryParameters: {'studentId': studentId},
       );

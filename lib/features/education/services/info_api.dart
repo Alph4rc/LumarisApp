@@ -1,15 +1,13 @@
 import 'dart:convert';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client.dart';
+import 'edu_http_client_manager.dart';
 
 /// Info相关API
 class InfoApi {
-  static final EduHttpClient _client = EduHttpClient();
-
   /// 获取学生信息完成度
   static Future<String> getInfoCompletion() async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Info/Completion',
       );
       // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
@@ -23,7 +21,7 @@ class InfoApi {
   /// 获取时间信息
   static Future<String> getTime() async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Info/Time',
       );
       // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串

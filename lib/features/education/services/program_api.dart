@@ -1,15 +1,13 @@
 import 'dart:convert';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client.dart';
+import 'edu_http_client_manager.dart';
 
 /// Program相关API
 class ProgramApi {
-  static final EduHttpClient _client = EduHttpClient();
-
   /// 获取培养方案
   static Future<String> getProgram(String studentId, {String? name}) async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Program',
         queryParameters: {
           'id': studentId,
@@ -27,7 +25,7 @@ class ProgramApi {
   /// 获取培养方案字典
   static Future<String> getProgramDic(String studentId) async {
     try {
-      final response = await _client.get(
+      final response = await EduHttpClientManager.instance.get(
         '/Program/GetDic',
         queryParameters: {'id': studentId},
       );
