@@ -4,18 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:ios_club_app/core/models/semester_model.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
+import 'package:ios_club_app/features/education/services/edu_api_client.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -44,10 +43,6 @@ class _ScorePageState extends State<ScorePage>
   late PageController pageController = PageController();
   late int _currentIndex = 0;
   final List<String> _selectorList = [];
-
-  /// 重登录次数限制，避免频繁重登录
-  static const int _maxReloginAttempts = 1;
-  int _reloginAttempts = 0;
 
   static const yearStringList = [
     '一',
@@ -135,8 +130,6 @@ class _ScorePageState extends State<ScorePage>
     if (!mounted) return;
 
     setState(() => _isLoading = true);
-    // 重置重登录计数器
-    _reloginAttempts = 0;
 
     try {
       final cookieData = await EduService.getUserData();
@@ -147,7 +140,6 @@ class _ScorePageState extends State<ScorePage>
         return;
       }
 
-      final headers = _buildHeaders(cookieData);
       setState(() {
         _loadingText = '正在获取所有学期数据...';
       });
@@ -160,9 +152,8 @@ class _ScorePageState extends State<ScorePage>
         });
 
         final semesterScores = await _fetchSemesterScores(
-          cookieData: cookieData,
+          studentId: cookieData.studentId,
           semester: semester,
-          headers: headers,
         );
 
         if (semesterScores != null) {
@@ -196,76 +187,25 @@ class _ScorePageState extends State<ScorePage>
     }
   }
 
-  Map<String, String> _buildHeaders(UserData cookieData) {
-    return {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Cookie': cookieData.cookie,
-      'xauat': cookieData.cookie,
-    };
-  }
-
+  /// 使用统一的 EduApiClient 获取学期成绩
+  /// EduHttpClient 已内置缓存、认证和重登录机制
   Future<ScoreList?> _fetchSemesterScores({
-    required UserData cookieData,
+    required String studentId,
     required SemesterModel semester,
-    required Map<String, String> headers,
   }) async {
     try {
-      final response = await http.get(
-        Uri.parse(
-            'https://xauatapi.xauat.site/Score?studentId=${cookieData.studentId}&semester=${semester.semester}'),
-        headers: headers,
+      final response = await EduApiClient.getScore(studentId, semester.semester);
+      final list = jsonDecode(response) as List;
+      return ScoreList(
+        semester: semester,
+        list: list.map((e) => ScoreModel.fromJson(e)).toList(),
       );
-
-      if (response.statusCode == 200) {
-        final list = jsonDecode(response.body) as List;
-        return ScoreList(
-          semester: semester,
-          list: list.map((e) => ScoreModel.fromJson(e)).toList(),
-        );
-      } else {
-        // 只有在未超过重登录次数限制时才尝试重登录
-        if (_reloginAttempts < _maxReloginAttempts) {
-          _reloginAttempts++;
-          return await _retryWithFreshLogin(
-            cookieData: cookieData,
-            semester: semester,
-          );
-        }
-        AppLogger.debug('跳过重登录，已达到最大重试次数: $_maxReloginAttempts');
-        return null;
-      }
     } catch (e) {
       if (kDebugMode) {
         AppLogger.error('Error fetching semester scores: $e');
       }
       return null;
     }
-  }
-
-  Future<ScoreList?> _retryWithFreshLogin({
-    required UserData cookieData,
-    required SemesterModel semester,
-  }) async {
-    await EduService.login();
-    final freshCookieData = await EduService.getUserData();
-    if (freshCookieData == null) return null;
-
-    final response = await http.get(
-      Uri.parse(
-        'https://xauatapi.xauat.site/Score?studentId=${cookieData.studentId}&semester=${semester.semester}',
-      ),
-      headers: _buildHeaders(freshCookieData),
-    );
-
-    if (response.statusCode == 200) {
-      final list = jsonDecode(response.body) as List;
-      return ScoreList(
-        semester: semester,
-        list: list.map((e) => ScoreModel.fromJson(e)).toList(),
-      );
-    }
-    return null;
   }
 
   Future<void> _cacheFreshData(List<ScoreList> freshData) async {
