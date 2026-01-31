@@ -37,11 +37,18 @@ class EduService {
       }
 
       var cookieData = await getUserData();
-      await getSemester(userData: cookieData);
-      await getTime();
+
+      // 并行获取不依赖其他数据的请求
+      await Future.wait([
+        getSemester(userData: cookieData),
+        getTime(),
+        getExam(userData: cookieData),
+        getInfoCompletion(userData: cookieData),
+      ]);
+
+      // getCourse 依赖 getTime 的数据，需要在 getTime 完成后执行
       await getCourse(userData: cookieData, isRefresh: true);
-      await getExam(userData: cookieData);
-      await getInfoCompletion(userData: cookieData);
+
       await prefs.setInt(PrefsKeys.LAST_FETCH_TIME, now);
       return true;
     } catch (e) {
@@ -71,11 +78,18 @@ class EduService {
 
       var cookieData = await getUserData();
       var now = DateTime.now().millisecondsSinceEpoch;
-      await getSemester(userData: cookieData);
-      await getTime();
+
+      // 并行获取不依赖其他数据的请求
+      await Future.wait([
+        getSemester(userData: cookieData),
+        getTime(),
+        getExam(userData: cookieData),
+        getInfoCompletion(userData: cookieData),
+      ]);
+
+      // getCourse 依赖 getTime 的数据，需要在 getTime 完成后执行
       await getCourse(userData: cookieData, isRefresh: true);
-      await getExam(userData: cookieData);
-      await getInfoCompletion(userData: cookieData);
+
       await prefs.setInt(PrefsKeys.LAST_FETCH_TIME, now);
 
       final courseStore = Get.put(CourseStore());
