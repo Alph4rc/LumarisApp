@@ -1,5 +1,5 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,6 +9,11 @@ import 'package:ios_club_app/core/models/electric_data.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class TileService {
+  static final Dio _dio = Dio(BaseOptions(
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 10),
+  ));
+
   static Future<double?> getTextAfterKeyword({String? url}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -21,13 +26,13 @@ class TileService {
         }
       }
 
-      final response = await http.get(Uri.parse(url));
+      final response = await _dio.get(url);
       if (response.statusCode != 200) {
         throw Exception('HTTP请求失败: ${response.statusCode}');
       }
 
       // 解析HTML内容
-      final document = parser.parse(response.body);
+      final document = parser.parse(response.data);
 
       // 获取所有文本节点
       final textNodes = document.body?.text
@@ -100,8 +105,8 @@ class TileService {
 
     url = url.replaceAll('wxAccount', 'wxElecDtl');
 
-    final response = await http.get(Uri.parse(url));
-    var document = parser.parse(response.body);
+    final response = await _dio.get(url);
+    var document = parser.parse(response.data);
     var tables = document.querySelectorAll('table');
     final List<ElectricData> data = [];
     for (var table in tables) {

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 class ProgramController extends GetxController {
   TabController? _tabController;
   late PageController pageController;
+  bool _isTabListenerAdded = false;
+
   List<String> semesterNames = [
     "大一上",
     "大一下",
@@ -60,6 +62,14 @@ class ProgramController extends GetxController {
 
   TabController? get tabController => _tabController;
 
+  /// 添加 TabController 监听器（仅添加一次）
+  void addTabListenerIfNeeded() {
+    if (_tabController != null && !_isTabListenerAdded) {
+      _tabController!.addListener(onTabChanged);
+      _isTabListenerAdded = true;
+    }
+  }
+
   void onPageChanged(int index) {
     if (_tabController != null && _tabController!.index != index) {
       _tabController!.animateTo(index);
@@ -78,6 +88,9 @@ class ProgramController extends GetxController {
 
   @override
   void onClose() {
+    if (_isTabListenerAdded && _tabController != null) {
+      _tabController!.removeListener(onTabChanged);
+    }
     _tabController?.dispose();
     pageController.dispose();
     super.onClose();

@@ -21,7 +21,7 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 /// 提供与教务系统相关的所有操作，包括数据刷新、登录、信息获取等
 /// 所有方法均为静态方法，可以直接调用
 class EduService {
-  
+
   /// 刷新所有数据
   /// 该方法会执行登录、获取学期信息、时间信息、课程信息、考试信息和完成情况等操作
   ///
@@ -51,10 +51,8 @@ class EduService {
 
       await prefs.setInt(PrefsKeys.LAST_FETCH_TIME, now);
       return true;
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('刷新数据失败', error: e, stackTrace: stackTrace);
     }
 
     return false;
@@ -131,10 +129,8 @@ class EduService {
 
         return true;
       }
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('登录失败', error: e, stackTrace: stackTrace);
     }
 
     return false;
@@ -181,10 +177,8 @@ class EduService {
       if (jsonString != null) {
         return UserData.fromJson(jsonDecode(jsonString));
       }
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error reading local data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('读取本地数据失败', error: e, stackTrace: stackTrace);
     }
     return null;
   }
@@ -199,10 +193,8 @@ class EduService {
       final response = await EduApiClient.getThisSemester();
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(PrefsKeys.THIS_SEMESTER_DATA, response);
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取本学期成绩失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -224,10 +216,8 @@ class EduService {
 
       final now = DateTime.now().microsecondsSinceEpoch;
       await prefs.setInt(PrefsKeys.SEMESTER_TIME, now);
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取学期信息失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -284,10 +274,8 @@ class EduService {
         // 更新课程数据刷新时间
         await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME, DateTime.now().millisecondsSinceEpoch);
       }
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取课程信息失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -311,10 +299,8 @@ class EduService {
       }
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(json));
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取所有学期成绩失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -388,12 +374,10 @@ class EduService {
         await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(mergedScores));
         await prefs.setString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS', jsonEncode(scoreTimestamps));
         await prefs.setInt(PrefsKeys.LAST_SCORE_TIME, now);
-        
+
         return _buildScoreListFromCache(mergedScores, semesters);
-      } catch (e) {
-        if (kDebugMode) {
-          AppLogger.error('Error fetching data: $e');
-        }
+      } catch (e, stackTrace) {
+        AppLogger.error('获取成绩数据失败', error: e, stackTrace: stackTrace);
       }
     }
     
@@ -452,10 +436,8 @@ class EduService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
           PrefsKeys.EXAM_DATA, jsonEncode(jsonDecode(response)));
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取考试信息失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -472,10 +454,8 @@ class EduService {
           PrefsKeys.TIME_DATA, jsonEncode(jsonDecode(response)));
       final now = DateTime.now().millisecondsSinceEpoch;
       await prefs.setInt(PrefsKeys.TIME_LAST_UPDATED, now);
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取时间信息失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -495,10 +475,8 @@ class EduService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
           PrefsKeys.INFO_DATA, jsonEncode(jsonDecode(response)));
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取学生信息完成度失败', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -530,10 +508,8 @@ class EduService {
       }
 
       return result;
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取校巴信息失败', error: e, stackTrace: stackTrace);
     }
 
     return BusModel(records: [], total: 0);
@@ -556,10 +532,8 @@ class EduService {
         AppLogger.debug('找到了培养方案：${result.length}');
       }
       return result.map<PlanCourse>((e) => PlanCourse.fromJson(e)).toList();
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取培养方案失败', error: e, stackTrace: stackTrace);
     }
 
     return [];
@@ -585,10 +559,8 @@ class EduService {
           .map<PlanCourseList>(
               (entry) => PlanCourseList.fromMap(entry.key, entry.value))
           .toList();
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching data: $e');
-      }
+    } catch (e, stackTrace) {
+      AppLogger.error('获取培养方案字典失败', error: e, stackTrace: stackTrace);
     }
 
     return [];

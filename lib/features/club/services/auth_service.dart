@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
@@ -9,15 +7,15 @@ import 'package:ios_club_app/features/club/utils/api_response_helper.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 认证服务类
-/// 
+///
 /// 负责处理用户的登录、注册、登出、密码重置等认证相关功能。
 /// 与后端API交互，处理认证流程和用户凭据管理。
 class AuthService {
   /// 用户登录
-  /// 
+  ///
   /// 向服务器发送登录请求，验证用户凭据并获取JWT令牌。
   /// 如果登录成功，将JWT令牌保存到本地存储。
-  /// 
+  ///
   /// @param userId 用户ID（通常是学号）
   /// @param password 用户密码
   /// @param clientId 客户端ID（可选，用于OAuth2认证）
@@ -25,21 +23,16 @@ class AuthService {
   /// @return 登录成功返回JWT令牌，失败返回null
   static Future<String?> login(String userId, String password, {String clientId = '', String scope = ''}) async {
     try {
-      final Map<String, String> finalHeaders = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
-
-      final response = await http.post(
-        Uri.parse('https://api.xauat.site/Auth/login'),
-        headers: finalHeaders,
-        body: jsonEncode({
+      final response = await ApiClient.post(
+        '/Auth/login',
+        body: {
           'userId': userId,
           'password': password,
-        }),
+        },
+        withAuth: false,
       );
 
-      final jwt = await ApiResponseHelper.parseString(
+      final jwt = ApiResponseHelper.parseString(
         response,
         errorMessage: 'Login failed',
       );
@@ -65,7 +58,7 @@ class AuthService {
   static Future<bool> signup(StudentModel studentData) async {
     try {
       final response = await ApiClient.post('/Auth/signup', body: studentData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error during signup',
       );
@@ -87,7 +80,7 @@ class AuthService {
   static Future<bool> logout(String userId, {String clientId = ''}) async {
     try {
       final response = await ApiClient.post('/Auth/logout?userId=$userId');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error during logout',
       );
@@ -108,7 +101,7 @@ class AuthService {
   static Future<bool> validate(String userId) async {
     try {
       final response = await ApiClient.get('/Auth/validate?userId=$userId');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error during validation',
       );
@@ -132,7 +125,7 @@ class AuthService {
     try {
       final response = await ApiClient.put(
         '/Auth/change-password?userId=$userId&oldPassword=$oldPassword&newPassword=$newPassword');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error changing password',
       );
@@ -154,7 +147,7 @@ class AuthService {
   static Future<bool> requestPasswordReset(String userId) async {
     try {
       final response = await ApiClient.post('/Auth/request-password-reset?userId=$userId');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error requesting password reset',
       );
@@ -179,7 +172,7 @@ class AuthService {
     try {
       final response = await ApiClient.post(
         '/Auth/reset-password?userId=$userId&code=$code&newPassword=$newPassword');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error resetting password',
       );
@@ -204,7 +197,7 @@ class AuthService {
     try {
       final response = await ApiClient.post(
         '/Auth/refresh-token?userId=$userId&refreshToken=$refreshToken&clientId=$clientId&scope=$scope');
-      final jwt = await ApiResponseHelper.parseString(
+      final jwt = ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error refreshing token',
       );

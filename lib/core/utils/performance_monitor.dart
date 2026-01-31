@@ -1,5 +1,4 @@
-import 'dart:math';
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
@@ -20,45 +19,19 @@ class PerformanceMonitor {
   /// 页面渲染时间记录
   final Map<String, List<int>> _pageRenderTimes = {};
 
-  /// 内存使用记录
-  final List<double> _memoryUsage = [];
-
-  /// CPU使用记录
-  final List<double> _cpuUsage = [];
+  /// 定期监控定时器
+  Timer? _monitoringTimer;
 
   /// 初始化性能监控
   void initialize() {
     _startTime = DateTime.now();
     AppLogger.debug('性能监控初始化完成，启动时间: $_startTime');
-    
-    // 定期记录性能指标
-    if (kDebugMode) {
-      _startPeriodicMonitoring();
-    }
   }
 
-  /// 开始定期监控
-  void _startPeriodicMonitoring() {
-    // 每5秒记录一次性能指标
-    Future.delayed(const Duration(seconds: 5), () {
-      _recordPerformanceMetrics();
-      _startPeriodicMonitoring();
-    });
-  }
-
-  /// 记录性能指标
-  void _recordPerformanceMetrics() {
-    // 记录内存使用情况
-    // 注意：在Flutter中，直接获取内存使用情况需要使用platform_channel
-    // 这里使用模拟数据作为示例
-    final memoryUsage = 100 + Random().nextDouble() * 200;
-    _memoryUsage.add(memoryUsage);
-    
-    // 记录CPU使用情况
-    final cpuUsage = 10 + Random().nextDouble() * 30;
-    _cpuUsage.add(cpuUsage);
-    
-    AppLogger.debug('性能指标 - 内存: ${memoryUsage.toStringAsFixed(2)} MB, CPU: ${cpuUsage.toStringAsFixed(2)}%');
+  /// 停止性能监控
+  void dispose() {
+    _monitoringTimer?.cancel();
+    _monitoringTimer = null;
   }
 
   /// 记录页面渲染时间

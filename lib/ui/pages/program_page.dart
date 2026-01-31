@@ -36,10 +36,8 @@ class ProgramPage extends StatelessWidget {
               return const SizedBox.shrink();
             }
 
-            // Listen to tab controller changes
-            if (controller.tabController != null) {
-              controller.tabController!.addListener(controller.onTabChanged);
-            }
+            // 确保监听器只添加一次
+            controller.addTabListenerIfNeeded();
 
             return TabBar(
               controller: controller.tabController,

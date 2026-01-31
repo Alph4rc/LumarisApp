@@ -1,15 +1,13 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/core/services/base_http_client.dart';
 
 /// 支付数据模型类
 /// 包含支付记录列表和总金额
 class PaymentData {
   /// 支付记录列表
   final List<PaymentModel> payments;
-  
+
   /// 总金额
   final double total;
 
@@ -31,13 +29,13 @@ class PaymentData {
 class PaymentModel {
   /// 交易类型
   final String turnoverType;
-  
+
   /// 交易日期时间字符串
   final String datetimeStr;
-  
+
   /// 交易摘要
   final String resume;
-  
+
   /// 交易金额（分为单位）
   final double amount;
 
@@ -72,6 +70,11 @@ class PaymentModel {
 ///
 /// 负责获取、存储和处理用户的支付数据
 class PaymentAnalyzer {
+  static final BaseHttpClient _client = BaseHttpClient(
+    baseUrl: 'https://xauatapi.xauat.site',
+    enableCache: true,
+  );
+
   /// 获取支付数据
   /// 如果本地没有存储卡号，则返回空数据
   /// 否则从服务器获取该卡号对应的交易记录
@@ -80,11 +83,14 @@ class PaymentAnalyzer {
     if (cardId.isEmpty) {
       return PaymentData([], 0);
     }
-    final response = await http
-        .get(Uri.parse('https://xauatapi.xauat.site/Payment/$cardId/turnover'));
-    if (response.statusCode == 200) {
-      var a = jsonDecode(response.body);
-      return PaymentData.fromJson(a);
+
+    try {
+      final response = await _client.get('/Payment/$cardId/turnover');
+      if (response != null && response is Map<String, dynamic>) {
+        return PaymentData.fromJson(response);
+      }
+    } catch (_) {
+      // 忽略错误，返回空数据
     }
 
     return PaymentData([], 0);
@@ -94,11 +100,13 @@ class PaymentAnalyzer {
   ///
   /// [cardId] 卡号
   static Future<PaymentData> fetchData(String cardId) async {
-    final response = await http
-        .get(Uri.parse('https://xauatapi.xauat.site/Payment/$cardId/turnover'));
-    if (response.statusCode == 200) {
-      var a = jsonDecode(response.body);
-      return PaymentData.fromJson(a);
+    try {
+      final response = await _client.get('/Payment/$cardId/turnover');
+      if (response != null && response is Map<String, dynamic>) {
+        return PaymentData.fromJson(response);
+      }
+    } catch (_) {
+      // 忽略错误，返回空数据
     }
 
     return PaymentData([], 0);

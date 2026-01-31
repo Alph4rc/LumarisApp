@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/link_model.dart';
-import 'package:http/http.dart' as http;
+import 'package:ios_club_app/core/services/base_http_client.dart';
 
 import 'package:ios_club_app/features/club/services/auth_service.dart';
 import 'package:ios_club_app/features/club/services/user_service.dart';
@@ -18,21 +18,19 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 /// 俱乐部服务类 - 为向后兼容而保留的接口
 /// 新代码应直接使用 clubServices 目录下的模块化服务
 class ClubService {
+  static final BaseHttpClient _client = BaseHttpClient(
+    baseUrl: 'https://link.xauat.site',
+    enableCache: true,
+  );
+
   /// 获取链接分类
   static Future<List<CategoryModel>> getLinks() async {
     final List<CategoryModel> list = [];
     try {
-      final Map<String, String> finalHeaders = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
+      final response = await _client.get('/Category');
 
-      final response = await http.get(
-          Uri.parse('https://link.xauat.site/Category'),
-          headers: finalHeaders);
-
-      if (response.statusCode == 200) {
-        for (var item in jsonDecode(response.body)) {
+      if (response is List) {
+        for (var item in response) {
           list.add(CategoryModel.fromJson(item));
         }
       }
