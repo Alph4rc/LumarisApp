@@ -349,21 +349,26 @@ class DataService {
   static Future<List<SemesterModel>> getSemester(
       {bool isRefresh = false}) async {
     final prefs = await SharedPreferences.getInstance();
-    if (isRefresh) {
-      await EduService.getSemester();
-    } else {
-      final semesterIntTime = prefs.getInt(PrefsKeys.SEMESTER_TIME);
 
-      if (semesterIntTime != null) {
+    // 判断是否需要刷新数据
+    bool needRefresh = isRefresh;
+    if (!needRefresh) {
+      final semesterIntTime = prefs.getInt(PrefsKeys.SEMESTER_TIME);
+      if (semesterIntTime == null) {
+        // 没有缓存时间，需要刷新
+        needRefresh = true;
+      } else {
         final now = DateTime.now();
-        if (now
-                .difference(
-                    DateTime.fromMicrosecondsSinceEpoch(semesterIntTime))
-                .inHours <
-            1) {
-          await EduService.getSemester();
+        final cacheTime = DateTime.fromMicrosecondsSinceEpoch(semesterIntTime);
+        // 缓存超过1小时，需要刷新
+        if (now.difference(cacheTime).inHours >= 1) {
+          needRefresh = true;
         }
       }
+    }
+
+    if (needRefresh) {
+      await EduService.getSemester();
     }
 
     final String? jsonString = prefs.getString(PrefsKeys.SEMESTER_DATA);

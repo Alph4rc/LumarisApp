@@ -88,10 +88,13 @@ class ExamService {
   /// [cookieData] 用户认证信息
   /// [now] 当前时间
   /// 返回一个元组，第一个元素表示是否成功，第二个元素是JSON响应字符串，第三个元素是错误结果
+  ///
+  /// 注意：EduHttpClient 已内置重试和重登录机制，这里不再额外处理
   static Future<(bool isSuccess, String jsonString, ExamResult errorResult)>
       _fetchExamData(UserData cookieData, DateTime now) async {
     try {
       // 使用ExamApi获取考试数据
+      // ExamApi 使用 EduHttpClient，已内置重试和401/403重登录机制
       final response = await ExamApi.getExam(cookieData.studentId);
 
       final prefs = await SharedPreferences.getInstance();
@@ -101,61 +104,15 @@ class ExamService {
       final mergedData = _mergeExamData(existingData, response, now);
 
       return (true, mergedData, ExamResult.empty());
+    } on AuthenticationException catch (e) {
+      AppLogger.debug('认证失败: $e');
+      return (false, '', ExamResult.error('认证失败，请重新登录'));
     } on NetworkException catch (e) {
-      AppLogger.debug('Network error: $e');
-      return await _retryWithNewLogin(cookieData, now, isNetworkError: true);
-    } catch (e) {
-      AppLogger.debug('Initial request failed: $e');
-      return await _retryWithNewLogin(cookieData, now, isNetworkError: false);
-    }
-  }
-
-  /// 使用新登录信息重试请求
-  ///
-  /// 当初次请求失败时，尝试重新登录并再次发送请求
-  /// [oldCookie] 原始用户认证信息
-  /// [now] 当前时间
-  /// [isNetworkError] 是否为网络错误
-  /// 返回一个元组，第一个元素表示是否成功，第二个元素是JSON响应字符串，第三个元素是错误结果
-  static Future<(bool isSuccess, String jsonString, ExamResult errorResult)>
-      _retryWithNewLogin(UserData oldCookie, DateTime now,
-          {bool isNetworkError = false}) async {
-    // 尝试重新登录
-    if (!(await EduService.login())) {
-      return (false, '', ExamResult.error('登录失败，请检查账号密码'));
-    }
-
-    // 获取新的用户认证信息
-    final newCookie = await EduService.getUserData();
-    if (newCookie == null) {
-      return (false, '', ExamResult.error('获取用户信息失败'));
-    }
-
-    try {
-      // 使用ExamApi重新获取考试数据
-      final response = await ExamApi.getExam(newCookie.studentId);
-
-      AppLogger.debug('数据获取成功');
-
-      final prefs = await SharedPreferences.getInstance();
-      final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
-
-      // 合并现有数据和新数据，实现增量更新
-      final mergedData = _mergeExamData(existingData, response, now);
-      return (true, mergedData, ExamResult.empty());
-    } on NetworkException catch (e) {
-      AppLogger.debug('重试请求失败 - 网络错误: $e');
+      AppLogger.debug('网络错误: $e');
       return (false, '', ExamResult.networkError(e.message));
     } catch (e) {
-      AppLogger.debug('重试请求失败: $e');
-      final errorMsg = isNetworkError ? '网络连接失败，请检查网络设置' : '获取考试信息失败: $e';
-      return (
-        false,
-        '',
-        isNetworkError
-            ? ExamResult.networkError(errorMsg)
-            : ExamResult.error(errorMsg)
-      );
+      AppLogger.debug('获取考试数据失败: $e');
+      return (false, '', ExamResult.error('获取考试信息失败: $e'));
     }
   }
 
