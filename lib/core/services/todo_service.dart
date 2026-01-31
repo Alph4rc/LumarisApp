@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:ios_club_app/core/services/club_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/todo_item.dart';
@@ -27,7 +27,7 @@ class TodoService {
   ///
   /// [list] 需要保存的待办事项列表
   static Future<void> setTodoList(List<TodoItem> list) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.TODO_DATA);
     final String? username = prefs.getString(PrefsKeys.USERNAME);
 
@@ -46,7 +46,7 @@ class TodoService {
   ///
   /// 从 SharedPreferences 中读取当前用户的待办事项列表
   static Future<List<TodoItem>> getLocalTodoList() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.TODO_DATA);
     final String? username = prefs.getString(PrefsKeys.USERNAME);
 
@@ -73,7 +73,7 @@ class TodoService {
   /// 通过 HTTP 请求从俱乐部服务器获取用户的待办事项列表
   /// 如果认证失败会尝试重新登录并再次请求
   static Future<List<TodoItem>> getClubTodoList() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
 
     if (memberDataString == null || memberDataString.isEmpty) {
@@ -148,7 +148,7 @@ class TodoService {
   /// 将本地存储的待办事项逐一上传到俱乐部服务器
   /// 如果全部上传成功，则清除本地待办事项数据
   static Future<void> nowToUpdate() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
 
     if (memberDataString == null || memberDataString.isEmpty) {

@@ -13,6 +13,7 @@ import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -33,6 +34,8 @@ void main() async {
 
   // 在微信小程序环境中，跳过大部分平台特定的初始化
   if (PlatformUtils.isMPFlutter) {
+    // 初始化 SharedPreferences
+    await PrefsService.init();
     // 只初始化必要的 Stores
     initStores();
     // 直接启动应用
@@ -41,6 +44,9 @@ void main() async {
   }
 
   // 以下代码只在非微信小程序环境中执行
+
+  // 初始化 SharedPreferences（最先初始化，其他服务可能依赖它）
+  await PrefsService.init();
 
   // 初始化性能监控
   PerformanceMonitor().initialize();

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/bus_model.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/services/new_bus_api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 class BusTileStore extends GetxController {
@@ -18,7 +18,7 @@ class BusTileStore extends GetxController {
   }
 
   Future<void> loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     useNewApi.value = prefs.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
   }
 
@@ -51,7 +51,7 @@ class BusTileStore extends GetxController {
 
   Future<void> toggleUseNewApi(bool value) async {
     useNewApi.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.USE_NEW_BUS_API, useNewApi.value);
     await loadBusData(); // 切换后重新加载数据
   }

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'prefs_keys.dart';
 
@@ -37,7 +37,7 @@ class CourseStore extends GetxController {
   /// 同时加载自定义课程数据并合并到课程列表中。
   /// 如果解析失败，会清除本地存储中的课程数据。
   Future<void> loadCourses() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final List<CourseModel> allCourses = [];
 
     // 加载系统课程数据
@@ -80,7 +80,7 @@ class CourseStore extends GetxController {
   /// 从SharedPreferences中读取被忽略的课程数据，解析为字符串列表并存储到响应式列表中。
   /// 如果解析失败，会清除本地存储中的被忽略课程数据。
   Future<void> loadIgnoreCourses() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.IGNORE_DATA);
 
     if (jsonString != null) {
@@ -110,7 +110,7 @@ class CourseStore extends GetxController {
   ///
   /// @param ignoreList 被忽略的课程名称列表
   Future<void> saveCourseData(List<String> ignoreList) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(
         PrefsKeys.IGNORE_DATA, jsonEncode({"data": ignoreList}));
   }

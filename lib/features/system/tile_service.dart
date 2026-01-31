@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
@@ -16,7 +16,7 @@ class TileService {
 
   static Future<double?> getTextAfterKeyword({String? url}) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
 
       if (url == null || url.isEmpty) {
         url = prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
@@ -65,12 +65,12 @@ class TileService {
   }
 
   static Future<void> setTiles(List<String> map) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setStringList(PrefsKeys.TILES, map);
   }
 
   static Future<List<String>> getTiles() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     return prefs.getStringList(PrefsKeys.TILES) ?? [];
   }
 
@@ -95,7 +95,7 @@ class TileService {
   }
 
   static Future<List<ElectricData>> getElectricityWeeklyData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     var url = prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
 

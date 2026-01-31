@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
@@ -32,7 +32,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
       isLoading = true;
     });
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString('custom_courses');
 
     if (jsonString != null) {
@@ -55,7 +55,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
   }
 
   Future<void> _saveCustomCourses() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final jsonString =
         jsonEncode(customCourses.map((course) => course.toJson()).toList());
     await prefs.setString('custom_courses', jsonString);

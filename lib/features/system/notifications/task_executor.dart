@@ -7,7 +7,7 @@ import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 任务执行器 - 实际的业务逻辑
@@ -169,7 +169,7 @@ class TaskExecutor {
   /// 检查并发送课程提醒
   static Future<void> checkAndSendCourseReminder() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await PrefsService.getInstanceAsync();
 
       // 检查是否启用提醒
       final isReminderEnabled = prefs.getBool(PrefsKeys.IS_REMIND) ?? false;

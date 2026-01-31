@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'dart:math';
 
 import 'package:ios_club_app/core/utils/animations/animations.dart';
@@ -345,7 +345,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                         title: Text('电费充值'),
                         subtitle: Text('跳转至微信进行电费充值'),
                         onTap: () async {
-                          final prefs = await SharedPreferences.getInstance();
+                          final prefs = PrefsService.instance;
                           var url =
                               prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
                           url = url.replaceAll('wxAccount', 'wxCharge');

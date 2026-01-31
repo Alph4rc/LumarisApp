@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'prefs_keys.dart';
 import '../core/config/api_config.dart';
 import '../features/education/services/edu_http_client_manager.dart';
@@ -81,7 +81,7 @@ class SettingsStore extends GetxController {
 
   /// 加载所有设置
   Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     _isRemind.value = prefs.getBool(PrefsKeys.IS_REMIND) ?? false;
     _remindTime.value = prefs.getInt(PrefsKeys.NOTIFICATION_TIME) ?? 15;
@@ -102,84 +102,84 @@ class SettingsStore extends GetxController {
   /// 设置课程通知开关
   Future<void> setIsRemind(bool value) async {
     _isRemind.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.IS_REMIND, value);
   }
 
   /// 设置提醒时间
   Future<void> setRemindTime(int value) async {
     _remindTime.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setInt(PrefsKeys.NOTIFICATION_TIME, value);
   }
 
   /// 设置是否显示明日课程
   Future<void> setIsShowTomorrow(bool value) async {
     _isShowTomorrow.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.IS_SHOW_TOMORROW, value);
   }
 
   /// 设置是否同步待办事项到社团
   Future<void> setIsUpdateToClub(bool value) async {
     _isUpdateToClub.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.IS_UPDATE_CLUB, value);
   }
 
   /// 设置主页索引
   Future<void> setPageIndex(int value) async {
     _pageIndex.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setInt(PrefsKeys.PAGE_DATA, value);
   }
 
   /// 设置是否启用触觉反馈
   Future<void> setEnableHapticFeedback(bool value) async {
     _enableHapticFeedback.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK, value);
   }
 
   /// 设置是否忽略更新
   Future<void> setUpdateIgnored(bool value) async {
     _updateIgnored.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.UPDATE_IGNORED, value);
   }
 
   /// 设置字体
   Future<void> setFontFamily(String value) async {
     _fontFamily.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.FONT_FAMILY, value);
   }
   
   /// 设置是否显示课表网格线
   Future<void> setShowCourseGrid(bool value) async {
     _showCourseGrid.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.SHOW_COURSE_GRID, value);
   }
   
   /// 设置是否启用待办事项提醒
   Future<void> setTodoRemindEnabled(bool value) async {
     _todoRemindEnabled.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.TODO_REMIND_ENABLED, value);
   }
   
   /// 设置课表背景
   Future<void> setScheduleBackground(String value) async {
     _scheduleBackground.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.SCHEDULE_BACKGROUND, value);
   }
   
   /// 设置自定义背景图片路径
   Future<void> setCustomBackgroundImage(String value) async {
     _customBackgroundImage.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE, value);
   }
 
@@ -202,7 +202,7 @@ class SettingsStore extends GetxController {
     }
 
     _schoolId.value = schoolId;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.SCHOOL_ID, schoolId);
 
     // 更新 HTTP 客户端的基础 URL
@@ -219,7 +219,7 @@ class SettingsStore extends GetxController {
 
   /// 清除学校相关的缓存数据
   Future<void> _clearSchoolRelatedData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     // 清除用户登录数据
     await prefs.remove(PrefsKeys.USER_DATA);

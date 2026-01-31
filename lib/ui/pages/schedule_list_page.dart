@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
@@ -52,7 +52,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   }
 
   Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final courseSize = prefs.getDouble('course_size') ?? 55;
 
     setState(() {
@@ -465,7 +465,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     );
 
     if (confirm == true) {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       final jsonString = prefs.getString('custom_courses');
 
       if (jsonString != null) {
@@ -494,7 +494,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   }
 
   Future<void> _saveUpdatedCustomCourse(CourseModel updatedCourse) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final jsonString = prefs.getString('custom_courses');
 
     if (jsonString != null) {

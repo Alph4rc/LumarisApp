@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
@@ -116,7 +116,7 @@ class CourseReminderService {
 
   /// 获取上次提醒时间
   static Future<DateTime?> getLastReminderTime() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await PrefsService.getInstanceAsync();
     final lastTimeStr = prefs.getString(PrefsKeys.LAST_REMIND_DATE);
 
     if (lastTimeStr != null) {
@@ -131,7 +131,7 @@ class CourseReminderService {
 
   /// 设置是否启用提醒
   static Future<void> setReminderEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await PrefsService.getInstanceAsync();
     await prefs.setBool(PrefsKeys.IS_REMIND, enabled);
 
     if (enabled) {
@@ -145,7 +145,7 @@ class CourseReminderService {
 
   /// 获取是否启用提醒
   static Future<bool> isReminderEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await PrefsService.getInstanceAsync();
     return prefs.getBool(PrefsKeys.IS_REMIND) ?? false;
   }
 

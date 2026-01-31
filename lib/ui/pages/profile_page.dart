@@ -11,7 +11,7 @@ import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
@@ -50,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _checkLoginStatus() async {
     // 检查是否已有登录信息
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final username = prefs.getString(PrefsKeys.USERNAME);
     final iosName = prefs.getString(PrefsKeys.CLUB_NAME);
 
@@ -211,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// 保存登录信息
   Future<void> _saveLoginInfo() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     if (_isOnlyLoginMember) {
       // 仅登录社团账号

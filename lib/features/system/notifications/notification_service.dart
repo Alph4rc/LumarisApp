@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -91,7 +91,7 @@ class NotificationService {
       required String title,
       required String body,
       required DateTime courseTime}) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final notificationTime = prefs.getInt(PrefsKeys.NOTIFICATION_TIME) ?? 15;
     final now = DateTime.now();
     final reminderTime =

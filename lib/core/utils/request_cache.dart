@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:dio/dio.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
@@ -35,7 +36,7 @@ class RequestCache {
 
   /// SharedPreferences 实例
   SharedPreferences? _prefs;
-  
+
   /// URL模式到缓存策略的映射
   final Map<RegExp, CachePolicy> _urlCachePolicies = {
     // 默认策略
@@ -56,7 +57,7 @@ class RequestCache {
 
   /// 初始化缓存
   Future<void> initialize() async {
-    _prefs = await SharedPreferences.getInstance();
+    _prefs = PrefsService.instance;
   }
   
   /// 根据URL获取缓存策略

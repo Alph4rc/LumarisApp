@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/staff_service.dart';
 import 'package:ios_club_app/features/club/models/member_model.dart';
 import 'package:ios_club_app/core/services/gzip_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/link_model.dart';
@@ -53,7 +53,7 @@ class ClubService {
   /// 获取成员信息
   /// 推荐使用 UserService.getUserData
   static Future<Map<String, dynamic>> getMemberInfo() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final Map<String, dynamic> data = {};
     Map<String, dynamic> memberData = {};
     try {

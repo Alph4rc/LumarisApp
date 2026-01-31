@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/network_exception.dart';
@@ -98,7 +98,7 @@ class EduHttpClient {
   }
 
   Future<String?> _getCookie() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final userDataJson = prefs.getString(PrefsKeys.USER_DATA);
     if (userDataJson != null) {
       final userData = jsonDecode(userDataJson);
@@ -109,7 +109,7 @@ class EduHttpClient {
 
   Future<bool> _reLogin() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       final username = prefs.getString(PrefsKeys.USERNAME);
       final password = prefs.getString(PrefsKeys.PASSWORD);
       

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
@@ -121,7 +121,7 @@ class ScheduleStore extends GetxController {
 
   /// 加载用户偏好设置
   Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final courseSize = prefs.getDouble('course_size');
 
     if (courseSize != null && courseSize != 0) {
@@ -155,7 +155,7 @@ class ScheduleStore extends GetxController {
   /// 设置课程高度
   Future<void> setCourseHeight(double value) async {
     _height.value = value;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setDouble('course_size', value);
   }
 

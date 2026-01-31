@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ios_club_app/core/models/bus_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/services/new_bus_api.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -50,7 +50,7 @@ class BusController extends GetxController with GetSingleTickerProviderStateMixi
   }
 
   Future<void> _loadTiles() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     tiles.assignAll(prefs.getStringList(PrefsKeys.TILES) ?? []);
     isShowBus.value = tiles.contains('校车');
   }
@@ -61,7 +61,7 @@ class BusController extends GetxController with GetSingleTickerProviderStateMixi
 
     try {
       if (isInit) {
-        final prefs = await SharedPreferences.getInstance();
+        final prefs = PrefsService.instance;
         useNewApi.value = prefs.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
       }
 
@@ -113,14 +113,14 @@ class BusController extends GetxController with GetSingleTickerProviderStateMixi
       tiles.remove("校车");
     }
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setStringList(PrefsKeys.TILES, tiles);
   }
 
   void toggleUseNewApi(bool value) async {
     useNewApi.value = value;
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.USE_NEW_BUS_API, useNewApi.value);
 
     // 切换API后重新获取数据

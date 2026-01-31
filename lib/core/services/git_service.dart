@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
@@ -17,7 +17,7 @@ class GiteeService {
   );
 
   static Future<ReleaseModel> getReleases() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     try {
       final response = await _client.get('/App');

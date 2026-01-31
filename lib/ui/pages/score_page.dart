@@ -12,7 +12,7 @@ import 'package:ios_club_app/features/education/services/edu_api_client.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/models/score_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
@@ -105,7 +105,7 @@ class _ScorePageState extends State<ScorePage>
   }
 
   Future<List<ScoreList>?> _tryGetCachedData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final jsonString = prefs.getString(PrefsKeys.ALL_SCORE_DATA);
     final lastFetchTime = prefs.getInt(PrefsKeys.LAST_SCORE_TIME);
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -209,7 +209,7 @@ class _ScorePageState extends State<ScorePage>
   }
 
   Future<void> _cacheFreshData(List<ScoreList> freshData) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(freshData));
     await prefs.setInt(
         PrefsKeys.LAST_SCORE_TIME, DateTime.now().millisecondsSinceEpoch);

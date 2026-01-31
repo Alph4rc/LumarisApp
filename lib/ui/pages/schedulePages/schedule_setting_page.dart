@@ -9,7 +9,7 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -48,7 +48,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Future<void> _loadCredentials() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       final username = prefs.getString('username');
       final password = prefs.getString('password');
 

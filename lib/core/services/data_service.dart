@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/models/info_model.dart';
 import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/course_time.dart';
@@ -28,7 +28,7 @@ class DataService {
       ig = await getIgnore();
     }
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     // 检查课程数据最后一次刷新时间，如果是一周前则刷新数据
     final courseLastFetchTime = prefs.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME);
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -82,7 +82,7 @@ class DataService {
   ///
   /// @return 不重复的课程名称列表
   static Future<List<String>> getCourseName() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
     final List<String> list = [];
     if (jsonString != null) {
@@ -103,7 +103,7 @@ class DataService {
   ///
   /// @param list 需要忽略的课程名称列表
   static Future<void> setIgnore(List<String> list) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     prefs.setString(PrefsKeys.IGNORE_DATA, jsonEncode({"data": list}));
   }
 
@@ -113,7 +113,7 @@ class DataService {
   ///
   /// @return 被忽略的课程名称列表
   static Future<List<String>> getIgnore() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.IGNORE_DATA);
     final List<String> list = [];
     if (jsonString != null) {
@@ -322,7 +322,7 @@ class DataService {
   ///
   /// @return 按学期分组的成绩列表
   static Future<List<ScoreList>> getScore() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString('all_score_data');
     final s = await getSemester();
     final List<ScoreList> list = [];
@@ -348,7 +348,7 @@ class DataService {
   /// @return 学期模型列表
   static Future<List<SemesterModel>> getSemester(
       {bool isRefresh = false}) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     // 判断是否需要刷新数据
     bool needRefresh = isRefresh;
@@ -391,7 +391,7 @@ class DataService {
   ///
   /// @return 包含时间信息的Map
   static Future<Map<String, String>> getTime() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     String? jsonString = prefs.getString(PrefsKeys.TIME_DATA);
     final timeLastUpdated = prefs.getInt(PrefsKeys.TIME_LAST_UPDATED);
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -422,7 +422,7 @@ class DataService {
   /// @return 信息模型列表
   static Future<List<InfoModel>> getInfoList() async {
     List<InfoModel> list = [];
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.INFO_DATA);
     final time = prefs.getInt(PrefsKeys.INFO_DATA_TIME);
 

@@ -9,7 +9,7 @@ import 'package:ios_club_app/core/models/bus_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/score_model.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/models/plan_course.dart';
@@ -28,7 +28,7 @@ class EduService {
   /// `@return` Future&lt;bool&gt; 返回是否刷新成功
   static Future<bool> refresh() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       var now = DateTime.now().millisecondsSinceEpoch;
 
       final loginResult = await login();
@@ -68,7 +68,7 @@ class EduService {
       return false;
     }
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     final response = await LoginService.login(username, password);
     if (response["success"] == true) {
@@ -104,7 +104,7 @@ class EduService {
   /// @return Future<bool> 返回是否登录成功
   static Future<bool> login() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       final String? username = prefs.getString(PrefsKeys.USERNAME);
       final String? password = prefs.getString(PrefsKeys.PASSWORD);
 
@@ -166,7 +166,7 @@ class EduService {
     try {
       var now = DateTime.now().millisecondsSinceEpoch;
 
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       final lastFetchTime = prefs.getInt(PrefsKeys.LAST_FETCH_TIME);
       if (lastFetchTime == null || now - lastFetchTime > 1000 * 60 * 20) {
         // 20小时
@@ -191,7 +191,7 @@ class EduService {
   static Future<void> getThisSemester({UserData? userData}) async {
     try {
       final response = await EduApiClient.getThisSemester();
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       await prefs.setString(PrefsKeys.THIS_SEMESTER_DATA, response);
     } catch (e, stackTrace) {
       AppLogger.error('获取本学期成绩失败', error: e, stackTrace: stackTrace);
@@ -211,7 +211,7 @@ class EduService {
 
     try {
       final response = await EduApiClient.getSemester(cookieData.studentId);
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       await prefs.setString(PrefsKeys.SEMESTER_DATA, response);
 
       final now = DateTime.now().microsecondsSinceEpoch;
@@ -248,7 +248,7 @@ class EduService {
       return;
     }
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
     if (jsonString != null &&
         jsonString.isNotEmpty &&
@@ -297,7 +297,7 @@ class EduService {
         final response = await EduApiClient.getScore(cookieData.studentId, item.semester);
         json[item.semester] = response;
       }
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(json));
     } catch (e, stackTrace) {
       AppLogger.error('获取所有学期成绩失败', error: e, stackTrace: stackTrace);
@@ -311,7 +311,7 @@ class EduService {
   /// @return Future<List<ScoreList>> 返回所有学期的成绩列表
   static Future<List<ScoreList>> getAllScoreFromLocal(
       {bool isRefresh = false}) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.ALL_SCORE_DATA);
     var now = DateTime.now().millisecondsSinceEpoch;
     final semesters = await DataService.getSemester();
@@ -433,7 +433,7 @@ class EduService {
 
     try {
       final response = await EduApiClient.getExam(cookieData.studentId);
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       await prefs.setString(
           PrefsKeys.EXAM_DATA, jsonEncode(jsonDecode(response)));
     } catch (e, stackTrace) {
@@ -449,7 +449,7 @@ class EduService {
   static Future<void> getTime() async {
     try {
       final response = await EduApiClient.getTime();
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       await prefs.setString(
           PrefsKeys.TIME_DATA, jsonEncode(jsonDecode(response)));
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -472,7 +472,7 @@ class EduService {
 
     try {
       final response = await EduApiClient.getInfoCompletion();
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       await prefs.setString(
           PrefsKeys.INFO_DATA, jsonEncode(jsonDecode(response)));
     } catch (e, stackTrace) {

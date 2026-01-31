@@ -3,7 +3,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import '../../modern_sidebar.dart';
 
@@ -134,7 +134,7 @@ Sidebar macosUISidebar({
 
 Future<String> _getUsername() async {
   final UserStore userStore = UserStore.to;
-  final prefs = await SharedPreferences.getInstance();
+  final prefs = PrefsService.instance;
   var name = '未登录';
 
   if (userStore.isLogin) {

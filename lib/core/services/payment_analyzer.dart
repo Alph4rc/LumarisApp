@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
 
@@ -116,7 +116,7 @@ class PaymentAnalyzer {
   ///
   /// [a] 卡号
   static Future<void> setPayment(String a) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.PAYMENT_NUM, a);
   }
 
@@ -124,7 +124,7 @@ class PaymentAnalyzer {
   ///
   /// 返回存储的卡号，如果未存储则返回空字符串
   static Future<String> getPayment() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     return prefs.getString(PrefsKeys.PAYMENT_NUM) ?? '';
   }
 }

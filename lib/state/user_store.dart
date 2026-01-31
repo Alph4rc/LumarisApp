@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/controllers/program_controller.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
 import 'prefs_keys.dart';
 
@@ -28,7 +28,7 @@ class UserStore extends GetxController {
 
   /// 加载用户数据
   Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     final String? userDataString = prefs.getString(PrefsKeys.USER_DATA);
     final String? iosName = prefs.getString(PrefsKeys.MEMBER_DATA);
 
@@ -68,7 +68,7 @@ class UserStore extends GetxController {
     _userData.value = null;
     _isLogin.value = false;
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
     await prefs.remove(PrefsKeys.USER_DATA);
     await prefs.remove(PrefsKeys.COURSE_LAST_FETCH_TIME);
     await prefs.remove(PrefsKeys.EXAM_DATA);
@@ -95,8 +95,8 @@ class UserStore extends GetxController {
   /// 退出iMember登录
   Future<void> logoutMember() async {
     _isLoginMember.value = false;
-    
-    final prefs = await SharedPreferences.getInstance();
+
+    final prefs = PrefsService.instance;
     await prefs.remove(PrefsKeys.MEMBER_DATA);
     await prefs.remove(PrefsKeys.MEMBER_JWT);
     await prefs.remove(PrefsKeys.CLUB_NAME);

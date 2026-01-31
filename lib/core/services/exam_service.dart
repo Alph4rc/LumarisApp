@@ -6,6 +6,7 @@ import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/models/exam_model.dart';
 import 'package:ios_club_app/core/models/exam_result.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -19,7 +20,7 @@ class ExamService {
   /// 返回考试结果，包含成功/失败状态和数据
   static Future<ExamResult> getExam({bool isRefresh = false}) async {
     final now = DateTime.now();
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = PrefsService.instance;
 
     // 缓存检查
     final cacheResult = _checkCache(prefs, now, isRefresh);
@@ -97,7 +98,7 @@ class ExamService {
       // ExamApi 使用 EduHttpClient，已内置重试和401/403重登录机制
       final response = await ExamApi.getExam(cookieData.studentId);
 
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = PrefsService.instance;
       final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
 
       // 合并现有数据和新数据，实现增量更新

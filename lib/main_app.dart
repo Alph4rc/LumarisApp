@@ -8,7 +8,7 @@ import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/performance_monitor.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:macos_ui/macos_ui.dart';
 
@@ -46,14 +46,13 @@ class _MainAppState extends State<MainApp> {
 
     // 延迟执行导航，确保GetMaterialApp已经初始化
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      SharedPreferences.getInstance().then((prefs) {
-        setState(() {
-          _currentIndex = prefs.getInt(PrefsKeys.PAGE_DATA) ?? 0;
-          // 只有在不是默认首页时才导航
-          if (_currentIndex != 0) {
-            Get.toNamed(_routeMap[_currentIndex] ?? '/');
-          }
-        });
+      final prefs = PrefsService.instance;
+      setState(() {
+        _currentIndex = prefs.getInt(PrefsKeys.PAGE_DATA) ?? 0;
+        // 只有在不是默认首页时才导航
+        if (_currentIndex != 0) {
+          Get.toNamed(_routeMap[_currentIndex] ?? '/');
+        }
       });
     });
   }
@@ -99,7 +98,7 @@ class _MainAppState extends State<MainApp> {
               ),
               TextButton(
                 onPressed: () async {
-                  final prefs = await SharedPreferences.getInstance();
+                  final prefs = PrefsService.instance;
                   prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
                   if (context.mounted) {
                     Navigator.of(context).pop();
