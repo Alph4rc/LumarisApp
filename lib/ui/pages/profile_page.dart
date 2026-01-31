@@ -130,22 +130,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /// 登录教务系统
+  /// 注意：EduHttpClient 已内置重试机制，这里不再额外重试
   Future<bool> _loginToEduSystem() async {
-    bool result = false;
-    for (var i = 0; i < 3; i++) {
-      result = await EduService.loginFromData(
-        _usernameController.text,
-        _passwordController.text,
-      );
-      if (result) break;
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted) {
-        showClubSnackBar(
-          context,
-          const Text('正在重试'),
-        );
-      }
-    }
+    final result = await EduService.loginFromData(
+      _usernameController.text,
+      _passwordController.text,
+    );
 
     if (!result && mounted) {
       showClubSnackBar(

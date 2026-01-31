@@ -11,8 +11,11 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class EduHttpClient {
   final Dio _dio;
-  final int _maxRetryCount = 3;
+  final int _maxRetryCount = 2;
   String _baseUrl;
+
+  /// 标记是否正在重登录，避免重复触发
+  bool _isRelogging = false;
 
   EduHttpClient({Dio? dio, String? baseUrl})
       : _dio = dio ?? Dio(),
@@ -27,10 +30,10 @@ class EduHttpClient {
       receiveTimeout: const Duration(seconds: 5),
       contentType: 'application/json',
     );
-    
+
     // 添加缓存拦截器
     _dio.interceptors.add(CacheInterceptor());
-    
+
     // 添加认证拦截器
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -43,11 +46,14 @@ class EduHttpClient {
         handler.next(options);
       },
       onError: (DioException e, handler) async {
-        if (e.response?.statusCode != 200) {
-          // 认证失败，尝试重登录
-          if (await _reLogin()) {
-            // 重登录成功，重新发送请求
-            try {
+        final statusCode = e.response?.statusCode;
+
+        // 只在认证相关错误（401/403）且未在重登录中时尝试重登录
+        if ((statusCode == 401 || statusCode == 403) && !_isRelogging) {
+          _isRelogging = true;
+          try {
+            if (await _reLogin()) {
+              // 重登录成功，重新发送请求
               final cookie = await _getCookie();
               if (cookie != null) {
                 e.requestOptions.headers['Cookie'] = cookie;
@@ -63,14 +69,17 @@ class EduHttpClient {
                 data: e.requestOptions.data,
                 queryParameters: e.requestOptions.queryParameters,
               );
+              _isRelogging = false;
               return handler.resolve(response);
-            } catch (retryError) {
-              // 重新请求失败，继续处理原错误
-              return handler.next(e);
             }
+          } catch (retryError) {
+            // 重新请求失败，继续处理原错误
+            AppLogger.debug('重登录后请求失败: $retryError');
+          } finally {
+            _isRelogging = false;
           }
         }
-        
+
         // 处理其他错误
         handler.next(e);
       },
@@ -140,8 +149,8 @@ class EduHttpClient {
       // 如果response.data已经是Map或List，直接返回，否则返回原始数据
       return response.data;
     } on DioException catch (e) {
-      if (retryCount < _maxRetryCount) {
-        // 重试请求
+      // 只在网络超时等临时错误时重试，认证错误由拦截器处理
+      if (retryCount < _maxRetryCount && _shouldRetry(e)) {
         return get(
           path,
           queryParameters: queryParameters,
@@ -171,8 +180,8 @@ class EduHttpClient {
       // 如果response.data已经是Map或List，直接返回，否则返回原始数据
       return response.data;
     } on DioException catch (e) {
-      if (retryCount < _maxRetryCount) {
-        // 重试请求
+      // 只在网络超时等临时错误时重试，认证错误由拦截器处理
+      if (retryCount < _maxRetryCount && _shouldRetry(e)) {
         return post(
           path,
           data: data,
@@ -183,6 +192,29 @@ class EduHttpClient {
       }
       _handleDioError(e);
     }
+  }
+
+  /// 判断是否应该重试
+  /// 只在网络超时、连接错误等临时性错误时重试
+  /// 认证错误（401/403）由拦截器处理，不在这里重试
+  bool _shouldRetry(DioException e) {
+    // 网络超时，应该重试
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.connectionError) {
+      return true;
+    }
+
+    // 服务器错误（5xx），可能是临时问题，应该重试
+    final statusCode = e.response?.statusCode;
+    if (statusCode != null && statusCode >= 500) {
+      return true;
+    }
+
+    // 认证错误（401/403）由拦截器处理，不重试
+    // 其他客户端错误（4xx）通常是请求本身的问题，不重试
+    return false;
   }
 
   void _handleDioError(DioException e) {
