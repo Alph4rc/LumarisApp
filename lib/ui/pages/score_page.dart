@@ -45,6 +45,10 @@ class _ScorePageState extends State<ScorePage>
   late int _currentIndex = 0;
   final List<String> _selectorList = [];
 
+  /// 重登录次数限制，避免频繁重登录
+  static const int _maxReloginAttempts = 1;
+  int _reloginAttempts = 0;
+
   static const yearStringList = [
     '一',
     '二',
@@ -131,6 +135,8 @@ class _ScorePageState extends State<ScorePage>
     if (!mounted) return;
 
     setState(() => _isLoading = true);
+    // 重置重登录计数器
+    _reloginAttempts = 0;
 
     try {
       final cookieData = await EduService.getUserData();
@@ -218,10 +224,16 @@ class _ScorePageState extends State<ScorePage>
           list: list.map((e) => ScoreModel.fromJson(e)).toList(),
         );
       } else {
-        return await _retryWithFreshLogin(
-          cookieData: cookieData,
-          semester: semester,
-        );
+        // 只有在未超过重登录次数限制时才尝试重登录
+        if (_reloginAttempts < _maxReloginAttempts) {
+          _reloginAttempts++;
+          return await _retryWithFreshLogin(
+            cookieData: cookieData,
+            semester: semester,
+          );
+        }
+        AppLogger.debug('跳过重登录，已达到最大重试次数: $_maxReloginAttempts');
+        return null;
       }
     } catch (e) {
       if (kDebugMode) {
@@ -258,9 +270,9 @@ class _ScorePageState extends State<ScorePage>
 
   Future<void> _cacheFreshData(List<ScoreList> freshData) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('all_score_data', jsonEncode(freshData));
+    await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(freshData));
     await prefs.setInt(
-        'last_Score_time', DateTime.now().millisecondsSinceEpoch);
+        PrefsKeys.LAST_SCORE_TIME, DateTime.now().millisecondsSinceEpoch);
   }
 
   void _handleFoolishMode() {
