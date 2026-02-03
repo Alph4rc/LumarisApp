@@ -20,6 +20,7 @@ class ScheduleGrid extends StatelessWidget {
     this.showGrid = true,
     this.onCourseTap,
     this.onCourseLongPress,
+    this.onConflictCourseTap,
   });
 
   final List<CourseModel> courses;
@@ -30,6 +31,7 @@ class ScheduleGrid extends StatelessWidget {
   final bool showGrid;
   final void Function(CourseModel)? onCourseTap;
   final void Function(CourseModel)? onCourseLongPress;
+  final void Function(List<CourseModel>)? onConflictCourseTap;
 
   @override
   Widget build(BuildContext context) {
@@ -211,8 +213,9 @@ class ScheduleGrid extends StatelessWidget {
 
     final top = (minStart - 1) * cellHeight;
     final height = (maxEnd - minStart + 1) * cellHeight;
-    final course = courses.first;
-    final courseColor = CourseColorManager.generateSoftColor(course.courseName);
+    // 使用第一个课程的颜色作为背景
+    final courseColor =
+        CourseColorManager.generateSoftColor(courses.first.courseName);
 
     return Positioned(
       top: top,
@@ -227,11 +230,10 @@ class ScheduleGrid extends StatelessWidget {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: onCourseTap != null ? () => onCourseTap!(course) : null,
-          onLongPress:
-              onCourseLongPress != null && course.isCustom
-                  ? () => onCourseLongPress!(course)
-                  : null,
+          onTap: onConflictCourseTap != null
+              ? () => onConflictCourseTap!(courses)
+              : (onCourseTap != null ? () => onCourseTap!(courses.first) : null),
+          onLongPress: null,
           child: Padding(
             padding: EdgeInsets.all(isTablet ? 8 : 4),
             child: const Center(

@@ -49,3 +49,5 @@ my-release-key.jks
 
 .env
 .env.example
+
+nul

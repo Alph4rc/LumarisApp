@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/models/course_model.dart';
@@ -312,6 +313,8 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                       _showCourseActions(course);
                     }
                   },
+                  onConflictCourseTap: (courses) =>
+                      _showConflictCourseSelector(courses),
                 ),
               ),
             ),
@@ -399,6 +402,70 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
       course,
       onEdit: course.isCustom ? () => _editCustomCourse(course) : null,
       onDelete: course.isCustom ? () => _deleteCustomCourse(course) : null,
+    );
+  }
+
+  /// 显示冲突课程选择列表
+  void _showConflictCourseSelector(List<CourseModel> courses) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.grey[900] : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '选择要查看的课程',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...courses.map((course) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    width: 8,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: CourseColorManager.generateSoftColor(
+                          course.courseName),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  title: Text(
+                    course.courseName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  subtitle: Text(
+                    '${course.room} · 第${course.startUnit}-${course.endUnit}节',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showCourseDetail(course);
+                  },
+                )),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
     );
   }
 
