@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -13,8 +14,14 @@ class EduHttpClient {
   final Dio _dio;
   String _baseUrl;
 
-  /// 标记是否正在重登录，避免重复触发
-  bool _isRelogging = false;
+  /// 全局登录锁，确保同一时间只有一个登录请求
+  static Completer<bool>? _loginCompleter;
+
+  /// 最后一次登录失败的时间戳，用于防止频繁重试
+  static int? _lastLoginFailTime;
+
+  /// 登录失败后的冷却时间（毫秒）
+  static const int _loginCooldownMs = 5000;
 
   EduHttpClient({Dio? dio, String? baseUrl})
       : _dio = dio ?? Dio(),
@@ -53,11 +60,11 @@ class EduHttpClient {
       onError: (DioException e, handler) async {
         final statusCode = e.response?.statusCode;
 
-        // 只在认证相关错误（401/403）且未在重登录中时尝试重登录
-        if ((statusCode == 401 || statusCode == 403) && !_isRelogging) {
-          _isRelogging = true;
+        // 只在认证相关错误（401/403）时尝试重登录
+        if (statusCode == 401 || statusCode == 403) {
           try {
-            if (await _reLogin()) {
+            // 使用全局登录锁，确保同一时间只有一个登录请求
+            if (await _reLoginWithLock()) {
               // 重登录成功，重新发送请求
               final cookie = await _getCookie();
               if (cookie != null) {
@@ -74,14 +81,11 @@ class EduHttpClient {
                 data: e.requestOptions.data,
                 queryParameters: e.requestOptions.queryParameters,
               );
-              _isRelogging = false;
               return handler.resolve(response);
             }
           } catch (retryError) {
             // 重新请求失败，继续处理原错误
             AppLogger.debug('重登录后请求失败: $retryError');
-          } finally {
-            _isRelogging = false;
           }
         }
 
@@ -110,6 +114,56 @@ class EduHttpClient {
       return userData['cookie'];
     }
     return null;
+  }
+
+  /// 带全局锁的重登录方法
+  ///
+  /// 确保同一时间只有一个登录请求在执行，其他请求等待并复用结果
+  Future<bool> _reLoginWithLock() async {
+    // 检查是否在冷却期内（防止频繁重试）
+    if (_lastLoginFailTime != null) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      if (now - _lastLoginFailTime! < _loginCooldownMs) {
+        AppLogger.debug('登录冷却中，跳过重登录');
+        return false;
+      }
+    }
+
+    // 如果已有登录请求在进行中，等待其完成
+    if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
+      AppLogger.debug('等待其他登录请求完成...');
+      return await _loginCompleter!.future;
+    }
+
+    // 创建新的登录 Completer
+    _loginCompleter = Completer<bool>();
+    AppLogger.debug('开始重登录...');
+
+    try {
+      final success = await _reLogin();
+
+      if (success) {
+        AppLogger.debug('重登录成功');
+        _lastLoginFailTime = null; // 清除失败时间戳
+      } else {
+        AppLogger.debug('重登录失败');
+        _lastLoginFailTime = DateTime.now().millisecondsSinceEpoch;
+      }
+
+      // 完成 Completer，通知所有等待的请求
+      _loginCompleter!.complete(success);
+      return success;
+    } catch (e) {
+      AppLogger.error('重登录异常', error: e);
+      _lastLoginFailTime = DateTime.now().millisecondsSinceEpoch;
+      _loginCompleter!.complete(false);
+      return false;
+    } finally {
+      // 延迟清理 Completer，给其他等待的请求一点时间获取结果
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _loginCompleter = null;
+      });
+    }
   }
 
   Future<bool> _reLogin() async {
