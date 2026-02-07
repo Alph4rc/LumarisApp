@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -132,10 +133,20 @@ class _ScorePageState extends State<ScorePage>
     setState(() => _isLoading = true);
 
     try {
-      final cookieData = await EduService.getUserData();
+      AppLogger.debug('[ScorePage] 开始获取成绩数据');
+
+      // 添加超时保护：获取用户数据最多5秒
+      final cookieData = await EduService.getUserData().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          AppLogger.warning('[ScorePage] 获取用户数据超时');
+          return null;
+        },
+      );
+
       if (cookieData == null) {
         if (mounted) {
-          showClubSnackBar(context, Text('获取用户凭证失败，请重新登录'));
+          showClubSnackBar(context, const Text('获取用户凭证失败，请重新登录'));
         }
         return;
       }
@@ -143,17 +154,36 @@ class _ScorePageState extends State<ScorePage>
       setState(() {
         _loadingText = '正在获取所有学期数据...';
       });
-      final semesters = await DataService.getSemester(isRefresh: isRefresh);
+
+      // 添加超时保护：获取学期列表最多10秒
+      final semesters = await DataService.getSemester(isRefresh: isRefresh).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          AppLogger.warning('[ScorePage] 获取学期列表超时');
+          return <SemesterModel>[];
+        },
+      );
 
       final freshScoreList = <ScoreList>[];
       for (final semester in semesters) {
+        if (!mounted) break;
+
         setState(() {
           _loadingText = '正在获取 ${semester.name} 学期数据...';
         });
 
+        AppLogger.debug('[ScorePage] 获取学期 ${semester.name} 的成绩');
+
+        // 添加超时保护：每个学期最多10秒
         final semesterScores = await _fetchSemesterScores(
           studentId: cookieData.studentId,
           semester: semester,
+        ).timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            AppLogger.warning('[ScorePage] 获取学期 ${semester.name} 超时');
+            return null;
+          },
         );
 
         if (semesterScores != null) {
@@ -177,13 +207,27 @@ class _ScorePageState extends State<ScorePage>
           }
         });
       }
-    } catch (e) {
+
+      AppLogger.debug('[ScorePage] 成绩数据获取完成');
+    } on TimeoutException catch (e) {
+      if (mounted) {
+        showClubSnackBar(context, const Text('获取数据超时，请检查网络连接后重试'));
+      }
+      AppLogger.warning('[ScorePage] 获取数据超时: $e');
+    } catch (e, stackTrace) {
       if (mounted) {
         showClubSnackBar(context, Text('获取数据失败: ${e.toString()}'));
       }
-      AppLogger.debug('Error fetching data: $e');
+      AppLogger.error('[ScorePage] 获取数据失败', error: e, stackTrace: stackTrace);
     } finally {
       _isFool = false;
+      // ✅ 确保 _isLoading 总是被设置为 false
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      AppLogger.debug('[ScorePage] 设置 _isLoading = false');
     }
   }
 

@@ -7,10 +7,12 @@ import 'schedule_store.dart';
 import 'settings_store.dart';
 import 'electricity_store.dart';
 import '../features/education/services/edu_http_client_manager.dart';
+import '../core/services/auth_state_notifier.dart';
 
 /// 初始化所有 Store
 void initStores() {
   Get.put(SettingsStore());
+  Get.put(AuthStateNotifier()); // 初始化认证状态通知器
   Get.put(EduHttpClientManager()); // 初始化教务系统 HTTP 客户端管理器
   Get.put(UserStore());
   Get.put(CourseStore());
@@ -22,6 +24,7 @@ void initStores() {
 
 /// 释放所有 Store
 void disposeStores() {
+  Get.delete<AuthStateNotifier>();
   Get.delete<EduHttpClientManager>();
   Get.delete<UserStore>();
   Get.delete<CourseStore>();

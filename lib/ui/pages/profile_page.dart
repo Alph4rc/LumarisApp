@@ -1,12 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/core/models/info_model.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
@@ -90,42 +93,84 @@ class _ProfilePageState extends State<ProfilePage> {
       _isLoading = true;
     });
 
-    bool eduLoginSuccess = true;
-    bool clubLoginSuccess = true;
+    try {
+      AppLogger.debug('[ProfilePage] 开始登录');
 
-    // 登录教务系统账号
-    if (!_isOnlyLoginMember) {
-      eduLoginSuccess = await _loginToEduSystem();
-    }
+      bool eduLoginSuccess = true;
+      bool clubLoginSuccess = true;
 
-    // 登录社团账号
-    if (_isOnlyLoginMember || _isLoginMember) {
-      clubLoginSuccess = await _loginToClub();
-    }
+      // 登录教务系统账号（添加超时保护：最多20秒）
+      if (!_isOnlyLoginMember) {
+        AppLogger.debug('[ProfilePage] 登录教务系统');
+        eduLoginSuccess = await _loginToEduSystem().timeout(
+          const Duration(seconds: 20),
+          onTimeout: () {
+            AppLogger.warning('[ProfilePage] 教务系统登录超时');
+            if (mounted) {
+              showClubSnackBar(context, const Text('教务系统登录超时，请检查网络连接'));
+            }
+            return false;
+          },
+        );
+      }
 
-    // 检查登录结果
-    if (!eduLoginSuccess || !clubLoginSuccess) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
+      // 登录社团账号（添加超时保护：最多10秒）
+      if (_isOnlyLoginMember || _isLoginMember) {
+        AppLogger.debug('[ProfilePage] 登录社团账号');
+        clubLoginSuccess = await _loginToClub().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            AppLogger.warning('[ProfilePage] 社团账号登录超时');
+            if (mounted) {
+              showClubSnackBar(context, const Text('社团账号登录超时，请检查网络连接'));
+            }
+            return false;
+          },
+        );
+      }
 
-    // 保存登录信息
-    await _saveLoginInfo();
+      // 检查登录结果
+      if (!eduLoginSuccess || !clubLoginSuccess) {
+        return;
+      }
 
-    // 更新UI状态
-    setState(() {
-      _isLoading = false;
-      _isOnlyLoginMember = false;
-      _showLoginForm = false;
-    });
+      // 保存登录信息
+      await _saveLoginInfo();
 
-    // 清空输入框
-    _usernameController.clear();
-    _passwordController.clear();
-    if (_isLoginMember) {
-      _nameController.clear();
+      // 更新UI状态
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isOnlyLoginMember = false;
+          _showLoginForm = false;
+        });
+      }
+
+      // 清空输入框
+      _usernameController.clear();
+      _passwordController.clear();
+      if (_isLoginMember) {
+        _nameController.clear();
+      }
+
+      AppLogger.debug('[ProfilePage] 登录成功');
+    } on TimeoutException catch (e) {
+      AppLogger.warning('[ProfilePage] 登录超时: $e');
+      if (mounted) {
+        showClubSnackBar(context, const Text('登录超时，请检查网络连接后重试'));
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('[ProfilePage] 登录失败', error: e, stackTrace: stackTrace);
+      if (mounted) {
+        showClubSnackBar(context, Text('登录失败: ${e.toString()}'));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      AppLogger.debug('[ProfilePage] 设置 _isLoading = false');
     }
   }
 
@@ -606,15 +651,45 @@ class _ProfilePageState extends State<ProfilePage> {
           if (userStore.isLogin) const SizedBox(height: 16),
           if (userStore.isLogin)
             FutureBuilder(
-                future: DataService.getInfoList(),
-                builder: (context, snapshot) => snapshot.hasData
-                    ? ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: snapshot.data?.length,
-                        itemBuilder: (context, index) =>
-                            StudyCreditCard(data: snapshot.data![index]))
-                    : const CircularProgressIndicator()),
+                // 添加超时保护：最多10秒
+                future: DataService.getInfoList().timeout(
+                  const Duration(seconds: 10),
+                  onTimeout: () {
+                    AppLogger.warning('[ProfilePage] 获取信息列表超时');
+                    return <InfoModel>[];
+                  },
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text('加载失败: ${snapshot.error}'),
+                      ),
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) =>
+                        StudyCreditCard(data: snapshot.data![index]),
+                  );
+                }),
         ],
       ),
     );

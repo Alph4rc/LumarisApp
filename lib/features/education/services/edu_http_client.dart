@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' as getx;
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/retry_policy.dart';
 import '../../../core/config/api_config.dart';
+import '../../../core/services/auth_state_notifier.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
@@ -32,8 +34,10 @@ class EduHttpClient {
   void _setupDio() {
     _dio.options = BaseOptions(
       baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 5),
+      // 增加超时时间以适应重登录场景
+      // 重登录可能需要3-5秒，加上原请求时间，总共需要更长的超时
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
       contentType: 'application/json',
     );
 
@@ -63,8 +67,18 @@ class EduHttpClient {
         // 只在认证相关错误（401/403）时尝试重登录
         if (statusCode == 401 || statusCode == 403) {
           try {
+            AppLogger.info('检测到认证失败($statusCode)，正在尝试重新登录...');
+
+            // 通知UI层开始重登录
+            _notifyRelogging();
+
             // 使用全局登录锁，确保同一时间只有一个登录请求
             if (await _reLoginWithLock()) {
+              AppLogger.info('重新登录成功，正在重试原请求...');
+
+              // 通知UI层重登录成功
+              _notifyRelogSuccess();
+
               // 重登录成功，重新发送请求
               final cookie = await _getCookie();
               if (cookie != null) {
@@ -82,10 +96,18 @@ class EduHttpClient {
                 queryParameters: e.requestOptions.queryParameters,
               );
               return handler.resolve(response);
+            } else {
+              AppLogger.warning('重新登录失败，请检查账号密码');
+
+              // 通知UI层重登录失败
+              _notifyRelogFailed('账号或密码错误');
             }
           } catch (retryError) {
             // 重新请求失败，继续处理原错误
             AppLogger.debug('重登录后请求失败: $retryError');
+
+            // 通知UI层重登录失败
+            _notifyRelogFailed(retryError.toString());
           }
         }
 
@@ -129,10 +151,21 @@ class EduHttpClient {
       }
     }
 
-    // 如果已有登录请求在进行中，等待其完成
+    // 如果已有登录请求在进行中，等待其完成（最多等待15秒）
     if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
       AppLogger.debug('等待其他登录请求完成...');
-      return await _loginCompleter!.future;
+      try {
+        return await _loginCompleter!.future.timeout(
+          const Duration(seconds: 15),
+          onTimeout: () {
+            AppLogger.warning('等待登录超时，放弃等待');
+            return false;
+          },
+        );
+      } catch (e) {
+        AppLogger.error('等待登录失败', error: e);
+        return false;
+      }
     }
 
     // 创建新的登录 Completer
@@ -140,7 +173,14 @@ class EduHttpClient {
     AppLogger.debug('开始重登录...');
 
     try {
-      final success = await _reLogin();
+      // 添加超时保护：登录最多15秒
+      final success = await _reLogin().timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          AppLogger.warning('重登录超时');
+          return false;
+        },
+      );
 
       if (success) {
         AppLogger.debug('重登录成功');
@@ -156,7 +196,11 @@ class EduHttpClient {
     } catch (e) {
       AppLogger.error('重登录异常', error: e);
       _lastLoginFailTime = DateTime.now().millisecondsSinceEpoch;
-      _loginCompleter!.complete(false);
+
+      // 确保 Completer 被完成，即使发生异常
+      if (!_loginCompleter!.isCompleted) {
+        _loginCompleter!.complete(false);
+      }
       return false;
     } finally {
       // 延迟清理 Completer，给其他等待的请求一点时间获取结果
@@ -187,6 +231,40 @@ class EduHttpClient {
     } catch (e) {
       AppLogger.debug('重登录失败: $e');
       return false;
+    }
+  }
+
+  /// 通知UI层开始重登录
+  void _notifyRelogging() {
+    try {
+      if (getx.Get.isRegistered<AuthStateNotifier>()) {
+        AuthStateNotifier.to.startRelogging();
+      }
+    } catch (e) {
+      // 忽略通知失败
+      AppLogger.debug('通知重登录状态失败: $e');
+    }
+  }
+
+  /// 通知UI层重登录成功
+  void _notifyRelogSuccess() {
+    try {
+      if (getx.Get.isRegistered<AuthStateNotifier>()) {
+        AuthStateNotifier.to.relogSuccess();
+      }
+    } catch (e) {
+      AppLogger.debug('通知重登录成功失败: $e');
+    }
+  }
+
+  /// 通知UI层重登录失败
+  void _notifyRelogFailed(String reason) {
+    try {
+      if (getx.Get.isRegistered<AuthStateNotifier>()) {
+        AuthStateNotifier.to.relogFailed(reason);
+      }
+    } catch (e) {
+      AppLogger.debug('通知重登录失败失败: $e');
     }
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
@@ -131,13 +133,43 @@ class ScheduleStore extends GetxController {
 
   /// 刷新课程数据
   Future<void> refreshCourses() async {
+    AppLogger.debug('[ScheduleStore] 开始刷新课程');
     _isLoading.value = true;
     try {
-      await EduService.getCourse(isRefresh: true);
+      AppLogger.debug('[ScheduleStore] 调用 EduService.getCourse');
+
+      // 添加超时保护：最多等待20秒
+      // 考虑到可能需要重登录（3-5秒）+ 请求时间（5-10秒）
+      await EduService.getCourse(isRefresh: true)
+          .timeout(
+            const Duration(seconds: 20),
+            onTimeout: () {
+              AppLogger.warning('[ScheduleStore] 刷新课程超时');
+              throw TimeoutException('刷新课程超时');
+            },
+          );
+
+      AppLogger.debug('[ScheduleStore] EduService.getCourse 完成');
+
       await getRemindCourses();
+      AppLogger.debug('[ScheduleStore] getRemindCourses 完成');
+
       await CourseStore.to.loadCourses(); // 更新自定义课程数据
+      AppLogger.debug('[ScheduleStore] CourseStore.loadCourses 完成');
+
       await _loadCourses();
+      AppLogger.debug('[ScheduleStore] _loadCourses 完成');
+
+      AppLogger.debug('[ScheduleStore] 刷新课程成功');
+    } on TimeoutException catch (e) {
+      AppLogger.warning('[ScheduleStore] 刷新课程超时: $e');
+      // 超时错误会被UI层捕获并显示给用户
+      rethrow;
+    } catch (e, stackTrace) {
+      AppLogger.error('[ScheduleStore] 刷新课程失败', error: e, stackTrace: stackTrace);
+      rethrow;
     } finally {
+      AppLogger.debug('[ScheduleStore] 设置 _isLoading = false');
       _isLoading.value = false;
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -390,9 +391,25 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
 
   Future<void> _handleRefresh() async {
     showClubSnackBar(context, const Text('正在更新课表...'));
-    await scheduleStore.refreshCourses();
-    if (mounted) {
-      showClubSnackBar(context, const Text('更新完成'));
+    try {
+      await scheduleStore.refreshCourses();
+      if (mounted) {
+        showClubSnackBar(context, const Text('更新完成'));
+      }
+    } on TimeoutException {
+      if (mounted) {
+        showClubSnackBar(
+          context,
+          const Text('更新超时，请检查网络连接后重试'),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        showClubSnackBar(
+          context,
+          Text('更新失败: ${e.toString()}'),
+        );
+      }
     }
   }
 
