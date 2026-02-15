@@ -14,7 +14,10 @@
       "Bash(flutter pub deps:*)",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)",
       "Bash(test:*)",
-      "Bash(flutter pub get:*)"
+      "Bash(flutter pub get:*)",
+      "Bash(flutter devices:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)"
     ]
   }
 }

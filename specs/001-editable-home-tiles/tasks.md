@@ -90,18 +90,18 @@
 
 ### Implementation for User Story 1
 
-- [ ] T032 [P] [US1] Create EditableTileWrapper component in lib/ui/components/tiles/editable_tile_wrapper.dart
-- [ ] T033 [US1] Integrate ReorderableGridView in TilesWidget for full Flutter platforms in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T034 [US1] Implement tap-based reordering fallback for WeChat Mini Program in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T035 [US1] Add platform detection using PlatformUtils for drag vs tap mode in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T036 [US1] Add drag visual feedback (scale, shadow, elevation) in lib/ui/components/tiles/editable_tile_wrapper.dart
-- [ ] T037 [US1] Add haptic feedback on drag start/end for mobile platforms in lib/ui/components/tiles/editable_tile_wrapper.dart
-- [ ] T038 [US1] Connect drag events to TileEditController.reorderTile() in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T039 [US1] Add performance monitoring for drag operations in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T040 [US1] Handle edge cases (screen rotation, app backgrounding) in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T041 [P] [US1] Write widget tests for drag interactions in test/widget/tiles_widget_test.dart
-- [ ] T042 [P] [US1] Write widget tests for platform-specific behavior in test/widget/tiles_widget_test.dart
-- [ ] T043 [P] [US1] Write widget tests for visual feedback in test/widget/editable_tile_wrapper_test.dart
+- [x] T032 [P] [US1] Create EditableTileWrapper component in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T033 [US1] Integrate ReorderableGridView in TilesWidget for full Flutter platforms in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T034 [US1] Implement tap-based reordering fallback for WeChat Mini Program in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T035 [US1] Add platform detection using PlatformUtils for drag vs tap mode in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T036 [US1] Add drag visual feedback (scale, shadow, elevation) in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T037 [US1] Add haptic feedback on drag start/end for mobile platforms in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T038 [US1] Connect drag events to TileEditController.reorderTile() in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T039 [US1] Add performance monitoring for drag operations in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T040 [US1] Handle edge cases (screen rotation, app backgrounding) in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T041 [P] [US1] Write widget tests for drag interactions in test/widget/tiles_widget_test.dart
+- [x] T042 [P] [US1] Write widget tests for platform-specific behavior in test/widget/tiles_widget_test.dart
+- [x] T043 [P] [US1] Write widget tests for visual feedback in test/widget/editable_tile_wrapper_test.dart
 
 **Checkpoint**: Drag-to-reorder is fully functional and testable independently
 

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// Represents the configuration for a single tile on the home page
 class TileConfiguration {
   /// Unique identifier for the tile (e.g., "电费", "校车", "饭卡")

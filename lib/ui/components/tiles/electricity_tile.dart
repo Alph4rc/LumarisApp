@@ -18,6 +18,7 @@ class ElectricityTile extends StatelessWidget {
           onTap: () => Get.toNamed('/Electricity'),
           borderRadius: BorderRadius.circular(20),
           child: Obx(() {
+            // Show data if available
             if (controller.hasData.value) {
               final amount = controller.electricity.value;
               final isLow = amount <= 10;
@@ -105,10 +106,64 @@ class ElectricityTile extends StatelessWidget {
               );
             }
 
+            // Show loading indicator while loading
+            if (controller.isLoading.value) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            // Show unsubscribed state
             return Container(
               padding: const EdgeInsets.all(20),
-              child: const Center(
-                child: CircularProgressIndicator(),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.grey.withValues(alpha: 0.1),
+                    Colors.grey.withValues(alpha: 0.05)
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.bolt_fill,
+                      color: Colors.grey,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    '电费查询',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '点击订阅',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             );
           }),
