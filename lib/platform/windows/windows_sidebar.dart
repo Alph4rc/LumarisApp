@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/modern_sidebar.dart';
+import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 
 /// Windows 11 Fluent Design 风格侧边栏
 ///

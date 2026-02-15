@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -13,7 +14,6 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'bottom_navigation.dart';
-import 'modern_sidebar.dart';
 import 'platform/macos/macos_ui_sidebar.dart';
 import 'platform/windows/windows_sidebar.dart';
 import 'platform/tablet/tablet_navigation.dart';

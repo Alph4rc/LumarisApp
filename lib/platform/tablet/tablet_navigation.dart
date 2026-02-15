@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/modern_sidebar.dart';
+import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 
 /// 平板设备导航组件
 ///
