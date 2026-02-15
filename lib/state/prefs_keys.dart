@@ -51,6 +51,7 @@ class PrefsKeys {
   /// 电费相关
   static const String ELECTRICITY_URL = 'electricity_url';
   static const String TILES = 'tiles';
+  static const String TILE_CONFIGURATIONS = 'tile_configurations';
 
   /// 支付相关
   static const String PAYMENT_NUM = 'payment_num';

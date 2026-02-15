@@ -16,6 +16,7 @@ class PaymentTile extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           child: Obx(() {
+            // Show data if available
             if (!controller.isLoading.value &&
                 controller.totalRecharge.value != 0) {
               final amount = controller.totalRecharge.value;
@@ -104,10 +105,66 @@ class PaymentTile extends StatelessWidget {
               );
             }
 
+            // Show loading indicator while loading
+            if (controller.isLoading.value) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            // Show unsubscribed state (errorMessage is set when not bound)
             return Container(
               padding: const EdgeInsets.all(20),
-              child: const Center(
-                child: CircularProgressIndicator(),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.grey.withValues(alpha: 0.1),
+                    Colors.grey.withValues(alpha: 0.05)
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.monetization_on_outlined,
+                      color: Colors.grey,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    '饭卡余额',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    controller.errorMessage.value.isNotEmpty
+                        ? controller.errorMessage.value
+                        : '点击绑定',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             );
           }),

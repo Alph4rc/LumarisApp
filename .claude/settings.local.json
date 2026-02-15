@@ -3,7 +3,25 @@
     "allow": [
       "Bash(flutter analyze:*)",
       "Bash(find:*)",
-      "Bash(flutter test:*)"
+      "Bash(flutter test:*)",
+      "Bash(git fetch:*)",
+      "Bash(ls:*)",
+      "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"editable-home-tiles\" \"我想让首页的快捷方式（磁贴）变得可编辑且可拖动更改\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"editable-home-tiles\" \"我想让首页的快捷方式（磁贴）变得可编辑且可拖动更改\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File .specify/scripts/powershell/setup-plan.ps1 -Json)",
+      "WebSearch",
+      "WebFetch(domain:pub.dev)",
+      "Bash(flutter pub deps:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)",
+      "Bash(test:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter devices:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(dart format:*)",
+      "Bash(else echo \"Coverage file not found\")",
+      "Bash(fi)",
+      "Bash(bash scripts/check_coverage.sh:*)"
     ]
   }
 }
