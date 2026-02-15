@@ -104,8 +104,11 @@ class _TilesWidgetState extends State<TilesWidget>
         itemCount: visibleTiles.length,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
+        onDragStart: (index) {
+          controller.setDragging(true);
+        },
         onReorder: (oldIndex, newIndex) async {
-
+          controller.setDragging(false);
           try {
             await controller.reorderTile(
               visibleTiles[oldIndex].id,
@@ -121,7 +124,6 @@ class _TilesWidgetState extends State<TilesWidget>
                 ),
               );
             }
-          } finally {
           }
         },
         itemBuilder: (context, index) {

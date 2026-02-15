@@ -147,24 +147,30 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
   }
 
   Widget _buildDragHandle() {
-    return ReorderableDragStartListener(
-      index: widget.index,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.grab,
-        child: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Icon(
-            Icons.drag_indicator,
-            color: Colors.grey[700],
-            size: 20,
+    final controller = Get.find<TileEditController>();
+
+    return Obx(() {
+      final isDragging = controller.isDragging.value;
+
+      return ReorderableDragStartListener(
+        index: widget.index,
+        child: MouseRegion(
+          cursor: isDragging ? SystemMouseCursors.grabbing : SystemMouseCursors.grab,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              Icons.drag_indicator,
+              color: Colors.grey[700],
+              size: 20,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildHideButton(TileEditController controller) {

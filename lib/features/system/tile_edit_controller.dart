@@ -11,6 +11,9 @@ class TileEditController extends GetxController {
   /// Whether edit mode is currently active
   final RxBool isEditMode = false.obs;
 
+  /// Whether a tile is currently being dragged
+  final RxBool isDragging = false.obs;
+
   /// Current tile configuration
   final Rx<TileConfigurationList> config =
       TileConfigurationList.defaultConfig().obs;
@@ -164,5 +167,10 @@ class TileEditController extends GetxController {
   /// Reload configuration from storage
   Future<void> reload() async {
     await _loadConfiguration();
+  }
+
+  /// Set dragging state
+  void setDragging(bool dragging) {
+    isDragging.value = dragging;
   }
 }
