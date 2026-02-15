@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart' as parser;
@@ -6,7 +8,20 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+
+/// Custom exception for tile configuration errors
+class TileConfigurationException implements Exception {
+  final String message;
+  final String? details;
+
+  TileConfigurationException(this.message, {this.details});
+
+  @override
+  String toString() =>
+      'TileConfigurationException: $message${details != null ? ' ($details)' : ''}';
+}
 
 class TileService {
   static final Dio _dio = Dio(BaseOptions(
@@ -134,5 +149,134 @@ class TileService {
     data.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     return data;
+  }
+
+  // ========== New Tile Configuration Methods ==========
+
+  /// Get the complete tile configuration from local storage
+  static Future<TileConfigurationList> getTileConfigurations() async {
+    final prefs = PrefsService.instance;
+
+    try {
+      // Try new format first
+      final newFormatJson = prefs.getString(PrefsKeys.TILE_CONFIGURATIONS);
+      if (newFormatJson != null && newFormatJson.isNotEmpty) {
+        final json = jsonDecode(newFormatJson) as Map<String, dynamic>;
+        return TileConfigurationList.fromJson(json);
+      }
+
+      // Fall back to old format and migrate (only if not empty)
+      final oldFormatList = prefs.getStringList(PrefsKeys.TILES);
+      if (oldFormatList != null && oldFormatList.isNotEmpty) {
+        final config = _migrateFromOldFormat(oldFormatList);
+        await saveTileConfigurations(config);
+        return config;
+      }
+
+      // No data, return default
+      return TileConfigurationList.defaultConfig();
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.error('Failed to load tile configuration: $e');
+      }
+      return TileConfigurationList.defaultConfig();
+    }
+  }
+
+  /// Save the complete tile configuration to local storage
+  static Future<void> saveTileConfigurations(
+      TileConfigurationList config) async {
+    final prefs = PrefsService.instance;
+
+    try {
+      // Update lastModified timestamp
+      final updatedConfig = config.copyWith(lastModified: DateTime.now());
+
+      // Serialize to JSON
+      final json = jsonEncode(updatedConfig.toJson());
+
+      // Save to storage
+      await prefs.setString(PrefsKeys.TILE_CONFIGURATIONS, json);
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.error('Failed to save tile configuration: $e');
+      }
+      throw TileConfigurationException(
+        '保存失败，请重试',
+        details: e.toString(),
+      );
+    }
+  }
+
+  /// Move a tile to a new position in the display order
+  static Future<void> reorderTile(
+      String tileId, int oldIndex, int newIndex) async {
+    try {
+      final config = await getTileConfigurations();
+      final reordered = config.reorderTile(tileId, oldIndex, newIndex);
+      await saveTileConfigurations(reordered);
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.error('Failed to reorder tile: $e');
+      }
+      throw TileConfigurationException(
+        '重新排序失败',
+        details: e.toString(),
+      );
+    }
+  }
+
+  /// Show or hide a tile
+  static Future<void> toggleTileVisibility(String tileId) async {
+    try {
+      final config = await getTileConfigurations();
+      final toggled = config.toggleVisibility(tileId);
+      await saveTileConfigurations(toggled);
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.error('Failed to toggle tile visibility: $e');
+      }
+      throw TileConfigurationException(
+        '切换显示状态失败',
+        details: e.toString(),
+      );
+    }
+  }
+
+  /// Reset tile configuration to default state
+  static Future<void> resetToDefault() async {
+    try {
+      final defaultConfig = TileConfigurationList.defaultConfig();
+      await saveTileConfigurations(defaultConfig);
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.error('Failed to reset tile configuration: $e');
+      }
+      throw TileConfigurationException(
+        '重置失败',
+        details: e.toString(),
+      );
+    }
+  }
+
+  /// Get list of all available tile types
+  static List<String> getAvailableTiles() {
+    return ['电费', '校车', '饭卡'];
+  }
+
+  /// Migrate from old format (List<String>) to new format (TileConfigurationList)
+  static TileConfigurationList _migrateFromOldFormat(List<String> oldList) {
+    final configurations = oldList.asMap().entries.map((entry) {
+      return TileConfiguration(
+        id: entry.value,
+        order: entry.key,
+        isVisible: true,
+      );
+    }).toList();
+
+    return TileConfigurationList(
+      configurations: configurations,
+      lastModified: DateTime.now(),
+    );
   }
 }

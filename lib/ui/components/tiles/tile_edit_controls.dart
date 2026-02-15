@@ -1,0 +1,210 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+
+/// Controls for entering and exiting tile edit mode
+class TileEditControls extends StatelessWidget {
+  const TileEditControls({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<TileEditController>();
+
+    return Obx(() {
+      final isEditMode = controller.isEditMode.value;
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Title
+            const Text(
+              '快捷功能',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            // Edit/Done button
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: isEditMode
+                  ? _buildDoneButton(controller)
+                  : _buildEditButton(controller),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  /// Build edit button
+  Widget _buildEditButton(TileEditController controller) {
+    return TextButton.icon(
+      key: const ValueKey('edit_button'),
+      onPressed: () => controller.toggleEditMode(),
+      icon: const Icon(Icons.edit_outlined, size: 18),
+      label: const Text('编辑'),
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.blue,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+    );
+  }
+
+  /// Build done button
+  Widget _buildDoneButton(TileEditController controller) {
+    return ElevatedButton.icon(
+      key: const ValueKey('done_button'),
+      onPressed: () => controller.toggleEditMode(),
+      icon: const Icon(Icons.check, size: 18),
+      label: const Text('完成'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        elevation: 2,
+      ),
+    );
+  }
+}
+
+/// Visual indicator for edit mode (optional overlay)
+class EditModeIndicator extends StatelessWidget {
+  final Widget child;
+
+  const EditModeIndicator({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<TileEditController>();
+
+    return Obx(() {
+      final isEditMode = controller.isEditMode.value;
+
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+          border: isEditMode
+              ? Border.all(
+                  color: Colors.blue.withOpacity(0.3),
+                  width: 2,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: child,
+      );
+    });
+  }
+}
+
+/// Empty state message when all tiles are hidden
+class EmptyTilesMessage extends StatelessWidget {
+  const EmptyTilesMessage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.widgets_outlined,
+            size: 64,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '暂无快捷功能',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '请在编辑模式中添加',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Available tiles list for edit mode (shows hidden tiles)
+class AvailableTilesList extends StatelessWidget {
+  const AvailableTilesList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<TileEditController>();
+
+    return Obx(() {
+      final allTiles = controller.allTiles;
+      final hiddenTiles = allTiles.where((t) => !t.isVisible).toList();
+
+      if (hiddenTiles.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.visibility_off, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 8),
+                Text(
+                  '已隐藏的磁贴',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: hiddenTiles.map((tile) {
+                return _buildHiddenTileChip(tile.id, controller);
+              }).toList(),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildHiddenTileChip(String tileId, TileEditController controller) {
+    return ActionChip(
+      avatar: const Icon(Icons.add_circle_outline, size: 18),
+      label: Text(tileId),
+      onPressed: () => controller.toggleVisibility(tileId),
+      backgroundColor: Colors.white,
+      side: BorderSide(color: Colors.grey[400]!),
+    );
+  }
+}

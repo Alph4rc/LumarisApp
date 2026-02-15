@@ -12,7 +12,9 @@
       "WebSearch",
       "WebFetch(domain:pub.dev)",
       "Bash(flutter pub deps:*)",
-      "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)"
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)",
+      "Bash(test:*)",
+      "Bash(flutter pub get:*)"
     ]
   }
 }

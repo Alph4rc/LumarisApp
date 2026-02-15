@@ -7,6 +7,7 @@ import 'schedule_store.dart';
 import 'settings_store.dart';
 import 'electricity_store.dart';
 import '../features/education/services/edu_http_client_manager.dart';
+import '../features/system/tile_edit_controller.dart';
 import '../core/services/auth_state_notifier.dart';
 
 /// 初始化所有 Store
@@ -20,6 +21,7 @@ void initStores() {
   Get.put(ElectricityStore());
   Get.put(PaymentStore());
   Get.put(BusTileStore());
+  Get.put(TileEditController()); // 初始化磁贴编辑控制器
 }
 
 /// 释放所有 Store
@@ -33,4 +35,5 @@ void disposeStores() {
   Get.delete<ElectricityStore>();
   Get.delete<PaymentStore>();
   Get.delete<BusTileStore>();
+  Get.delete<TileEditController>();
 }
