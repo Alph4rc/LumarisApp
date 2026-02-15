@@ -6,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/info_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
-import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
@@ -60,11 +58,6 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
 
-    if (!userStore.isLogin && !userStore.isLoginMember) {
-      // 没有登录信息，进入游客模式
-      // await _enterGuestMode(); // 其实这里不需要做什么，只是确认状态
-    }
-
     if (mounted) {
       setState(() {
         _isLoading = false;
@@ -91,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return Scaffold(
-      body: Obx(() => _buildProfileContent()),
+      body: Obx(() => _buildProfileContent(context)),
     );
   }
 
@@ -134,129 +127,209 @@ class _ProfilePageState extends State<ProfilePage> {
     ];
   }
 
-  Widget _buildProfileContent() {
+  Widget _buildProfileContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return SingleChildScrollView(
-      child: Column(
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 20),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              // Header Title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '我的',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  // Optional: Add a profile edit button or settings icon here if needed
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // User Info Card
+              _buildUserInfoCard(context, isDark),
+              const SizedBox(height: 32),
+
+              // Services Section
+              Text(
+                '应用与服务',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              GridView.builder(
+                padding: EdgeInsets.zero,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isTablet ? 6 : 4,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 0.75,
+                ),
+                itemBuilder: (context, index) {
+                  return profileButtonItems[index].build(context);
+                },
+                itemCount: profileButtonItems.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+              ),
+
+              if (userStore.isLogin) ...[
+                const SizedBox(height: 32),
+                Text(
+                  '学业概览',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildStudyInfoList(),
+              ],
+              
+              const SizedBox(height: 40),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserInfoCard(BuildContext context, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+        ],
+      ),
+      child: Row(
         children: [
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isDark ? Colors.white24 : Colors.black12,
+                width: 1,
+              ),
+            ),
+            child: ClipOval(
+              child: LazyLoadImage.assets(
+                'assets/icon.webp',
+                width: 64,
+                height: 64,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    LazyLoadImage.assets(
-                      'assets/icon.webp',
-                      width: 48,
-                      height: 48,
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _username.isNotEmpty ? _username : '未登录',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        Text(
-                          userStore.isLogin && userStore.isLoginMember
-                              ? '教务系统账号 & iMember账号'
-                              : userStore.isLogin
-                                  ? '教务系统账号'
-                                  : userStore.isLoginMember
-                                      ? 'iMember账号'
-                                      : '游客',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                Text(
+                  _username.isNotEmpty ? _username : '未登录',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  userStore.isLogin && userStore.isLoginMember
+                      ? '教务系统 & iMember'
+                      : userStore.isLogin
+                          ? '教务系统已连接'
+                          : userStore.isLoginMember
+                              ? 'iMember已连接'
+                              : '点击登录以访问更多功能',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white60 : Colors.grey[600],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          AnimatedCard(
-            delay: const Duration(milliseconds: 100),
-            child: ClubCard(
-              margin: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-              child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: isTablet ? 6 : 3,
-                    ),
-                    itemBuilder: (context, index) {
-                      return AnimatedCard(
-                        delay: Duration(milliseconds: 50 * index),
-                        child: Center(
-                          child: profileButtonItems[index].build(),
-                        ),
-                      );
-                    },
-                    itemCount: profileButtonItems.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                  )),
-            ),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: isDark ? Colors.white24 : Colors.black26,
+            size: 28,
           ),
-          if (userStore.isLogin) const SizedBox(height: 16),
-          if (userStore.isLogin)
-            FutureBuilder(
-                // 添加超时保护：最多10秒
-                future: DataService.getInfoList().timeout(
-                  const Duration(seconds: 10),
-                  onTimeout: () {
-                    AppLogger.warning('[ProfilePage] 获取信息列表超时');
-                    return <InfoModel>[];
-                  },
-                ),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('加载失败: ${snapshot.error}'),
-                      ),
-                    );
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (context, index) =>
-                        StudyCreditCard(data: snapshot.data![index]),
-                  );
-                }),
         ],
       ),
+    );
+  }
+
+  Widget _buildStudyInfoList() {
+    return FutureBuilder(
+      future: DataService.getInfoList().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          AppLogger.warning('[ProfilePage] 获取信息列表超时');
+          return <InfoModel>[];
+        },
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text('加载失败: ${snapshot.error}'),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: snapshot.data?.length ?? 0,
+          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          itemBuilder: (context, index) => StudyCreditCard(data: snapshot.data![index]),
+        );
+      },
     );
   }
 }
@@ -267,46 +340,67 @@ class ProfileButtonItem {
   String route = '';
   Function? onPressed;
 
-  ProfileButtonItem(
-      {required this.title,
-      required this.icon,
-      this.route = '',
-      this.onPressed});
+  ProfileButtonItem({
+    required this.title,
+    required this.icon,
+    this.route = '',
+    this.onPressed,
+  });
 
-  Widget build() {
-    return Material(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Hero(
-                    tag: title,
-                    child: Icon(icon,
-                        size: 32,
-                        color: CourseColorManager.generateSoftColor(title,
-                            isDark: true))),
-                Text(
-                  title,
-                  style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),
-                )
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
+    // 生成图标背景色
+    final Color baseColor = CourseColorManager.generateSoftColor(title, isDark: false);
+    
+    return GestureDetector(
+      onTap: () {
+        if (route.isEmpty) {
+          onPressed?.call();
+        } else {
+          Get.toNamed(route);
+        }
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                if (!isDark)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
               ],
             ),
+            child: Center(
+              child: Icon(
+                icon,
+                size: 30,
+                color: baseColor,
+              ),
+            ),
           ),
-          onTap: () {
-            if (route.isEmpty) {
-              onPressed?.call();
-            } else {
-              Get.toNamed(route);
-            }
-          },
-        ));
+          const SizedBox(height: 8),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          )
+        ],
+      ),
+    );
   }
 }
