@@ -3,6 +3,7 @@ import 'package:ios_club_app/ui/pages/author_page.dart';
 import 'package:ios_club_app/ui/pages/easter_egg_page.dart';
 import 'package:ios_club_app/ui/pages/helper_page.dart';
 import 'package:ios_club_app/ui/pages/license_page.dart';
+import 'package:ios_club_app/ui/pages/login_page.dart';
 import 'package:ios_club_app/ui/pages/net_page.dart';
 import 'package:ios_club_app/ui/pages/electricity_page.dart';
 import 'package:ios_club_app/ui/pages/payment_page.dart';
@@ -63,6 +64,13 @@ class AppRouter {
           name: '/Profile',
           page: () => PageRenderTimeMonitor(
               pageName: '个人中心页面', child: const ProfilePage()),
+        ),
+
+        /// 登录页面
+        GetPage(
+          name: '/Login',
+          page: () => PageRenderTimeMonitor(
+              pageName: '登录页面', child: const LoginPage()),
         ),
 
         /// 链接页面

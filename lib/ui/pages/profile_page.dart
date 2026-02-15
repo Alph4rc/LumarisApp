@@ -1,24 +1,18 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/info_model.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
-import 'package:ios_club_app/core/services/club_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
@@ -35,14 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final UserStore userStore = UserStore.to;
   final SettingsStore settingsStore = SettingsStore.to;
 
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-  bool _obscureText = true;
   bool _isLoading = true;
-  bool _isLoginMember = false;
-  bool _isOnlyLoginMember = false;
-  bool _showLoginForm = false; // 新增状态，控制是否显示登录表单
   String _username = '';
 
   @override
@@ -56,6 +43,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final prefs = PrefsService.instance;
     final username = prefs.getString(PrefsKeys.USERNAME);
     final iosName = prefs.getString(PrefsKeys.CLUB_NAME);
+
+    // 重置 _username
+    _username = '';
 
     if (userStore.isLogin && username != null) {
       _username = username;
@@ -72,235 +62,22 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (!userStore.isLogin && !userStore.isLoginMember) {
       // 没有登录信息，进入游客模式
-      await _enterGuestMode();
+      // await _enterGuestMode(); // 其实这里不需要做什么，只是确认状态
     }
 
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _login() async {
-    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-      showClubSnackBar(
-        context,
-        const Text('用户名和密码不能为空'),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      AppLogger.debug('[ProfilePage] 开始登录');
-
-      bool eduLoginSuccess = true;
-      bool clubLoginSuccess = true;
-
-      // 登录教务系统账号（添加超时保护：最多20秒）
-      if (!_isOnlyLoginMember) {
-        AppLogger.debug('[ProfilePage] 登录教务系统');
-        eduLoginSuccess = await _loginToEduSystem().timeout(
-          const Duration(seconds: 20),
-          onTimeout: () {
-            AppLogger.warning('[ProfilePage] 教务系统登录超时');
-            if (mounted) {
-              showClubSnackBar(context, const Text('教务系统登录超时，请检查网络连接'));
-            }
-            return false;
-          },
-        );
-      }
-
-      // 登录社团账号（添加超时保护：最多10秒）
-      if (_isOnlyLoginMember || _isLoginMember) {
-        AppLogger.debug('[ProfilePage] 登录社团账号');
-        clubLoginSuccess = await _loginToClub().timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            AppLogger.warning('[ProfilePage] 社团账号登录超时');
-            if (mounted) {
-              showClubSnackBar(context, const Text('社团账号登录超时，请检查网络连接'));
-            }
-            return false;
-          },
-        );
-      }
-
-      // 检查登录结果
-      if (!eduLoginSuccess || !clubLoginSuccess) {
-        return;
-      }
-
-      // 保存登录信息
-      await _saveLoginInfo();
-
-      // 更新UI状态
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isOnlyLoginMember = false;
-          _showLoginForm = false;
-        });
-      }
-
-      // 清空输入框
-      _usernameController.clear();
-      _passwordController.clear();
-      if (_isLoginMember) {
-        _nameController.clear();
-      }
-
-      AppLogger.debug('[ProfilePage] 登录成功');
-    } on TimeoutException catch (e) {
-      AppLogger.warning('[ProfilePage] 登录超时: $e');
-      if (mounted) {
-        showClubSnackBar(context, const Text('登录超时，请检查网络连接后重试'));
-      }
-    } catch (e, stackTrace) {
-      AppLogger.error('[ProfilePage] 登录失败', error: e, stackTrace: stackTrace);
-      if (mounted) {
-        showClubSnackBar(context, Text('登录失败: ${e.toString()}'));
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      AppLogger.debug('[ProfilePage] 设置 _isLoading = false');
-    }
-  }
-
-  /// 登录教务系统
-  /// 注意：EduHttpClient 已内置重试机制，这里不再额外重试
-  Future<bool> _loginToEduSystem() async {
-    final result = await EduService.loginFromData(
-      _usernameController.text,
-      _passwordController.text,
-    );
-
-    if (!result && mounted) {
-      showClubSnackBar(
-        context,
-        const Text('登录失败，请检查用户名和密码'),
-      );
-    }
-
-    if (result) {
+    if (mounted) {
       setState(() {
-        _username = _usernameController.text;
+        _isLoading = false;
       });
     }
-
-    return result;
   }
 
-  /// 登录社团账号
-  Future<bool> _loginToClub() async {
-    // 验证输入
-    if (_isOnlyLoginMember && _usernameController.text.isEmpty) {
-      if (mounted) {
-        showClubSnackBar(
-          context,
-          const Text('登录社团账号时姓名不能为空'),
-        );
-      }
-      return false;
+  Future<void> _enterLoginMode({bool isOnlyLoginMember = false}) async {
+    final result = await Get.toNamed('/Login', arguments: {'isOnlyLoginMember': isOnlyLoginMember});
+    // 如果登录成功返回 true
+    if (result == true) {
+      _checkLoginStatus();
     }
-
-    if (_isLoginMember && _nameController.text.isEmpty) {
-      if (mounted) {
-        showClubSnackBar(
-          context,
-          const Text('登录社团账号时姓名不能为空'),
-        );
-      }
-      return false;
-    }
-
-    bool result = false;
-    if (_isOnlyLoginMember) {
-      // 仅登录社团账号：用户名(姓名)和密码(学号)
-      result = await ClubService.loginMember(
-        _usernameController.text,
-        _passwordController.text,
-      );
-    } else if (_isLoginMember) {
-      // 同时登录两个账号：姓名和学号
-      result = await ClubService.loginMember(
-        _nameController.text,
-        _usernameController.text,
-      );
-    }
-
-    if (!result && mounted) {
-      showClubSnackBar(
-        context,
-        const Text('社团账号登陆失败'),
-      );
-    }
-
-    if (result) {
-      setState(() {
-        _username = _isOnlyLoginMember
-            ? _usernameController.text
-            : _nameController.text;
-      });
-    }
-
-    return result;
-  }
-
-  /// 保存登录信息
-  Future<void> _saveLoginInfo() async {
-    final prefs = PrefsService.instance;
-
-    if (_isOnlyLoginMember) {
-      // 仅登录社团账号
-      await prefs.setString(PrefsKeys.CLUB_NAME, _usernameController.text);
-      await prefs.setString(PrefsKeys.CLUB_ID, _passwordController.text);
-      userStore.setLoginMember();
-    } else if (!_isOnlyLoginMember && !_isLoginMember) {
-      // 仅登录教务系统
-      await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
-      await prefs.setString(PrefsKeys.PASSWORD, _passwordController.text);
-      final userDataString = prefs.getString(PrefsKeys.USER_DATA);
-      if (userDataString != null) {
-        final userData = jsonDecode(userDataString);
-        userStore.setUserData(UserData.fromJson(userData));
-      }
-    }
-
-    // 同时登录两个账号的情况
-    if (_isLoginMember) {
-      await prefs.setString(PrefsKeys.CLUB_NAME, _nameController.text);
-      await prefs.setString(PrefsKeys.CLUB_ID, _passwordController.text);
-      userStore.setLoginMember();
-    }
-  }
-
-  Future<void> _enterGuestMode() async {
-    // 更新 UserStore 状态
-    await userStore.logout();
-
-    setState(() {
-      _isLoading = false;
-      _showLoginForm = false; // 确保隐藏登录表单
-    });
-  }
-
-  Future<void> _enterLoginMode() async {
-    setState(() {
-      _isLoading = false;
-      _showLoginForm = true; // 显示登录表单
-    });
-
-    _usernameController.clear();
-    _passwordController.clear();
-    _nameController.clear();
   }
 
   @override
@@ -313,214 +90,9 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    // 根据状态决定显示登录表单还是用户信息界面
-    if (_showLoginForm) {
-      return Scaffold(
-        body: _buildLoginForm(),
-      );
-    } else {
-      return Scaffold(
-        body: Obx(() => _buildProfileContent()),
-      );
-    }
-  }
-
-  Widget _buildLoginForm() {
-    return SingleChildScrollView(
-        child: Column(
-      children: [
-        if (_isOnlyLoginMember)
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _isOnlyLoginMember = false;
-                          _passwordController.clear();
-                          _showLoginForm = false; // 添加这行代码来隐藏登录表单
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_back)),
-                  const Text(
-                    '登录社团账号',
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  SizedBox(
-                    width: 40,
-                  )
-                ],
-              )),
-        if (!_isOnlyLoginMember)
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isLoginMember = false;
-                            _nameController.clear();
-                            _showLoginForm = false; // 添加这行代码来隐藏登录表单
-                          });
-                        },
-                        icon: const Icon(Icons.arrow_back)),
-                    const Text(
-                      '登录教务系统账号',
-                      style: TextStyle(fontSize: 22),
-                    ),
-                    SizedBox(
-                      width: 40,
-                    )
-                  ])),
-        Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                LazyLoadImage.assets(
-                  'assets/icon.webp',
-                  width: 160,
-                  height: 160,
-                ),
-                const SizedBox(height: 24),
-                TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800] // 暗色模式下的背景
-                        : Colors.grey[100],
-                    prefixIcon: Icon(Icons.person_outline,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[300] // 暗色模式下的图标颜色
-                            : Colors.grey[700] // 亮色模式下的图标颜色
-                        ),
-                    hintText: '学号',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // 密码输入框
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800] // 暗色模式下的背景
-                        : Colors.grey[100],
-                    prefixIcon: Icon(Icons.lock_outline,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[300] // 暗色模式下的图标颜色
-                            : Colors.grey[700] // 亮色模式下的图标颜色
-                        ),
-                    hintText: _isOnlyLoginMember ? 'iMember 密码（初始值为手机号）' : '统一身份认证密码',
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscureText
-                          ? Icons.visibility_off
-                          : Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                if (_isLoginMember) const SizedBox(height: 16),
-                if (_isLoginMember)
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey[800] // 暗色模式下的背景
-                          : Colors.grey[100],
-                      prefixIcon: Icon(Icons.person_outline,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[300] // 暗色模式下的图标颜色
-                              : Colors.grey[700] // 亮色模式下的图标颜色
-                          ),
-                      hintText: '姓名（登录社团账号时必填）',
-                      //李嘉俊
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                if (!_isOnlyLoginMember)
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (!userStore.isLoginMember)
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _isLoginMember,
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  setState(() {
-                                    _isLoginMember = value;
-                                  });
-                                },
-                              ),
-                              const Text('登录社团账号'),
-                            ],
-                          ),
-                        SizedBox(
-                          width: 1,
-                        ),
-                        TextButton(
-                            onPressed: () async {
-                              if (await canLaunchUrl(Uri.parse(
-                                  'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form'))) {
-                                await launchUrl(
-                                    Uri.parse(
-                                        'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form'),
-                                    mode: LaunchMode.externalApplication);
-                              }
-                            },
-                            child: Text('忘记密码?'))
-                      ]),
-                if (!_isOnlyLoginMember) const SizedBox(height: 16),
-                // 登录按钮
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      '登录',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ))
-      ],
-    ));
+    return Scaffold(
+      body: Obx(() => _buildProfileContent()),
+    );
   }
 
   List<ProfileButtonItem> get profileButtonItems {
@@ -535,10 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
           title: userStore.isLoginMember ? '社团详情' : '登录社团iMember',
           onPressed: () {
             if (!userStore.isLoginMember) {
-              setState(() {
-                _isOnlyLoginMember = true;
-                _showLoginForm = true;
-              });
+              _enterLoginMode(isOnlyLoginMember: true);
             } else {
               Navigator.pushNamed(context, '/iMember');
             }
@@ -558,11 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: Icons.login,
             title: '登录教务系统',
             onPressed: () {
-              setState(() {
-                _isLoading = true;
-                _showLoginForm = true;
-              });
-              _enterLoginMode();
+              _enterLoginMode(isOnlyLoginMember: false);
             }),
       ProfileButtonItem(
           icon: Icons.help_outline, title: '帮助', route: '/Helper'),
@@ -693,13 +258,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }
 
