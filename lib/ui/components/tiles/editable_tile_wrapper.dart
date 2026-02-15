@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
@@ -155,7 +156,9 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
       return ReorderableDragStartListener(
         index: widget.index,
         child: MouseRegion(
-          cursor: isDragging ? SystemMouseCursors.grabbing : SystemMouseCursors.grab,
+          cursor: isDragging
+              ? SystemMouseCursors.grabbing
+              : SystemMouseCursors.grab,
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -181,12 +184,7 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
         } catch (e) {
           // Show error if trying to hide all tiles
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('至少需要保留一个磁贴'),
-                duration: Duration(seconds: 2),
-              ),
-            );
+            showClubSnackBar(context, Text('至少需要保留一个磁贴'));
           }
         }
       },

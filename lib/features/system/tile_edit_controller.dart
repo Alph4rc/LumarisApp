@@ -159,8 +159,8 @@ class TileEditController extends GetxController {
 
   /// Check if a tile is visible
   bool isTileVisible(String tileId) {
-    final tile = config.value.configurations
-        .firstWhereOrNull((t) => t.id == tileId);
+    final tile =
+        config.value.configurations.firstWhereOrNull((t) => t.id == tileId);
     return tile?.isVisible ?? false;
   }
 

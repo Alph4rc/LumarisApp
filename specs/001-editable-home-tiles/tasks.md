@@ -115,13 +115,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T044 [P] [US2] Add hide/show toggle buttons to tiles in edit mode in lib/ui/components/tiles/editable_tile_wrapper.dart
-- [ ] T045 [P] [US2] Create available tiles list view for edit mode in lib/ui/components/tiles/tile_edit_controls.dart
-- [ ] T046 [US2] Connect hide/show buttons to TileEditController.toggleVisibility() in lib/ui/components/tiles/editable_tile_wrapper.dart
-- [ ] T047 [US2] Filter visible tiles in TilesWidget based on configuration in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T048 [US2] Add empty state message when all tiles hidden in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T049 [US2] Implement warning dialog when attempting to hide all tiles in lib/ui/pages/homePages/tiles_widget.dart
-- [ ] T050 [US2] Add haptic feedback on visibility toggle in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T044 [P] [US2] Add hide/show toggle buttons to tiles in edit mode in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T045 [P] [US2] Create available tiles list view for edit mode in lib/ui/components/tiles/tile_edit_controls.dart
+- [x] T046 [US2] Connect hide/show buttons to TileEditController.toggleVisibility() in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T047 [US2] Filter visible tiles in TilesWidget based on configuration in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T048 [US2] Add empty state message when all tiles hidden in lib/ui/pages/homePages/tiles_widget.dart
+- [x] T049 [US2] Implement warning dialog when attempting to hide all tiles in lib/ui/components/tiles/editable_tile_wrapper.dart
+- [x] T050 [US2] Add haptic feedback on visibility toggle in lib/features/system/tile_edit_controller.dart
 - [ ] T051 [P] [US2] Write widget tests for hide/show functionality in test/widget/tiles_widget_test.dart
 - [ ] T052 [P] [US2] Write widget tests for empty state in test/widget/tiles_widget_test.dart
 - [ ] T053 [P] [US2] Write widget tests for all-hidden warning in test/widget/tiles_widget_test.dart

@@ -17,7 +17,11 @@
       "Bash(flutter pub get:*)",
       "Bash(flutter devices:*)",
       "Bash(tasklist:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(dart format:*)",
+      "Bash(else echo \"Coverage file not found\")",
+      "Bash(fi)",
+      "Bash(bash scripts/check_coverage.sh:*)"
     ]
   }
 }

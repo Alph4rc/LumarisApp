@@ -10,7 +10,7 @@ class ElectricityTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ElectricityStore controller = Get.find<ElectricityStore>();
-    
+
     return ClubCard(
       child: Material(
         color: Colors.transparent,

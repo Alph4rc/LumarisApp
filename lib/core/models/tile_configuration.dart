@@ -154,8 +154,7 @@ class TileConfigurationList {
 
   /// Toggle visibility of a tile
   TileConfigurationList toggleVisibility(String tileId) {
-    final tileIndex =
-        configurations.indexWhere((tile) => tile.id == tileId);
+    final tileIndex = configurations.indexWhere((tile) => tile.id == tileId);
 
     if (tileIndex == -1) {
       throw ArgumentError('Tile not found: $tileId');
@@ -167,8 +166,9 @@ class TileConfigurationList {
     // If showing, append to end of visible tiles
     if (newTile.isVisible) {
       final visibleTiles = getVisibleTiles();
-      final maxOrder =
-          visibleTiles.isEmpty ? -1 : visibleTiles.map((t) => t.order).reduce((a, b) => a > b ? a : b);
+      final maxOrder = visibleTiles.isEmpty
+          ? -1
+          : visibleTiles.map((t) => t.order).reduce((a, b) => a > b ? a : b);
       newTile = newTile.copyWith(order: maxOrder + 1);
     }
 

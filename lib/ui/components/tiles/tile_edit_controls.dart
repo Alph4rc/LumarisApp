@@ -92,7 +92,7 @@ class EditModeIndicator extends StatelessWidget {
         decoration: BoxDecoration(
           border: isEditMode
               ? Border.all(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: Colors.blue.withValues(alpha: 0.3),
                   width: 2,
                 )
               : null,
