@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 
-/// Windows 11 Fluent Design 风格侧边栏
+/// Apple 风格侧边栏 (参考 iCloud / App Store 设计)
 ///
 /// 特点：
-/// - Acrylic 毛玻璃效果背景
-/// - 流畅的悬停和选中动画
-/// - 符合 Windows 11 设计语言
+/// - 极简设计，大圆角选中态
+/// - 适配亮色/暗黑模式
+/// - 更加通透的视觉效果
 class WindowsSidebar extends StatefulWidget {
   final List<SidebarDestination> items;
   final int selectedIndex;
@@ -18,7 +18,7 @@ class WindowsSidebar extends StatefulWidget {
     required this.items,
     required this.selectedIndex,
     required this.onItemSelected,
-    this.width = 280,
+    this.width = 260, // Apple 风格侧边栏通常稍窄
   });
 
   @override
@@ -33,34 +33,37 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+    // Apple 风格配色
+    final backgroundColor = isDark 
+        ? const Color(0xFF1E1E1E) // macOS Dark Sidebar
+        : const Color(0xFFF2F2F7); // macOS Light Sidebar (System Grey 6)
+        
+    final dividerColor = isDark
+        ? Colors.black.withValues(alpha: 0.2)
+        : const Color(0xFFE5E5E5);
+
+    return Container(
       width: widget.width,
       decoration: BoxDecoration(
-        // Windows 11 风格背景
-        color: isDark
-            ? const Color(0xFF202020).withValues(alpha: 0.95)
-            : const Color(0xFFF3F3F3).withValues(alpha: 0.95),
+        color: backgroundColor,
         border: Border(
           right: BorderSide(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.08),
+            color: dividerColor,
             width: 1,
           ),
         ),
       ),
       child: Column(
         children: [
-          // 顶部标题区域（Windows 11 风格）
+          // 顶部标题区域
           _buildHeader(isDark, colorScheme),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
           // 导航项列表
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               itemCount: widget.items.length,
               itemBuilder: (context, index) {
                 final item = widget.items[index];
@@ -90,24 +93,15 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
 
   Widget _buildHeader(bool isDark, ColorScheme colorScheme) {
     return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.08),
-            width: 1,
-          ),
-        ),
-      ),
+      height: 60, // 稍微增加高度
+      padding: const EdgeInsets.fromLTRB(20, 16, 16, 8),
+      alignment: Alignment.centerLeft,
       child: Row(
         children: [
-          // App 图标
+          // App 图标 - 更加圆润
           Container(
-            width: 32,
-            height: 32,
+            width: 28,
+            height: 28,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -117,25 +111,30 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8), // Apple 风格圆角
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: const Icon(
-              Icons.dashboard_rounded,
+              Icons.apple, // 使用 Apple 图标或保持 dashboard
               size: 18,
               color: Colors.white,
             ),
           ),
           const SizedBox(width: 12),
           // App 名称
-          Expanded(
-            child: Text(
-              'iOS Club App',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1F1F1F),
-                letterSpacing: 0.3,
-              ),
+          Text(
+            'iOS Club',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+              letterSpacing: -0.5, // 紧凑的字间距
             ),
           ),
         ],
@@ -152,96 +151,86 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
     required bool isDark,
     required ColorScheme colorScheme,
   }) {
+    // 选中态颜色 - 模仿 macOS 强调色
+    final selectedBgColor = colorScheme.primary;
+    final selectedTextColor = Colors.white;
+
+    // 悬停态颜色
+    final hoverBgColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.05);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
-        child: InkWell(
-          onTap: onTap,
-          onHover: onHover,
-          borderRadius: BorderRadius.circular(6),
-          splashColor: colorScheme.primary.withValues(alpha: 0.1),
-          highlightColor: colorScheme.primary.withValues(alpha: 0.05),
+      child: GestureDetector(
+        onTap: onTap,
+        child: MouseRegion(
+          onEnter: (_) => onHover(true),
+          onExit: (_) => onHover(false),
+          cursor: SystemMouseCursors.click,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
             padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
+              horizontal: 12,
+              vertical: 10,
             ),
             decoration: BoxDecoration(
-              // Windows 11 选中效果
               color: isSelected
-                  ? (isDark
-                      ? colorScheme.primary.withValues(alpha: 0.15)
-                      : colorScheme.primary.withValues(alpha: 0.12))
+                  ? selectedBgColor
                   : isHovered
-                      ? (isDark
-                          ? Colors.white.withValues(alpha: 0.06)
-                          : Colors.black.withValues(alpha: 0.04))
+                      ? hoverBgColor
                       : Colors.transparent,
-              borderRadius: BorderRadius.circular(6),
-              // 选中时左侧高亮条
-              border: isSelected
-                  ? Border(
-                      left: BorderSide(
-                        color: colorScheme.primary,
-                        width: 3,
-                      ),
-                    )
-                  : null,
+              borderRadius: BorderRadius.circular(10), // Apple 风格大圆角
             ),
             child: Row(
               children: [
                 // 图标
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    isSelected ? item.selectedIcon : item.icon,
-                    size: 20,
-                    color: isSelected
-                        ? colorScheme.primary
-                        : (isDark ? Colors.grey[300] : Colors.grey[700]),
-                  ),
+                Icon(
+                  isSelected ? item.selectedIcon : item.icon,
+                  size: 20,
+                  color: isSelected
+                      ? selectedTextColor
+                      : (isDark ? const Color(0xFF636366) : const Color(0xFF98989D)), // Apple System Grey
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 // 标签
                 Expanded(
-                  child: AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    item.label,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                       color: isSelected
-                          ? (isDark ? Colors.white : const Color(0xFF1F1F1F))
-                          : (isDark ? Colors.grey[300] : Colors.grey[700]),
-                      letterSpacing: 0.2,
+                          ? selectedTextColor
+                          : (isDark ? const Color(0xFFDDDDDD) : const Color(0xFF1C1C1E)),
+                      letterSpacing: -0.2,
                     ),
-                    child: Text(
-                      item.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // Badge（如果有）
+                // Badge (如果有)
                 if (item.badge != null)
                   Container(
-                    margin: const EdgeInsets.only(left: 8),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
-                      vertical: 3,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      borderRadius: BorderRadius.circular(10),
+                      color: isSelected
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5EA)),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       item.badge!,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark ? Colors.white : Colors.black87),
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
 class EditableTileWrapper extends StatefulWidget {
