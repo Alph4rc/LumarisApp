@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
@@ -27,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  
+
   bool _obscureText = true;
   bool _isLoading = false;
   bool _isLoginMember = false;
@@ -232,6 +233,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final groupBackgroundColor =
+        isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final inputFillColor = Colors
+        .transparent; // Grouped style usually has transparent inputs on colored background
+
     if (_isLoading) {
       return const Scaffold(
         body: Center(
@@ -241,174 +248,247 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  Text(
-                    _isOnlyLoginMember ? '登录社团账号' : '登录教务系统账号',
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                  const SizedBox(width: 40),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  LazyLoadImage.assets(
-                    'assets/icon.webp',
-                    width: 160,
-                    height: 160,
-                  ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey[800]
-                          : Colors.grey[100],
-                      prefixIcon: Icon(
-                        Icons.person_outline,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[300]
-                            : Colors.grey[700],
+      // 简约风格通常使用系统背景色，Material 3 默认背景色已足够适配
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: Icon(
+            Icons.arrow_back_ios_new, // 更现代的返回图标
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                // Logo
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
-                      hintText: '学号',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: LazyLoadImage.assets(
+                      'assets/icon.webp',
+                      width: 100,
+                      height: 100,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: _obscureText,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey[800]
-                          : Colors.grey[100],
-                      prefixIcon: Icon(
-                        Icons.lock_outline,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[300]
-                            : Colors.grey[700],
-                      ),
-                      hintText: _isOnlyLoginMember ? 'iMember 密码（初始值为手机号）' : '统一身份认证密码',
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscureText
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
+                ),
+                const SizedBox(height: 24),
+                // Title
+                Text(
+                  _isOnlyLoginMember ? '登录社团账号' : '登录教务系统',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
                   ),
-                  if (_isLoginMember) const SizedBox(height: 16),
-                  if (_isLoginMember)
-                    TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[800]
-                            : Colors.grey[100],
-                        prefixIcon: Icon(
-                          Icons.person_outline,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey[300]
-                              : Colors.grey[700],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '请使用您的账号继续',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withOpacity(0.6),
+                  ),
+                ),
+                const SizedBox(height: 40),
+
+                // Grouped Inputs
+                Container(
+                  decoration: BoxDecoration(
+                    color: groupBackgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildCupertinoLikeTextField(
+                        context,
+                        controller: _usernameController,
+                        hintText: '学号',
+                        icon: Icons.person_outline,
+                        isFirst: true,
+                        isLast: false,
+                      ),
+                      const Divider(height: 1, indent: 48),
+                      // Indent to align with text
+                      _buildCupertinoLikeTextField(
+                        context,
+                        controller: _passwordController,
+                        hintText:
+                            _isOnlyLoginMember ? 'iMember 密码' : '统一身份认证密码',
+                        icon: Icons.lock_outline,
+                        obscureText: _obscureText,
+                        isPassword: true,
+                        isFirst: false,
+                        isLast: !_isLoginMember,
+                      ),
+                      if (_isLoginMember) ...[
+                        const Divider(height: 1, indent: 48),
+                        _buildCupertinoLikeTextField(
+                          context,
+                          controller: _nameController,
+                          hintText: '姓名（登录社团账号时必填）',
+                          icon: Icons.badge_outlined,
+                          isFirst: false,
+                          isLast: true,
                         ),
-                        hintText: '姓名（登录社团账号时必填）',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 16),
-                  if (!_isOnlyLoginMember)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (!userStore.isLoginMember)
-                          Row(
+                      ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Options Row
+                if (!_isOnlyLoginMember)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (!userStore.isLoginMember)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isLoginMember = !_isLoginMember;
+                            });
+                          },
+                          child: Row(
                             children: [
-                              Checkbox(
-                                value: _isLoginMember,
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  setState(() {
-                                    _isLoginMember = value;
-                                  });
-                                },
+                              Transform.scale(
+                                scale: 0.9,
+                                child: Checkbox(
+                                  value: _isLoginMember,
+                                  onChanged: (value) {
+                                    if (value == null) return;
+                                    setState(() {
+                                      _isLoginMember = value;
+                                    });
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
                               ),
-                              const Text('登录社团账号'),
+                              const Text('同时登录社团账号'),
                             ],
                           ),
-                        const SizedBox(width: 1),
-                        TextButton(
-                          onPressed: () async {
-                            const url = 'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(
-                                Uri.parse(url),
-                                mode: LaunchMode.externalApplication,
-                              );
-                            }
-                          },
-                          child: const Text('忘记密码?'),
-                        )
-                      ],
-                    ),
-                  if (!_isOnlyLoginMember) const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                      child: const Text(
-                        '登录',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () async {
+                          const url =
+                              'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(
+                              Uri.parse(url),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
+                        child: const Text('忘记密码?'),
+                      )
+                    ],
+                  ),
+
+                const SizedBox(height: 32),
+
+                // Login Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: CupertinoButton.filled(
+                    onPressed: _login,
+                    child: const Text(
+                      '登录',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+
+                // Footer info or extra spacing
+                const SizedBox(height: 40),
+              ],
             ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCupertinoLikeTextField(
+    BuildContext context, {
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    bool obscureText = false,
+    bool isPassword = false,
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(fontSize: 17),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color:
+              Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
+        ),
+        prefixIcon: Icon(
+          icon,
+          color:
+              Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+          size: 22,
+        ),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.color
+                      ?.withOpacity(0.5),
+                  size: 20,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : null,
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        isDense: true,
       ),
     );
   }
