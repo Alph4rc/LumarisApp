@@ -17,6 +17,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/models/score_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -293,33 +294,33 @@ class _ScorePageState extends State<ScorePage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                CupertinoIcons.exclamationmark_circle,
+                Icons.warning,
                 size: 48,
-                color: CupertinoColors.systemGrey,
+                color: Colors.grey[400],
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 '未登录',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 '请先去登录即可查看成绩',
                 style: TextStyle(
                   fontSize: 16,
-                  color: CupertinoColors.systemGrey.resolveFrom(context),
+                  color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 24),
-              CupertinoButton.filled(
+              SizedBox(height: 24),
+              ElevatedButton(
                 onPressed: () {
                   // 导航到个人页面进行登录
                   Get.toNamed('/Profile');
                 },
-                child: const Text('前往登录'),
+                child: Text('前往登录'),
               ),
             ],
           ),
@@ -333,14 +334,11 @@ class _ScorePageState extends State<ScorePage>
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CupertinoActivityIndicator(radius: 16),
-            const SizedBox(height: 16),
+            CircularProgressIndicator(),
+            SizedBox(height: 10),
             Text(
               _loadingText,
-              style: TextStyle(
-                fontSize: 16,
-                color: CupertinoColors.secondaryLabel.resolveFrom(context),
-              ),
+              style: TextStyle(fontSize: 16),
             )
           ],
         )),
@@ -348,73 +346,53 @@ class _ScorePageState extends State<ScorePage>
     }
 
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            _buildAppBar(),
-            _buildStatsCard(),
-            _buildSelector(),
-            Expanded(
-              child: _buildScoreList(),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
+      body: Column(
         children: [
-          const Text(
-            '成绩与绩点',
-            style: TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
-              fontFamily: '.SF Pro Display',
-            ),
-          ),
-          Row(
-            children: [
-              _buildIconButton(
-                onPressed: _changeScoreList,
-                icon: _isYear
-                    ? CupertinoIcons.calendar
-                    : CupertinoIcons.list_bullet,
-              ),
-              if (!_isFool)
-                _buildIconButton(
-                  onPressed: _handleFoolishMode,
-                  icon: CupertinoIcons.smiley,
-                ),
-              _buildIconButton(
-                onPressed: () => refresh(isRefresh: true),
-                icon: CupertinoIcons.refresh,
-              ),
-            ],
-          ),
+          _buildAppBar(),
+          _buildStatsCard(),
+          _buildSelector(),
+          Expanded(
+            child: _buildScoreList(),
+          )
         ],
       ),
     );
   }
 
-  Widget _buildIconButton(
-      {required VoidCallback onPressed, required IconData icon}) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: onPressed,
-      child: Icon(
-        icon,
-        size: 24,
-        color: CupertinoColors.activeBlue.resolveFrom(context),
-      ),
-    );
+  Widget _buildAppBar() {
+    return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              '成绩与绩点',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: _changeScoreList,
+                  icon: Icon(_isYear
+                      ? Icons.calendar_today_rounded
+                      : Icons.calendar_view_day_rounded),
+                ),
+                if (!_isFool)
+                  IconButton(
+                    onPressed: _handleFoolishMode,
+                    icon: const Icon(Icons.mood),
+                  ),
+                IconButton(
+                  onPressed: () => refresh(isRefresh: true),
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
+          ],
+        ));
   }
 
   void _changeScoreList() {
@@ -466,13 +444,8 @@ class _ScorePageState extends State<ScorePage>
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: CupertinoColors.secondarySystemGroupedBackground
-              .resolveFrom(context),
-          borderRadius: BorderRadius.circular(12),
-        ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: ClubCard(
         child: _buildStatsPadding(),
       ),
     );
@@ -485,40 +458,27 @@ class _ScorePageState extends State<ScorePage>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildStatItem(
-            icon: CupertinoIcons.graph_circle,
+            icon: Icons.credit_score,
             value: scoreList == null
                 ? ScoreList.getTotalGpa(_scoreList).toStringAsFixed(2)
                 : scoreList.totalGpa.toStringAsFixed(2),
             label: 'GPA',
-            color: CupertinoColors.systemIndigo,
-          ),
-          Container(
-            width: 1,
-            height: 40,
-            color: CupertinoColors.separator.resolveFrom(context),
           ),
           _buildStatItem(
-            icon: CupertinoIcons.book,
+            icon: Icons.library_books,
             value: scoreList == null
                 ? ScoreList.getTotalCourse(_scoreList).toString()
                 : scoreList.totalCourse.toString(),
             label: '通过课程',
-            color: CupertinoColors.systemOrange,
           ),
-          Container(
-            width: 1,
-            height: 40,
-            color: CupertinoColors.separator.resolveFrom(context),
-          ),
-          GestureDetector(
+          InkWell(
             onTap: _showCreditInfoDialog,
             child: _buildStatItem(
-              icon: CupertinoIcons.chart_bar,
+              icon: Icons.equalizer,
               value: scoreList == null
                   ? ScoreList.getTotalCredit(_scoreList).toStringAsFixed(1)
                   : scoreList.totalCredit.toStringAsFixed(1),
               label: '总学分',
-              color: CupertinoColors.systemPink,
               withInfo: true,
             ),
           )
@@ -531,47 +491,38 @@ class _ScorePageState extends State<ScorePage>
     required IconData icon,
     required String value,
     required String label,
-    required Color color,
     bool withInfo = false,
   }) {
     return Column(
       children: [
         Icon(
           icon,
-          size: 28,
-          color: CupertinoDynamicColor.resolve(color, context),
+          size: 32,
         ),
-        const SizedBox(height: 4),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color:
-                CupertinoDynamicColor.resolve(CupertinoColors.label, context),
-            letterSpacing: -0.5,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
           ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (withInfo)
+              const Icon(
+                Icons.info_outline,
+                size: 9,
+                color: Colors.grey,
+              ),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 11,
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.secondaryLabel, context),
+              style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
               ),
             ),
-            if (withInfo) ...[
-              const SizedBox(width: 2),
-              Icon(
-                CupertinoIcons.info_circle,
-                size: 10,
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.secondaryLabel, context),
-              ),
-            ],
           ],
         ),
       ],
@@ -579,13 +530,13 @@ class _ScorePageState extends State<ScorePage>
   }
 
   void _showCreditInfoDialog() {
-    showCupertinoDialog(
+    showDialog(
       context: context,
-      builder: (context) => CupertinoAlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text('说明'),
         content: const Text('这里的学分是按照成绩算出来的，只要没有挂科就OK。教务系统给的一般来说要小于等于这个数'),
         actions: [
-          CupertinoDialogAction(
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('确定'),
           ),
@@ -601,8 +552,9 @@ class _ScorePageState extends State<ScorePage>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
       child: CupertinoSlidingSegmentedControl<int>(
+        proportionalWidth: true,
         groupValue: _currentIndex,
         onValueChanged: (int? value) async {
           if (value != null && value < _selectorList.length) {
@@ -616,15 +568,7 @@ class _ScorePageState extends State<ScorePage>
         },
         children: _selectorList
             .map(
-              (x) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  x,
-                  style: TextStyle(
-                    fontSize: 13,
-                  ),
-                ),
-              ),
+              (x) => Text(x),
             )
             .toList()
             .asMap(),
@@ -651,7 +595,6 @@ class _ScorePageState extends State<ScorePage>
       itemCount: _scoreList.length,
       itemBuilder: (context, index) => SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        padding: const EdgeInsets.only(bottom: 24),
         child: _buildSemesterCard(_scoreList[index]),
       ),
     );
@@ -668,58 +611,33 @@ class _ScorePageState extends State<ScorePage>
         },
         itemBuilder: (context, index) => SingleChildScrollView(
               scrollDirection: Axis.vertical,
-              padding: const EdgeInsets.only(bottom: 24),
               child: _buildYearCard(_yearList[index], index),
             ));
   }
 
   Widget _buildYearCard(ScoreList score, int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
-            child: Text(
-              '大${yearStringList[index]}学年',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.label.resolveFrom(context),
-              ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: CupertinoColors.secondarySystemGroupedBackground
-                  .resolveFrom(context),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                _buildStatsPadding(scoreList: score),
-                const Divider(height: 1, indent: 16),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: score.list.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    indent: 60,
-                    color: CupertinoColors.separator.resolveFrom(context),
-                  ),
-                  itemBuilder: (context, index) => AnimatedListItem(
-                    index: index,
-                    child: _buildScoreItem(score.list[index]),
-                  ),
+    const yearStringList = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    return ClubCard(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Column(children: [
+              Text('大${yearStringList[index]}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  )),
+              _buildStatsPadding(scoreList: score),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: score.list.length,
+                itemBuilder: (context, index) => AnimatedListItem(
+                  index: index,
+                  child: _buildScoreItem(score.list[index]),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+              )
+            ])));
   }
 
   Widget _buildEmptyState() {
@@ -730,10 +648,10 @@ class _ScorePageState extends State<ScorePage>
           EmptyWidget(
             title: '没有成绩',
             subtitle: '建议刷新或退出重进',
-            icon: CupertinoIcons.book,
+            icon: Icons.school,
           ),
           const SizedBox(height: 16),
-          CupertinoButton.filled(
+          ElevatedButton(
             onPressed: () => refresh(isRefresh: true),
             child: const Text('刷新数据'),
           ),
@@ -745,55 +663,31 @@ class _ScorePageState extends State<ScorePage>
   Widget _buildSemesterCard(ScoreList score) {
     final semesterNames = score.semester.name.split('-');
     return AnimatedCard(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
-              child: Text(
-                '${semesterNames[0]} - ${semesterNames[1]} 学年',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: CupertinoDynamicColor.resolve(
-                      CupertinoColors.secondaryLabel, context),
+      child: ClubCard(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Column(
+            children: [
+              Text(
+                '${semesterNames[0]}至${semesterNames[1]}年 第${semesterNames[2]}学期',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: CupertinoColors.secondarySystemGroupedBackground
-                    .resolveFrom(context),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListView.separated(
+              const SizedBox(height: 16),
+              ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: score.list.length,
-                separatorBuilder: (context, index) => Divider(
-                  height: 1,
-                  indent: 60,
-                  color: CupertinoColors.separator.resolveFrom(context),
-                ),
                 itemBuilder: (context, index) => AnimatedListItem(
                   index: index,
                   child: _buildScoreItem(score.list[index]),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 4.0, top: 8.0),
-              child: Text(
-                '第 ${semesterNames[2]} 学期',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: CupertinoColors.tertiaryLabel.resolveFrom(context),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -802,121 +696,93 @@ class _ScorePageState extends State<ScorePage>
   Widget _buildScoreItem(ScoreModel item) {
     final isTablet = MediaQuery.of(context).size.width > 600;
 
-    return GestureDetector(
-      onTap: () => _showScoreDetails(item),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: CourseColorManager.generateSoftColor(item.name)
-                    .withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  item.name.isNotEmpty ? item.name.substring(0, 1) : '',
-                  style: TextStyle(
-                    color: CourseColorManager.generateSoftColor(item.name),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+    return Material(
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _showScoreDetails(item),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: CourseColorManager.generateSoftColor(item.name),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${item.name}${item.isMinor ? ' (辅修)' : ''}',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                      color: CupertinoColors.label.resolveFrom(context),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${item.credit}学分',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color:
-                          CupertinoColors.secondaryLabel.resolveFrom(context),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  item.grade,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: CupertinoDynamicColor.resolve(
-                        _getGradeColor(item.grade), context),
-                  ),
-                ),
-                if (item.gpa.isNotEmpty && item.gpa != '0')
-                  Text(
-                    'GPA: ${item.gpa}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          CupertinoColors.secondaryLabel.resolveFrom(context),
-                    ),
-                  ),
-              ],
-            ),
-            if (isTablet) ...[
               const SizedBox(width: 16),
-              SizedBox(
-                width: 100,
-                child: Text(
-                  item.gradeDetail,
-                  style: TextStyle(
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
+              Expanded(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${item.name}${item.isMinor ? ' (辅修)' : ''}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                              const SizedBox(height: 4),
+                              _buildScoreMeta(item),
+                            ]),
+                      ),
+                      if (isTablet)
+                        Expanded(
+                          child: Text(
+                            item.gradeDetail,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                    ]),
               ),
             ],
-            const SizedBox(width: 8),
-            Icon(
-              CupertinoIcons.chevron_forward,
-              size: 16,
-              color: CupertinoColors.tertiaryLabel.resolveFrom(context),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Color _getGradeColor(String grade) {
-    final double? score = double.tryParse(grade);
-    if (score != null) {
-      if (score >= 90) return CupertinoColors.systemGreen;
-      if (score >= 80) return CupertinoColors.systemBlue;
-      if (score >= 60) return CupertinoColors.systemOrange;
-      return CupertinoColors.systemRed;
-    }
-    // 非数字成绩
-    if (grade == '优秀' || grade == 'A') return CupertinoColors.systemGreen;
-    if (grade == '良好' || grade == 'B') return CupertinoColors.systemBlue;
-    if (grade == '及格' || grade == 'C') return CupertinoColors.systemOrange;
-    return CupertinoColors.label.resolveFrom(context);
+  Widget _buildScoreMeta(ScoreModel item) {
+    return Wrap(
+      spacing: 16,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.time, size: 16, color: Colors.grey[600]),
+            const SizedBox(width: 4),
+            Text('${item.credit}学分', style: TextStyle(color: Colors.grey[600]))
+          ],
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.location, size: 16, color: Colors.grey[600]),
+            const SizedBox(width: 4),
+            Text('成绩 ${item.grade}', style: TextStyle(color: Colors.grey[600]))
+          ],
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.star, size: 16, color: Colors.grey[600]),
+            const SizedBox(width: 4),
+            Text('绩点 ${item.gpa}', style: TextStyle(color: Colors.grey[600]))
+          ],
+        ),
+      ],
+    );
   }
 
   Future<void> _showScoreDetails(ScoreModel score) async {
