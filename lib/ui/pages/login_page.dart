@@ -274,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -308,7 +308,7 @@ class _LoginPageState extends State<LoginPage> {
                         .textTheme
                         .bodyMedium
                         ?.color
-                        ?.withOpacity(0.6),
+                        ?.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -452,15 +452,15 @@ class _LoginPageState extends State<LoginPage> {
       obscureText: obscureText,
       style: const TextStyle(fontSize: 17),
       decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color:
-              Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
-        ),
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color:
+                Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
+          ),
         prefixIcon: Icon(
           icon,
           color:
-              Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+              Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
           size: 22,
         ),
         suffixIcon: isPassword
@@ -471,7 +471,7 @@ class _LoginPageState extends State<LoginPage> {
                       .textTheme
                       .bodyMedium
                       ?.color
-                      ?.withOpacity(0.5),
+                      ?.withValues(alpha: 0.5),
                   size: 20,
                 ),
                 onPressed: () {
