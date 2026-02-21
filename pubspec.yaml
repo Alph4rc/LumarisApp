@@ -1,21 +1,7 @@
 name: ios_club_app
-description: "西建大iOS Club出品的社团软件。"
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: "西建大iOS Club出品软件，包括教务系统数据查询，电费饭卡校车和社团内数据显示等内容"
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.1.19+1
 
 environment:
@@ -59,6 +45,10 @@ dependencies:
   flutter_markdown: ^0.7.7+1
   logger: ^2.5.0
   reorderable_grid_view: ^2.2.8
+  mpflutter_core: ^2.7.5
+  mpflutter_build_tools: ^2.7.5
+  mpflutter_wechat_api: ^2.2.3
+  mpflutter_wechat_mapview: ^0.0.3
 
 dev_dependencies:
   flutter_test:
@@ -70,10 +60,6 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   leak_tracker: ^11.0.1
   leak_tracker_flutter_testing: ^3.0.10
-  mpflutter_core: ^2.7.5
-  mpflutter_build_tools: ^2.7.5
-  mpflutter_wechat_api: ^2.2.3
-  mpflutter_wechat_mapview: ^0.0.3
 
 dependency_overrides:
   web: ^1.1.0

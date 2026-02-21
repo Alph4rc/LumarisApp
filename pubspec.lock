@@ -705,7 +705,7 @@ packages:
     source: hosted
     version: "5.6.1"
   mpflutter_build_tools:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: mpflutter_build_tools
       sha256: "6b28253c43505904bca58677c844a87a07963389ec9fa34451fd302ed44ce4b2"
@@ -713,7 +713,7 @@ packages:
     source: hosted
     version: "2.8.0"
   mpflutter_core:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: mpflutter_core
       sha256: "9a5d5904966b134d62cebd8ed0a56d801ac283e7afdd09dec2ecb6e59dd27c99"
@@ -721,7 +721,7 @@ packages:
     source: hosted
     version: "2.8.0"
   mpflutter_wechat_api:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: mpflutter_wechat_api
       sha256: "7ae0e08546acb6d77d65e9c6d530dd83604fe2b9eddfcd963ca3d6845b29133c"
@@ -729,7 +729,7 @@ packages:
     source: hosted
     version: "2.2.4"
   mpflutter_wechat_mapview:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: mpflutter_wechat_mapview
       sha256: "9d83e99e3f8079e39edcab46895e08e08e8a207c3cd5dc8966ce32e9e3b71ac6"
