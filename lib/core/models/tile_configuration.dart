@@ -174,12 +174,26 @@ class TileConfigurationList {
 
     // Check if all tiles would be hidden
     final newConfigurations = List<TileConfiguration>.from(configurations);
-    newConfigurations[tileIndex] = newTile;
-
-    final visibleCount =
-        newConfigurations.where((tile) => tile.isVisible).length;
-    if (visibleCount == 0) {
-      throw StateError('Cannot hide all tiles');
+    // Find the index again in the new list to update
+    final indexToUpdate = newConfigurations.indexWhere((t) => t.id == tileId);
+    if (indexToUpdate != -1) {
+      newConfigurations[indexToUpdate] = newConfigurations[indexToUpdate].copyWith(
+        isVisible: !tile.isVisible,
+        order: !tile.isVisible ? (
+          newConfigurations.where((t) => t.isVisible).length
+        ) : tile.order
+      );
+    }
+    
+    // Re-normalize orders for visible tiles
+    final visibleTiles = newConfigurations.where((t) => t.isVisible).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
+      
+    for (int i = 0; i < visibleTiles.length; i++) {
+      final tileIndex = newConfigurations.indexWhere((t) => t.id == visibleTiles[i].id);
+      if (tileIndex != -1) {
+        newConfigurations[tileIndex] = newConfigurations[tileIndex].copyWith(order: i);
+      }
     }
 
     return TileConfigurationList(

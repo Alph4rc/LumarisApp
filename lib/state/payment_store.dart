@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
+import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';
 
 class PaymentStore extends GetxController {
@@ -7,7 +8,6 @@ class PaymentStore extends GetxController {
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
   final RxList<PaymentModel> records = <PaymentModel>[].obs;
-  final RxList<String> tiles = <String>[].obs;
   final RxDouble totalRecharge = 0.0.obs;
   final RxString num = ''.obs;
   final RxBool isShowTile = false.obs;
@@ -31,12 +31,11 @@ class PaymentStore extends GetxController {
       }
 
       final recordsResult = await PaymentAnalyzer.fetchData(num.value);
-      final newTiles = await TileService.getTiles();
+      final isVisible = await TileService.isTileVisible('饭卡');
 
       records.assignAll(recordsResult.payments);
       totalRecharge.value = recordsResult.total;
-      tiles.assignAll(newTiles);
-      isShowTile.value = tiles.contains("饭卡");
+      isShowTile.value = isVisible;
     } finally {
       isLoading.value = false;
     }
@@ -47,13 +46,16 @@ class PaymentStore extends GetxController {
     await loadData();
   }
 
-  void toggleTileShow(bool value) {
+  Future<void> toggleTileShow(bool value) async {
     isShowTile.value = value;
     if (value) {
-      tiles.add("饭卡");
+      await TileService.addTile("饭卡");
     } else {
-      tiles.remove("饭卡");
+      await TileService.removeTile("饭卡");
     }
-    TileService.setTiles(tiles);
+
+    if (Get.isRegistered<TileEditController>()) {
+      await Get.find<TileEditController>().reload();
+    }
   }
 }

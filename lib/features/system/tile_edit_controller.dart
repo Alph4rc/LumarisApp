@@ -43,7 +43,34 @@ class TileEditController extends GetxController {
   Future<void> _loadConfiguration() async {
     try {
       isLoading.value = true;
-      config.value = await TileService.getTileConfigurations();
+      var loadedConfig = await TileService.getTileConfigurations();
+
+      // Merge with available tiles if any are missing
+      final availableTiles = TileService.getAvailableTiles();
+      final existingIds = loadedConfig.configurations.map((t) => t.id).toSet();
+      
+      var hasChanges = false;
+      var newConfigs = List<TileConfiguration>.from(loadedConfig.configurations);
+      
+      for (final id in availableTiles) {
+        if (!existingIds.contains(id)) {
+           // Add missing tile as hidden
+           newConfigs.add(TileConfiguration(
+             id: id,
+             order: newConfigs.length, 
+             isVisible: false,
+           ));
+           hasChanges = true;
+        }
+      }
+      
+      if (hasChanges) {
+        loadedConfig = loadedConfig.copyWith(configurations: newConfigs);
+        // Save back immediately to ensure consistency
+        await TileService.saveTileConfigurations(loadedConfig);
+      }
+
+      config.value = loadedConfig;
     } catch (e) {
       // Error already logged in TileService
       config.value = TileConfigurationList.defaultConfig();

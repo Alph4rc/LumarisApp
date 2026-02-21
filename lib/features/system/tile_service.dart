@@ -79,14 +79,49 @@ class TileService {
     }
   }
 
-  static Future<void> setTiles(List<String> map) async {
-    final prefs = PrefsService.instance;
-    await prefs.setStringList(PrefsKeys.TILES, map);
+  static Future<bool> isTileVisible(String tileId) async {
+    final config = await getTileConfigurations();
+    return config.configurations.any((t) => t.id == tileId && t.isVisible);
   }
 
-  static Future<List<String>> getTiles() async {
-    final prefs = PrefsService.instance;
-    return prefs.getStringList(PrefsKeys.TILES) ?? [];
+  static Future<void> addTile(String tileId) async {
+    final config = await getTileConfigurations();
+    final index = config.configurations.indexWhere((t) => t.id == tileId);
+
+    if (index != -1) {
+      // 已存在配置中
+      if (!config.configurations[index].isVisible) {
+        // 如果不可见，则切换为可见
+        await toggleTileVisibility(tileId);
+      }
+    } else {
+      // 不在配置中，添加新配置
+      final visibleTiles = config.getVisibleTiles();
+      final maxOrder = visibleTiles.isEmpty
+          ? -1
+          : visibleTiles.map((t) => t.order).reduce((a, b) => a > b ? a : b);
+      
+      final newTile = TileConfiguration(
+        id: tileId,
+        order: maxOrder + 1,
+        isVisible: true,
+      );
+      
+      final newConfigs = List<TileConfiguration>.from(config.configurations)
+        ..add(newTile);
+      
+      final newList = config.copyWith(configurations: newConfigs);
+      await saveTileConfigurations(newList.normalizeOrders());
+    }
+  }
+
+  static Future<void> removeTile(String tileId) async {
+    final config = await getTileConfigurations();
+    final index = config.configurations.indexWhere((t) => t.id == tileId);
+
+    if (index != -1 && config.configurations[index].isVisible) {
+      await toggleTileVisibility(tileId);
+    }
   }
 
   static Future<void> openInWeChat(String url) async {

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
+import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/core/models/electric_data.dart';
 
 class ElectricityStore extends GetxController {
@@ -21,7 +22,7 @@ class ElectricityStore extends GetxController {
       isLoading.value = true;
       
       final value = await TileService.getTextAfterKeyword();
-      final tilesList = await TileService.getTiles();
+      final isVisible = await TileService.isTileVisible('电费');
       final weekly = await TileService.getElectricityWeeklyData();
 
       if (value != null) {
@@ -29,7 +30,11 @@ class ElectricityStore extends GetxController {
         hasData.value = true;
       }
       
-      tiles.assignAll(tilesList);
+      if (isVisible) {
+        if (!tiles.contains('电费')) tiles.add('电费');
+      } else {
+        tiles.remove('电费');
+      }
       weeklyData.assignAll(weekly);
     } catch (e) {
       // Handle error
@@ -58,18 +63,19 @@ class ElectricityStore extends GetxController {
     }
   }
 
-  Future<void> setTiles(List<String> newTiles) async {
-    tiles.assignAll(newTiles);
-    await TileService.setTiles(newTiles);
-  }
-
-  void toggleTile(String tileName, bool value) {
+  Future<void> toggleTile(String tileName, bool value) async {
     if (value) {
       if (!tiles.contains(tileName)) {
         tiles.add(tileName);
       }
+      await TileService.addTile(tileName);
     } else {
       tiles.remove(tileName);
+      await TileService.removeTile(tileName);
+    }
+
+    if (Get.isRegistered<TileEditController>()) {
+      await Get.find<TileEditController>().reload();
     }
   }
 }

@@ -335,8 +335,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                         trailing: Obx(() => CupertinoSwitch(
                               value: controller.tiles.contains('电费'),
                               onChanged: (value) async {
-                                controller.toggleTile('电费', value);
-                                await TileService.setTiles(controller.tiles);
+                                await controller.toggleTile('电费', value);
                               },
                             )),
                       ),
