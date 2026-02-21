@@ -130,9 +130,10 @@ class DataService {
   ///
   /// 根据学期开始时间和结束时间计算当前是第几周以及学期总周数。
   ///
+  /// @param isRefresh 是否强制刷新时间数据
   /// @return 包含当前周数(week)和最大周数(maxWeek)的Map
-  static Future<Map<String, int>> getWeek() async {
-    final time = await getTime();
+  static Future<Map<String, int>> getWeek({bool isRefresh = false}) async {
+    final time = await getTime(isRefresh: isRefresh);
     if (time["startTime"] == null) {
       return {'week': 0, 'maxWeek': 0};
     }
@@ -389,14 +390,18 @@ class DataService {
   /// 从本地存储获取时间信息，包括学期开始时间、结束时间等。
   /// 如果数据超过24小时未更新，则自动从服务器刷新。
   ///
+  /// @param isRefresh 是否强制刷新，默认为false
   /// @return 包含时间信息的Map
-  static Future<Map<String, String>> getTime() async {
+  static Future<Map<String, String>> getTime({bool isRefresh = false}) async {
     final prefs = PrefsService.instance;
     String? jsonString = prefs.getString(PrefsKeys.TIME_DATA);
     final timeLastUpdated = prefs.getInt(PrefsKeys.TIME_LAST_UPDATED);
     final now = DateTime.now().millisecondsSinceEpoch;
     final Map<String, String> list = {};
-    if (jsonString != null &&
+    
+    // 如果不是强制刷新，且数据在有效期内，则使用缓存
+    if (!isRefresh &&
+        jsonString != null &&
         (timeLastUpdated != null &&
             (now - timeLastUpdated).abs() < 1000 * 60 * 60 * 24)) {
       var jsonList = jsonDecode(jsonString);

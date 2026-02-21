@@ -138,6 +138,11 @@ class ScheduleStore extends GetxController {
     try {
       AppLogger.debug('[ScheduleStore] 调用 EduService.getCourse');
 
+      // 获取最新时间数据
+      // 传入 isRefresh: true 以强制从服务器获取最新时间
+      final weekData = await DataService.getWeek(isRefresh: true);
+      _handleWeekData(weekData);
+
       // 添加超时保护：最多等待20秒
       // 考虑到可能需要重登录（3-5秒）+ 请求时间（5-10秒）
       await EduService.getCourse(isRefresh: true)
@@ -208,14 +213,17 @@ class ScheduleStore extends GetxController {
     final weekDay = now.weekday;
     var a = false;
 
+    // 使用 currentWeek 替代 weekNow，确保响应式更新
+    final weekIndex = currentWeek;
+
     // 处理今天的课程，使用DataService.getCourse中相同的逻辑
-    if (weekNow >= allCourses.length) {
+    if (weekIndex < 0 || weekIndex >= allCourses.length) {
       return [];
     }
 
-    var filteredCourses = allCourses[weekNow]
+    var filteredCourses = allCourses[weekIndex]
         .where((course) =>
-            course.weekIndexes.contains(weekNow) && course.weekday == weekDay)
+            course.weekIndexes.contains(weekIndex) && course.weekday == weekDay)
         .toList();
 
     // 过滤掉已经结束的课程
@@ -240,7 +248,7 @@ class ScheduleStore extends GetxController {
       }
 
       // 如果明天是周日，则周数需要增加
-      final targetWeek = tomorrowWeekDay == 7 ? weekNow + 1 : weekNow;
+      final targetWeek = tomorrowWeekDay == 7 ? weekIndex + 1 : weekIndex;
 
       // 检查targetWeek是否超出范围
       if (targetWeek >= allCourses.length) {
