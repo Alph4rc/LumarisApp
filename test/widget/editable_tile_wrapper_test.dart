@@ -174,8 +174,6 @@ void main() {
 
   group('DraggableTileItem', () {
     testWidgets('should_create_draggable_tile', (WidgetTester tester) async {
-      bool dragStarted = false;
-      bool dragEnded = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -183,8 +181,6 @@ void main() {
             body: DraggableTileItem(
               tileId: '电费',
               index: 0,
-              onDragStarted: () => dragStarted = true,
-              onDragEnd: () => dragEnded = true,
               child: Container(
                 width: 100,
                 height: 100,

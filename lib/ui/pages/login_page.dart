@@ -236,8 +236,6 @@ class _LoginPageState extends State<LoginPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final groupBackgroundColor =
         isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final inputFillColor = Colors
-        .transparent; // Grouped style usually has transparent inputs on colored background
 
     if (_isLoading) {
       return const Scaffold(
