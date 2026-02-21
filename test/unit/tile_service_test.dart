@@ -251,23 +251,4 @@ void main() {
       expect(config.configurations.every((t) => t.isVisible), true);
     });
   });
-
-  group('TileService - Legacy Methods', () {
-    test('should_maintain_backward_compatibility_with_getTiles', () async {
-      final prefs = PrefsService.instance;
-      await prefs.setStringList(PrefsKeys.TILES, ['电费', '校车']);
-
-      final tiles = await TileService.getTiles();
-
-      expect(tiles, ['电费', '校车']);
-    });
-
-    test('should_maintain_backward_compatibility_with_setTiles', () async {
-      await TileService.setTiles(['电费', '校车', '饭卡']);
-
-      final tiles = await TileService.getTiles();
-
-      expect(tiles, ['电费', '校车', '饭卡']);
-    });
-  });
 }
