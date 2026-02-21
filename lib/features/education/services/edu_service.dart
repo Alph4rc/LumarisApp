@@ -266,14 +266,14 @@ class EduService {
 
     try {
       final response = await EduApiClient.getCourse(cookieData.studentId);
-      if (response.isNotEmpty) {
-        // 存储到本地
-        await prefs.setString(
-            PrefsKeys.COURSE_DATA, jsonEncode(jsonDecode(response)));
-        await DataService.setIgnore([]);
-        // 更新课程数据刷新时间
-        await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME, DateTime.now().millisecondsSinceEpoch);
-      }
+      
+      // 即使是空数组也需要更新，因为可能原本有课现在退课了，或者学期切换了
+      // 存储到本地
+      await prefs.setString(
+          PrefsKeys.COURSE_DATA, jsonEncode(jsonDecode(response)));
+      await DataService.setIgnore([]);
+      // 更新课程数据刷新时间
+      await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME, DateTime.now().millisecondsSinceEpoch);
     } catch (e, stackTrace) {
       AppLogger.error('获取课程信息失败', error: e, stackTrace: stackTrace);
     }
