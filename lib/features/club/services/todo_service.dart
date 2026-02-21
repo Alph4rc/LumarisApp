@@ -9,7 +9,7 @@ class TodoService {
   static Future<List<TodoModel>?> getAllTodos() async {
     try {
       final response = await ApiClient.get('/Todo');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         TodoModel.fromJson,
         errorMessage: 'Error fetching all todos',
@@ -26,7 +26,7 @@ class TodoService {
   static Future<String?> createTodo(TodoModel todoData) async {
     try {
       final response = await ApiClient.post('/Todo', body: todoData.toJson());
-      return await ApiResponseHelper.parseString(
+      return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error creating todo',
       );
@@ -42,7 +42,7 @@ class TodoService {
   static Future<bool> updateTodo(TodoModel todoData) async {
     try {
       final response = await ApiClient.put('/Todo', body: todoData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating todo',
       );
@@ -58,7 +58,7 @@ class TodoService {
   static Future<bool> getTodoStatistics() async {
     try {
       final response = await ApiClient.get('/Todo/statistics');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error fetching todo statistics',
       );
@@ -74,7 +74,7 @@ class TodoService {
   static Future<TodoModel?> getTodoById(String id) async {
     try {
       final response = await ApiClient.get('/Todo/$id');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         TodoModel.fromJson,
         errorMessage: 'Error fetching todo by ID',
@@ -91,7 +91,7 @@ class TodoService {
   static Future<bool> deleteTodo(String id) async {
     try {
       final response = await ApiClient.delete('/Todo/$id');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting todo',
       );
@@ -107,7 +107,7 @@ class TodoService {
   static Future<List<TodoModel>?> getTodosByPage(int page, int pageSize) async {
     try {
       final response = await ApiClient.get('/Todo/Page/$page/$pageSize');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         TodoModel.fromJson,
         errorMessage: 'Error fetching todos by page',

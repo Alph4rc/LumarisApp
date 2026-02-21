@@ -9,7 +9,7 @@ class ResourceService {
   static Future<List<ResourceModel>?> getAllResources() async {
     try {
       final response = await ApiClient.get('/Resource');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         ResourceModel.fromJson,
         errorMessage: 'Error fetching all resources',
@@ -26,7 +26,7 @@ class ResourceService {
   static Future<ResourceModel?> createResource(ResourceModel resourceData) async {
     try {
       final response = await ApiClient.post('/Resource', body: resourceData.toJson());
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         ResourceModel.fromJson,
         errorMessage: 'Error creating resource',
@@ -43,7 +43,7 @@ class ResourceService {
   static Future<bool> updateResource(ResourceModel resourceData) async {
     try {
       final response = await ApiClient.put('/Resource', body: resourceData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating resource',
       );
@@ -59,7 +59,7 @@ class ResourceService {
   static Future<ResourceModel?> getResourceById(String id) async {
     try {
       final response = await ApiClient.get('/Resource/$id');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         ResourceModel.fromJson,
         errorMessage: 'Error fetching resource by ID',
@@ -76,7 +76,7 @@ class ResourceService {
   static Future<bool> deleteResource(String id) async {
     try {
       final response = await ApiClient.delete('/Resource/$id');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting resource',
       );
@@ -92,7 +92,7 @@ class ResourceService {
   static Future<List<ResourceModel>?> getResourcesByTag(String tag) async {
     try {
       final response = await ApiClient.get('/Resource/tag/$tag');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         ResourceModel.fromJson,
         errorMessage: 'Error fetching resources by tag',
@@ -109,7 +109,7 @@ class ResourceService {
   static Future<List<ResourceModel>?> searchResourcesByName(String name) async {
     try {
       final response = await ApiClient.get('/Resource/search/$name');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         ResourceModel.fromJson,
         errorMessage: 'Error searching resources by name',
@@ -126,7 +126,7 @@ class ResourceService {
   static Future<List<String>?> getAllTags() async {
     try {
       final response = await ApiClient.get('/Resource/tags');
-      final data = await ApiResponseHelper.parseRaw<List<dynamic>>(
+      final data = ApiResponseHelper.parseRaw<List<dynamic>>(
         response,
         errorMessage: 'Error fetching all tags',
       );
@@ -146,7 +146,7 @@ class ResourceService {
   static Future<bool> getResourceStatistics() async {
     try {
       final response = await ApiClient.get('/Resource/statistics');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error fetching resource statistics',
       );

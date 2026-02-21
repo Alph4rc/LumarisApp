@@ -10,7 +10,7 @@ class StaffService {
   static Future<List<StaffModel>?> getAllStaff() async {
     try {
       final response = await ApiClient.get('/Staff');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         StaffModel.fromJson,
         errorMessage: 'Error fetching all staff',
@@ -27,7 +27,7 @@ class StaffService {
   static Future<List<MemberModel>?> getStaffMembers() async {
     try {
       final response = await ApiClient.get('/Staff/members');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         MemberModel.fromJson,
         errorMessage: 'Error fetching staff members',
@@ -44,7 +44,7 @@ class StaffService {
   static Future<StaffModel?> getStaffByUserId(String userId) async {
     try {
       final response = await ApiClient.get('/Staff/$userId');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         StaffModel.fromJson,
         errorMessage: 'Error fetching staff by user ID',
@@ -61,7 +61,7 @@ class StaffService {
   static Future<bool> createStaff(StaffModel staffData) async {
     try {
       final response = await ApiClient.post('/Staff/Create', body: staffData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error creating staff',
       );
@@ -77,7 +77,7 @@ class StaffService {
   static Future<bool> updateStaff(StaffModel staffData) async {
     try {
       final response = await ApiClient.post('/Staff/Update', body: staffData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating staff',
       );
@@ -93,7 +93,7 @@ class StaffService {
   static Future<bool> deleteStaff(String userId) async {
     try {
       final response = await ApiClient.get('/Staff/Delete/$userId');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting staff',
       );
@@ -109,7 +109,7 @@ class StaffService {
   static Future<List<StaffModel>?> getStaffByIdentity(String identity) async {
     try {
       final response = await ApiClient.get('/Staff/by-identity/$identity');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         StaffModel.fromJson,
         errorMessage: 'Error fetching staff by identity',
@@ -126,7 +126,7 @@ class StaffService {
   static Future<bool> changeStaffDepartment(String userId, String departmentName) async {
     try {
       final response = await ApiClient.post('/Staff/change-department/$userId?departmentName=$departmentName');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error changing staff department',
       );

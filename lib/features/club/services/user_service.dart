@@ -11,7 +11,7 @@ class UserService {
   static Future<MemberModel?> getUserData() async {
     try {
       final response = await ApiClient.get('/User/data');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         MemberModel.fromJson,
         errorMessage: 'Error fetching user data',
@@ -28,7 +28,7 @@ class UserService {
   static Future<List<TodoModel>?> getUserTodos() async {
     try {
       final response = await ApiClient.get('/User/todos');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         TodoModel.fromJson,
         errorMessage: 'Error fetching user todos',
@@ -45,7 +45,7 @@ class UserService {
   static Future<TodoModel?> createUserTodo(TodoModel todoData) async {
     try {
       final response = await ApiClient.post('/User/todos', body: todoData.toJson());
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         TodoModel.fromJson,
         errorMessage: 'Error creating user todo',
@@ -62,7 +62,7 @@ class UserService {
   static Future<bool> updateUserTodo(TodoModel todoData) async {
     try {
       final response = await ApiClient.put('/User/todos', body: todoData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating user todo',
       );
@@ -78,7 +78,7 @@ class UserService {
   static Future<bool> deleteUserTodo(String id) async {
     try {
       final response = await ApiClient.delete('/User/todos/$id');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting user todo',
       );
@@ -94,7 +94,7 @@ class UserService {
   static Future<TodoModel?> getTodoById(String id) async {
     try {
       final response = await ApiClient.get('/User/todos/$id');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         TodoModel.fromJson,
         errorMessage: 'Error fetching todo by id',
@@ -111,7 +111,7 @@ class UserService {
   static Future<bool> updateUserProfile(StudentModel profileData) async {
     try {
       final response = await ApiClient.put('/User/profile', body: profileData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating user profile',
       );

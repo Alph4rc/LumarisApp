@@ -13,7 +13,7 @@ class DataCentreService {
   static Future<List<YearCount>?> getYearStatistics() async {
     try {
       final response = await ApiClient.get('/DataCentre/year');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         YearCount.fromJson,
         errorMessage: 'Error fetching year statistics',
@@ -30,7 +30,7 @@ class DataCentreService {
   static Future<List<AcademyCount>?> getAcademyStatistics() async {
     try {
       final response = await ApiClient.get('/DataCentre/college');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         AcademyCount.fromJson,
         errorMessage: 'Error fetching academy statistics',
@@ -47,7 +47,7 @@ class DataCentreService {
   static Future<List<LandscapeCount>?> getGradeStatistics() async {
     try {
       final response = await ApiClient.get('/DataCentre/grade');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         LandscapeCount.fromJson,
         errorMessage: 'Error fetching grade statistics',
@@ -64,7 +64,7 @@ class DataCentreService {
   static Future<List<LandscapeCount>?> getLandscapeStatistics() async {
     try {
       final response = await ApiClient.get('/DataCentre/landscape');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         LandscapeCount.fromJson,
         errorMessage: 'Error fetching landscape statistics',
@@ -81,7 +81,7 @@ class DataCentreService {
   static Future<List<GenderCount>?> getGenderStatistics() async {
     try {
       final response = await ApiClient.get('/DataCentre/gender');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         GenderCount.fromJson,
         errorMessage: 'Error fetching gender statistics',
@@ -112,7 +112,7 @@ class DataCentreService {
   static Future<DataCentreModel?> getData() async {
     try {
       final response = await ApiClient.get('/DataCentre');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         DataCentreModel.fromJson,
         errorMessage: 'Error getting data',

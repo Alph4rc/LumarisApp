@@ -253,7 +253,7 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       key: _visibilityDetectorKey,
       width: widget.width,
       height: widget.height,

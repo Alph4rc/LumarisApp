@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 /// 清理未使用的导入脚本
 void main() async {
   // 需要清理的文件列表
@@ -48,7 +50,9 @@ void main() async {
   for (final filePath in filesToClean) {
     final file = File(filePath);
     if (!await file.exists()) {
-      print('⚠ 文件不存在: $filePath');
+      if (kDebugMode) {
+        print('⚠ 文件不存在: $filePath');
+      }
       continue;
     }
 
@@ -64,9 +68,13 @@ void main() async {
     if (content != originalContent) {
       await file.writeAsString(content);
       totalCleaned++;
-      print('✓ $filePath: 已清理 ${imports.length} 个导入');
+      if (kDebugMode) {
+        print('✓ $filePath: 已清理 ${imports.length} 个导入');
+      }
     }
   }
 
-  print('\n完成！清理了 $totalCleaned 个文件');
+  if (kDebugMode) {
+    print('\n完成！清理了 $totalCleaned 个文件');
+  }
 }

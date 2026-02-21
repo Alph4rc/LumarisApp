@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 /// 批量替换 print/debugPrint 为 AppLogger 的脚本
 void main() async {
   final libDir = Directory('lib');
 
   if (!await libDir.exists()) {
-    print('错误: lib 目录不存在');
+    if (kDebugMode) {
+      print('错误: lib 目录不存在');
+    }
     exit(1);
   }
 
@@ -18,14 +22,18 @@ void main() async {
       if (result > 0) {
         totalFiles++;
         totalReplacements += result;
-        print('✓ ${entity.path}: $result 处替换');
+        if (kDebugMode) {
+          print('✓ ${entity.path}: $result 处替换');
+        }
       }
     }
   }
 
-  print('\n完成！');
-  print('处理文件数: $totalFiles');
-  print('总替换数: $totalReplacements');
+  if (kDebugMode) {
+    print('\n完成！');
+    print('处理文件数: $totalFiles');
+    print('总替换数: $totalReplacements');
+  }
 }
 
 Future<int> processFile(File file) async {

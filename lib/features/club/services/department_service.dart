@@ -9,7 +9,7 @@ class DepartmentService {
   static Future<DepartmentModel?> getDepartmentByName(String name) async {
     try {
       final response = await ApiClient.get('/Department/$name');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         DepartmentModel.fromJson,
         errorMessage: 'Error fetching department by name',
@@ -26,7 +26,7 @@ class DepartmentService {
   static Future<List<DepartmentModel>?> getAllDepartments() async {
     try {
       final response = await ApiClient.get('/Department/all');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         DepartmentModel.fromJson,
         errorMessage: 'Error fetching all departments',
@@ -43,7 +43,7 @@ class DepartmentService {
   static Future<bool> updateDepartment(DepartmentModel departmentData) async {
     try {
       final response = await ApiClient.post('/Department/Update', body: departmentData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating department',
       );
@@ -59,7 +59,7 @@ class DepartmentService {
   static Future<bool> createDepartment(DepartmentModel departmentData) async {
     try {
       final response = await ApiClient.post('/Department/Create', body: departmentData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error creating department',
       );
@@ -75,7 +75,7 @@ class DepartmentService {
   static Future<bool> deleteDepartment(String name) async {
     try {
       final response = await ApiClient.get('/Department/Delete/$name');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting department',
       );
@@ -91,7 +91,7 @@ class DepartmentService {
   static Future<bool> exportDepartmentsToJson() async {
     try {
       final response = await ApiClient.get('/Department/export-json');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error exporting departments to JSON',
       );

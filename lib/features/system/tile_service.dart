@@ -265,7 +265,7 @@ class TileService {
     return ['电费', '校车', '饭卡'];
   }
 
-  /// Migrate from old format (List<String>) to new format (TileConfigurationList)
+  /// Migrate from old format (List&lt;String>) to new format (TileConfigurationList)
   static TileConfigurationList _migrateFromOldFormat(List<String> oldList) {
     final configurations = oldList.asMap().entries.map((entry) {
       return TileConfiguration(

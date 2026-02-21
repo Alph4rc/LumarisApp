@@ -9,7 +9,7 @@ class ProjectService {
   static Future<List<ProjectModel>?> getAllProjects() async {
     try {
       final response = await ApiClient.get('/Project');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         ProjectModel.fromJson,
         errorMessage: 'Error fetching all projects',
@@ -26,7 +26,7 @@ class ProjectService {
   static Future<ProjectModel?> createProject(ProjectModel projectData) async {
     try {
       final response = await ApiClient.post('/Project', body: projectData.toJson());
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         ProjectModel.fromJson,
         errorMessage: 'Error creating project',
@@ -43,7 +43,7 @@ class ProjectService {
   static Future<List<ProjectModel>?> getUserProjects() async {
     try {
       final response = await ApiClient.get('/Project/your-projects');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         ProjectModel.fromJson,
         errorMessage: 'Error fetching user projects',
@@ -60,7 +60,7 @@ class ProjectService {
   static Future<bool> deleteProject(String id) async {
     try {
       final response = await ApiClient.post('/Project/delete/$id');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting project',
       );
@@ -76,7 +76,7 @@ class ProjectService {
   static Future<bool> changeProjectMember(String id, String projId) async {
     try {
       final response = await ApiClient.post('/Project/change-member/$id/$projId');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error changing project member',
       );

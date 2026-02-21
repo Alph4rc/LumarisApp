@@ -11,7 +11,7 @@ class ArticleService {
   static Future<List<ArticleModel>?> getAllArticles() async {
     try {
       final response = await ApiClient.get('/Article');
-      return await ApiResponseHelper.parseList(
+      return ApiResponseHelper.parseList(
         response,
         ArticleModel.fromJson,
         errorMessage: 'Error fetching articles',
@@ -28,7 +28,7 @@ class ArticleService {
   static Future<ArticleModel?> createArticle(ArticleCreateDto articleData) async {
     try {
       final response = await ApiClient.post('/Article', body: articleData.toJson());
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         ArticleModel.fromJson,
         errorMessage: 'Error creating article',
@@ -45,7 +45,7 @@ class ArticleService {
   static Future<ArticleModel?> getArticleByPath(String path) async {
     try {
       final response = await ApiClient.get('/Article/$path');
-      return await ApiResponseHelper.parseSingleObject(
+      return ApiResponseHelper.parseSingleObject(
         response,
         ArticleModel.fromJson,
         errorMessage: 'Error fetching article by path',
@@ -62,7 +62,7 @@ class ArticleService {
   static Future<bool> updateArticle(String path, ArticleUpdateDto articleData) async {
     try {
       final response = await ApiClient.post('/Article/update/$path', body: articleData.toJson());
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating article',
       );
@@ -78,7 +78,7 @@ class ArticleService {
   static Future<bool> deleteArticle(String path) async {
     try {
       final response = await ApiClient.post('/Article/delete/$path');
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error deleting article',
       );
@@ -94,7 +94,7 @@ class ArticleService {
   static Future<List<dynamic>?> searchArticlesWithHighlights(String keyword) async {
     try {
       final response = await ApiClient.get('/Article/search/highlights?keyword=$keyword');
-      return await ApiResponseHelper.parseRaw<List<dynamic>>(
+      return ApiResponseHelper.parseRaw<List<dynamic>>(
         response,
         errorMessage: 'Error searching articles with highlights',
       );
@@ -110,7 +110,7 @@ class ArticleService {
   static Future<Map<String, dynamic>?> getCategories() async {
     try {
       final response = await ApiClient.get('/Article/category');
-      return await ApiResponseHelper.parseRaw<Map<String, dynamic>>(
+      return ApiResponseHelper.parseRaw<Map<String, dynamic>>(
         response,
         errorMessage: 'Error fetching categories',
       );
@@ -128,7 +128,7 @@ class ArticleService {
   static Future<bool> updateArticleOrders(Map<String, int> orders) async {
     try {
       final response = await ApiClient.post('/Article/update-orders', body: orders);
-      return await ApiResponseHelper.parseBool(
+      return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating article orders',
       );

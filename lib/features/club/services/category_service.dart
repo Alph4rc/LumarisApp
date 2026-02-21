@@ -11,7 +11,7 @@ class CategoryService {
   static Future<List<dynamic>?> getAllCategories() async {
     try {
       final response = await ApiClient.get('/Category/all');
-      return await ApiResponseHelper.parseRaw<List<dynamic>>(
+      return ApiResponseHelper.parseRaw<List<dynamic>>(
         response,
         errorMessage: 'Error fetching all categories',
       );
@@ -27,7 +27,7 @@ class CategoryService {
   static Future<Map<String, dynamic>?> getCategoryByName(String name) async {
     try {
       final response = await ApiClient.get('/Category/$name');
-      return await ApiResponseHelper.parseRaw<Map<String, dynamic>>(
+      return ApiResponseHelper.parseRaw<Map<String, dynamic>>(
         response,
         errorMessage: 'Error fetching category by name',
       );
@@ -43,7 +43,7 @@ class CategoryService {
   static Future<Map<String, dynamic>?> getCategoryById(String id) async {
     try {
       final response = await ApiClient.get('/Category/byId/$id');
-      return await ApiResponseHelper.parseRaw<Map<String, dynamic>>(
+      return ApiResponseHelper.parseRaw<Map<String, dynamic>>(
         response,
         errorMessage: 'Error fetching category by id',
       );
@@ -59,7 +59,7 @@ class CategoryService {
   static Future<List<dynamic>?> getArticlesByCategory(String categoryId) async {
     try {
       final response = await ApiClient.get('/Category/articles/$categoryId');
-      return await ApiResponseHelper.parseRaw<List<dynamic>>(
+      return ApiResponseHelper.parseRaw<List<dynamic>>(
         response,
         errorMessage: 'Error fetching articles by category',
       );
@@ -75,7 +75,7 @@ class CategoryService {
   static Future<String?> createOrUpdateCategory(Map<String, dynamic> categoryData) async {
     try {
       final response = await ApiClient.post('/Category/CreateOrUpdate', body: categoryData);
-      return await ApiResponseHelper.parseString(
+      return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error creating or updating category',
       );
@@ -91,7 +91,7 @@ class CategoryService {
   static Future<String?> deleteCategory(String name) async {
     try {
       final response = await ApiClient.get('/Category/Delete/$name');
-      return await ApiResponseHelper.parseString(
+      return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error deleting category',
       );
@@ -107,7 +107,7 @@ class CategoryService {
   static Future<String?> updateCategoryOrder(String name, int order) async {
     try {
       final response = await ApiClient.post('/Category/UpdateOrder/$name/$order');
-      return await ApiResponseHelper.parseString(
+      return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error updating category order',
       );
@@ -125,7 +125,7 @@ class CategoryService {
   static Future<String?> updateCategoryOrders(Map<String, int> orders) async {
     try {
       final response = await ApiClient.post('/Category/UpdateOrders', body: orders);
-      return await ApiResponseHelper.parseString(
+      return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error updating category orders',
       );
