@@ -19,7 +19,6 @@ import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 
 import 'package:ios_club_app/ui/pages/settingPages/todo_list_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/gradient_icon.dart';
 import 'package:ios_club_app/ui/pages/settingPages/haptic_feedback_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
@@ -87,7 +86,6 @@ class SettingPage extends StatelessWidget {
                 _buildSettingsGroup([
                   _buildTeamTile(isDark),
                   _buildLicenseTile(isDark),
-                  _buildClubTile(context, isDark),
                 ]),
                 const SizedBox(height: 24),
                 // 其他
@@ -177,7 +175,7 @@ class SettingPage extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '试着把建大囊括其中',
+          '试着把大学囊括其中',
           style: TextStyle(
             fontSize: 14,
             color: isDark
@@ -348,140 +346,6 @@ class SettingPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildClubTile(BuildContext context, bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () => _showClubDescription(context),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              GradientIcon(
-                size: 20,
-                icon: Icons.apple,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '关于社团',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'iOS Club of XAUAT',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.5)
-                            : CupertinoColors.secondaryLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 18,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : CupertinoColors.tertiaryLabel,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showClubDescription(BuildContext context) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showClubModalBottomSheet(
-        context,
-        Column(
-          children: [
-            Text(
-              '关于社团',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.1)
-                        : Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: const Image(
-                  image: AssetImage('assets/iOS_Club_Logo.webp'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'iOS Club of XAUAT',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.6)
-                    : CupertinoColors.secondaryLabel,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.3)
-                    : CupertinoColors.systemGrey6,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '西建大iOS众创空间俱乐部（别称为西建大iOS Club），是苹果公司和学校共同创办的创新创业类社团。成立于2019年9月。目前是全校较大和较为知名的科技类社团。',
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '西建大iOS众创空间俱乐部没有设备要求，或者说没有任何限制 —— 只要你喜欢数码，热爱编程，或者想要学习编程开发搞项目，就可以加入到西建大iOS众创空间俱乐部。',
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ));
   }
 
   Widget _buildLogoutTile(BuildContext context, bool isDark) {

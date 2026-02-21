@@ -18,54 +18,6 @@ class AuthorPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 联系方式
-            const SectionTitle(title: '联系方式'),
-            ClubCard(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(
-                      CupertinoIcons.mail,
-                      color: CupertinoColors.systemBlue,
-                    ),
-                    title: const Text('电子邮件'),
-                    subtitle: const Text('iosclubxauat@163.com'),
-                    trailing: const Icon(CupertinoIcons.chevron_right),
-                    onTap: () {
-                      _launchUrl('mailto:iosclubxauat@163.com');
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      CupertinoIcons.globe,
-                      color: CupertinoColors.activeGreen,
-                    ),
-                    title: const Text('官方网站'),
-                    subtitle: const Text('https://www.xauat.site'),
-                    trailing: const Icon(CupertinoIcons.chevron_right),
-                    onTap: () {
-                      _launchUrl('https://www.xauat.site');
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.gite,
-                      color: CupertinoColors.systemOrange,
-                    ),
-                    title: const Text('Gitee'),
-                    subtitle: const Text('https://gitee.com/XAUATiOSClub'),
-                    trailing: const Icon(CupertinoIcons.chevron_right),
-                    onTap: () {
-                      _launchUrl('https://gitee.com/XAUATiOSClub');
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // 特别感谢
-            const SectionTitle(title: '特别感谢'),
             ClubCard(
                 padding: const EdgeInsets.all(16),
                 child: Column(
