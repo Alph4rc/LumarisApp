@@ -7,6 +7,8 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/user_data.dart';
 import 'prefs_keys.dart';
 
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
+
 class UserStore extends GetxController {
   static UserStore get to => Get.find();
 
@@ -69,13 +71,16 @@ class UserStore extends GetxController {
     _isLogin.value = false;
 
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
+    
     await prefs.remove(PrefsKeys.USER_DATA);
     await prefs.remove(PrefsKeys.COURSE_LAST_FETCH_TIME);
     await prefs.remove(PrefsKeys.EXAM_DATA);
     await prefs.remove(PrefsKeys.INFO_DATA);
     await prefs.remove(PrefsKeys.COURSE_DATA);
-    await prefs.remove(PrefsKeys.USERNAME);
-    await prefs.remove(PrefsKeys.PASSWORD);
+    
+    await secureStorage.delete(key: PrefsKeys.USERNAME);
+    await secureStorage.delete(key: PrefsKeys.PASSWORD);
 
     final courseStore = Get.put(CourseStore());
     courseStore.clearCourseData();
@@ -97,9 +102,12 @@ class UserStore extends GetxController {
     _isLoginMember.value = false;
 
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
+    
     await prefs.remove(PrefsKeys.MEMBER_DATA);
-    await prefs.remove(PrefsKeys.MEMBER_JWT);
-    await prefs.remove(PrefsKeys.CLUB_NAME);
-    await prefs.remove(PrefsKeys.CLUB_ID);
+    
+    await secureStorage.delete(key: PrefsKeys.MEMBER_JWT);
+    await secureStorage.delete(key: PrefsKeys.CLUB_NAME);
+    await secureStorage.delete(key: PrefsKeys.CLUB_ID);
   }
 }

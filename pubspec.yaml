@@ -49,6 +49,7 @@ dependencies:
   mpflutter_build_tools: ^2.7.5
   mpflutter_wechat_api: ^2.2.3
   mpflutter_wechat_mapview: ^0.0.3
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:

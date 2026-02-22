@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
 import 'package:ios_club_app/features/club/models/student_model.dart';
@@ -37,8 +37,8 @@ class AuthService {
         errorMessage: 'Login failed',
       );
       if (jwt != null) {
-        final prefs = PrefsService.instance;
-        await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
+        final secureStorage = SecureStorageService.instance;
+        await secureStorage.write(key: PrefsKeys.MEMBER_JWT, value: jwt);
         return jwt;
       }
     } catch (e) {
@@ -202,8 +202,8 @@ class AuthService {
         errorMessage: 'Error refreshing token',
       );
       if (jwt != null) {
-        final prefs = PrefsService.instance;
-        await prefs.setString(PrefsKeys.MEMBER_JWT, jwt);
+        final secureStorage = SecureStorageService.instance;
+        await secureStorage.write(key: PrefsKeys.MEMBER_JWT, value: jwt);
       }
       return jwt;
     } catch (e) {

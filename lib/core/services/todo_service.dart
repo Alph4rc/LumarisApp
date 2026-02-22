@@ -7,6 +7,8 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/todo_item.dart';
 
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
+
 /// 待办事项服务类
 ///
 /// 提供本地和云端待办事项的管理功能，包括获取、设置和同步待办事项列表
@@ -28,8 +30,9 @@ class TodoService {
   /// [list] 需要保存的待办事项列表
   static Future<void> setTodoList(List<TodoItem> list) async {
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.TODO_DATA);
-    final String? username = prefs.getString(PrefsKeys.USERNAME);
+    final String? username = await secureStorage.read(key: PrefsKeys.USERNAME);
 
     if (username != null) {
       final Map<String, dynamic> jsonList =
@@ -47,8 +50,9 @@ class TodoService {
   /// 从 SharedPreferences 中读取当前用户的待办事项列表
   static Future<List<TodoItem>> getLocalTodoList() async {
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
     final String? jsonString = prefs.getString(PrefsKeys.TODO_DATA);
-    final String? username = prefs.getString(PrefsKeys.USERNAME);
+    final String? username = await secureStorage.read(key: PrefsKeys.USERNAME);
 
     if (jsonString != null && username != null) {
       final List<TodoItem> list = [];
@@ -74,6 +78,7 @@ class TodoService {
   /// 如果认证失败会尝试重新登录并再次请求
   static Future<List<TodoItem>> getClubTodoList() async {
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
     final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
 
     if (memberDataString == null || memberDataString.isEmpty) {
@@ -82,7 +87,7 @@ class TodoService {
 
     final memberData = jsonDecode(memberDataString);
 
-    var jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
+    var jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
 
     try {
       final response = await _dio.get(
@@ -101,7 +106,7 @@ class TodoService {
       if (e.response?.statusCode == 401) {
         if (await ClubService.loginMember(
             memberData['userName'], memberData['userId'])) {
-          jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
+          jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
 
           try {
             final retryResponse = await _dio.get(
@@ -149,13 +154,14 @@ class TodoService {
   /// 如果全部上传成功，则清除本地待办事项数据
   static Future<void> nowToUpdate() async {
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
     final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
 
     if (memberDataString == null || memberDataString.isEmpty) {
       return;
     }
 
-    var jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
+    var jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
 
     final list = await getLocalTodoList();
     var isOK = true;

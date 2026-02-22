@@ -18,10 +18,59 @@ import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
+
 /// 教务系统服务类
 /// 提供与教务系统相关的所有操作，包括数据刷新、登录、信息获取等
 /// 所有方法均为静态方法，可以直接调用
 class EduService {
+  /// 迁移旧的凭证数据到安全存储
+  static Future<void> migrateCredentials() async {
+    final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
+
+    // 迁移教务系统账号
+    final username = prefs.getString(PrefsKeys.USERNAME);
+    final password = prefs.getString(PrefsKeys.PASSWORD);
+
+    if (username != null && username.isNotEmpty) {
+      await secureStorage.write(key: PrefsKeys.USERNAME, value: username);
+      await prefs.remove(PrefsKeys.USERNAME);
+    }
+
+    if (password != null && password.isNotEmpty) {
+      await secureStorage.write(key: PrefsKeys.PASSWORD, value: password);
+      await prefs.remove(PrefsKeys.PASSWORD);
+    }
+
+    // 迁移社团账号
+    final clubName = prefs.getString(PrefsKeys.CLUB_NAME);
+    final clubId = prefs.getString(PrefsKeys.CLUB_ID);
+    final memberJwt = prefs.getString(PrefsKeys.MEMBER_JWT);
+
+    if (clubName != null && clubName.isNotEmpty) {
+      await secureStorage.write(key: PrefsKeys.CLUB_NAME, value: clubName);
+      await prefs.remove(PrefsKeys.CLUB_NAME);
+    }
+
+    if (clubId != null && clubId.isNotEmpty) {
+      await secureStorage.write(key: PrefsKeys.CLUB_ID, value: clubId);
+      await prefs.remove(PrefsKeys.CLUB_ID);
+    }
+
+    if (memberJwt != null && memberJwt.isNotEmpty) {
+      await secureStorage.write(key: PrefsKeys.MEMBER_JWT, value: memberJwt);
+      await prefs.remove(PrefsKeys.MEMBER_JWT);
+    }
+
+    // 迁移支付卡号
+    final paymentNum = prefs.getString(PrefsKeys.PAYMENT_NUM);
+    if (paymentNum != null && paymentNum.isNotEmpty) {
+      await secureStorage.write(key: PrefsKeys.PAYMENT_NUM, value: paymentNum);
+      await prefs.remove(PrefsKeys.PAYMENT_NUM);
+    }
+  }
+
   /// 清理所有教务系统相关的缓存数据
   /// 包括SharedPreferences中的缓存数据和HTTP请求层的缓存
   ///
@@ -56,6 +105,11 @@ class EduService {
       for (final key in eduKeys) {
         await prefs.remove(key);
       }
+
+      // 清除安全存储中的用户名密码
+      // 注意：通常不建议清除用户名，方便用户下次登录，但如果这是完全退出或切换账号，则可能需要清除
+      // 这里 clearEduCache 通常在登录新账号前调用，所以不清除用户名密码可能是为了保留记录
+      // 但如果用户显式退出，应该在 logout 方法中清除
 
       AppLogger.debug('[EduService] SharedPreferences 缓存清理完成');
 
@@ -154,14 +208,21 @@ class EduService {
   }
 
   /// 登录用户
-  /// 从SharedPreferences中读取用户名和密码，然后尝试登录
+  /// 从 SecureStorageService 中读取用户名和密码，然后尝试登录
   ///
   /// @return Future<bool> 返回是否登录成功
   static Future<bool> login() async {
     try {
       final prefs = PrefsService.instance;
-      final String? username = prefs.getString(PrefsKeys.USERNAME);
-      final String? password = prefs.getString(PrefsKeys.PASSWORD);
+      final secureStorage = SecureStorageService.instance;
+
+      // 尝试迁移旧数据
+      await migrateCredentials();
+
+      final String? username =
+          await secureStorage.read(key: PrefsKeys.USERNAME);
+      final String? password =
+          await secureStorage.read(key: PrefsKeys.PASSWORD);
 
       if (username == null || password == null) {
         return false;

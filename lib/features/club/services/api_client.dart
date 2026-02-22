@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -21,8 +21,8 @@ class ApiClient {
   /// 获取请求头
   static Future<Map<String, dynamic>> _getAuthHeaders() async {
     final headers = <String, dynamic>{};
-    final prefs = PrefsService.instance;
-    final jwt = prefs.getString(PrefsKeys.MEMBER_JWT);
+    final secureStorage = SecureStorageService.instance;
+    final jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
     if (jwt != null) {
       headers['Authorization'] = 'Bearer $jwt';
     }

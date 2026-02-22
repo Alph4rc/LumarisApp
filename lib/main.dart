@@ -20,6 +20,7 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'main_app.dart';
+import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
 import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
@@ -47,6 +48,9 @@ void main() async {
 
   // 初始化 SharedPreferences（最先初始化，其他服务可能依赖它）
   await PrefsService.init();
+
+  // 尝试迁移旧的凭证数据到安全存储
+  await EduService.migrateCredentials();
 
   // 初始化性能监控
   PerformanceMonitor().initialize();

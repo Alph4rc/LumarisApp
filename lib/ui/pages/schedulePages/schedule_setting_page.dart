@@ -10,12 +10,14 @@ import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 
 class ScheduleSettingPage extends StatefulWidget {
   const ScheduleSettingPage({super.key});
@@ -49,9 +51,9 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Future<void> _loadCredentials() async {
     try {
-      final prefs = PrefsService.instance;
-      final username = prefs.getString('username');
-      final password = prefs.getString('password');
+      final secureStorage = SecureStorageService.instance;
+      final username = await secureStorage.read(key: PrefsKeys.USERNAME);
+      final password = await secureStorage.read(key: PrefsKeys.PASSWORD);
 
       if (username != null && password != null) {
         setState(() {

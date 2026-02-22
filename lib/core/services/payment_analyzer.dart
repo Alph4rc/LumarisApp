@@ -1,6 +1,6 @@
-import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
 /// 支付数据模型类
 /// 包含支付记录列表和总金额
@@ -116,15 +116,15 @@ class PaymentAnalyzer {
   ///
   /// [a] 卡号
   static Future<void> setPayment(String a) async {
-    final prefs = PrefsService.instance;
-    await prefs.setString(PrefsKeys.PAYMENT_NUM, a);
+    final secureStorage = SecureStorageService.instance;
+    await secureStorage.write(key: PrefsKeys.PAYMENT_NUM, value: a);
   }
 
   /// 从本地获取已存储的支付卡号
   ///
   /// 返回存储的卡号，如果未存储则返回空字符串
   static Future<String> getPayment() async {
-    final prefs = PrefsService.instance;
-    return prefs.getString(PrefsKeys.PAYMENT_NUM) ?? '';
+    final secureStorage = SecureStorageService.instance;
+    return await secureStorage.read(key: PrefsKeys.PAYMENT_NUM) ?? '';
   }
 }

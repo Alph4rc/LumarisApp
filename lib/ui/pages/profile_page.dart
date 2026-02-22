@@ -10,13 +10,14 @@ import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/study_credit_card.dart';
+
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -41,9 +42,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _checkLoginStatus() async {
     // 检查是否已有登录信息
-    final prefs = PrefsService.instance;
-    final username = prefs.getString(PrefsKeys.USERNAME);
-    final iosName = prefs.getString(PrefsKeys.CLUB_NAME);
+    final secureStorage = SecureStorageService.instance;
+    final username = await secureStorage.read(key: PrefsKeys.USERNAME);
+    final iosName = await secureStorage.read(key: PrefsKeys.CLUB_NAME);
 
     // 重置 _username
     _username = '';

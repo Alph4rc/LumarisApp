@@ -15,6 +15,8 @@ import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -206,16 +208,17 @@ class _LoginPageState extends State<LoginPage> {
   /// 保存登录信息
   Future<void> _saveLoginInfo() async {
     final prefs = PrefsService.instance;
+    final secureStorage = SecureStorageService.instance;
 
     if (_isOnlyLoginMember) {
       // 仅登录社团账号
-      await prefs.setString(PrefsKeys.CLUB_NAME, _usernameController.text);
-      await prefs.setString(PrefsKeys.CLUB_ID, _passwordController.text);
+      await secureStorage.write(key: PrefsKeys.CLUB_NAME, value: _usernameController.text);
+      await secureStorage.write(key: PrefsKeys.CLUB_ID, value: _passwordController.text);
       userStore.setLoginMember();
     } else if (!_isOnlyLoginMember && !_isLoginMember) {
       // 仅登录教务系统
-      await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
-      await prefs.setString(PrefsKeys.PASSWORD, _passwordController.text);
+      await secureStorage.write(key: PrefsKeys.USERNAME, value: _usernameController.text);
+      await secureStorage.write(key: PrefsKeys.PASSWORD, value: _passwordController.text);
       final userDataString = prefs.getString(PrefsKeys.USER_DATA);
       if (userDataString != null) {
         final userData = jsonDecode(userDataString);
@@ -225,8 +228,8 @@ class _LoginPageState extends State<LoginPage> {
 
     // 同时登录两个账号的情况
     if (_isLoginMember) {
-      await prefs.setString(PrefsKeys.CLUB_NAME, _nameController.text);
-      await prefs.setString(PrefsKeys.CLUB_ID, _passwordController.text);
+      await secureStorage.write(key: PrefsKeys.CLUB_NAME, value: _nameController.text);
+      await secureStorage.write(key: PrefsKeys.CLUB_ID, value: _passwordController.text);
       userStore.setLoginMember();
     }
   }

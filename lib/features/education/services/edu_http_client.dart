@@ -11,6 +11,7 @@ import '../../../core/config/api_config.dart';
 import '../../../core/services/auth_state_notifier.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
 class EduHttpClient {
   final Dio _dio;
@@ -213,8 +214,9 @@ class EduHttpClient {
   Future<bool> _reLogin() async {
     try {
       final prefs = PrefsService.instance;
-      final username = prefs.getString(PrefsKeys.USERNAME);
-      final password = prefs.getString(PrefsKeys.PASSWORD);
+      final secureStorage = SecureStorageService.instance;
+      final username = await secureStorage.read(key: PrefsKeys.USERNAME);
+      final password = await secureStorage.read(key: PrefsKeys.PASSWORD);
 
       if (username == null || password == null) {
         return false;

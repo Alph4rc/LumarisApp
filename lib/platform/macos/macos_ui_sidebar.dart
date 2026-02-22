@@ -4,8 +4,9 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
 
+
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
 Sidebar macosUISidebar({
   required List<SidebarDestination> items,
@@ -134,18 +135,18 @@ Sidebar macosUISidebar({
 
 Future<String> _getUsername() async {
   final UserStore userStore = UserStore.to;
-  final prefs = PrefsService.instance;
+  final secureStorage = SecureStorageService.instance;
   var name = '未登录';
 
   if (userStore.isLogin) {
-    final iosName = prefs.getString(PrefsKeys.USERNAME);
+    final iosName = await secureStorage.read(key: PrefsKeys.USERNAME);
     if (iosName != null) {
       name = iosName;
     }
   }
 
   if (userStore.isLoginMember) {
-    final iosName = prefs.getString(PrefsKeys.CLUB_NAME);
+    final iosName = await secureStorage.read(key: PrefsKeys.CLUB_NAME);
     if (iosName != null) {
       name = iosName;
     }
