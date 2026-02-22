@@ -8,6 +8,7 @@ import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -142,18 +143,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Widget _buildCalendarSection(
       BuildContext context, bool isDark, Color? cardColor) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return ClubCard(
       child: Column(
         children: [
           ListTile(
@@ -240,50 +230,80 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Widget _buildManagementSection(
       BuildContext context, bool isDark, Color? cardColor) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return ClubCard(
       child: Column(
         children: [
-          ListTile(
-            leading: Icon(
-              Icons.edit_calendar_outlined,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-            ),
-            title: const Text(
-              '自定义课程管理',
-              style: TextStyle(fontSize: 16),
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () => Get.toNamed('/CustomCourseManage'),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.grid_on_outlined,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-            ),
-            title: const Text(
-              '显示课表网格线',
-              style: TextStyle(fontSize: 16),
-            ),
-            trailing: CupertinoSwitch(
-              value: settingsStore.showCourseGrid,
-              onChanged: (value) {
-                setState(() {
-                  settingsStore.setShowCourseGrid(value);
-                });
-              },
-            ),
-          ),
+          Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+              child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => Get.toNamed('/CustomCourseManage'),
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.edit_calendar_outlined,
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                '自定义课程管理',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.arrow_forward_ios, size: 16),
+                              const SizedBox(width: 8),
+                            ],
+                          )
+                        ],
+                      )))),
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.grid_on_outlined,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        '显示课表网格线',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      CupertinoSwitch(
+                        value: settingsStore.showCourseGrid,
+                        onChanged: (value) {
+                          setState(() {
+                            settingsStore.setShowCourseGrid(value);
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  )
+                ],
+              ))
         ],
       ),
     );
@@ -291,18 +311,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Widget _buildBackgroundSection(
       BuildContext context, bool isDark, Color? cardColor) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return ClubCard(
       child: Column(
         children: [
           _buildBackgroundOption('无背景', '', isDark),
@@ -340,17 +349,17 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   Widget _buildBackgroundOption(String title, String value, bool isDark) {
     final isSelected = settingsStore.scheduleBackground == value;
     return Material(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(20),
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         onTap: () {
           setState(() {
             settingsStore.setScheduleBackground(value);
           });
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -379,18 +388,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Widget _buildIgnoreCourseSection(
       BuildContext context, bool isDark, Color? cardColor) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return ClubCard(
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -565,19 +563,30 @@ class CourseIgnoreItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return ListTile(
-      leading: Icon(
-        ignore.isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
-        color: ignore.isCompleted
-            ? Theme.of(context).colorScheme.primary
-            : (isDark ? Colors.grey[600] : Colors.grey[400]),
-      ),
-      title: Text(
-        ignore.title,
-        style: const TextStyle(fontSize: 16),
-      ),
-      onTap: () => onChanged(ignore, !ignore.isCompleted),
-    );
+    return Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => onChanged(ignore, !ignore.isCompleted),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Icon(
+                    ignore.isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+                    color: ignore.isCompleted
+                        ? Theme.of(context).colorScheme.primary
+                        : (isDark ? Colors.grey[600] : Colors.grey[400]),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    ignore.title,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            )));
   }
 }
 
