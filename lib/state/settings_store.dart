@@ -3,6 +3,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'prefs_keys.dart';
 import '../core/config/api_config.dart';
 import '../features/education/services/edu_http_client_manager.dart';
+import '../features/education/services/edu_service.dart';
 
 class SettingsStore extends GetxController {
   static SettingsStore get to => Get.find();
@@ -214,10 +215,14 @@ class SettingsStore extends GetxController {
     }
 
     // 清除与学校相关的缓存数据
+    // 使用 EduService.clearEduCache() 统一清理逻辑
+    await EduService.clearEduCache();
+    
+    // 额外清理可能未被 EduService 覆盖的旧 Key (如果有)
     await _clearSchoolRelatedData();
   }
 
-  /// 清除学校相关的缓存数据
+  /// 清除学校相关的缓存数据 (保留作为辅助清理)
   Future<void> _clearSchoolRelatedData() async {
     final prefs = PrefsService.instance;
 

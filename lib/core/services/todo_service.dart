@@ -41,6 +41,21 @@ class TodoService {
     }
   }
 
+  /// 清除本地待办事项数据
+  static Future<void> clearLocalData() async {
+    try {
+      final secureStorage = SecureStorageService.instance;
+      final String? username = await secureStorage.read(key: PrefsKeys.USERNAME);
+      
+      if (username != null) {
+        final box = await _getBox();
+        await box.delete(username);
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to clear local todo data', error: e, stackTrace: stackTrace);
+    }
+  }
+
   /// 从本地存储获取待办事项列表
   ///
   /// 从 Hive 中读取当前用户的待办事项列表

@@ -23,6 +23,8 @@ import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
+import 'package:ios_club_app/core/services/todo_service.dart';
+
 /// 教务系统服务类
 /// 提供与教务系统相关的所有操作，包括数据刷新、登录、信息获取等
 /// 所有方法均为静态方法，可以直接调用
@@ -108,13 +110,20 @@ class EduService {
       for (final key in eduKeys) {
         await prefs.remove(key);
       }
-
+      AppLogger.debug('[EduService] SharedPreferences 缓存清理完成');
       // 清除安全存储中的用户名密码
       // 注意：通常不建议清除用户名，方便用户下次登录，但如果这是完全退出或切换账号，则可能需要清除
       // 这里 clearEduCache 通常在登录新账号前调用，所以不清除用户名密码可能是为了保留记录
       // 但如果用户显式退出，应该在 logout 方法中清除
 
-      AppLogger.debug('[EduService] SharedPreferences 缓存清理完成');
+      // 清除 Hive 中的业务数据
+      await CourseRepository().clear();
+      await ScoreRepository().clear();
+      await TodoService.clearLocalData();
+
+      AppLogger.debug('[EduService] Hive 业务数据清理完成');
+
+
 
       // 清理 HTTP 请求层的缓存（教务系统相关）
       await RequestCache().deleteByPattern(RegExp(r'.*/course.*'));
