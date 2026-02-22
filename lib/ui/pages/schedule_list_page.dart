@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/utils/image_helper.dart';
 
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
@@ -20,7 +21,7 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
 // 条件导入 dart:io，仅在非 Web 环境中使用
-import 'dart:io' if (dart.library.html) 'dart:html' as io;
+// import 'dart:io' if (dart.library.html) 'dart:html' as io;
 
 /// 课表列表页面
 ///
@@ -363,29 +364,15 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
       );
     }
 
-    // 本地文件图片（仅在非 Web 环境中支持）
-    if (!kIsWeb) {
-      try {
-        final file = io.File(imagePath);
-        if (file.existsSync()) {
-          return Image.file(
-            file,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-              );
-            },
-          );
-        }
-      } catch (e) {
-        // 文件访问失败，返回默认背景
-      }
-    }
-
-    // 如果图片加载失败或在 Web 环境中，返回默认背景
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+    // 本地文件图片（使用 image_helper 处理平台差异）
+    return getLocalImage(
+      imagePath,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+        );
+      },
     );
   }
 

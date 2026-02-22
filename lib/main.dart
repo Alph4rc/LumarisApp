@@ -27,8 +27,6 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
 import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
 
-import 'package:ios_club_app/core/services/hive_manager.dart';
-
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,9 +1,20 @@
+import 'package:hive/hive.dart';
+
+part 'todo_item.g.dart';
+
+@HiveType(typeId: 4)
 class TodoItem {
+  @HiveField(0)
   String id;
+  @HiveField(1)
   String title;
+  @HiveField(2)
   String deadline;
+  @HiveField(3)
   bool isCompleted;
+  @HiveField(4)
   String? description;
+  @HiveField(5)
   String? key;
 
   TodoItem({

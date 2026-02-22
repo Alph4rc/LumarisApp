@@ -1,13 +1,25 @@
+import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/models/semester_model.dart';
 
+part 'score_model.g.dart';
+
+@HiveType(typeId: 1)
 class ScoreModel {
+  @HiveField(0)
   String name;
+  @HiveField(1)
   String lessonCode;
+  @HiveField(2)
   String lessonName;
+  @HiveField(3)
   String grade;
+  @HiveField(4)
   String gpa;
+  @HiveField(5)
   String gradeDetail;
+  @HiveField(6)
   String credit;
+  @HiveField(7)
   bool isMinor;
 
   ScoreModel({
@@ -49,8 +61,11 @@ class ScoreModel {
   }
 }
 
+@HiveType(typeId: 2)
 class ScoreList {
+  @HiveField(0)
   List<ScoreModel> list;
+  @HiveField(1)
   SemesterModel semester;
 
   Map<String, dynamic> toJson() {

@@ -1,42 +1,59 @@
+import 'package:hive/hive.dart';
+
+part 'course_model.g.dart';
+
 /// 课程模型类
 ///
 /// 用于表示课程的详细信息，包括课程名称、上课时间、地点、教师等。
 /// 是应用中核心的数据结构之一，用于课程表展示、查询和管理。
+@HiveType(typeId: 0)
 class CourseModel {
   /// 课程周次索引列表，例如：[1, 2, 3, 5, 6] 表示第1-3周和第5-6周上课
+  @HiveField(0)
   List<int> weekIndexes = [];
 
   /// 授课教师列表
+  @HiveField(1)
   List<String> teachers = [];
 
   /// 上课地点
+  @HiveField(2)
   String room = '';
 
   /// 课程名称
+  @HiveField(3)
   String courseName = '';
 
   /// 课程代码
+  @HiveField(4)
   String courseCode = '';
 
   /// 星期几上课（0-6，0表示周一，6表示周日）
+  @HiveField(5)
   int weekday = 0;
 
   /// 开始上课的节次（例如：1表示第1节课）
+  @HiveField(6)
   int startUnit = 0;
 
   /// 结束上课的节次（例如：2表示第2节课结束）
+  @HiveField(7)
   int endUnit = 0;
 
   /// 课程学分
+  @HiveField(8)
   String credits = '';
 
   /// 课程ID
+  @HiveField(9)
   String lessonId = '';
 
   /// 上课校区
+  @HiveField(10)
   String campus = '';
 
   /// 是否为自定义课程
+  @HiveField(11)
   bool isCustom = false;
 
   /// 创建一个新的课程实例
@@ -86,8 +103,8 @@ class CourseModel {
   /// @return 课程实例
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
-      weekIndexes: List<int>.from(json['weekIndexes'] ?? []),
-      teachers: List<String>.from(json['teachers'] ?? []),
+      weekIndexes: json['weekIndexes'] != null ? List<int>.from(json['weekIndexes']) : [],
+      teachers: json['teachers'] != null ? List<String>.from(json['teachers']) : [],
       room: json['room'] ?? '',
       courseName: json['courseName'] ?? '',
       courseCode: json['courseCode'] ?? '',

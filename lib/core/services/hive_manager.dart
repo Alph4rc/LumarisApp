@@ -1,5 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/core/models/score_model.dart';
+import 'package:ios_club_app/core/models/semester_model.dart';
+import 'package:ios_club_app/core/models/todo_item.dart';
 
 /// Hive 数据库管理类
 ///
@@ -24,10 +28,14 @@ class HiveManager {
     try {
       await Hive.initFlutter();
       
-      // 可以在这里注册 Adapters
-      // Hive.registerAdapter(CourseModelAdapter());
+      // 注册 Adapters
+      Hive.registerAdapter(CourseModelAdapter());
+      Hive.registerAdapter(ScoreModelAdapter());
+      Hive.registerAdapter(ScoreListAdapter());
+      Hive.registerAdapter(SemesterModelAdapter());
+      Hive.registerAdapter(TodoItemAdapter());
       
-      AppLogger.info('Hive initialized successfully');
+      AppLogger.info('Hive initialized successfully with adapters');
     } catch (e, stackTrace) {
       AppLogger.error('Failed to initialize Hive', error: e, stackTrace: stackTrace);
     }
