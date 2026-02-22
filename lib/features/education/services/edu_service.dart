@@ -16,11 +16,63 @@ import 'package:ios_club_app/core/models/plan_course.dart';
 import 'edu_api_client.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
 
 /// 教务系统服务类
 /// 提供与教务系统相关的所有操作，包括数据刷新、登录、信息获取等
 /// 所有方法均为静态方法，可以直接调用
 class EduService {
+  /// 清理所有教务系统相关的缓存数据
+  /// 包括SharedPreferences中的缓存数据和HTTP请求层的缓存
+  ///
+  /// 该方法应该在用户登录新账号前调用，以避免显示旧用户的数据
+  static Future<void> clearEduCache() async {
+    try {
+      final prefs = PrefsService.instance;
+
+      AppLogger.debug('[EduService] 开始清理教务系统缓存');
+
+      // 清理 SharedPreferences 中的教务相关数据
+      final eduKeys = [
+        PrefsKeys.USER_DATA,
+        PrefsKeys.LAST_FETCH_TIME,
+        PrefsKeys.COURSE_DATA,
+        PrefsKeys.IGNORE_DATA,
+        PrefsKeys.COURSE_LAST_FETCH_TIME,
+        PrefsKeys.SEMESTER_DATA,
+        PrefsKeys.SEMESTER_TIME,
+        PrefsKeys.ALL_SCORE_DATA,
+        PrefsKeys.LAST_SCORE_TIME,
+        PrefsKeys.THIS_SEMESTER_DATA,
+        PrefsKeys.EXAM_DATA,
+        PrefsKeys.EXAM_TIME,
+        PrefsKeys.TIME_DATA,
+        PrefsKeys.TIME_LAST_UPDATED,
+        PrefsKeys.INFO_DATA,
+        PrefsKeys.INFO_DATA_TIME,
+        '${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS',
+      ];
+
+      for (final key in eduKeys) {
+        await prefs.remove(key);
+      }
+
+      AppLogger.debug('[EduService] SharedPreferences 缓存清理完成');
+
+      // 清理 HTTP 请求层的缓存（教务系统相关）
+      await RequestCache().deleteByPattern(RegExp(r'.*/course.*'));
+      await RequestCache().deleteByPattern(RegExp(r'.*/score.*'));
+      await RequestCache().deleteByPattern(RegExp(r'.*/exam.*'));
+      await RequestCache().deleteByPattern(RegExp(r'.*/semester.*'));
+      await RequestCache().deleteByPattern(RegExp(r'.*/program.*'));
+      await RequestCache().deleteByPattern(RegExp(r'.*/info.*'));
+      await RequestCache().deleteByPattern(RegExp(r'.*/time.*'));
+
+      AppLogger.debug('[EduService] HTTP 请求层缓存清理完成');
+    } catch (e, stackTrace) {
+      AppLogger.error('清理教务系统缓存失败', error: e, stackTrace: stackTrace);
+    }
+  }
 
   /// 刷新所有数据
   /// 该方法会执行登录、获取学期信息、时间信息、课程信息、考试信息和完成情况等操作
@@ -67,6 +119,9 @@ class EduService {
     if (username.isEmpty || password.isEmpty) {
       return false;
     }
+
+    // 在登录前清理旧用户的缓存数据
+    await clearEduCache();
 
     final prefs = PrefsService.instance;
 
@@ -119,7 +174,8 @@ class EduService {
       final preNow = DateTime.now().millisecondsSinceEpoch;
       final response = await LoginService.login(username, password);
       if (kDebugMode) {
-        AppLogger.debug('登录用时: ${DateTime.now().millisecondsSinceEpoch - preNow}');
+        AppLogger.debug(
+            '登录用时: ${DateTime.now().millisecondsSinceEpoch - preNow}');
       }
 
       if (response["success"] == true) {
@@ -232,9 +288,7 @@ class EduService {
       {UserData? userData, bool isRefresh = false}) async {
     final time = await DataService.getTime();
     final week = await DataService.getWeek();
-    if (!isRefresh &&
-        (time.startTime == null ||
-            time.endTime == null)) {
+    if (!isRefresh && (time.startTime == null || time.endTime == null)) {
       return;
     }
 
@@ -263,14 +317,15 @@ class EduService {
 
     try {
       final response = await EduApiClient.getCourse(cookieData.studentId);
-      
+
       // 即使是空数组也需要更新，因为可能原本有课现在退课了，或者学期切换了
       // 存储到本地
       await prefs.setString(
           PrefsKeys.COURSE_DATA, jsonEncode(jsonDecode(response)));
       await DataService.setIgnore([]);
       // 更新课程数据刷新时间
-      await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME,
+          DateTime.now().millisecondsSinceEpoch);
     } catch (e, stackTrace) {
       AppLogger.error('获取课程信息失败', error: e, stackTrace: stackTrace);
     }
@@ -291,7 +346,8 @@ class EduService {
       final list = await DataService.getSemester();
       final Map<String, String> json = {};
       for (var item in list) {
-        final response = await EduApiClient.getScore(cookieData.studentId, item.semester);
+        final response =
+            await EduApiClient.getScore(cookieData.studentId, item.semester);
         json[item.semester] = response;
       }
       final prefs = PrefsService.instance;
@@ -312,9 +368,10 @@ class EduService {
     final String? jsonString = prefs.getString(PrefsKeys.ALL_SCORE_DATA);
     var now = DateTime.now().millisecondsSinceEpoch;
     final semesters = await DataService.getSemester();
-    final Map<String, dynamic> cachedScores = jsonString != null && jsonString.isNotEmpty 
-        ? jsonDecode(jsonString) 
-        : {};
+    final Map<String, dynamic> cachedScores =
+        jsonString != null && jsonString.isNotEmpty
+            ? jsonDecode(jsonString)
+            : {};
 
     UserData? cookieData = await getUserData();
     if (cookieData == null) {
@@ -324,31 +381,35 @@ class EduService {
 
     // 缓存检查和增量更新
     final Map<String, String> updatedScores = {};
-    
+
     // 获取每个学期的缓存时间戳
-    final String? scoreTimestampsString = prefs.getString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS');
-    final Map<String, int> scoreTimestamps = scoreTimestampsString != null 
-        ? Map<String, int>.from(jsonDecode(scoreTimestampsString)) 
+    final String? scoreTimestampsString =
+        prefs.getString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS');
+    final Map<String, int> scoreTimestamps = scoreTimestampsString != null
+        ? Map<String, int>.from(jsonDecode(scoreTimestampsString))
         : {};
 
     // 确定需要更新的学期
     final List<dynamic> semestersToUpdate = [];
-    
+
     // 按学期排序，最新学期在前
     final sortedSemesters = List.from(semesters);
     sortedSemesters.sort((a, b) => b.semester.compareTo(a.semester));
-    
+
     for (var semester in sortedSemesters) {
       final lastUpdate = scoreTimestamps[semester.semester];
-      
+
       // 为不同学期设置不同的缓存过期时间
       // 最新学期：1小时过期
       // 其他学期：7天过期
       final isLatestSemester = semester == sortedSemesters.first;
-      final expiryTime = isLatestSemester ? 1000 * 60 * 60 : 1000 * 60 * 60 * 24 * 7;
+      final expiryTime =
+          isLatestSemester ? 1000 * 60 * 60 : 1000 * 60 * 60 * 24 * 7;
       final isExpired = lastUpdate == null || now - lastUpdate > expiryTime;
-      
-      if (isRefresh || isExpired || !cachedScores.containsKey(semester.semester)) {
+
+      if (isRefresh ||
+          isExpired ||
+          !cachedScores.containsKey(semester.semester)) {
         semestersToUpdate.add(semester);
       }
     }
@@ -357,19 +418,22 @@ class EduService {
     if (semestersToUpdate.isNotEmpty) {
       try {
         for (var semester in semestersToUpdate) {
-          final response = await EduApiClient.getScore(cookieData.studentId, semester.semester);
+          final response = await EduApiClient.getScore(
+              cookieData.studentId, semester.semester);
           updatedScores[semester.semester] = response;
           // 更新时间戳
           scoreTimestamps[semester.semester] = now;
         }
-        
+
         // 合并更新的数据到缓存
         final Map<String, dynamic> mergedScores = Map.from(cachedScores);
         mergedScores.addAll(updatedScores);
-        
+
         // 保存更新后的数据和时间戳
-        await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(mergedScores));
-        await prefs.setString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS', jsonEncode(scoreTimestamps));
+        await prefs.setString(
+            PrefsKeys.ALL_SCORE_DATA, jsonEncode(mergedScores));
+        await prefs.setString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS',
+            jsonEncode(scoreTimestamps));
         await prefs.setInt(PrefsKeys.LAST_SCORE_TIME, now);
 
         return _buildScoreListFromCache(mergedScores, semesters);
@@ -377,7 +441,7 @@ class EduService {
         AppLogger.error('获取成绩数据失败', error: e, stackTrace: stackTrace);
       }
     }
-    
+
     // 返回缓存数据
     return _buildScoreListFromCache(cachedScores, semesters);
   }
@@ -393,25 +457,24 @@ class EduService {
     cachedScores.forEach((String key, value) {
       // 查找匹配的学期
       final semesterMatch = semesters.firstWhere(
-        (x) => x.semester == key, 
+        (x) => x.semester == key,
         orElse: () => null,
       );
-      
+
       // 如果找到了匹配的学期，使用它；否则创建一个临时的学期对象
-      final semester = semesterMatch ?? {
-        'semester': key,
-        'name': key,
-      };
-      
+      final semester = semesterMatch ??
+          {
+            'semester': key,
+            'name': key,
+          };
+
       final scoreList = jsonDecode(value);
       list.add(ScoreList(
         semester: semester,
-        list: (scoreList as List)
-            .map((e) => ScoreModel.fromJson(e))
-            .toList(),
+        list: (scoreList as List).map((e) => ScoreModel.fromJson(e)).toList(),
       ));
     });
-    
+
     // 按学期顺序排序，最新学期在前
     list.sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
     return list;
@@ -489,7 +552,9 @@ class EduService {
       final now = DateTime.now();
       var result = BusModel.fromJson(jsonDecode(response));
       if (result.records.isNotEmpty &&
-          (dayDate == null || dayDate.isEmpty || dayDate == DateFormat('yyyy-MM-dd').format(now))) {
+          (dayDate == null ||
+              dayDate.isEmpty ||
+              dayDate == DateFormat('yyyy-MM-dd').format(now))) {
         result.records = result.records.where((element) {
           final split = element.runTime.split(':');
           if (split.length < 2) return false;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 /// Controls for entering and exiting tile edit mode
 class TileEditControls extends StatelessWidget {
@@ -110,35 +112,12 @@ class EmptyTilesMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.widgets_outlined,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '暂无快捷功能',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '请在编辑模式中添加',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
-          ),
-        ],
-      ),
+    return ClubCard(
+      margin: const EdgeInsets.all(16),
+      child: EmptyWidget(
+          title: '暂无快捷功能',
+          icon: Icons.widgets_outlined,
+          subtitle: '请在编辑模式中添加'),
     );
   }
 }
@@ -159,14 +138,9 @@ class AvailableTilesList extends StatelessWidget {
         return const SizedBox.shrink();
       }
 
-      return Container(
+      return ClubCard(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[300]!),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -203,8 +177,6 @@ class AvailableTilesList extends StatelessWidget {
       avatar: const Icon(Icons.add_circle_outline, size: 18),
       label: Text(tileId),
       onPressed: () => controller.toggleVisibility(tileId),
-      backgroundColor: Colors.white,
-      side: BorderSide(color: Colors.grey[400]!),
     );
   }
 }
