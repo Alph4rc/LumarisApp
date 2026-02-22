@@ -3,6 +3,7 @@ import 'bus_api.dart';
 import 'course_api.dart';
 import 'exam_api.dart';
 import 'info_api.dart';
+import '../models/login_response.dart';
 import 'login_api.dart';
 import 'payment_api.dart';
 import 'program_api.dart';
@@ -78,7 +79,7 @@ class EduApiClient {
   }
   
   /// 登录
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<LoginResponse> login(String username, String password) async {
     return await LoginApi.login(username, password);
   }
   

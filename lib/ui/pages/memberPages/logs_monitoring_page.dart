@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/features/club/services/logs_service.dart';
 import 'package:ios_club_app/features/club/services/monitoring_service.dart';
 import 'package:ios_club_app/features/club/services/ip_blacklist_service.dart';
+import 'package:ios_club_app/features/club/models/performance_data.dart';
+import 'package:ios_club_app/features/club/models/http_stats.dart';
+import 'package:ios_club_app/features/club/models/data_access_stats.dart';
+import 'package:ios_club_app/features/club/models/data_change_stats.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
@@ -445,8 +449,8 @@ class _PerformanceTabState extends State<_PerformanceTab>
   @override
   bool get wantKeepAlive => true;
 
-  Map<String, dynamic>? _performanceData;
-  Map<String, dynamic>? _httpStats;
+  PerformanceData? _performanceData;
+  HttpStats? _httpStats;
   bool _isLoading = true;
 
   @override
@@ -465,8 +469,8 @@ class _PerformanceTabState extends State<_PerformanceTab>
       ]);
 
       setState(() {
-        _performanceData = results[0];
-        _httpStats = results[1];
+        _performanceData = results[0] as PerformanceData?;
+        _httpStats = results[1] as HttpStats?;
         _isLoading = false;
       });
     } catch (e) {
@@ -503,21 +507,20 @@ class _PerformanceTabState extends State<_PerformanceTab>
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
-                        children: _performanceData!.entries.map((e) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(e.key),
-                                Text(
-                                  e.value.toString(),
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        children: [
+                          if (_performanceData!.cpuUsage != null)
+                            _buildStatRow('CPU使用率', '${(_performanceData!.cpuUsage! * 100).toStringAsFixed(1)}%'),
+                          if (_performanceData!.memoryUsage != null)
+                            _buildStatRow('内存使用率', '${(_performanceData!.memoryUsage! * 100).toStringAsFixed(1)}%'),
+                          if (_performanceData!.diskUsage != null)
+                            _buildStatRow('磁盘使用率', '${(_performanceData!.diskUsage! * 100).toStringAsFixed(1)}%'),
+                          if (_performanceData!.requestCount != null)
+                            _buildStatRow('请求数', _performanceData!.requestCount.toString()),
+                          if (_performanceData!.errorCount != null)
+                            _buildStatRow('错误数', _performanceData!.errorCount.toString()),
+                          if (_performanceData!.avgResponseTime != null)
+                            _buildStatRow('平均响应时间', '${_performanceData!.avgResponseTime!.toStringAsFixed(2)}ms'),
+                        ],
                       ),
                     ),
                   ),
@@ -534,27 +537,44 @@ class _PerformanceTabState extends State<_PerformanceTab>
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
-                        children: _httpStats!.entries.map((e) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(e.key),
-                                Text(
-                                  e.value.toString(),
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        children: [
+                          if (_httpStats!.totalRequests != null)
+                            _buildStatRow('总请求数', _httpStats!.totalRequests.toString()),
+                          if (_httpStats!.successfulRequests != null)
+                            _buildStatRow('成功请求', _httpStats!.successfulRequests.toString()),
+                          if (_httpStats!.failedRequests != null)
+                            _buildStatRow('失败请求', _httpStats!.failedRequests.toString()),
+                          if (_httpStats!.avgResponseTime != null)
+                            _buildStatRow('平均响应时间', '${_httpStats!.avgResponseTime!.toStringAsFixed(2)}ms'),
+                          if (_httpStats!.minResponseTime != null)
+                            _buildStatRow('最小响应时间', '${_httpStats!.minResponseTime!.toStringAsFixed(2)}ms'),
+                          if (_httpStats!.maxResponseTime != null)
+                            _buildStatRow('最大响应时间', '${_httpStats!.maxResponseTime!.toStringAsFixed(2)}ms'),
+                          if (_httpStats!.requestsPerSecond != null)
+                            _buildStatRow('每秒请求数', _httpStats!.requestsPerSecond.toString()),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ]),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -750,8 +770,8 @@ class _DataStatsTabState extends State<_DataStatsTab>
   bool get wantKeepAlive => true;
 
   String _entityType = 'Article';
-  Map<String, dynamic>? _accessStats;
-  Map<String, dynamic>? _changeStats;
+  DataAccessStats? _accessStats;
+  DataChangeStats? _changeStats;
   bool _isLoading = false;
 
   @override
@@ -770,8 +790,8 @@ class _DataStatsTabState extends State<_DataStatsTab>
       ]);
 
       setState(() {
-        _accessStats = results[0];
-        _changeStats = results[1];
+        _accessStats = results[0] as DataAccessStats?;
+        _changeStats = results[1] as DataChangeStats?;
         _isLoading = false;
       });
     } catch (e) {
@@ -824,7 +844,22 @@ class _DataStatsTabState extends State<_DataStatsTab>
                   ClubCard(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text(_accessStats.toString()),
+                      child: Column(
+                        children: [
+                          if (_accessStats!.totalAccessCount != null)
+                            _buildStatRow('总访问数', _accessStats!.totalAccessCount.toString()),
+                          if (_accessStats!.topAccessedEntities != null &&
+                              _accessStats!.topAccessedEntities!.isNotEmpty)
+                            const SizedBox(height: 12),
+                          if (_accessStats!.topAccessedEntities != null)
+                            ...(_accessStats!.topAccessedEntities!.map((entity) =>
+                                _buildStatRow(
+                                  entity.entityName ?? entity.entityId ?? '未知',
+                                  '访问 ${entity.accessCount} 次',
+                                ),
+                              )),
+                        ],
+                      ),
                     ),
                   ),
                 const SizedBox(height: 24),
@@ -837,13 +872,44 @@ class _DataStatsTabState extends State<_DataStatsTab>
                   ClubCard(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text(_changeStats.toString()),
+                      child: Column(
+                        children: [
+                          if (_changeStats!.totalChangeCount != null)
+                            _buildStatRow('总变更数', _changeStats!.totalChangeCount.toString()),
+                          if (_changeStats!.topChangedEntities != null &&
+                              _changeStats!.topChangedEntities!.isNotEmpty)
+                            const SizedBox(height: 12),
+                          if (_changeStats!.topChangedEntities != null)
+                            ...(_changeStats!.topChangedEntities!.map((entity) =>
+                                _buildStatRow(
+                                  entity.entityName ?? entity.entityId ?? '未知',
+                                  '变更 ${entity.changeCount} 次',
+                                ),
+                              )),
+                        ],
+                      ),
                     ),
                   ),
               ]),
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildStatRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 }

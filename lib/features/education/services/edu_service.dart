@@ -233,14 +233,13 @@ class EduService {
     final time = await DataService.getTime();
     final week = await DataService.getWeek();
     if (!isRefresh &&
-        (time["startTime"] == null ||
-            time["endTime"] == null ||
-            week["week"] == null)) {
+        (time.startTime == null ||
+            time.endTime == null)) {
       return;
     }
 
-    final startTime = DateTime.parse(time["startTime"]!);
-    final endTime = DateTime.parse(time["endTime"]!);
+    final startTime = DateTime.parse(time.startTime!);
+    final endTime = DateTime.parse(time.endTime!);
 
     if (!isRefresh &&
         (DateTime.now().isBefore(startTime) ||
@@ -252,9 +251,7 @@ class EduService {
     final String? jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
     if (jsonString != null &&
         jsonString.isNotEmpty &&
-        week["week"] != null &&
-        week["week"] is int &&
-        week["week"]! > 2 &&
+        week.week > 2 &&
         !isRefresh) {
       return;
     }

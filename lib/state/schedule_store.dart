@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/core/models/week_info.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -72,10 +73,10 @@ class ScheduleStore extends GetxController {
   }
 
   /// 处理周数据
-  void _handleWeekData(Map<String, dynamic> weekData) {
-    _currentWeek.value = weekData['week']!;
-    weekNow = weekData['week']!;
-    _maxWeek.value = weekData['maxWeek']!;
+  void _handleWeekData(WeekInfo weekData) {
+    _currentWeek.value = weekData.week;
+    weekNow = weekData.week;
+    _maxWeek.value = weekData.maxWeek;
     _currentPage.value = _currentWeek.value <= 0 ? 0 : _currentWeek.value;
   }
 

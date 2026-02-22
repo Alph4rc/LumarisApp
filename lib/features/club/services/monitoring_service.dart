@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
+import 'package:ios_club_app/features/club/models/performance_data.dart';
+import 'package:ios_club_app/features/club/models/http_stats.dart';
+import 'package:ios_club_app/features/club/models/data_access_stats.dart';
+import 'package:ios_club_app/features/club/models/data_change_stats.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 监控服务类
@@ -10,12 +14,14 @@ class MonitoringService {
   /// 获取性能监控数据
   ///
   /// @return 性能监控数据
-  static Future<Map<String, dynamic>?> getPerformance() async {
+  static Future<PerformanceData?> getPerformance() async {
     try {
       final response = await ApiClient.get('/Monitoring/performance');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
+        if (apiResponse['data'] != null) {
+          return PerformanceData.fromJson(apiResponse['data']);
+        }
       }
     } catch (e) {
       if (kDebugMode) {
@@ -28,12 +34,14 @@ class MonitoringService {
   /// 获取HTTP统计数据
   ///
   /// @return HTTP请求统计数据
-  static Future<Map<String, dynamic>?> getHttpStats() async {
+  static Future<HttpStats?> getHttpStats() async {
     try {
       final response = await ApiClient.get('/Monitoring/http-stats');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
+        if (apiResponse['data'] != null) {
+          return HttpStats.fromJson(apiResponse['data']);
+        }
       }
     } catch (e) {
       if (kDebugMode) {
@@ -48,7 +56,7 @@ class MonitoringService {
   /// @param entityType 实体类型（可选）
   /// @param top 返回前N条记录（默认为10）
   /// @return 数据访问统计信息
-  static Future<Map<String, dynamic>?> getDataAccessStats({
+  static Future<DataAccessStats?> getDataAccessStats({
     String? entityType,
     int top = 10,
   }) async {
@@ -68,7 +76,9 @@ class MonitoringService {
       final response = await ApiClient.get('/Monitoring/data-access-stats?$queryString');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
+        if (apiResponse['data'] != null) {
+          return DataAccessStats.fromJson(apiResponse['data']);
+        }
       }
     } catch (e) {
       if (kDebugMode) {
@@ -83,7 +93,7 @@ class MonitoringService {
   /// @param entityType 实体类型（可选）
   /// @param top 返回前N条记录（默认为10）
   /// @return 数据变更统计信息
-  static Future<Map<String, dynamic>?> getDataChangeStats({
+  static Future<DataChangeStats?> getDataChangeStats({
     String? entityType,
     int top = 10,
   }) async {
@@ -103,7 +113,9 @@ class MonitoringService {
       final response = await ApiClient.get('/Monitoring/data-change-stats?$queryString');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        return apiResponse['data'];
+        if (apiResponse['data'] != null) {
+          return DataChangeStats.fromJson(apiResponse['data']);
+        }
       }
     } catch (e) {
       if (kDebugMode) {

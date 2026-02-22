@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/models/info_model.dart';
 import 'package:ios_club_app/core/models/score_model.dart';
+import 'package:ios_club_app/core/models/week_info.dart';
+import 'package:ios_club_app/core/models/time_info.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
@@ -131,15 +133,15 @@ class DataService {
   /// 根据学期开始时间和结束时间计算当前是第几周以及学期总周数。
   ///
   /// @param isRefresh 是否强制刷新时间数据
-  /// @return 包含当前周数(week)和最大周数(maxWeek)的Map
-  static Future<Map<String, int>> getWeek({bool isRefresh = false}) async {
+  /// @return 包含当前周数(week)和最大周数(maxWeek)的WeekInfo
+  static Future<WeekInfo> getWeek({bool isRefresh = false}) async {
     final time = await getTime(isRefresh: isRefresh);
-    if (time["startTime"] == null) {
-      return {'week': 0, 'maxWeek': 0};
+    if (time.startTime == null) {
+      return WeekInfo(week: 0, maxWeek: 0);
     }
 
-    final startTime = DateTime.parse(time["startTime"]!);
-    final endTime = DateTime.parse(time["endTime"]!);
+    final startTime = DateTime.parse(time.startTime!);
+    final endTime = DateTime.parse(time.endTime!);
     final now = DateTime.now();
 
     // 获取某个日期所在周的周日（一周的第一天）
@@ -166,7 +168,7 @@ class DataService {
     final maxWeekDiff = endWeekSunday.difference(startWeekSunday).inDays ~/ 7;
     final maxWeek = maxWeekDiff + 1;
 
-    return {'week': week, 'maxWeek': maxWeek};
+    return WeekInfo(week: week, maxWeek: maxWeek);
   }
 
   /// 根据指定周数获取课程
@@ -180,7 +182,7 @@ class DataService {
     if (week == 0) {
       final time = await getTime();
       week = DateTime.now()
-                  .difference(DateTime.parse(time["startTime"]!))
+                  .difference(DateTime.parse(time.startTime!))
                   .inDays ~/
               7 +
           1;
@@ -201,11 +203,11 @@ class DataService {
     final allCourse = await getAllCourse();
     final time = await getTime();
     var now = DateTime.now();
-    if (time["startTime"] == null) {
+    if (time.startTime == null) {
       return (false, List<CourseModel>.unmodifiable([]));
     }
     var weekNow =
-        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
     var filteredCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
@@ -261,7 +263,7 @@ class DataService {
     final time = await getTime();
     var now = DateTime.now();
 
-    if (time["startTime"] == null) {
+    if (time.startTime == null) {
       return {
         'today': List<CourseModel>.unmodifiable([]),
         'tomorrow': List<CourseModel>.unmodifiable([])
@@ -270,7 +272,7 @@ class DataService {
 
     // 计算当前周数
     var weekNow =
-        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
 
     // 获取今天的课程
     var todayCourses = allCourse.where((course) {
@@ -391,14 +393,14 @@ class DataService {
   /// 如果数据超过24小时未更新，则自动从服务器刷新。
   ///
   /// @param isRefresh 是否强制刷新，默认为false
-  /// @return 包含时间信息的Map
-  static Future<Map<String, String>> getTime({bool isRefresh = false}) async {
+  /// @return 包含时间信息的TimeInfo
+  static Future<TimeInfo> getTime({bool isRefresh = false}) async {
     final prefs = PrefsService.instance;
     String? jsonString = prefs.getString(PrefsKeys.TIME_DATA);
     final timeLastUpdated = prefs.getInt(PrefsKeys.TIME_LAST_UPDATED);
     final now = DateTime.now().millisecondsSinceEpoch;
     final Map<String, String> list = {};
-    
+
     // 如果不是强制刷新，且数据在有效期内，则使用缓存
     if (!isRefresh &&
         jsonString != null &&
@@ -417,7 +419,7 @@ class DataService {
       });
     }
 
-    return list;
+    return TimeInfo.fromJson(list);
   }
 
   /// 获取信息列表
@@ -472,7 +474,7 @@ class DataService {
 
     final List<CourseTime> timeList = [];
     final weekCourses = allCourse.where((course) {
-      return course.weekIndexes.contains(weekData["week"]!);
+      return course.weekIndexes.contains(weekData.week);
     }).toList();
 
     for (var j = now.weekday; j < 7; j++) {

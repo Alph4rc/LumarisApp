@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/staff_service.dart';
 import 'package:ios_club_app/features/club/models/member_model.dart';
+import 'package:ios_club_app/core/models/member_info.dart';
 import 'package:ios_club_app/core/services/gzip_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -52,29 +53,26 @@ class ClubService {
 
   /// 获取成员信息
   /// 推荐使用 UserService.getUserData
-  static Future<Map<String, dynamic>> getMemberInfo() async {
+  static Future<MemberInfo> getMemberInfo() async {
     final prefs = PrefsService.instance;
-    final Map<String, dynamic> data = {};
     Map<String, dynamic> memberData = {};
     try {
       final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
       memberData = jsonDecode(memberDataString ?? '{}');
-      data['memberData'] = memberData;
     } catch (e) {
       if (kDebugMode) {
         AppLogger.error('Error fetching data: $e');
       }
       prefs.setString(PrefsKeys.MEMBER_DATA, '');
-      return {};
+      return MemberInfo(memberData: {}, info: null);
     }
-    data['memberData'] = memberData;
 
     final userData = await UserService.getUserData();
-    if (userData != null) {
-      data['info'] = userData;
-    }
 
-    return data;
+    return MemberInfo(
+      memberData: memberData,
+      info: userData,
+    );
   }
 
   /// 分页获取成员
