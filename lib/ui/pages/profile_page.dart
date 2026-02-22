@@ -31,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool _isLoading = true;
   String _username = '';
+  int _dataRefreshKey = 0;
 
   @override
   void initState() {
@@ -77,7 +78,13 @@ class _ProfilePageState extends State<ProfilePage> {
         arguments: {'isOnlyLoginMember': isOnlyLoginMember});
     // 如果登录成功返回 true
     if (result == true) {
-      _checkLoginStatus();
+      await _checkLoginStatus();
+      // 强制刷新数据
+      if (mounted) {
+        setState(() {
+          _dataRefreshKey++;
+        });
+      }
     }
   }
 
@@ -217,6 +224,7 @@ class _ProfilePageState extends State<ProfilePage> {
           if (userStore.isLogin) const SizedBox(height: 16),
           if (userStore.isLogin)
             FutureBuilder(
+                key: ValueKey('info_data_$_dataRefreshKey'),
                 // 添加超时保护：最多10秒
                 future: DataService.getInfoList().timeout(
                   const Duration(seconds: 10),
