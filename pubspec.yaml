@@ -88,13 +88,6 @@ flutter:
     - family: IconFont
       fonts:
         - asset: assets/iconfont/iconfont.ttf
-    - family: Roboto
-      fonts:
-        - asset: fonts/Roboto-Regular.ttf
-        - asset: fonts/Roboto-Bold.ttf
-    - family: Noto Sans SC
-      fonts:
-        - asset: fonts/NotoSansSC-Regular.ttf
 
 flutter_launcher_icons:
   android: "ic_launcher"
