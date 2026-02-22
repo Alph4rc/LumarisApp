@@ -20,11 +20,14 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'main_app.dart';
+import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
 import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
 import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
+
+import 'package:ios_club_app/core/services/hive_manager.dart';
 
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
@@ -32,6 +35,9 @@ void main() async {
 
   // 日志系统已就绪（AppLogger 是静态类，无需初始化）
   AppLogger.info('iOS Club App 启动中...');
+
+  // 初始化 Hive 数据库
+  await HiveManager.init();
 
   // 在微信小程序环境中，跳过大部分平台特定的初始化
   if (PlatformUtils.isMPFlutter) {
