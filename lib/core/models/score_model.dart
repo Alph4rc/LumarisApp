@@ -76,9 +76,20 @@ class ScoreList {
   }
 
   ScoreList.fromJson(Map<String, dynamic> json)
-      : list =
-            (json['list'] as List).map((x) => ScoreModel.fromJson(x)).toList(),
-        semester = SemesterModel.fromJson(json['semester']);
+      : list = (json['list'] as List? ?? []).map((x) {
+          try {
+            return ScoreModel.fromJson(x as Map<String, dynamic>);
+          } catch (_) {
+            return ScoreModel();
+          }
+        }).toList(),
+        semester = (() {
+          try {
+            return SemesterModel.fromJson(json['semester'] as Map<String, dynamic>);
+          } catch (_) {
+            return SemesterModel(semester: '', name: '');
+          }
+        })();
 
   ScoreList({required this.semester, required this.list});
 

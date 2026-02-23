@@ -251,6 +251,31 @@ class RequestCache {
     await _box?.clear();
   }
 
+  /// 清除所有已过期的缓存条目
+  Future<int> clearExpired() async {
+    if (!_isInitialized) await initialize();
+
+    final keys = _box?.keys.cast<String>().toList() ?? [];
+    int removed = 0;
+    for (final key in keys) {
+      final rawData = _box?.get(key);
+      if (rawData == null) continue;
+      try {
+        final entry = CacheEntry.fromJson(Map<String, dynamic>.from(rawData));
+        if (entry.isExpired) {
+          await _box?.delete(key);
+          removed++;
+        }
+      } catch (_) {
+        // 无法解析的条目视为损坏，一并清除
+        await _box?.delete(key);
+        removed++;
+      }
+    }
+    AppLogger.info('Cleared $removed expired cache entries.');
+    return removed;
+  }
+
   /// 获取缓存大小 (字节数 - 估算)
   Future<int> getCacheSize() async {
     if (!_isInitialized) await initialize();

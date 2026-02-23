@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
+import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/services/club_service.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -13,11 +14,13 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 ///
 /// 提供本地和云端待办事项的管理功能，包括获取、设置和同步待办事项列表
 class TodoService {
-  static final Dio _dio = Dio(BaseOptions(
+  static final BaseHttpClient _client = BaseHttpClient(
     baseUrl: 'https://www.xauat.site/api',
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-  ));
+    enableCache: false,
+  );
+
+  // 保留 _dio 引用以便在需要自定义 Options（如 Authorization header）时使用
+  static Dio get _dio => _client.dio;
 
   /// 获取 Hive Box
   static Future<Box<dynamic>> _getBox() async {
@@ -83,23 +86,28 @@ class TodoService {
   /// 从 SharedPreferences 迁移数据
   static Future<List<TodoItem>> _migrateFromPrefs(String username) async {
     final prefs = PrefsService.instance;
+    // ignore: deprecated_member_use
     final jsonString = prefs.getString(PrefsKeys.TODO_DATA);
-    
+
     if (jsonString != null && jsonString.isNotEmpty) {
       try {
-        final Map<String, dynamic> jsonList = jsonDecode(jsonString);
-        if (jsonList.containsKey(username)) {
+        final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        if (jsonMap.containsKey(username)) {
           AppLogger.info('Migrating todo data for $username from SharedPreferences to Hive...');
-          final d = jsonList[username];
+          final d = jsonMap[username] as List;
           final List<TodoItem> list = [];
-          for (var i in d) {
-            list.add(TodoItem.fromJson(i));
+          for (final i in d) {
+            try {
+              list.add(TodoItem.fromJson(i as Map<String, dynamic>));
+            } catch (itemErr) {
+              AppLogger.warning('Skipping corrupt todo entry during migration', error: itemErr);
+            }
           }
-          
+
           // 保存到 Hive
           final box = await _getBox();
           await box.put(username, list);
-          
+
           AppLogger.info('Todo data migration completed. Count: ${list.length}');
           return list;
         }
@@ -175,16 +183,21 @@ class TodoService {
   /// [json] 从俱乐部API获取的待办事项JSON数据
   /// 返回转换后的TodoItem对象
   static TodoItem fromJsonClub(Map<String, dynamic> json) {
-    final a = TodoItem(
-      title: json['title'],
-      deadline: json['endTime'],
-      isCompleted: json['status'] ?? false, // 默认值处理
+    // status 字段可能是 bool 或 int（0/1），统一处理
+    final dynamic rawStatus = json['status'];
+    final bool completed = rawStatus == true || rawStatus == 1;
+
+    final item = TodoItem(
+      id: json['id']?.toString(),
+      title: (json['title'] ?? '').toString(),
+      deadline: (json['endTime'] ?? '').toString(),
+      isCompleted: completed,
     );
 
-    a.description = json['description'];
-    a.key = json['key'];
+    item.description = json['description']?.toString();
+    item.key = json['key']?.toString();
 
-    return a;
+    return item;
   }
 
   /// 将本地待办事项同步到俱乐部服务器
@@ -226,7 +239,8 @@ class TodoService {
     }
 
     if (isOK) {
-      prefs.remove(PrefsKeys.TODO_DATA);
+      // 清除 Hive 中的本地数据（数据已成功同步到服务器）
+      await clearLocalData();
     }
   }
 }

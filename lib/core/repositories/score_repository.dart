@@ -63,20 +63,28 @@ class ScoreRepository {
   /// 从 SharedPreferences 迁移数据
   Future<List<ScoreList>> _migrateFromPrefs() async {
     final prefs = PrefsService.instance;
+    // ignore: deprecated_member_use
     final jsonString = prefs.getString(PrefsKeys.ALL_SCORE_DATA);
-    
+
     if (jsonString != null && jsonString.isNotEmpty) {
       try {
         AppLogger.info('Migrating score data from SharedPreferences to Hive...');
         final List<dynamic> jsonList = jsonDecode(jsonString);
-        final scores = jsonList.map((e) => ScoreList.fromJson(e)).toList();
-        
+        final scores = <ScoreList>[];
+        for (final e in jsonList) {
+          try {
+            scores.add(ScoreList.fromJson(e as Map<String, dynamic>));
+          } catch (itemErr) {
+            AppLogger.warning('Skipping corrupt score entry during migration', error: itemErr);
+          }
+        }
+
         // 保存到 Hive
         await saveScores(scores);
-        
+
         // 删除旧数据
         // await prefs.remove(PrefsKeys.ALL_SCORE_DATA);
-        
+
         AppLogger.info('Score data migration completed. Count: ${scores.length}');
         return scores;
       } catch (e) {

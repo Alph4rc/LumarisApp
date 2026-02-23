@@ -65,20 +65,28 @@ class CourseRepository {
   /// 从 SharedPreferences 迁移数据
   Future<List<CourseModel>> _migrateFromPrefs() async {
     final prefs = PrefsService.instance;
+    // ignore: deprecated_member_use
     final jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
-    
+
     if (jsonString != null && jsonString.isNotEmpty) {
       try {
         AppLogger.info('Migrating course data from SharedPreferences to Hive...');
         final List<dynamic> jsonList = jsonDecode(jsonString);
-        final courses = jsonList.map((e) => CourseModel.fromJson(e)).toList();
-        
+        final courses = <CourseModel>[];
+        for (final e in jsonList) {
+          try {
+            courses.add(CourseModel.fromJson(e as Map<String, dynamic>));
+          } catch (itemErr) {
+            AppLogger.warning('Skipping corrupt course entry during migration', error: itemErr);
+          }
+        }
+
         // 保存到 Hive
         await saveCourses(courses);
-        
+
         // 删除旧数据 (可选，为了安全起见可以先保留，确认稳定后再删)
         // await prefs.remove(PrefsKeys.COURSE_DATA);
-        
+
         AppLogger.info('Course data migration completed. Count: ${courses.length}');
         return courses;
       } catch (e) {
