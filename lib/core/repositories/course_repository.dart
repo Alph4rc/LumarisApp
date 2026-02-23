@@ -7,61 +7,136 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 课程数据仓库
-/// 
-/// 负责课程数据的持久化存储（Hive）和迁移
+///
+/// 每门课程作为独立 Hive 条目存储：
+///   course_{lessonId}           — 正式课程（lessonId 非空）
+///   course_custom_{ts}_{index}  — 自定义课程（lessonId 为空）
 class CourseRepository {
   static const String _boxName = HiveManager.courseBoxName;
-  
-  /// 获取 Box
-  Future<Box<CourseModel>> _getBox() async {
-    return await HiveManager.instance.openBox<CourseModel>(_boxName);
+  static const String _keyPrefix = 'course_';
+  static const String _legacyKey = 'current_courses';
+
+  Future<Box> _getBox() async {
+    return await HiveManager.instance.openBox(_boxName);
   }
-  
-  /// 保存课程列表
-  /// 
-  /// 现在的设计是将所有课程作为一个List存储，或者按ID存储。
-  /// 原有的 SharedPreferences 实现是将整个列表序列化为一个 JSON 字符串。
-  /// 在 Hive 中，我们可以直接存储 List<CourseModel>，或者将每门课作为单独的条目。
-  /// 为了查询方便，建议将每门课作为单独条目存储，Key 可以是 courseCode 或者自动生成的 ID。
-  /// 但考虑到 current course data 是一组，我们可以用一个特定的 Key (如 'current_courses') 存储这个列表。
-  /// 或者，更灵活的方式是：Box<CourseModel> 存储所有课程，但我们需要区分"当前学期课程"。
-  /// 
-  /// 简单起见，我们沿用"一组课程"的概念，但在 Hive 中，我们可能需要一个 Wrapper 或者直接存 List。
-  /// Hive Box 的值可以是 List，但更好的做法是定义一个 CourseList 模型，或者直接 put('current', list)。
-  /// 由于 Hive 不支持直接 put List<T> 到动态类型 Box 而保留类型信息（除非用 wrapper），
-  /// 我们这里选择将 List<CourseModel> 存储在 Box 的一个 Key 下。
+
+  /// 生成课程的存储 key
+  String _keyFor(CourseModel course, int index) {
+    final id = course.lessonId;
+    if (id.isNotEmpty) {
+      return '$_keyPrefix$id';
+    }
+    final ts = DateTime.now().millisecondsSinceEpoch;
+    return '${_keyPrefix}custom_${ts}_$index';
+  }
+
+  /// 保存课程列表（全量替换）
   Future<void> saveCourses(List<CourseModel> courses) async {
     try {
-      final box = await HiveManager.instance.openBox(HiveManager.courseBoxName);
-      // Hive 支持直接存储 List<dynamic>，只要里面的元素注册了 Adapter
-      await box.put('current_courses', courses);
+      final box = await _getBox();
+
+      // 删除所有 course_ 前缀条目
+      final oldKeys = box.keys
+          .where((k) => k is String && k.startsWith(_keyPrefix))
+          .toList();
+      await box.deleteAll(oldKeys);
+
+      // 防御性清理旧格式
+      if (box.containsKey(_legacyKey)) {
+        await box.delete(_legacyKey);
+      }
+
+      // 批量写入
+      if (courses.isEmpty) return;
+      final entries = <String, CourseModel>{};
+      for (var i = 0; i < courses.length; i++) {
+        entries[_keyFor(courses[i], i)] = courses[i];
+      }
+      await box.putAll(entries);
     } catch (e, stackTrace) {
       AppLogger.error('Failed to save courses to Hive', error: e, stackTrace: stackTrace);
     }
   }
-  
+
   /// 获取课程列表
   Future<List<CourseModel>> getCourses() async {
     try {
-      final box = await HiveManager.instance.openBox(HiveManager.courseBoxName);
-      
-      // 尝试从 Hive 读取
-      final dynamic data = box.get('current_courses');
-      
-      if (data != null) {
-        if (data is List) {
-          return data.cast<CourseModel>();
-        }
+      final box = await _getBox();
+
+      // 检测旧格式并迁移
+      if (box.containsKey(_legacyKey)) {
+        return await _migrateFromLegacyHive(box);
       }
-      
-      // 如果 Hive 中没有，尝试从 SharedPreferences 迁移
+
+      // 读取所有 course_ 前缀条目
+      final courses = box.keys
+          .where((k) => k is String && k.startsWith(_keyPrefix))
+          .map((k) => box.get(k))
+          .whereType<CourseModel>()
+          .toList();
+
+      if (courses.isNotEmpty) return courses;
+
+      // Hive 中无数据，尝试从 SharedPreferences 迁移
       return await _migrateFromPrefs();
     } catch (e, stackTrace) {
       AppLogger.error('Failed to get courses from Hive', error: e, stackTrace: stackTrace);
       return [];
     }
   }
-  
+
+  /// 按 lessonId 查询单门课程
+  Future<CourseModel?> getCourseById(String id) async {
+    try {
+      final box = await _getBox();
+      final byPrefixed = box.get('$_keyPrefix$id');
+      if (byPrefixed is CourseModel) return byPrefixed;
+      final direct = box.get(id);
+      if (direct is CourseModel) return direct;
+      return null;
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to get course by id', error: e, stackTrace: stackTrace);
+      return null;
+    }
+  }
+
+  /// 清除课程数据
+  Future<void> clear() async {
+    try {
+      final box = await _getBox();
+      final keys = box.keys
+          .where((k) => k is String && k.startsWith(_keyPrefix))
+          .toList();
+      await box.deleteAll(keys);
+      if (box.containsKey(_legacyKey)) {
+        await box.delete(_legacyKey);
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to clear courses from Hive', error: e, stackTrace: stackTrace);
+    }
+  }
+
+  /// 将旧单 key 格式迁移到新多 key 格式
+  Future<List<CourseModel>> _migrateFromLegacyHive(Box box) async {
+    try {
+      AppLogger.info('Migrating course data from legacy Hive format...');
+      final dynamic data = box.get(_legacyKey);
+      final courses = <CourseModel>[];
+      if (data is List) {
+        for (final item in data) {
+          if (item is CourseModel) courses.add(item);
+        }
+      }
+      // saveCourses 会自动删除旧 key
+      await saveCourses(courses);
+      AppLogger.info('Legacy Hive migration completed. Count: ${courses.length}');
+      return courses;
+    } catch (e) {
+      AppLogger.warning('Failed to migrate from legacy Hive format', error: e);
+      return [];
+    }
+  }
+
   /// 从 SharedPreferences 迁移数据
   Future<List<CourseModel>> _migrateFromPrefs() async {
     final prefs = PrefsService.instance;
@@ -81,11 +156,7 @@ class CourseRepository {
           }
         }
 
-        // 保存到 Hive
         await saveCourses(courses);
-
-        // 删除旧数据 (可选，为了安全起见可以先保留，确认稳定后再删)
-        // await prefs.remove(PrefsKeys.COURSE_DATA);
 
         AppLogger.info('Course data migration completed. Count: ${courses.length}');
         return courses;
@@ -94,11 +165,5 @@ class CourseRepository {
       }
     }
     return [];
-  }
-  
-  /// 清除课程数据
-  Future<void> clear() async {
-    final box = await HiveManager.instance.openBox(HiveManager.courseBoxName);
-    await box.delete('current_courses');
   }
 }
