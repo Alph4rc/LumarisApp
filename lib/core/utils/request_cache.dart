@@ -60,10 +60,8 @@ class RequestCache {
   /// 标记是否已初始化
   bool _isInitialized = false;
 
-  /// URL模式到缓存策略的映射
+  /// URL模式到缓存策略的映射（按优先级从高到低排列，默认策略通过方法兜底）
   final Map<RegExp, CachePolicy> _urlCachePolicies = {
-    // 默认策略
-    RegExp(r'.*'): CachePolicy.defaultPolicy,
     // 课程相关API - 中短期缓存
     RegExp(r'.*/course.*'): CachePolicy.mediumTerm,
     // 成绩相关API - 长期缓存
@@ -154,8 +152,9 @@ class RequestCache {
 
   /// 生成缓存键
   String _generateCacheKey(String url, {Map<String, dynamic>? params}) {
-    final paramsString = params != null ? jsonEncode(params) : '';
-    // 保持与旧版一致的 Key 生成逻辑，以便兼容
+    // 空 map 与 null 视为等价，统一序列化为空字符串，避免 key 不一致
+    final paramsString =
+        (params != null && params.isNotEmpty) ? jsonEncode(params) : '';
     return 'request_cache_${Uri.encodeComponent(url)}_${Uri.encodeComponent(paramsString)}';
   }
 
@@ -171,27 +170,31 @@ class RequestCache {
     try {
       // Hive 中存储的是 Map (json)
       final entry = CacheEntry.fromJson(Map<String, dynamic>.from(rawData));
-      
+
       if (entry.isExpired) {
         await _box?.delete(cacheKey);
         return null;
       }
-      
+
       final data = entry.data;
-      
+
       if (data is T) {
         return data;
       }
-      
+
       // 尝试类型转换
       if (T == Map && data is List) {
         return {'data': data} as T;
       }
-      
+
       return data as T?;
-    } catch (e) {
-      AppLogger.debug('解析Hive缓存数据失败: $e');
-      // 数据损坏，删除
+    } catch (e, stackTrace) {
+      AppLogger.warning(
+        'Cache entry parse failed for url="$url" key="$cacheKey" '
+        'dataType=${rawData.runtimeType}',
+        error: e,
+        stackTrace: stackTrace,
+      );
       await _box?.delete(cacheKey);
       return null;
     }
@@ -266,8 +269,9 @@ class RequestCache {
           await _box?.delete(key);
           removed++;
         }
-      } catch (_) {
+      } catch (e, stackTrace) {
         // 无法解析的条目视为损坏，一并清除
+        AppLogger.warning('Corrupt cache entry removed: key="$key"', error: e, stackTrace: stackTrace);
         await _box?.delete(key);
         removed++;
       }

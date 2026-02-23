@@ -24,7 +24,7 @@
 ## 🛠 代码优化 (Code Refactoring)
 
 - [x] **网络请求缓存 (RequestCache)**
-  - [ ] 为 JSON 解析失败的情况添加更详细的错误日志或埋点。
+  - [x] 为 JSON 解析失败的情况添加更详细的错误日志或埋点。
   - [x] 添加 `clearExpired()` 方法，定期清理过期的 Hive 缓存条目以释放空间。
 
 - [x] **课程数据结构优化**
@@ -35,12 +35,9 @@
 
 ## 📝 其他待办 (General Todos)
 
-- [ ] **设置存储 (SettingsStore)**
-  - [ ] 评估是否需要将 `SettingsStore` 中的用户偏好设置也迁移到 Hive，或者继续保留在 SharedPreferences 中（目前作为轻量级配置存储是可接受的）。
-
 - [ ] **测试 (Testing)**
-  - [ ] 为 `RequestCache` 的缓存策略和降级逻辑编写单元测试。
-  - [ ] 为 `HiveManager` 的初始化和单例模式编写测试。
+  - [x] 为 `RequestCache` 的缓存策略和降级逻辑编写单元测试。
+  - [x] 为 `HiveManager` 的初始化和单例模式编写测试。
 
 ## 🔍 已知问题 (Known Issues)
 

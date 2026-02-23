@@ -23,7 +23,9 @@
       "Bash(fi)",
       "Bash(bash scripts/check_coverage.sh:*)",
       "Bash(echo fallback:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(echo dart run needed:*)",
+      "Bash(node:*)"
     ]
   }
 }
