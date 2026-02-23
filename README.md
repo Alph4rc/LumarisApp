@@ -68,17 +68,37 @@ UPDATE_CHANNEL=gitee
    ```bash
    flutter build apk --obfuscate --split-debug-info=xx --no-tree-shake-icons --target-platform android-arm64 --split-per-abi
    ```
+   
+3. Android (aab):
+   ```bash
+   flutter build appbundle --obfuscate --split-debug-info=xx --no-tree-shake-icons --target-platform android-arm64
+   ```
 
-3. Web (wasm):
+4. Web (wasm):
 
    ```bash
    flutter build web --no-tree-shake-icons --wasm
    ```
 
-4. macOS
+5. macOS
 
    ```bash
    flutter build macos
+   ```
+   
+6. iOS (ipa):
+   ```bash
+   flutter build ios
+   ```
+
+7. Linux
+   ```bash
+   flutter build linux
+   ```
+   
+8. 微信小程序
+   ```bash
+   
    ```
 
 ## 贡献指南
