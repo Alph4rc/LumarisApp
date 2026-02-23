@@ -404,7 +404,14 @@ class EduService {
 
     try {
       final response = await EduApiClient.getCourse(cookieData.studentId);
-      final courses = (jsonDecode(response) as List)
+      final data = jsonDecode(response);
+      var dataList = [];
+      if (data is List){
+        dataList = data;
+      }else if (data is Map){
+        dataList = data["data"];
+      }
+      final courses = dataList
           .map((e) => CourseModel.fromJson(e))
           .toList()
           .cast<CourseModel>();

@@ -15,6 +15,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
+import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/models/score_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -107,20 +108,18 @@ class _ScorePageState extends State<ScorePage>
 
   Future<List<ScoreList>?> _tryGetCachedData() async {
     final prefs = PrefsService.instance;
-    final jsonString = prefs.getString(PrefsKeys.ALL_SCORE_DATA);
     final lastFetchTime = prefs.getInt(PrefsKeys.LAST_SCORE_TIME);
     final now = DateTime.now().millisecondsSinceEpoch;
 
     if (lastFetchTime != null &&
-        now - lastFetchTime < const Duration(hours: 1).inMilliseconds &&
-        jsonString != null &&
-        jsonString.isNotEmpty) {
+        now - lastFetchTime < const Duration(hours: 1).inMilliseconds) {
       try {
-        final jsonList = jsonDecode(jsonString) as List<dynamic>;
-        return jsonList.map((value) => ScoreList.fromJson(value)).toList();
+        final scoreRepo = ScoreRepository();
+        final scores = await scoreRepo.getScores();
+        if (scores.isNotEmpty) return scores;
       } catch (e) {
         if (kDebugMode) {
-          AppLogger.error('Error parsing cached data: $e');
+          AppLogger.error('Error reading cached score data: $e');
         }
       }
     }
@@ -256,7 +255,8 @@ class _ScorePageState extends State<ScorePage>
 
   Future<void> _cacheFreshData(List<ScoreList> freshData) async {
     final prefs = PrefsService.instance;
-    await prefs.setString(PrefsKeys.ALL_SCORE_DATA, jsonEncode(freshData));
+    final scoreRepo = ScoreRepository();
+    await scoreRepo.saveScores(freshData);
     await prefs.setInt(
         PrefsKeys.LAST_SCORE_TIME, DateTime.now().millisecondsSinceEpoch);
   }

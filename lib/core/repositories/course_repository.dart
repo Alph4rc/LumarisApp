@@ -8,9 +8,9 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 课程数据仓库
 ///
-/// 每门课程作为独立 Hive 条目存储：
-///   course_{lessonId}           — 正式课程（lessonId 非空）
-///   course_custom_{ts}_{index}  — 自定义课程（lessonId 为空）
+/// 每门课程以 course_{index} 为 key 独立存储在 Hive 中。
+/// saveCourses 每次全量替换，index 仅在单次写入内保证唯一，
+/// 不依赖课程字段组合，彻底避免任何碰撞问题。
 class CourseRepository {
   static const String _boxName = HiveManager.courseBoxName;
   static const String _keyPrefix = 'course_';
@@ -18,16 +18,6 @@ class CourseRepository {
 
   Future<Box> _getBox() async {
     return await HiveManager.instance.openBox(_boxName);
-  }
-
-  /// 生成课程的存储 key
-  String _keyFor(CourseModel course, int index) {
-    final id = course.lessonId;
-    if (id.isNotEmpty) {
-      return '$_keyPrefix$id';
-    }
-    final ts = DateTime.now().millisecondsSinceEpoch;
-    return '${_keyPrefix}custom_${ts}_$index';
   }
 
   /// 保存课程列表（全量替换）
@@ -46,11 +36,11 @@ class CourseRepository {
         await box.delete(_legacyKey);
       }
 
-      // 批量写入
+      // 批量写入，直接用下标作为 key，保证唯一且无冲突
       if (courses.isEmpty) return;
       final entries = <String, CourseModel>{};
       for (var i = 0; i < courses.length; i++) {
-        entries[_keyFor(courses[i], i)] = courses[i];
+        entries['$_keyPrefix$i'] = courses[i];
       }
       await box.putAll(entries);
     } catch (e, stackTrace) {
@@ -85,18 +75,14 @@ class CourseRepository {
     }
   }
 
-  /// 按 lessonId 查询单门课程
-  Future<CourseModel?> getCourseById(String id) async {
+  /// 按 lessonId 查询所有匹配的课程（同一 lessonId 可能有多个时间段）
+  Future<List<CourseModel>> getCourseById(String id) async {
     try {
-      final box = await _getBox();
-      final byPrefixed = box.get('$_keyPrefix$id');
-      if (byPrefixed is CourseModel) return byPrefixed;
-      final direct = box.get(id);
-      if (direct is CourseModel) return direct;
-      return null;
+      final courses = await getCourses();
+      return courses.where((c) => c.lessonId == id).toList();
     } catch (e, stackTrace) {
       AppLogger.error('Failed to get course by id', error: e, stackTrace: stackTrace);
-      return null;
+      return [];
     }
   }
 
