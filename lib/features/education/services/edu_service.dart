@@ -123,8 +123,6 @@ class EduService {
 
       AppLogger.debug('[EduService] Hive 业务数据清理完成');
 
-
-
       // 清理 HTTP 请求层的缓存（教务系统相关）
       await RequestCache().deleteByPattern(RegExp(r'.*/course.*'));
       await RequestCache().deleteByPattern(RegExp(r'.*/score.*'));
@@ -406,9 +404,9 @@ class EduService {
       final response = await EduApiClient.getCourse(cookieData.studentId);
       final data = jsonDecode(response);
       var dataList = [];
-      if (data is List){
+      if (data is List) {
         dataList = data;
-      }else if (data is Map){
+      } else if (data is Map) {
         dataList = data["data"];
       }
       final courses = dataList
@@ -567,40 +565,6 @@ class EduService {
     cachedScoresList
         .sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
     return cachedScoresList;
-  }
-
-  /// 从缓存数据构建成绩列表
-  ///
-  /// @param cachedScores 缓存的成绩数据
-  /// @param semesters 学期列表
-  /// @return List<ScoreList> 成绩列表
-  static List<ScoreList> _buildScoreListFromCache(
-      Map<String, dynamic> cachedScores, List<dynamic> semesters) {
-    final List<ScoreList> list = [];
-    cachedScores.forEach((String key, value) {
-      // 查找匹配的学期
-      final semesterMatch = semesters.firstWhere(
-        (x) => x.semester == key,
-        orElse: () => null,
-      );
-
-      // 如果找到了匹配的学期，使用它；否则创建一个临时的学期对象
-      final semester = semesterMatch ??
-          {
-            'semester': key,
-            'name': key,
-          };
-
-      final scoreList = jsonDecode(value);
-      list.add(ScoreList(
-        semester: semester,
-        list: (scoreList as List).map((e) => ScoreModel.fromJson(e)).toList(),
-      ));
-    });
-
-    // 按学期顺序排序，最新学期在前
-    list.sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
-    return list;
   }
 
   /// 获取考试信息

@@ -33,7 +33,7 @@ void main() {
   });
 
   // ─── 辅助：直接向 box 写入已过期条目 ───────────────────────────────────────
-  Future<void> _putExpired(String url, dynamic data, {Map<String, dynamic>? params}) async {
+  Future<void> putExpired(String url, dynamic data, {Map<String, dynamic>? params}) async {
     final box = Hive.box(HiveManager.requestCacheBoxName);
     final paramsString =
         (params != null && params.isNotEmpty) ? jsonEncode(params) : '';
@@ -73,7 +73,7 @@ void main() {
     });
 
     test('should_return_null_for_expired_entry_and_delete_it', () async {
-      await _putExpired('https://example.com/api/old', 'stale');
+      await putExpired('https://example.com/api/old', 'stale');
 
       final result = await cache.get<String>('https://example.com/api/old');
 
@@ -134,8 +134,8 @@ void main() {
   group('RequestCache.clearExpired', () {
     test('should_remove_only_expired_entries', () async {
       await cache.set('https://example.com/api/valid', 'keep');
-      await _putExpired('https://example.com/api/expired1', 'gone1');
-      await _putExpired('https://example.com/api/expired2', 'gone2');
+      await putExpired('https://example.com/api/expired1', 'gone1');
+      await putExpired('https://example.com/api/expired2', 'gone2');
 
       await cache.clearExpired();
 
@@ -145,8 +145,8 @@ void main() {
     });
 
     test('should_return_count_of_removed_entries', () async {
-      await _putExpired('https://example.com/api/e1', 'x');
-      await _putExpired('https://example.com/api/e2', 'x');
+      await putExpired('https://example.com/api/e1', 'x');
+      await putExpired('https://example.com/api/e2', 'x');
       await cache.set('https://example.com/api/valid', 'keep');
 
       final removed = await cache.clearExpired();
@@ -193,7 +193,7 @@ void main() {
 
   group('URL cache policy', () {
     // 通过检查存储条目的过期时间来验证策略是否生效
-    Future<int> _getExpiryMs(String url) async {
+    Future<int> getExpiryMs(String url) async {
       final box = Hive.box(HiveManager.requestCacheBoxName);
       // no params → paramsString = '' → key ends with '_'
       final key = 'request_cache_${Uri.encodeComponent(url)}_';
@@ -205,7 +205,7 @@ void main() {
       final before = DateTime.now();
       await cache.set('https://api.example.com/course/list', 'data');
       final expiry = DateTime.fromMillisecondsSinceEpoch(
-          await _getExpiryMs('https://api.example.com/course/list'));
+          await getExpiryMs('https://api.example.com/course/list'));
 
       // medium-term = 15 分钟
       expect(expiry.isAfter(before.add(const Duration(minutes: 14))), isTrue);
@@ -216,7 +216,7 @@ void main() {
       final before = DateTime.now();
       await cache.set('https://api.example.com/score/query', 'data');
       final expiry = DateTime.fromMillisecondsSinceEpoch(
-          await _getExpiryMs('https://api.example.com/score/query'));
+          await getExpiryMs('https://api.example.com/score/query'));
 
       // long-term = 1 小时
       expect(expiry.isAfter(before.add(const Duration(minutes: 59))), isTrue);
@@ -227,7 +227,7 @@ void main() {
       final before = DateTime.now();
       await cache.set('https://api.example.com/bus/schedule', 'data');
       final expiry = DateTime.fromMillisecondsSinceEpoch(
-          await _getExpiryMs('https://api.example.com/bus/schedule'));
+          await getExpiryMs('https://api.example.com/bus/schedule'));
 
       // short-term = 1 分钟
       expect(expiry.isAfter(before.add(const Duration(seconds: 59))), isTrue);
@@ -238,7 +238,7 @@ void main() {
       final before = DateTime.now();
       await cache.set('https://api.example.com/unknown/endpoint', 'data');
       final expiry = DateTime.fromMillisecondsSinceEpoch(
-          await _getExpiryMs('https://api.example.com/unknown/endpoint'));
+          await getExpiryMs('https://api.example.com/unknown/endpoint'));
 
       // default = 5 分钟
       expect(expiry.isAfter(before.add(const Duration(minutes: 4))), isTrue);
@@ -248,7 +248,7 @@ void main() {
 
   group('降级逻辑 (stale cache)', () {
     test('should_keep_expired_entry_in_box_until_explicitly_cleared', () async {
-      await _putExpired('https://example.com/api/stale', 'stale_data');
+      await putExpired('https://example.com/api/stale', 'stale_data');
 
       // get() 会删除过期条目并返回 null
       final result = await cache.get<String>('https://example.com/api/stale');
