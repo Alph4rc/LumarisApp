@@ -12,18 +12,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 CourseModel _course({
   String lessonId = 'L001',
   String courseName = '高等数学',
+  int weekday = 1,
+  int startUnit = 1,
+  List<int>? weekIndexes,
   bool isCustom = false,
 }) =>
     CourseModel(
       lessonId: lessonId,
       courseName: courseName,
       isCustom: isCustom,
-      weekIndexes: [1, 2, 3],
+      weekIndexes: weekIndexes ?? [1, 2, 3],
       teachers: ['张老师'],
       room: 'A101',
-      weekday: 1,
-      startUnit: 1,
-      endUnit: 2,
+      weekday: weekday,
+      startUnit: startUnit,
+      endUnit: startUnit + 1,
     );
 
 void main() {
@@ -51,20 +54,34 @@ void main() {
   });
 
   group('CourseRepository.saveCourses', () {
-    test('should_store_course_under_course_lessonId_key', () async {
+    test('should_store_courses_under_indexed_keys', () async {
+      await repo.saveCourses([
+        _course(lessonId: 'L001'),
+        _course(lessonId: 'L002', courseName: '线性代数'),
+      ]);
+
+      final box = await Hive.openBox(HiveManager.courseBoxName);
+      expect(box.containsKey('course_0'), isTrue);
+      expect(box.containsKey('course_1'), isTrue);
+    });
+
+    test('should_not_use_lessonId_as_key', () async {
       await repo.saveCourses([_course(lessonId: 'L001')]);
 
       final box = await Hive.openBox(HiveManager.courseBoxName);
-      expect(box.containsKey('course_L001'), isTrue);
+      expect(box.containsKey('course_L001'), isFalse);
     });
 
-    test('should_store_custom_course_under_course_custom_key', () async {
-      await repo.saveCourses([_course(lessonId: '', isCustom: true)]);
+    test('should_store_all_courses_including_same_lessonId', () async {
+      // 同一 lessonId 不同时间段的课程不应互相覆盖
+      await repo.saveCourses([
+        _course(lessonId: 'L001', weekday: 1, startUnit: 1, weekIndexes: [1, 2]),
+        _course(lessonId: 'L001', weekday: 3, startUnit: 3, weekIndexes: [3, 4]),
+        _course(lessonId: 'L001', weekday: 5, startUnit: 5, weekIndexes: [5, 6]),
+      ]);
 
-      final box = await Hive.openBox(HiveManager.courseBoxName);
-      final customKeys =
-          box.keys.where((k) => k.toString().startsWith('course_custom_')).toList();
-      expect(customKeys, hasLength(1));
+      final result = await repo.getCourses();
+      expect(result, hasLength(3));
     });
 
     test('should_replace_all_courses_on_second_call', () async {
@@ -77,6 +94,21 @@ void main() {
       final result = await repo.getCourses();
       expect(result, hasLength(1));
       expect(result.first.lessonId, 'L003');
+    });
+
+    test('should_not_leave_stale_keys_after_replacement', () async {
+      await repo.saveCourses([
+        _course(lessonId: 'L001'),
+        _course(lessonId: 'L002', courseName: '线性代数'),
+      ]);
+      await repo.saveCourses([_course(lessonId: 'L003', courseName: '英语')]);
+
+      final box = await Hive.openBox(HiveManager.courseBoxName);
+      final courseKeys =
+          box.keys.where((k) => k.toString().startsWith('course_')).toList();
+      // 只剩 course_0，不应有 course_1
+      expect(courseKeys, hasLength(1));
+      expect(courseKeys.first, 'course_0');
     });
 
     test('should_clear_existing_courses_when_saving_empty_list', () async {
@@ -96,17 +128,15 @@ void main() {
       expect(box.containsKey('current_courses'), isFalse);
     });
 
-    test('should_save_multiple_courses_each_under_own_key', () async {
+    test('should_store_custom_courses_with_same_index_scheme', () async {
       await repo.saveCourses([
-        _course(lessonId: 'L001', courseName: '高等数学'),
-        _course(lessonId: 'L002', courseName: '线性代数'),
-        _course(lessonId: 'L003', courseName: '英语'),
+        _course(lessonId: 'L001', isCustom: false),
+        _course(lessonId: '', isCustom: true, courseName: '自定义课程'),
       ]);
 
       final box = await Hive.openBox(HiveManager.courseBoxName);
-      expect(box.containsKey('course_L001'), isTrue);
-      expect(box.containsKey('course_L002'), isTrue);
-      expect(box.containsKey('course_L003'), isTrue);
+      expect(box.containsKey('course_0'), isTrue);
+      expect(box.containsKey('course_1'), isTrue);
     });
   });
 
@@ -141,9 +171,9 @@ void main() {
       expect(result, hasLength(2));
       // 旧 key 已被删除
       expect(box.containsKey('current_courses'), isFalse);
-      // 新格式 key 已写入
-      expect(box.containsKey('course_L001'), isTrue);
-      expect(box.containsKey('course_L002'), isTrue);
+      // 新格式 key 已写入（index-based）
+      expect(box.containsKey('course_0'), isTrue);
+      expect(box.containsKey('course_1'), isTrue);
     });
 
     test('should_migrate_from_shared_preferences_when_hive_is_empty', () async {
@@ -198,17 +228,43 @@ void main() {
   });
 
   group('CourseRepository.getCourseById', () {
-    test('should_return_null_for_non_existent_id', () async {
+    test('should_return_empty_list_for_non_existent_id', () async {
       await repo.saveCourses([_course(lessonId: 'L001')]);
 
       final result = await repo.getCourseById('NONEXISTENT');
 
-      expect(result, isNull);
+      expect(result, isEmpty);
     });
 
-    test('should_return_null_when_box_is_empty', () async {
+    test('should_return_empty_list_when_box_is_empty', () async {
       final result = await repo.getCourseById('L001');
-      expect(result, isNull);
+      expect(result, isEmpty);
+    });
+
+    test('should_return_all_courses_matching_lessonId', () async {
+      // 同一 lessonId 的多个时间段都应被返回
+      await repo.saveCourses([
+        _course(lessonId: 'L001', weekday: 1, startUnit: 1),
+        _course(lessonId: 'L001', weekday: 3, startUnit: 3),
+        _course(lessonId: 'L002', courseName: '线性代数'),
+      ]);
+
+      final result = await repo.getCourseById('L001');
+
+      expect(result, hasLength(2));
+      expect(result.every((c) => c.lessonId == 'L001'), isTrue);
+    });
+
+    test('should_return_single_course_when_only_one_matches', () async {
+      await repo.saveCourses([
+        _course(lessonId: 'L001'),
+        _course(lessonId: 'L002', courseName: '线性代数'),
+      ]);
+
+      final result = await repo.getCourseById('L002');
+
+      expect(result, hasLength(1));
+      expect(result.first.courseName, '线性代数');
     });
   });
 

@@ -10,29 +10,16 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 class ScoreRepository {
   static const String _boxName = HiveManager.scoreBoxName;
   
-  /// 获取 Box
-  Future<Box<ScoreList>> _getBox() async {
-    return await HiveManager.instance.openBox<ScoreList>(_boxName);
-  }
-  
   /// 保存成绩列表
-  /// 
+  ///
   /// 这里的 ScoreList 包含了成绩列表和学期信息。
   /// 我们将每个学期的成绩作为一个条目存储，Key 可以是学期名。
-  /// 
+  ///
   /// @param scores 成绩列表数据
   Future<void> saveScores(List<ScoreList> scores) async {
     try {
-      final box = await _getBox();
-      
-      // 清空旧数据，全量更新
-      await box.clear();
-      
-      // 保存到 Hive
-      // Hive 支持直接存储 List<dynamic>，只要里面的元素注册了 Adapter
-      final dynamicBox = await HiveManager.instance.openBox(HiveManager.scoreBoxName);
-      await dynamicBox.put('all_scores', scores);
-      
+      final box = await HiveManager.instance.openBox(_boxName);
+      await box.put('all_scores', scores);
     } catch (e, stackTrace) {
       AppLogger.error('Failed to save scores to Hive', error: e, stackTrace: stackTrace);
     }
