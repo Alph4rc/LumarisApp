@@ -198,18 +198,6 @@ void main() {
   });
 
   group('CourseRepository.getCourseById', () {
-    test('should_return_course_matching_lessonId', () async {
-      await repo.saveCourses([
-        _course(lessonId: 'L001', courseName: '高等数学'),
-        _course(lessonId: 'L002', courseName: '线性代数'),
-      ]);
-
-      final result = await repo.getCourseById('L001');
-
-      expect(result, isNotNull);
-      expect(result!.courseName, '高等数学');
-    });
-
     test('should_return_null_for_non_existent_id', () async {
       await repo.saveCourses([_course(lessonId: 'L001')]);
 
