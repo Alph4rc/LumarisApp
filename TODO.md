@@ -27,8 +27,8 @@
   - [ ] 为 JSON 解析失败的情况添加更详细的错误日志或埋点。
   - [x] 添加 `clearExpired()` 方法，定期清理过期的 Hive 缓存条目以释放空间。
 
-- [ ] **课程数据结构优化**
-  - [ ] 目前 `CourseRepository` 将所有课程作为一个 List 存入 Hive。建议重构为将每门课程作为独立的 Hive Object 存储，以便支持更细粒度的更新和查询。
+- [x] **课程数据结构优化**
+  - [x] 目前 `CourseRepository` 将所有课程作为一个 List 存入 Hive。建议重构为将每门课程作为独立的 Hive Object 存储，以便支持更细粒度的更新和查询。
 
 - [x] **依赖注入**
   - [x] `TodoService` 已改为使用 `BaseHttpClient` 替代直接实例化 `Dio`，统一配置（超时、重试拦截器）。

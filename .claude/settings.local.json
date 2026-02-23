@@ -21,7 +21,9 @@
       "Bash(dart format:*)",
       "Bash(else echo \"Coverage file not found\")",
       "Bash(fi)",
-      "Bash(bash scripts/check_coverage.sh:*)"
+      "Bash(bash scripts/check_coverage.sh:*)",
+      "Bash(echo fallback:*)",
+      "Bash(grep:*)"
     ]
   }
 }
