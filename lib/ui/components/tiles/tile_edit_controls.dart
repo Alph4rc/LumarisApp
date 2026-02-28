@@ -24,8 +24,9 @@ class TileEditControls extends StatelessWidget {
             const Text(
               '快捷功能',
               style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
               ),
             ),
 
@@ -115,9 +116,7 @@ class EmptyTilesMessage extends StatelessWidget {
     return ClubCard(
       margin: const EdgeInsets.all(16),
       child: EmptyWidget(
-          title: '暂无快捷功能',
-          icon: Icons.widgets_outlined,
-          subtitle: '请在编辑模式中添加'),
+          title: '暂无快捷功能', icon: Icons.widgets_outlined, subtitle: '请在编辑模式中添加'),
     );
   }
 }
@@ -138,45 +137,70 @@ class AvailableTilesList extends StatelessWidget {
         return const SizedBox.shrink();
       }
 
-      return ClubCard(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(16),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(Icons.visibility_off, size: 18, color: Colors.grey[600]),
-                const SizedBox(width: 8),
-                Text(
-                  '已隐藏的磁贴',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
-                  ),
+            const Padding(
+              padding: EdgeInsets.only(left: 8.0, bottom: 8.0, top: 16.0),
+              child: Text(
+                '更多功能',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: hiddenTiles.map((tile) {
-                return _buildHiddenTileChip(tile.id, controller);
-              }).toList(),
+            ClubCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: hiddenTiles.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final tileId = entry.value.id;
+                  final isLast = index == hiddenTiles.length - 1;
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                        title: Text(
+                          tileId,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () => controller.toggleVisibility(tileId),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 4.0),
+                      ),
+                      if (!isLast)
+                        const Divider(
+                            height: 1,
+                            indent: 48,
+                            endIndent: 16,
+                            thickness: 0.5),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ],
         ),
       );
     });
-  }
-
-  Widget _buildHiddenTileChip(String tileId, TileEditController controller) {
-    return ActionChip(
-      avatar: const Icon(Icons.add_circle_outline, size: 18),
-      label: Text(tileId),
-      onPressed: () => controller.toggleVisibility(tileId),
-    );
   }
 }

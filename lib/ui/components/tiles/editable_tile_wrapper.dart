@@ -23,9 +23,13 @@ class EditableTileWrapper extends StatefulWidget {
 }
 
 class _EditableTileWrapperState extends State<EditableTileWrapper>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+
+  late AnimationController _jiggleController;
+  late Animation<double> _jiggleAnimation;
+
   bool _isDragging = false;
 
   @override
@@ -38,17 +42,30 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
     );
+
+    _jiggleController = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    // Slight rotation back and forth
+    _jiggleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.015), weight: 25),
+      TweenSequenceItem(tween: Tween(begin: 0.015, end: -0.015), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: -0.015, end: 0.0), weight: 25),
+    ]).animate(_jiggleController);
   }
 
   @override
   void dispose() {
     _scaleController.dispose();
+    _jiggleController.dispose();
     super.dispose();
   }
 
   void _onDragStarted() {
     setState(() => _isDragging = true);
     _scaleController.forward();
+    _jiggleController.stop();
 
     // Haptic feedback on drag start
     if (PlatformUtils.isIOS || PlatformUtils.isAndroid) {
@@ -59,6 +76,11 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
   void _onDragEnd() {
     setState(() => _isDragging = false);
     _scaleController.reverse();
+
+    final controller = Get.find<TileEditController>();
+    if (controller.isEditMode.value) {
+      _jiggleController.repeat(reverse: true);
+    }
 
     // Haptic feedback on drag end
     if (PlatformUtils.isIOS || PlatformUtils.isAndroid) {
@@ -73,107 +95,81 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
     return Obx(() {
       final isEditMode = controller.isEditMode.value;
 
-      return AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _isDragging ? _scaleAnimation.value : 1.0,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: _isDragging
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ]
-                    : isEditMode
-                        ? [
-                            BoxShadow(
-                              color: Colors.blue.withValues(alpha: 0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-              ),
-              child: Stack(
-                children: [
-                  // Original tile content
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: widget.child,
-                  ),
+      if (isEditMode && !_isDragging) {
+        if (!_jiggleController.isAnimating) {
+          // Create a slightly random offset so they don't all jiggle exactly identical
+          Future.delayed(Duration(milliseconds: widget.index * 50), () {
+            if (mounted && controller.isEditMode.value) {
+              _jiggleController.repeat();
+            }
+          });
+        }
+      } else {
+        _jiggleController.stop();
+        _jiggleController.reset();
+      }
 
-                  // Edit mode overlay
-                  if (isEditMode)
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.blue.withValues(alpha: 0.5),
-                            width: 2,
+      Widget content = AnimatedBuilder(
+        animation: Listenable.merge([_scaleAnimation, _jiggleAnimation]),
+        builder: (context, child) {
+          return Transform.rotate(
+            angle: isEditMode && !_isDragging ? _jiggleAnimation.value : 0.0,
+            child: Transform.scale(
+              scale: _isDragging ? _scaleAnimation.value : 1.0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: _isDragging
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Original tile content
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: widget.child,
+                    ),
+
+                    // Make the whole card act as a drag handle in edit mode
+                    if (isEditMode && !PlatformUtils.isMPFlutter)
+                      Positioned.fill(
+                        child: ReorderableDragStartListener(
+                          index: widget.index,
+                          child: Container(
+                            color: Colors.transparent,
                           ),
                         ),
                       ),
-                    ),
 
-                  // Hide button in edit mode
-                  if (isEditMode)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: _buildHideButton(controller),
-                    ),
-
-                  // Drag handle indicator in edit mode (also acts as drag listener)
-                  if (isEditMode && !PlatformUtils.isMPFlutter)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: _buildDragHandle(),
-                    ),
-                ],
+                    // iOS style minus button on top left
+                    if (isEditMode)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: _buildHideButton(controller),
+                      ),
+                  ],
+                ),
               ),
             ),
           );
         },
       );
+
+      return content;
     });
   }
 
-  Widget _buildDragHandle() {
-    final controller = Get.find<TileEditController>();
 
-    return Obx(() {
-      final isDragging = controller.isDragging.value;
-
-      return ReorderableDragStartListener(
-        index: widget.index,
-        child: MouseRegion(
-          cursor: isDragging
-              ? SystemMouseCursors.grabbing
-              : SystemMouseCursors.grab,
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Icon(
-              Icons.drag_indicator,
-              color: Colors.grey[700],
-              size: 20,
-            ),
-          ),
-        ),
-      );
-    });
-  }
 
   Widget _buildHideButton(TileEditController controller) {
     return GestureDetector(
@@ -181,29 +177,21 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
         try {
           await controller.toggleVisibility(widget.tileId);
         } catch (e) {
-          // Show error if trying to hide all tiles
-          if (context.mounted) {
-            showClubSnackBar(context, Text('至少需要保留一个磁贴'));
+          if (mounted) {
+            showClubSnackBar(context, const Text('至少需要保留一个磁贴'));
           }
         }
       },
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.9),
+          color: Colors.grey.shade400.withValues(alpha: 0.9), // iOS style grey
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: const Icon(
-          Icons.remove_circle_outline,
+          Icons.remove, // Simple minus
           color: Colors.white,
-          size: 20,
+          size: 16,
         ),
       ),
     );
@@ -239,7 +227,7 @@ class DraggableTileItem extends StatelessWidget {
       data: index,
       feedback: Material(
         elevation: 8,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
         child: Opacity(
           opacity: 0.8,
           child: SizedBox(
@@ -287,7 +275,7 @@ class TapReorderTileItem extends StatelessWidget {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(
                     color: Colors.blue,
                     width: 3,

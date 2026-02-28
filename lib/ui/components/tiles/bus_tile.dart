@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
@@ -15,96 +16,85 @@ class BusTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => Get.toNamed('/SchoolBus'),
-          borderRadius: BorderRadius.circular(20),
-          child: Obx(() {
-            if (busStore.isLoading.value) {
-              return Container(
-                padding: const EdgeInsets.all(20),
-                child: const Center(
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Obx(() {
+              if (busStore.isLoading.value) {
+                return const Center(
                   child: CircularProgressIndicator(),
-                ),
-              );
-            }
+                );
+              }
 
-            final busData = busStore.busCount.value;
-            return Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.green.withValues(alpha: 0.1),
-                    Colors.teal.withValues(alpha: 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
+              final busData = busStore.busCount.value;
+              final primaryColor = CupertinoColors.activeGreen;
+
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
+                          color: primaryColor.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.directions_bus_rounded,
-                          color: Colors.green,
+                          color: primaryColor,
                           size: 24,
                         ),
                       ),
                       const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '$busData班次',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                      if (busData > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '$busData班次',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  const Spacer(),
+                  Text(
                     '今日校车',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
+                      color: Theme.of(context).textTheme.bodySmall?.color ??
+                          Colors.grey.shade600,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  if (busData > 0)
-                    Text(
-                      '今日有$busData个班次',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    )
-                  else
-                    const Text(
-                      '今天没有班次',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
+                  const SizedBox(height: 2),
+                  Text(
+                    busData > 0 ? '$busData' : '无班次',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                      color: busData > 0
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Colors.grey,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ),
     );
