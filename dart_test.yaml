@@ -1,0 +1,6 @@
+tags:
+  performance:
+    timeout: 2x
+
+exclude_tags:
+  - performance

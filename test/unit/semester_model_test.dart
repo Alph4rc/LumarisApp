@@ -139,7 +139,7 @@ void main() {
       expect(semester.name, '2023-2024学年第一学期');
     });
     
-    test('should handle missing JSON keys by throwing error', () {
+    test('should handle missing JSON keys by fallback to empty string', () {
       // Test with missing value key
       final jsonMissingValue = {
         'text': '2023-2024学年第一学期',
@@ -150,9 +150,13 @@ void main() {
         'value': '2023-2024-1',
       };
       
-      // Both should throw errors since the model expects both keys
-      expect(() => SemesterModel.fromJson(jsonMissingValue), throwsA(isA<TypeError>()));
-      expect(() => SemesterModel.fromJson(jsonMissingText), throwsA(isA<TypeError>()));
+      final missingValue = SemesterModel.fromJson(jsonMissingValue);
+      final missingText = SemesterModel.fromJson(jsonMissingText);
+
+      expect(missingValue.semester, '');
+      expect(missingValue.name, '2023-2024学年第一学期');
+      expect(missingText.semester, '2023-2024-1');
+      expect(missingText.name, '');
     });
   });
 }

@@ -239,8 +239,8 @@ void main() {
 
       expect(tile.isVisible, true);
       expect(toggled.getVisibleTiles().length, 2);
-      // Should be appended to end
-      expect(tile.order, greaterThan(1));
+      // Order is normalized after toggle
+      expect(tile.order, 1);
     });
 
     test('should_throw_error_when_toggling_nonexistent_tile', () {
@@ -319,6 +319,21 @@ void main() {
 
       expect(config1, equals(config2));
       expect(config1, isNot(equals(config3)));
+    });
+
+    test('should_recover_order_consistency_after_high_frequency_operations', () {
+      var config = TileConfigurationList.defaultConfig();
+
+      for (var i = 0; i < 100; i++) {
+        config = config.reorderTile('电费', 0, 2);
+        config = config.reorderTile('电费', 2, 0);
+      }
+
+      final visible = config.getVisibleTiles();
+      for (var i = 0; i < visible.length; i++) {
+        expect(visible[i].order, i);
+      }
+      expect(visible.map((e) => e.id).toSet().length, visible.length);
     });
   });
 }

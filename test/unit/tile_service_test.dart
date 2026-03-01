@@ -203,6 +203,19 @@ void main() {
       expect(config.configurations[1].id, '饭卡');
     });
 
+    test('should_keep_result_stable_after_repeated_migration_reads', () async {
+      final prefs = PrefsService.instance;
+      await prefs.setStringList(PrefsKeys.TILES, ['电费', '校车']);
+
+      final firstLoad = await TileService.getTileConfigurations();
+      final secondLoad = await TileService.getTileConfigurations();
+
+      expect(firstLoad.configurations.length, 2);
+      expect(secondLoad.configurations.length, 2);
+      expect(secondLoad.configurations[0].id, firstLoad.configurations[0].id);
+      expect(secondLoad.configurations[1].id, firstLoad.configurations[1].id);
+    });
+
     test('should_handle_empty_old_format_list', () async {
       // Clear all data first
       final prefs = PrefsService.instance;

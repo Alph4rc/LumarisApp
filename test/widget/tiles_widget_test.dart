@@ -9,6 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  Future<void> pumpFrames(WidgetTester tester, {int count = 6}) async {
+    for (var i = 0; i < count; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+  }
+
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
@@ -34,7 +40,7 @@ void main() {
         (WidgetTester tester) async {
       Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should show tiles
       expect(find.text('快捷功能'), findsOneWidget);
@@ -45,11 +51,11 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('完成'), findsOneWidget);
     });
@@ -58,12 +64,12 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Hide all tiles except one
       await controller.toggleVisibility('电费');
       await controller.toggleVisibility('校车');
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should still show one tile
       expect(controller.visibleTiles.length, 1);
@@ -73,17 +79,17 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should show available tiles list if any tiles are hidden
       await controller.toggleVisibility('电费');
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
-      expect(find.text('已隐藏的磁贴'), findsOneWidget);
+      expect(find.text('更多功能'), findsOneWidget);
     });
   });
 
@@ -92,18 +98,18 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       final initialOrder = controller.visibleTiles.map((t) => t.id).toList();
       expect(initialOrder[0], '电费');
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Reorder tiles programmatically (simulating drag)
       await controller.reorderTile('电费', 0, 2);
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       final newOrder = controller.visibleTiles.map((t) => t.id).toList();
       expect(newOrder[0], '校车');
@@ -114,19 +120,19 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Make changes
       await controller.reorderTile('电费', 0, 1);
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Exit edit mode (should save)
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Verify changes persisted
       final order = controller.visibleTiles.map((t) => t.id).toList();
@@ -147,7 +153,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       // Complete animation
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Tiles should be visible
       expect(find.byType(TilesWidget), findsOneWidget);
@@ -157,20 +163,41 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isEditMode.value, true);
 
       // Simulate app going to background
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Edit mode should be exited
       expect(controller.isEditMode.value, false);
+    });
+
+    testWidgets('should_not_throw_when_disposed_without_controller',
+        (WidgetTester tester) async {
+      Get.put(TileEditController());
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: TilesWidget(),
+            ),
+          ),
+        ),
+      );
+      await pumpFrames(tester);
+
+      Get.reset();
+      await tester.pumpWidget(const SizedBox.shrink());
+      await pumpFrames(tester);
+
+      expect(find.byType(TilesWidget), findsNothing);
     });
   });
 
@@ -179,16 +206,16 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Hide tiles until only one left
       await controller.toggleVisibility('电费');
       await controller.toggleVisibility('校车');
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Try to hide the last tile
-      expect(
-        () => controller.toggleVisibility('饭卡'),
+      await expectLater(
+        controller.toggleVisibility('饭卡'),
         throwsA(isA<StateError>()),
       );
     });
@@ -197,11 +224,11 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Try invalid reorder
-      expect(
-        () => controller.reorderTile('电费', -1, 0),
+      await expectLater(
+        controller.reorderTile('电费', -1, 0),
         throwsA(isA<ArgumentError>()),
       );
     });

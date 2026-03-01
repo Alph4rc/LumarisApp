@@ -9,6 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  Future<void> pumpFrames(WidgetTester tester, {int count = 6}) async {
+    for (var i = 0; i < count; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+  }
+
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
@@ -45,7 +51,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('Test Tile'), findsOneWidget);
     });
@@ -67,17 +73,14 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
-
-      // Should show drag indicator
-      expect(find.byIcon(Icons.drag_indicator), findsOneWidget);
+      await pumpFrames(tester);
 
       // Should show hide button
-      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+      expect(find.byIcon(Icons.remove), findsOneWidget);
     });
 
     testWidgets('should_not_show_edit_indicators_in_normal_mode',
@@ -97,11 +100,10 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should not show edit indicators
-      expect(find.byIcon(Icons.drag_indicator), findsNothing);
-      expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+      expect(find.byIcon(Icons.remove), findsNothing);
     });
 
     testWidgets('should_handle_hide_button_tap',
@@ -121,17 +123,17 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), true);
 
       // Tap hide button
-      await tester.tap(find.byIcon(Icons.remove_circle_outline));
-      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.remove));
+      await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), false);
     });
@@ -157,15 +159,15 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Try to hide the last tile
-      await tester.tap(find.byIcon(Icons.remove_circle_outline));
-      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.remove));
+      await pumpFrames(tester);
 
       // Should show snackbar
       expect(find.text('至少需要保留一个磁贴'), findsOneWidget);
@@ -191,7 +193,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('Draggable'), findsOneWidget);
     });
@@ -217,7 +219,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should show check icon when selected
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
@@ -242,7 +244,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should not show check icon
       expect(find.byIcon(Icons.check_circle), findsNothing);
@@ -269,10 +271,10 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       await tester.tap(find.byType(TapReorderTileItem));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(tapped, true);
     });

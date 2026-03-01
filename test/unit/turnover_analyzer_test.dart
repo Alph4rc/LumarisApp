@@ -2,6 +2,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _InMemoryPaymentStorage implements PaymentStorage {
+  final Map<String, String?> _memory = <String, String?>{};
+
+  @override
+  Future<String?> read(String key) async => _memory[key];
+
+  @override
+  Future<void> write(String key, String? value) async {
+    if (value == null) {
+      _memory.remove(key);
+      return;
+    }
+    _memory[key] = value;
+  }
+}
+
 void main() {
   group('PaymentModel', () {
     test('should create instance with provided values', () {
@@ -213,6 +229,25 @@ void main() {
       expect(paymentData.payments[99].resume, '交易99');
     });
 
+    test('should handle extreme record count in JSON', () {
+      final records = List.generate(10000, (index) => {
+        'turnoverType': index.isEven ? '消费' : '充值',
+        'datetimeStr': '2023-01-01 12:00:00',
+        'resume': '极限交易$index',
+        'tranamt': index,
+      });
+
+      final json = {
+        'records': records,
+        'total': 49995000.0,
+      };
+
+      final paymentData = PaymentData.fromJson(json);
+      expect(paymentData.payments.length, 10000);
+      expect(paymentData.payments.first.resume, '极限交易0');
+      expect(paymentData.payments.last.resume, '极限交易9999');
+    });
+
     test('should handle missing total field in JSON', () {
       final json = {
         'records': [
@@ -244,6 +279,15 @@ void main() {
 
       expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
     });
+
+    test('should throw when records type is invalid', () {
+      final json = {
+        'records': 'invalid-records',
+        'total': 1.0,
+      };
+
+      expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
+    });
     
     test('should handle zero total correctly', () {
       final json = {
@@ -271,6 +315,11 @@ void main() {
     setUp(() {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
+      PaymentAnalyzer.setStorageForTest(_InMemoryPaymentStorage());
+    });
+
+    tearDown(() {
+      PaymentAnalyzer.resetStorage();
     });
 
     test('should set and get payment number correctly', () async {
@@ -320,6 +369,12 @@ void main() {
       
       // Verify returns the large card id
       expect(cardId, largeCardId);
+    });
+
+    test('should overwrite payment number correctly', () async {
+      await PaymentAnalyzer.setPayment('first');
+      await PaymentAnalyzer.setPayment('second');
+      expect(await PaymentAnalyzer.getPayment(), 'second');
     });
   });
 }

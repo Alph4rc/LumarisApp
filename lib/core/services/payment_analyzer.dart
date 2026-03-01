@@ -2,6 +2,27 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
+abstract class PaymentStorage {
+  Future<void> write(String key, String? value);
+  Future<String?> read(String key);
+}
+
+class SecurePaymentStorage implements PaymentStorage {
+  final SecureStorageService _secureStorage;
+
+  SecurePaymentStorage(this._secureStorage);
+
+  @override
+  Future<void> write(String key, String? value) {
+    return _secureStorage.write(key: key, value: value);
+  }
+
+  @override
+  Future<String?> read(String key) {
+    return _secureStorage.read(key: key);
+  }
+}
+
 /// 支付数据模型类
 /// 包含支付记录列表和总金额
 class PaymentData {
@@ -74,6 +95,18 @@ class PaymentAnalyzer {
     baseUrl: 'https://xauatapi.xauat.site',
     enableCache: true,
   );
+  static PaymentStorage _storage =
+      SecurePaymentStorage(SecureStorageService.instance);
+
+  /// Test-only storage injection.
+  static void setStorageForTest(PaymentStorage storage) {
+    _storage = storage;
+  }
+
+  /// Reset storage to production implementation.
+  static void resetStorage() {
+    _storage = SecurePaymentStorage(SecureStorageService.instance);
+  }
 
   /// 获取支付数据
   /// 如果本地没有存储卡号，则返回空数据
@@ -116,15 +149,13 @@ class PaymentAnalyzer {
   ///
   /// [a] 卡号
   static Future<void> setPayment(String a) async {
-    final secureStorage = SecureStorageService.instance;
-    await secureStorage.write(key: PrefsKeys.PAYMENT_NUM, value: a);
+    await _storage.write(PrefsKeys.PAYMENT_NUM, a);
   }
 
   /// 从本地获取已存储的支付卡号
   ///
   /// 返回存储的卡号，如果未存储则返回空字符串
   static Future<String> getPayment() async {
-    final secureStorage = SecureStorageService.instance;
-    return await secureStorage.read(key: PrefsKeys.PAYMENT_NUM) ?? '';
+    return await _storage.read(PrefsKeys.PAYMENT_NUM) ?? '';
   }
 }

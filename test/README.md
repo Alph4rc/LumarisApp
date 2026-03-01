@@ -15,8 +15,9 @@ test/
 │   ├── empty_widget_test.dart
 │   ├── club_card_test.dart
 │   └── show_club_snack_bar_test.dart
-├── all_tests.dart           # 所有测试的聚合文件
-└── widget_test.dart         # 主测试文件
+├── all_tests.dart           # 手动聚合入口（可选）
+├── widget_test.dart         # 轻量 smoke 测试
+└── performance/             # 性能回归测试（tag: performance）
 ```
 
 ## 运行测试
@@ -25,6 +26,12 @@ test/
 
 ```bash
 flutter test
+```
+
+### 运行性能测试
+
+```bash
+flutter test --tags performance
 ```
 
 ### 运行特定测试文件
@@ -55,7 +62,7 @@ flutter test --coverage
 1. 根据测试类型将测试文件放在相应的目录中
 2. 使用`test`函数进行单元测试，使用`testWidgets`函数进行小部件测试
 3. 确保测试覆盖各种边界情况和错误情况
-4. 将新测试添加到`all_tests.dart`文件中，以便统一运行
+4. 常规测试无需添加到`all_tests.dart`，自动发现即可；`all_tests.dart`仅作手动聚合
 
 ## 测试最佳实践
 
