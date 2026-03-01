@@ -262,4 +262,96 @@ void main() {
       expect(config.configurations.every((t) => t.isVisible), true);
     });
   });
+
+  group('TileService - Visibility helpers', () {
+    test('should_add_hidden_tile_back_to_visible', () async {
+      final config = TileConfigurationList(
+        configurations: const [
+          TileConfiguration(id: '电费', order: 0, isVisible: true),
+          TileConfiguration(id: '校车', order: 1, isVisible: false),
+        ],
+        lastModified: DateTime.now(),
+      );
+      await TileService.saveTileConfigurations(config);
+
+      await TileService.addTile('校车');
+
+      final loaded = await TileService.getTileConfigurations();
+      final bus = loaded.configurations.firstWhere((t) => t.id == '校车');
+      expect(bus.isVisible, isTrue);
+      expect(await TileService.isTileVisible('校车'), isTrue);
+    });
+
+    test('should_add_new_tile_when_not_in_configuration', () async {
+      final config = TileConfigurationList(
+        configurations: const [
+          TileConfiguration(id: '电费', order: 0, isVisible: true),
+        ],
+        lastModified: DateTime.now(),
+      );
+      await TileService.saveTileConfigurations(config);
+
+      await TileService.addTile('新功能');
+
+      final loaded = await TileService.getTileConfigurations();
+      final added = loaded.configurations.firstWhere((t) => t.id == '新功能');
+      expect(added.isVisible, isTrue);
+      expect(added.order, 1);
+    });
+
+    test('should_remove_visible_tile_by_toggling_visibility', () async {
+      final config = TileConfigurationList(
+        configurations: const [
+          TileConfiguration(id: '电费', order: 0, isVisible: true),
+          TileConfiguration(id: '校车', order: 1, isVisible: true),
+        ],
+        lastModified: DateTime.now(),
+      );
+      await TileService.saveTileConfigurations(config);
+
+      await TileService.removeTile('校车');
+
+      expect(await TileService.isTileVisible('校车'), isFalse);
+      expect(await TileService.isTileVisible('电费'), isTrue);
+    });
+
+    test('should_keep_state_when_removing_hidden_or_unknown_tile', () async {
+      final config = TileConfigurationList(
+        configurations: const [
+          TileConfiguration(id: '电费', order: 0, isVisible: true),
+          TileConfiguration(id: '校车', order: 1, isVisible: false),
+        ],
+        lastModified: DateTime.now(),
+      );
+      await TileService.saveTileConfigurations(config);
+
+      await TileService.removeTile('校车');
+      await TileService.removeTile('不存在');
+
+      final loaded = await TileService.getTileConfigurations();
+      final visible = loaded.getVisibleTiles().map((e) => e.id).toList();
+      expect(visible, ['电费']);
+    });
+  });
+
+  group('TileService - Electricity HTML parsing', () {
+    test('getTextAfterKeyword should return null when url is empty', () async {
+      await PrefsService.instance.remove(PrefsKeys.ELECTRICITY_URL);
+      final value = await TileService.getTextAfterKeyword(url: '');
+      expect(value, isNull);
+    });
+
+    test('getTextAfterKeyword should return null on request failure', () async {
+      final value =
+          await TileService.getTextAfterKeyword(url: 'http://127.0.0.1:1/x');
+      expect(value, isNull);
+    });
+
+    test('getElectricityWeeklyData should return empty when url missing',
+        () async {
+      await PrefsService.instance.remove(PrefsKeys.ELECTRICITY_URL);
+      final list = await TileService.getElectricityWeeklyData();
+      expect(list, isEmpty);
+    });
+  });
 }
