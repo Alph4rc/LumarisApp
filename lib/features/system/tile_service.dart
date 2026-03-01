@@ -24,7 +24,7 @@ class TileConfigurationException implements Exception {
 }
 
 class TileService {
-  static final Dio _dio = Dio(BaseOptions(
+  static Dio _dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));
@@ -314,5 +314,16 @@ class TileService {
       configurations: configurations,
       lastModified: DateTime.now(),
     );
+  }
+
+  static void setDioForTest(Dio dio) {
+    _dio = dio;
+  }
+
+  static void resetDioForTest() {
+    _dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ));
   }
 }

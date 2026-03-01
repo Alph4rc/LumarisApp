@@ -17,6 +17,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,6 +84,7 @@ void main() {
     secureStore.clear();
     await PrefsService.instance.clear();
     Get.reset();
+    LoginService.setLoginOverrideForTest(null);
 
     for (final boxName in <String>[
       'request_cache',
@@ -134,6 +136,7 @@ void main() {
   tearDown(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
+    LoginService.setLoginOverrideForTest(null);
     Get.reset();
   });
 
@@ -198,6 +201,26 @@ void main() {
 
       final result = await EduService.login();
       expect(result, isFalse);
+    });
+
+    test('login should succeed and persist user cache when api returns success',
+        () async {
+      secureStore[PrefsKeys.USERNAME] = 'u1';
+      secureStore[PrefsKeys.PASSWORD] = 'p1';
+      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
+            'success': true,
+            'studentId': '2026001',
+            'cookie': 'cookie-login',
+          });
+
+      final result = await EduService.login();
+      expect(result, isTrue);
+      expect(
+        PrefsService.instance.getString(PrefsKeys.USER_DATA),
+        contains('cookie-login'),
+      );
+      expect(
+          PrefsService.instance.getInt(PrefsKeys.LAST_FETCH_TIME), isNotNull);
     });
 
     test('getCookie should return null when cache is expired', () async {
@@ -273,6 +296,89 @@ void main() {
 
       final data = await EduService.getUserData();
       expect(data, isNull);
+    });
+
+    test('refresh should return false when login fails', () async {
+      final result = await EduService.refresh();
+      expect(result, isFalse);
+    });
+
+    test('refresh should fetch all data and return true on success', () async {
+      secureStore[PrefsKeys.USERNAME] = 'u2';
+      secureStore[PrefsKeys.PASSWORD] = 'p2';
+      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
+            'success': true,
+            'studentId': '2026002',
+            'cookie': 'cookie-refresh',
+          });
+      _mockEduResponse(
+        path: '/Score/Semester',
+        data: <String, dynamic>{
+          'data': <Map<String, String>>[
+            <String, String>{'semester': '2025-2', 'name': '2025-2'}
+          ]
+        },
+      );
+      _mockEduResponse(
+        path: '/Info/Time',
+        data: <String, dynamic>{
+          'startTime': '2026-02-20T00:00:00.000',
+          'endTime': '2026-07-20T00:00:00.000',
+          'semester': '2025-2026-2',
+        },
+      );
+      _mockEduResponse(path: '/Exam', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(
+          path: '/Info/Completion', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(path: '/Course', data: <Map<String, dynamic>>[]);
+
+      final result = await EduService.refresh();
+      expect(result, isTrue);
+      expect(PrefsService.instance.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME),
+          isNotNull);
+    });
+
+    test('loginFromData should return false on empty credentials', () async {
+      expect(await EduService.loginFromData('', 'p'), isFalse);
+      expect(await EduService.loginFromData('u', ''), isFalse);
+    });
+
+    test('loginFromData should fetch data and return true on success',
+        () async {
+      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
+            'success': true,
+            'studentId': '2026999',
+            'cookie': 'cookie-data-login',
+          });
+      _mockEduResponse(
+        path: '/Score/Semester',
+        data: <String, dynamic>{
+          'data': <Map<String, String>>[
+            <String, String>{'semester': '2025-2', 'name': '2025-2'}
+          ]
+        },
+      );
+      _mockEduResponse(
+        path: '/Info/Time',
+        data: <String, dynamic>{
+          'startTime': '2026-02-20T00:00:00.000',
+          'endTime': '2026-07-20T00:00:00.000',
+          'semester': '2025-2026-2',
+        },
+      );
+      _mockEduResponse(path: '/Exam', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(
+          path: '/Info/Completion', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(path: '/Course', data: <Map<String, dynamic>>[]);
+
+      final ok = await EduService.loginFromData('u3', 'p3');
+      expect(ok, isTrue);
+      expect(
+        PrefsService.instance.getString(PrefsKeys.USER_DATA),
+        contains('cookie-data-login'),
+      );
+      expect(
+          PrefsService.instance.getInt(PrefsKeys.LAST_FETCH_TIME), isNotNull);
     });
   });
 
@@ -532,6 +638,40 @@ void main() {
       final result = await EduService.getBus(dayDate: day);
       expect(result.records, hasLength(1));
       expect(result.records.first.lineName, 'line-future');
+    });
+
+    test('getThisSemester should persist response string', () async {
+      _mockEduResponse(
+        path: '/Score/ThisSemester',
+        data: <Map<String, dynamic>>[
+          <String, dynamic>{'name': 'Math', 'grade': '95'}
+        ],
+      );
+
+      await EduService.getThisSemester();
+      expect(
+        PrefsService.instance.getString(PrefsKeys.THIS_SEMESTER_DATA),
+        contains('Math'),
+      );
+    });
+
+    test('clearEduCache should remove cached preference keys', () async {
+      final prefs = PrefsService.instance;
+      await prefs.setString(PrefsKeys.USER_DATA, 'u');
+      await prefs.setString(PrefsKeys.COURSE_DATA, 'c');
+      await prefs.setString(PrefsKeys.TIME_DATA, 't');
+      await prefs.setString(PrefsKeys.INFO_DATA, 'i');
+      await prefs.setInt(PrefsKeys.LAST_FETCH_TIME, 1);
+      await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME, 1);
+
+      await EduService.clearEduCache();
+
+      expect(prefs.getString(PrefsKeys.USER_DATA), isNull);
+      expect(prefs.getString(PrefsKeys.COURSE_DATA), isNull);
+      expect(prefs.getString(PrefsKeys.TIME_DATA), isNull);
+      expect(prefs.getString(PrefsKeys.INFO_DATA), isNull);
+      expect(prefs.getInt(PrefsKeys.LAST_FETCH_TIME), isNull);
+      expect(prefs.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME), isNull);
     });
   });
 }
