@@ -41,8 +41,8 @@ class XAUATLogin {
   static const String aesChars =
       "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
 
-  XAUATLogin() {
-    _dio = Dio();
+  XAUATLogin({Dio? dio}) {
+    _dio = dio ?? Dio();
     _dio.options.connectTimeout = const Duration(seconds: 15);
     _dio.options.receiveTimeout = const Duration(seconds: 15);
   }

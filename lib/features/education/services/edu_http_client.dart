@@ -121,6 +121,9 @@ class EduHttpClient {
   /// 获取当前基础 URL
   String get baseUrl => _baseUrl;
 
+  /// 暴露 Dio 实例，便于在测试中注入拦截器和验证请求。
+  Dio get dio => _dio;
+
   /// 更新基础 URL
   ///
   /// 用于切换学校时更新 API 地址

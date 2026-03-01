@@ -1,123 +1,201 @@
-import 'dart:async';
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart' hide Response;
+import 'package:hive/hive.dart';
+import 'package:ios_club_app/core/services/auth_state_notifier.dart';
+import 'package:ios_club_app/core/services/network_exception.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  group('EduHttpClient 401错误处理测试', () {
-    test('验证401错误处理逻辑存在', () async {
-      // 这个测试验证了全局登录锁机制的设计
-      // 当多个请求同时遇到401错误时，只有第一个请求会触发登录
-      // 其他请求会等待第一个登录完成
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-      // 模拟401响应
-      final error401 = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        response: Response(
-          requestOptions: RequestOptions(path: '/test'),
-          statusCode: 401,
-        ),
-        type: DioExceptionType.badResponse,
-      );
+  const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  final secureStore = <String, String>{};
+  late Directory tempDir;
 
-      // 验证：401错误可以被正确识别
-      expect(error401.response?.statusCode, 401);
-      expect(error401.type, DioExceptionType.badResponse);
-    });
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await PrefsService.init();
+    Get.testMode = true;
 
-    test('验证403错误处理逻辑存在', () async {
-      // 403错误也应该触发重登录逻辑
-      final error403 = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        response: Response(
-          requestOptions: RequestOptions(path: '/test'),
-          statusCode: 403,
-        ),
-        type: DioExceptionType.badResponse,
-      );
+    tempDir = await Directory.systemTemp.createTemp('edu_http_client_test_');
+    Hive.init(tempDir.path);
+    final box = await Hive.openBox('request_cache');
+    await box.clear();
+  });
 
-      expect(error403.response?.statusCode, 403);
-      expect(error403.type, DioExceptionType.badResponse);
-    });
+  setUp(() async {
+    secureStore.clear();
+    await PrefsService.instance.clear();
+    Get.reset();
+    final box = await Hive.openBox('request_cache');
+    await box.clear();
 
-    test('登录冷却时间常量验证', () async {
-      // 验证冷却时间常量设置合理
-      const cooldownMs = 5000; // 5秒冷却期
-      expect(cooldownMs, greaterThan(0));
-      expect(cooldownMs, lessThanOrEqualTo(10000)); // 不超过10秒
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+      final key = call.arguments['key'] as String?;
+      switch (call.method) {
+        case 'read':
+          if (key == null) {
+            return null;
+          }
+          return secureStore[key];
+        case 'write':
+          final value = call.arguments['value'] as String?;
+          if (key != null && value != null) {
+            secureStore[key] = value;
+          }
+          return null;
+      }
+      return null;
     });
   });
 
-  group('EduHttpClient 并发场景测试', () {
-    test('模拟多个服务同时遇到401的场景', () async {
-      // 场景：多个不同的服务同时发起请求
-      // 所有请求都返回401
-      // 预期：通过全局锁机制，只有1个登录请求被发送
-
-      final requests = List.generate(
-          5,
-          (index) => {
-                'id': 'request_$index',
-                'status': 401,
-              });
-
-      // 在实际应用中，这些请求会通过 _reLoginWithLock 被序列化
-      // 只有第一个请求会真正执行登录，其他请求会等待
-      expect(requests.length, 5);
-      expect(requests.every((r) => r['status'] == 401), isTrue);
-    });
-
-    test('验证Completer机制可以用于请求排队', () async {
-      // Completer 是 Dart 中用于手动控制 Future 完成的机制
-      // 在 EduHttpClient 中用于实现登录请求的排队
-
-      final completer = Completer<bool>();
-
-      // 模拟多个请求等待同一个 Completer
-      final futures = <Future<bool>>[
-        completer.future,
-        completer.future,
-        completer.future,
-      ];
-
-      // 完成 Completer
-      completer.complete(true);
-
-      // 所有等待的 Future 都应该得到相同的结果
-      final results = await Future.wait(futures);
-      expect(results, everyElement(isTrue));
-      expect(results.length, 3);
-    });
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
+    Get.reset();
   });
 
-  group('错误处理边界测试', () {
-    test('验证非401/403错误不触发重登录', () {
-      // 500错误不应该触发重登录
-      final error500 = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        response: Response(
-          requestOptions: RequestOptions(path: '/test'),
-          statusCode: 500,
-        ),
-        type: DioExceptionType.badResponse,
-      );
+  tearDownAll(() async {
+    await Hive.close();
+    if (await tempDir.exists()) {
+      await tempDir.delete(recursive: true);
+    }
+  });
 
-      expect(error500.response?.statusCode, 500);
-      expect(error500.response?.statusCode == 401, isFalse);
-      expect(error500.response?.statusCode == 403, isFalse);
+  group('EduHttpClient', () {
+    test('should update baseUrl in runtime', () {
+      final client = EduHttpClient(baseUrl: 'http://api.old');
+      expect(client.baseUrl, 'http://api.old');
+
+      client.updateBaseUrl('http://api.new');
+      expect(client.baseUrl, 'http://api.new');
+
+      client.dispose();
     });
 
-    test('验证404错误不触发重登录', () {
-      final error404 = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        response: Response(
-          requestOptions: RequestOptions(path: '/test'),
-          statusCode: 404,
-        ),
-        type: DioExceptionType.badResponse,
+    test('should inject cookie headers and return get response data', () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.USER_DATA,
+        jsonEncode(<String, String>{
+          'studentId': '2026001',
+          'cookie': 'cookie-token',
+        }),
       );
 
-      expect(error404.response?.statusCode, 404);
-      expect(error404.response?.statusCode == 401, isFalse);
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.headers['Cookie'], 'cookie-token');
+            expect(options.headers['xauat'], 'cookie-token');
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'ok': true},
+              ),
+            );
+          },
+        ),
+      );
+
+      final data = await client.get('/ping');
+      expect(data, isA<Map>());
+      expect((data as Map<String, dynamic>)['ok'], isTrue);
+
+      client.dispose();
+    });
+
+    test('should return post response data', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.method, 'POST');
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'result': 'ok'},
+              ),
+            );
+          },
+        ),
+      );
+
+      final data = await client.post('/submit', data: <String, dynamic>{
+        'name': 'codex',
+      });
+      expect(data, isA<Map>());
+      expect((data as Map<String, dynamic>)['result'], 'ok');
+
+      client.dispose();
+    });
+
+    test('should trigger relog failed state on 401 and throw auth exception',
+        () async {
+      Get.put(AuthStateNotifier());
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                response: Response<dynamic>(
+                  requestOptions: options,
+                  statusCode: 401,
+                ),
+                type: DioExceptionType.badResponse,
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(
+        () => client.get('/need-auth'),
+        throwsA(isA<AuthenticationException>()),
+      );
+
+      client.dispose();
+    });
+
+    test('should map 500 response into server exception', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                response: Response<dynamic>(
+                  requestOptions: options,
+                  statusCode: 500,
+                ),
+                type: DioExceptionType.badResponse,
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(
+        () => client.get('/boom'),
+        throwsA(isA<ServerException>()),
+      );
+
+      client.dispose();
     });
   });
 }
