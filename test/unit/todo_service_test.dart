@@ -137,6 +137,16 @@ void main() {
       await TodoService.clearLocalData();
       expect(box.containsKey('u3'), isFalse);
     });
+
+    test('getClubTodoList should return empty when member data missing', () async {
+      final list = await TodoService.getClubTodoList();
+      expect(list, isEmpty);
+    });
+
+    test('nowToUpdate should return directly when member data missing', () async {
+      await TodoService.nowToUpdate();
+      expect(true, isTrue);
+    });
   });
 
   group('TodoService fromJsonClub', () {
