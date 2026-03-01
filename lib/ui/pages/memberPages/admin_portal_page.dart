@@ -101,7 +101,8 @@ class AdminPortalPage extends StatelessWidget {
                         subtitle: '发布和管理文章',
                         icon: Icons.description,
                         color: Colors.teal,
-                        onTap: () => Get.to(() => const ArticleManagementPage()),
+                        onTap: () =>
+                            Get.to(() => const ArticleManagementPage()),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -112,7 +113,8 @@ class AdminPortalPage extends StatelessWidget {
                         subtitle: '文章分类与排序',
                         icon: Icons.category,
                         color: Colors.indigo,
-                        onTap: () => Get.to(() => const CategoryManagementPage()),
+                        onTap: () =>
+                            Get.to(() => const CategoryManagementPage()),
                       ),
                     ),
                   ],
@@ -181,7 +183,8 @@ class AdminPortalPage extends StatelessWidget {
                         subtitle: 'OAuth应用管理',
                         icon: Icons.apps,
                         color: Colors.cyan,
-                        onTap: () => Get.to(() => const ClientAppManagementPage()),
+                        onTap: () =>
+                            Get.to(() => const ClientAppManagementPage()),
                       ),
                     ),
                   ],

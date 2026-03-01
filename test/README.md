@@ -25,7 +25,7 @@ test/
 ### 运行所有测试
 
 ```bash
-flutter test
+flutter test --exclude-tags performance
 ```
 
 ### 运行性能测试

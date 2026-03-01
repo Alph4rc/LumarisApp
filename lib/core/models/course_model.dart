@@ -103,8 +103,11 @@ class CourseModel {
   /// @return 课程实例
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
-      weekIndexes: json['weekIndexes'] != null ? List<int>.from(json['weekIndexes']) : [],
-      teachers: json['teachers'] != null ? List<String>.from(json['teachers']) : [],
+      weekIndexes: json['weekIndexes'] != null
+          ? List<int>.from(json['weekIndexes'])
+          : [],
+      teachers:
+          json['teachers'] != null ? List<String>.from(json['teachers']) : [],
       room: json['room'] ?? '',
       courseName: json['courseName'] ?? '',
       courseCode: json['courseCode'] ?? '',

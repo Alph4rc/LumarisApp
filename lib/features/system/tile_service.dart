@@ -100,16 +100,16 @@ class TileService {
       final maxOrder = visibleTiles.isEmpty
           ? -1
           : visibleTiles.map((t) => t.order).reduce((a, b) => a > b ? a : b);
-      
+
       final newTile = TileConfiguration(
         id: tileId,
         order: maxOrder + 1,
         isVisible: true,
       );
-      
+
       final newConfigs = List<TileConfiguration>.from(config.configurations)
         ..add(newTile);
-      
+
       final newList = config.copyWith(configurations: newConfigs);
       await saveTileConfigurations(newList.normalizeOrders());
     }

@@ -22,7 +22,8 @@ class PlatformUtils {
   static bool get isMPFlutter {
     if (!kIsWeb) return false;
     // 在编译时检查是否设置了 MPFLUTTER 标志
-    const mpflutterFlag = bool.fromEnvironment('MPFLUTTER', defaultValue: false);
+    const mpflutterFlag =
+        bool.fromEnvironment('MPFLUTTER', defaultValue: false);
     return mpflutterFlag;
   }
 

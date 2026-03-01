@@ -9,20 +9,20 @@ import 'package:ios_club_app/ui/components/optimized_image.dart';
 class IconUtil {
   static Future<Widget> getIconFont(LinkModel model) async {
     if (model.icon == null || model.icon!.isEmpty) {
-        return LazyLoadImage.network(
-          'https://${model.url.replaceAll("https://", "").replaceAll("http://", "").split('/').first}/favicon.ico',
-          width: 40,
-          height: 40,
-        );
-      }
+      return LazyLoadImage.network(
+        'https://${model.url.replaceAll("https://", "").replaceAll("http://", "").split('/').first}/favicon.ico',
+        width: 40,
+        height: 40,
+      );
+    }
 
-      if (model.icon!.startsWith('http')) {
-        return LazyLoadImage.network(
-          model.icon!,
-          width: 40,
-          height: 40,
-        );
-      }
+    if (model.icon!.startsWith('http')) {
+      return LazyLoadImage.network(
+        model.icon!,
+        width: 40,
+        height: 40,
+      );
+    }
     final dateList =
         await rootBundle.loadString('assets/iconfont/iconfont.json');
     var iconMap = jsonDecode(dateList);
@@ -34,7 +34,7 @@ class IconUtil {
       color: CourseColorManager.generateSoftColor(model, isDark: true),
     );
   }
-  
+
   // 添加一个静态方法来创建 IconData 实例，以解决 tree shaking 问题
   static IconData createIconData(int codePoint) {
     return IconData(

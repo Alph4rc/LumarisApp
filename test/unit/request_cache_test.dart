@@ -33,7 +33,8 @@ void main() {
   });
 
   // ─── 辅助：直接向 box 写入已过期条目 ───────────────────────────────────────
-  Future<void> putExpired(String url, dynamic data, {Map<String, dynamic>? params}) async {
+  Future<void> putExpired(String url, dynamic data,
+      {Map<String, dynamic>? params}) async {
     final box = Hive.box(HiveManager.requestCacheBoxName);
     final paramsString =
         (params != null && params.isNotEmpty) ? jsonEncode(params) : '';
@@ -41,7 +42,9 @@ void main() {
         '${Uri.encodeComponent(paramsString)}';
     final entry = CacheEntry(
       data: data,
-      expiryTime: DateTime.now().subtract(const Duration(seconds: 1)).millisecondsSinceEpoch,
+      expiryTime: DateTime.now()
+          .subtract(const Duration(seconds: 1))
+          .millisecondsSinceEpoch,
     );
     await box.put(key, entry.toJson());
   }
@@ -85,7 +88,8 @@ void main() {
 
     test('should_handle_corrupt_data_gracefully_and_return_null', () async {
       final box = Hive.box(HiveManager.requestCacheBoxName);
-      final key = 'request_cache_${Uri.encodeComponent('https://example.com/corrupt')}_';
+      final key =
+          'request_cache_${Uri.encodeComponent('https://example.com/corrupt')}_';
       await box.put(key, {'bad_field': 'no_expiry_time'});
 
       final result = await cache.get<String>('https://example.com/corrupt');
@@ -95,11 +99,19 @@ void main() {
     });
 
     test('should_differentiate_entries_by_params', () async {
-      await cache.set('https://example.com/api', 'result_a', params: {'page': '1'});
-      await cache.set('https://example.com/api', 'result_b', params: {'page': '2'});
+      await cache
+          .set('https://example.com/api', 'result_a', params: {'page': '1'});
+      await cache
+          .set('https://example.com/api', 'result_b', params: {'page': '2'});
 
-      expect(await cache.get<String>('https://example.com/api', params: {'page': '1'}), 'result_a');
-      expect(await cache.get<String>('https://example.com/api', params: {'page': '2'}), 'result_b');
+      expect(
+          await cache
+              .get<String>('https://example.com/api', params: {'page': '1'}),
+          'result_a');
+      expect(
+          await cache
+              .get<String>('https://example.com/api', params: {'page': '2'}),
+          'result_b');
     });
 
     test('should_respect_explicit_maxAge_over_url_policy', () async {
@@ -110,7 +122,8 @@ void main() {
       );
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
-      final result = await cache.get<String>('https://example.com/api/score/list');
+      final result =
+          await cache.get<String>('https://example.com/api/score/list');
       expect(result, isNull); // 自定义 1ms TTL 已过期，而非 score 的 1h 策略
     });
   });
@@ -127,7 +140,8 @@ void main() {
     });
 
     test('should_not_throw_when_deleting_non_existent_key', () async {
-      await expectLater(cache.delete('https://example.com/api/nonexistent'), completes);
+      await expectLater(
+          cache.delete('https://example.com/api/nonexistent'), completes);
     });
   });
 
@@ -140,8 +154,10 @@ void main() {
       await cache.clearExpired();
 
       expect(await cache.get<String>('https://example.com/api/valid'), 'keep');
-      expect(await cache.get<String>('https://example.com/api/expired1'), isNull);
-      expect(await cache.get<String>('https://example.com/api/expired2'), isNull);
+      expect(
+          await cache.get<String>('https://example.com/api/expired1'), isNull);
+      expect(
+          await cache.get<String>('https://example.com/api/expired2'), isNull);
     });
 
     test('should_return_count_of_removed_entries', () async {
@@ -280,7 +296,8 @@ void main() {
     });
 
     test('should_cache_GET_200_response_data', () async {
-      final options = RequestOptions(path: 'https://example.com/api/data', method: 'GET');
+      final options =
+          RequestOptions(path: 'https://example.com/api/data', method: 'GET');
       final response = Response<Map>(
         data: {'key': 'value'},
         requestOptions: options,
@@ -295,14 +312,16 @@ void main() {
       // 使用与拦截器相同的 URL 和 params 查询
       final cached = await cache.get<Map>(
         options.uri.toString(),
-        params: options.queryParameters.isEmpty ? null : options.queryParameters,
+        params:
+            options.queryParameters.isEmpty ? null : options.queryParameters,
       );
       expect(cached, isNotNull);
       expect(cached!['key'], 'value');
     });
 
     test('should_not_cache_non_GET_response', () async {
-      final options = RequestOptions(path: 'https://example.com/api/data', method: 'POST');
+      final options =
+          RequestOptions(path: 'https://example.com/api/data', method: 'POST');
       final response = Response<Map>(
         data: {'key': 'value'},
         requestOptions: options,
@@ -318,7 +337,8 @@ void main() {
     });
 
     test('should_not_cache_non_200_GET_response', () async {
-      final options = RequestOptions(path: 'https://example.com/api/data', method: 'GET');
+      final options =
+          RequestOptions(path: 'https://example.com/api/data', method: 'GET');
       final response = Response<Map>(
         data: {'error': 'not found'},
         requestOptions: options,

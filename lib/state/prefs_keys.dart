@@ -8,7 +8,8 @@ class PrefsKeys {
 
   /// 课程相关
   /// @deprecated 已迁移到 Hive (CourseRepository)，保留此 Key 仅用于迁移逻辑，禁止新代码写入
-  @Deprecated('Migrated to Hive via CourseRepository. Do not write new data to this key.')
+  @Deprecated(
+      'Migrated to Hive via CourseRepository. Do not write new data to this key.')
   static const String COURSE_DATA = 'course_data';
   static const String IGNORE_DATA = 'ignore_data';
   static const String COURSE_LAST_FETCH_TIME = 'course_last_fetch_time';
@@ -19,7 +20,8 @@ class PrefsKeys {
 
   /// 成绩相关
   /// @deprecated 已迁移到 Hive (ScoreRepository)，保留此 Key 仅用于迁移逻辑，禁止新代码写入
-  @Deprecated('Migrated to Hive via ScoreRepository. Do not write new data to this key.')
+  @Deprecated(
+      'Migrated to Hive via ScoreRepository. Do not write new data to this key.')
   static const String ALL_SCORE_DATA = 'all_score_data';
   static const String LAST_SCORE_TIME = 'last_Score_time';
   static const String THIS_SEMESTER_DATA = 'this_semester_data';
@@ -50,7 +52,8 @@ class PrefsKeys {
 
   /// 待办事项相关
   /// @deprecated 已迁移到 Hive (TodoService)，保留此 Key 仅用于迁移逻辑，禁止新代码写入
-  @Deprecated('Migrated to Hive via TodoService. Do not write new data to this key.')
+  @Deprecated(
+      'Migrated to Hive via TodoService. Do not write new data to this key.')
   static const String TODO_DATA = 'todo_data';
   static const String IS_UPDATE_CLUB = 'is_update_club';
 

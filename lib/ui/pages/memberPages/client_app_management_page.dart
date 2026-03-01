@@ -94,8 +94,7 @@ class _ClientAppManagementPageState extends State<ClientAppManagementPage> {
           _loadApps();
         }
       } catch (e) {
-        Get.snackbar('错误', '重新生成失败: $e',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('错误', '重新生成失败: $e', snackPosition: SnackPosition.BOTTOM);
       }
     }
   }

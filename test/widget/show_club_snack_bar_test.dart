@@ -4,7 +4,8 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 void main() {
   group('showClubSnackBar', () {
-    testWidgets('should show SnackBar with provided child widget', (WidgetTester tester) async {
+    testWidgets('should show SnackBar with provided child widget',
+        (WidgetTester tester) async {
       const testText = '测试消息';
       var snackBarShown = false;
 
@@ -38,7 +39,8 @@ void main() {
       expect(find.text(testText), findsOneWidget);
     });
 
-    testWidgets('should show SnackBar with correct styling', (WidgetTester tester) async {
+    testWidgets('should show SnackBar with correct styling',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

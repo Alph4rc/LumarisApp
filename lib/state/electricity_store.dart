@@ -20,7 +20,7 @@ class ElectricityStore extends GetxController {
   Future<void> loadElectricityData() async {
     try {
       isLoading.value = true;
-      
+
       final value = await TileService.getTextAfterKeyword();
       final isVisible = await TileService.isTileVisible('电费');
       final weekly = await TileService.getElectricityWeeklyData();
@@ -29,7 +29,7 @@ class ElectricityStore extends GetxController {
         electricity.value = value;
         hasData.value = true;
       }
-      
+
       if (isVisible) {
         if (!tiles.contains('电费')) tiles.add('电费');
       } else {
@@ -46,7 +46,7 @@ class ElectricityStore extends GetxController {
   Future<void> refreshElectricityData() async {
     try {
       isLoading.value = true;
-      
+
       final value = await TileService.getTextAfterKeyword();
       final weekly = await TileService.getElectricityWeeklyData();
 
@@ -54,7 +54,7 @@ class ElectricityStore extends GetxController {
         electricity.value = value;
         hasData.value = true;
       }
-      
+
       weeklyData.assignAll(weekly);
     } catch (e) {
       // Handle error

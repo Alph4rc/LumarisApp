@@ -10,7 +10,8 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-SemesterModel _semester({String semester = '2024-2025-1', String name = '2024-2025学年第一学期'}) =>
+SemesterModel _semester(
+        {String semester = '2024-2025-1', String name = '2024-2025学年第一学期'}) =>
     SemesterModel(semester: semester, name: name);
 
 ScoreModel _score({
@@ -130,7 +131,8 @@ void main() {
 
     test('should_preserve_score_fields_after_round_trip', () async {
       final original = ScoreList(
-        semester: SemesterModel(semester: '2024-2025-1', name: '2024-2025学年第一学期'),
+        semester:
+            SemesterModel(semester: '2024-2025-1', name: '2024-2025学年第一学期'),
         list: [
           ScoreModel(
             lessonCode: 'CS001',
@@ -184,7 +186,8 @@ void main() {
       await PrefsService.instance.remove(PrefsKeys.ALL_SCORE_DATA);
     });
 
-    test('should_return_empty_list_when_prefs_migration_data_is_corrupt', () async {
+    test('should_return_empty_list_when_prefs_migration_data_is_corrupt',
+        () async {
       await PrefsService.instance.setString('all_score_data', 'not-valid-json');
 
       final result = await repo.getScores();
@@ -205,7 +208,8 @@ void main() {
     });
 
     test('should_return_empty_list_after_clear', () async {
-      await repo.saveScores([_scoreList(), _scoreList(semester: '2023-2024-2')]);
+      await repo
+          .saveScores([_scoreList(), _scoreList(semester: '2023-2024-2')]);
 
       await repo.clear();
 

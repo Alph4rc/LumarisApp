@@ -10,7 +10,8 @@ class LoginService {
   /// 登录
   /// [username] 用户名
   /// [password] 密码
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
     try {
       final response = await _client.post(
         '/Login',

@@ -14,7 +14,7 @@ class ExamItem {
     this.seatNo = '',
   });
 
-  factory ExamItem.fromJson(Map<String, dynamic> json){
+  factory ExamItem.fromJson(Map<String, dynamic> json) {
     return ExamItem(
       name: json['name'] ?? '',
       examTime: json['time'] ?? '',

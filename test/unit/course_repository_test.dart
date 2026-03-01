@@ -75,9 +75,12 @@ void main() {
     test('should_store_all_courses_including_same_lessonId', () async {
       // 同一 lessonId 不同时间段的课程不应互相覆盖
       await repo.saveCourses([
-        _course(lessonId: 'L001', weekday: 1, startUnit: 1, weekIndexes: [1, 2]),
-        _course(lessonId: 'L001', weekday: 3, startUnit: 3, weekIndexes: [3, 4]),
-        _course(lessonId: 'L001', weekday: 5, startUnit: 5, weekIndexes: [5, 6]),
+        _course(
+            lessonId: 'L001', weekday: 1, startUnit: 1, weekIndexes: [1, 2]),
+        _course(
+            lessonId: 'L001', weekday: 3, startUnit: 3, weekIndexes: [3, 4]),
+        _course(
+            lessonId: 'L001', weekday: 5, startUnit: 5, weekIndexes: [5, 6]),
       ]);
 
       final result = await repo.getCourses();

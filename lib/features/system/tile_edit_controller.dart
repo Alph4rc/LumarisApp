@@ -48,22 +48,23 @@ class TileEditController extends GetxController {
       // Merge with available tiles if any are missing
       final availableTiles = TileService.getAvailableTiles();
       final existingIds = loadedConfig.configurations.map((t) => t.id).toSet();
-      
+
       var hasChanges = false;
-      var newConfigs = List<TileConfiguration>.from(loadedConfig.configurations);
-      
+      var newConfigs =
+          List<TileConfiguration>.from(loadedConfig.configurations);
+
       for (final id in availableTiles) {
         if (!existingIds.contains(id)) {
-           // Add missing tile as hidden
-           newConfigs.add(TileConfiguration(
-             id: id,
-             order: newConfigs.length, 
-             isVisible: false,
-           ));
-           hasChanges = true;
+          // Add missing tile as hidden
+          newConfigs.add(TileConfiguration(
+            id: id,
+            order: newConfigs.length,
+            isVisible: false,
+          ));
+          hasChanges = true;
         }
       }
-      
+
       if (hasChanges) {
         loadedConfig = loadedConfig.copyWith(configurations: newConfigs);
         // Save back immediately to ensure consistency

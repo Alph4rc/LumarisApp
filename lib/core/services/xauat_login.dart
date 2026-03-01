@@ -38,7 +38,8 @@ class XAUATLogin {
   final Map<String, String> _cookies = {};
 
   // AES加密字符集
-  static const String aesChars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+  static const String aesChars =
+      "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
 
   XAUATLogin() {
     _dio = Dio();
@@ -51,7 +52,7 @@ class XAUATLogin {
     final random = Random();
     return List.generate(
       length,
-          (index) => aesChars[random.nextInt(aesChars.length)],
+      (index) => aesChars[random.nextInt(aesChars.length)],
     ).join();
   }
 
@@ -334,7 +335,8 @@ class XAUATLogin {
 
   // 测试辅助方法 - 仅为测试目的暴露私有方法
   String randomStringTest(int length) => _randomString(length);
-  String buildCookieStringTest(Map<String, String> cookies) => _buildCookieString(cookies);
+  String buildCookieStringTest(Map<String, String> cookies) =>
+      _buildCookieString(cookies);
 }
 
 // 使用示例

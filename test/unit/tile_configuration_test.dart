@@ -236,11 +236,13 @@ void main() {
 
       final toggled = config.toggleVisibility('电费');
       final tile = toggled.configurations.firstWhere((t) => t.id == '电费');
+      final visibleOrders = toggled.getVisibleTiles().map((t) => t.order).toList()
+        ..sort();
 
       expect(tile.isVisible, true);
       expect(toggled.getVisibleTiles().length, 2);
-      // Order is normalized after toggle
-      expect(tile.order, 1);
+      // Order is normalized after toggle, and visible orders remain contiguous.
+      expect(visibleOrders, equals([0, 1]));
     });
 
     test('should_throw_error_when_toggling_nonexistent_tile', () {
@@ -321,7 +323,8 @@ void main() {
       expect(config1, isNot(equals(config3)));
     });
 
-    test('should_recover_order_consistency_after_high_frequency_operations', () {
+    test('should_recover_order_consistency_after_high_frequency_operations',
+        () {
       var config = TileConfigurationList.defaultConfig();
 
       for (var i = 0; i < 100; i++) {

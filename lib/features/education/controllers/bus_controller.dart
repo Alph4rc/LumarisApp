@@ -7,7 +7,8 @@ import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/services/new_bus_api.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
-class BusController extends GetxController with GetSingleTickerProviderStateMixin {
+class BusController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   // Observable variables
   var selectedDate = ''.obs;
   var busData = <BusItem>[].obs;
@@ -28,7 +29,8 @@ class BusController extends GetxController with GetSingleTickerProviderStateMixi
     _generateWeeklyDates();
     tabController = TabController(length: 7, vsync: this);
     tabController.addListener(_handleTabSelection);
-    selectedDate.value = availableDates.isNotEmpty ? availableDates.keys.first : '';
+    selectedDate.value =
+        availableDates.isNotEmpty ? availableDates.keys.first : '';
     if (selectedDate.isNotEmpty) _fetchBusData(isInit: true);
     _loadTiles();
   }
@@ -74,11 +76,13 @@ class BusController extends GetxController with GetSingleTickerProviderStateMixi
 
       todayBusData.assignAll(data.records);
       if (isCaoTang.value) {
-        busData.assignAll(
-            todayBusData.where((bus) => bus.lineName.startsWith('草堂')).toList());
+        busData.assignAll(todayBusData
+            .where((bus) => bus.lineName.startsWith('草堂'))
+            .toList());
       } else {
-        busData.assignAll(
-            todayBusData.where((bus) => bus.lineName.startsWith('雁塔')).toList());
+        busData.assignAll(todayBusData
+            .where((bus) => bus.lineName.startsWith('雁塔'))
+            .toList());
       }
     } catch (e) {
       errorMessage.value = '获取校车数据时出错: $e';

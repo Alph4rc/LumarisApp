@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -19,9 +20,16 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
     Get.testMode = true;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async => null,
+    );
   });
 
   tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null);
     Get.reset();
   });
 
@@ -81,7 +89,10 @@ void main() {
 
       // Should show hide button
       expect(find.byIcon(Icons.remove), findsOneWidget);
-    });
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
+    }, timeout: const Timeout(Duration(seconds: 15)));
 
     testWidgets('should_not_show_edit_indicators_in_normal_mode',
         (WidgetTester tester) async {
@@ -106,8 +117,7 @@ void main() {
       expect(find.byIcon(Icons.remove), findsNothing);
     });
 
-    testWidgets('should_handle_hide_button_tap',
-        (WidgetTester tester) async {
+    testWidgets('should_handle_hide_button_tap', (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
 
       await tester.pumpWidget(
@@ -136,6 +146,9 @@ void main() {
       await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), false);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
 
     testWidgets('should_show_error_when_hiding_last_tile',
@@ -171,12 +184,14 @@ void main() {
 
       // Should show snackbar
       expect(find.text('至少需要保留一个磁贴'), findsOneWidget);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
   });
 
   group('DraggableTileItem', () {
     testWidgets('should_create_draggable_tile', (WidgetTester tester) async {
-
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -250,8 +265,7 @@ void main() {
       expect(find.byIcon(Icons.check_circle), findsNothing);
     });
 
-    testWidgets('should_call_onTap_when_tapped',
-        (WidgetTester tester) async {
+    testWidgets('should_call_onTap_when_tapped', (WidgetTester tester) async {
       bool tapped = false;
 
       await tester.pumpWidget(

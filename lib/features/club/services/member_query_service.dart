@@ -26,7 +26,8 @@ class MemberQueryService {
     String? searchCondition,
   }) async {
     try {
-      var url = '/MemberQuery/all-data/page?pageNum=$pageNum&pageSize=$pageSize';
+      var url =
+          '/MemberQuery/all-data/page?pageNum=$pageNum&pageSize=$pageSize';
       if (searchTerm != null) {
         url += '&searchTerm=$searchTerm';
       }
@@ -47,10 +48,11 @@ class MemberQueryService {
   }
 
   /// 搜索成员数据
-  static Future<bool> searchMemberData(String searchTerm, String searchCondition) async {
+  static Future<bool> searchMemberData(
+      String searchTerm, String searchCondition) async {
     try {
       final response = await ApiClient.get(
-        '/MemberQuery/all-data/search?searchTerm=$searchTerm&searchCondition=$searchCondition');
+          '/MemberQuery/all-data/search?searchTerm=$searchTerm&searchCondition=$searchCondition');
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {

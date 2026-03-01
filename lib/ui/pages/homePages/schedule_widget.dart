@@ -89,7 +89,8 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                                                   .toggleShowTomorrow();
                                               _initializeData(); // 重新加载数据
                                             }))),
-                                    if (PlatformUtils.isIOS || PlatformUtils.isAndroid)
+                                    if (PlatformUtils.isIOS ||
+                                        PlatformUtils.isAndroid)
                                       ListTile(
                                         title: const Text('课程通知'),
                                         trailing: Obx(() => CupertinoSwitch(
@@ -124,27 +125,34 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                             icon: Icons.school,
                             subtitle: '好好休息会儿吧，学一天累死个人'))
                     : Column(
-                        children: todayCourses
-                            .asMap()
-                            .entries
-                            .map((entry) {
-                              final index = entry.key;
-                              final course = entry.value;
-                              final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
-                              final time = TimeService.getStartAndEnd(course);
-                              final item = ScheduleItem(
-                                title: course.courseName,
-                                time: '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
-                                location: course.room,
-                                teacher: course.teachers.join(','),
-                                description: '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
-                              );
-                              return AnimatedListItem(
-                                index: index,
-                                child: _buildScheduleItem(item, isTablet),
-                              );
-                            })
-                            .toList(),
+                        children: todayCourses.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final course = entry.value;
+                          final weekdayName = [
+                            '日',
+                            '一',
+                            '二',
+                            '三',
+                            '四',
+                            '五',
+                            '六',
+                            '日'
+                          ];
+                          final time = TimeService.getStartAndEnd(course);
+                          final item = ScheduleItem(
+                            title: course.courseName,
+                            time:
+                                '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
+                            location: course.room,
+                            teacher: course.teachers.join(','),
+                            description:
+                                '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
+                          );
+                          return AnimatedListItem(
+                            index: index,
+                            child: _buildScheduleItem(item, isTablet),
+                          );
+                        }).toList(),
                       );
               }),
             ),
@@ -153,8 +161,6 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
       ],
     );
   }
-
-
 
   Widget _buildScheduleItem(ScheduleItem item, bool isTablet) {
     return Material(

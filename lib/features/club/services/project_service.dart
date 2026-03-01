@@ -25,7 +25,8 @@ class ProjectService {
   /// 创建项目
   static Future<ProjectModel?> createProject(ProjectModel projectData) async {
     try {
-      final response = await ApiClient.post('/Project', body: projectData.toJson());
+      final response =
+          await ApiClient.post('/Project', body: projectData.toJson());
       return ApiResponseHelper.parseSingleObject(
         response,
         ProjectModel.fromJson,
@@ -75,7 +76,8 @@ class ProjectService {
   /// 更改项目成员
   static Future<bool> changeProjectMember(String id, String projId) async {
     try {
-      final response = await ApiClient.post('/Project/change-member/$id/$projId');
+      final response =
+          await ApiClient.post('/Project/change-member/$id/$projId');
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error changing project member',

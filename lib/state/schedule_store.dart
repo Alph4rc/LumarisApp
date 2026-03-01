@@ -146,14 +146,13 @@ class ScheduleStore extends GetxController {
 
       // 添加超时保护：最多等待20秒
       // 考虑到可能需要重登录（3-5秒）+ 请求时间（5-10秒）
-      await EduService.getCourse(isRefresh: true)
-          .timeout(
-            const Duration(seconds: 20),
-            onTimeout: () {
-              AppLogger.warning('[ScheduleStore] 刷新课程超时');
-              throw TimeoutException('刷新课程超时');
-            },
-          );
+      await EduService.getCourse(isRefresh: true).timeout(
+        const Duration(seconds: 20),
+        onTimeout: () {
+          AppLogger.warning('[ScheduleStore] 刷新课程超时');
+          throw TimeoutException('刷新课程超时');
+        },
+      );
 
       AppLogger.debug('[ScheduleStore] EduService.getCourse 完成');
 
@@ -172,7 +171,8 @@ class ScheduleStore extends GetxController {
       // 超时错误会被UI层捕获并显示给用户
       rethrow;
     } catch (e, stackTrace) {
-      AppLogger.error('[ScheduleStore] 刷新课程失败', error: e, stackTrace: stackTrace);
+      AppLogger.error('[ScheduleStore] 刷新课程失败',
+          error: e, stackTrace: stackTrace);
       rethrow;
     } finally {
       AppLogger.debug('[ScheduleStore] 设置 _isLoading = false');

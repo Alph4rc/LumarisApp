@@ -143,7 +143,7 @@ void main() {
         '2023-01-01 12:00:00 | 消费 | 0.15 元 | 食堂午餐',
       );
     });
-    
+
     test('should handle negative amount correctly', () {
       final payment = PaymentModel(
         turnoverType: '消费',
@@ -209,12 +209,14 @@ void main() {
     });
 
     test('should handle large number of records in JSON', () {
-      final records = List.generate(100, (index) => {
-        'turnoverType': index % 2 == 0 ? '消费' : '充值',
-        'datetimeStr': '2023-01-01 12:00:00',
-        'resume': '交易$index',
-        'tranamt': index * 10,
-      });
+      final records = List.generate(
+          100,
+          (index) => {
+                'turnoverType': index % 2 == 0 ? '消费' : '充值',
+                'datetimeStr': '2023-01-01 12:00:00',
+                'resume': '交易$index',
+                'tranamt': index * 10,
+              });
 
       final json = {
         'records': records,
@@ -230,12 +232,14 @@ void main() {
     });
 
     test('should handle extreme record count in JSON', () {
-      final records = List.generate(10000, (index) => {
-        'turnoverType': index.isEven ? '消费' : '充值',
-        'datetimeStr': '2023-01-01 12:00:00',
-        'resume': '极限交易$index',
-        'tranamt': index,
-      });
+      final records = List.generate(
+          10000,
+          (index) => {
+                'turnoverType': index.isEven ? '消费' : '充值',
+                'datetimeStr': '2023-01-01 12:00:00',
+                'resume': '极限交易$index',
+                'tranamt': index,
+              });
 
       final json = {
         'records': records,
@@ -288,7 +292,7 @@ void main() {
 
       expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
     });
-    
+
     test('should handle zero total correctly', () {
       final json = {
         'records': [],
@@ -299,7 +303,7 @@ void main() {
       expect(paymentData.total, 0.0);
       expect(paymentData.payments, isEmpty);
     });
-    
+
     test('should handle negative total correctly', () {
       final json = {
         'records': [],
@@ -324,25 +328,26 @@ void main() {
 
     test('should set and get payment number correctly', () async {
       const testCardId = '123456789';
-      
+
       // Set payment number
       await PaymentAnalyzer.setPayment(testCardId);
-      
+
       // Get payment number
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify the payment number was saved and retrieved correctly
       expect(cardId, testCardId);
     });
 
-    test('should return empty string for non-existent payment number', () async {
+    test('should return empty string for non-existent payment number',
+        () async {
       // Clear any existing payment number
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('payment_num');
-      
+
       // Get payment number (should return empty string)
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify returns empty string
       expect(cardId, '');
     });
@@ -350,23 +355,23 @@ void main() {
     test('should handle empty payment number', () async {
       // Set empty payment number
       await PaymentAnalyzer.setPayment('');
-      
+
       // Get payment number
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify returns empty string
       expect(cardId, '');
     });
-    
+
     test('should handle large payment number', () async {
       const largeCardId = '12345678901234567890';
-      
+
       // Set large payment number
       await PaymentAnalyzer.setPayment(largeCardId);
-      
+
       // Get payment number
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify returns the large card id
       expect(cardId, largeCardId);
     });

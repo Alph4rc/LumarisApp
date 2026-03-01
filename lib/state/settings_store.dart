@@ -29,10 +29,10 @@ class SettingsStore extends GetxController {
 
   // 字体设置
   final _fontFamily = ''.obs;
-  
+
   // 课表网格线显示设置
   final _showCourseGrid = false.obs;
-  
+
   // 待办事项提醒设置
   final _todoRemindEnabled = false.obs;
 
@@ -58,9 +58,9 @@ class SettingsStore extends GetxController {
   bool get updateIgnored => _updateIgnored.value;
 
   String get fontFamily => _fontFamily.value;
-  
+
   bool get showCourseGrid => _showCourseGrid.value;
-  
+
   bool get todoRemindEnabled => _todoRemindEnabled.value;
 
   String get scheduleBackground => _scheduleBackground.value;
@@ -71,7 +71,8 @@ class SettingsStore extends GetxController {
 
   /// 获取当前学校配置
   SchoolConfig get currentSchool {
-    return ApiConfig.getSchoolById(_schoolId.value) ?? ApiConfig.getDefaultSchool();
+    return ApiConfig.getSchoolById(_schoolId.value) ??
+        ApiConfig.getDefaultSchool();
   }
 
   @override
@@ -94,10 +95,14 @@ class SettingsStore extends GetxController {
     _updateIgnored.value = prefs.getBool(PrefsKeys.UPDATE_IGNORED) ?? false;
     _fontFamily.value = prefs.getString(PrefsKeys.FONT_FAMILY) ?? '';
     _showCourseGrid.value = prefs.getBool(PrefsKeys.SHOW_COURSE_GRID) ?? false;
-    _todoRemindEnabled.value = prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED) ?? false;
-    _scheduleBackground.value = prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND) ?? '';
-    _customBackgroundImage.value = prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE) ?? '';
-    _schoolId.value = prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolId;
+    _todoRemindEnabled.value =
+        prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED) ?? false;
+    _scheduleBackground.value =
+        prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND) ?? '';
+    _customBackgroundImage.value =
+        prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE) ?? '';
+    _schoolId.value =
+        prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolId;
   }
 
   /// 设置课程通知开关
@@ -155,28 +160,28 @@ class SettingsStore extends GetxController {
     final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.FONT_FAMILY, value);
   }
-  
+
   /// 设置是否显示课表网格线
   Future<void> setShowCourseGrid(bool value) async {
     _showCourseGrid.value = value;
     final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.SHOW_COURSE_GRID, value);
   }
-  
+
   /// 设置是否启用待办事项提醒
   Future<void> setTodoRemindEnabled(bool value) async {
     _todoRemindEnabled.value = value;
     final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.TODO_REMIND_ENABLED, value);
   }
-  
+
   /// 设置课表背景
   Future<void> setScheduleBackground(String value) async {
     _scheduleBackground.value = value;
     final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.SCHEDULE_BACKGROUND, value);
   }
-  
+
   /// 设置自定义背景图片路径
   Future<void> setCustomBackgroundImage(String value) async {
     _customBackgroundImage.value = value;
@@ -217,7 +222,7 @@ class SettingsStore extends GetxController {
     // 清除与学校相关的缓存数据
     // 使用 EduService.clearEduCache() 统一清理逻辑
     await EduService.clearEduCache();
-    
+
     // 额外清理可能未被 EduService 覆盖的旧 Key (如果有)
     await _clearSchoolRelatedData();
   }

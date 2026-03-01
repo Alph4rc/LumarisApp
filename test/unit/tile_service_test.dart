@@ -80,8 +80,7 @@ void main() {
       expect(visible[2].id, '电费');
     });
 
-    test('should_throw_exception_when_reordering_with_invalid_index',
-        () async {
+    test('should_throw_exception_when_reordering_with_invalid_index', () async {
       final initialConfig = TileConfigurationList.defaultConfig();
       await TileService.saveTileConfigurations(initialConfig);
 
@@ -230,8 +229,7 @@ void main() {
 
     test('should_handle_corrupted_json_gracefully', () async {
       final prefs = PrefsService.instance;
-      await prefs.setString(
-          PrefsKeys.TILE_CONFIGURATIONS, 'invalid json data');
+      await prefs.setString(PrefsKeys.TILE_CONFIGURATIONS, 'invalid json data');
 
       final config = await TileService.getTileConfigurations();
 

@@ -186,7 +186,8 @@ class TileConfigurationList {
       ..sort((a, b) => a.order.compareTo(b.order));
 
     for (int i = 0; i < visibleTiles.length; i++) {
-      final index = newConfigurations.indexWhere((t) => t.id == visibleTiles[i].id);
+      final index =
+          newConfigurations.indexWhere((t) => t.id == visibleTiles[i].id);
       if (index != -1) {
         newConfigurations[index] = newConfigurations[index].copyWith(order: i);
       }

@@ -173,11 +173,10 @@ class DataService {
     final allCourse = await getAllCourse();
     if (week == 0) {
       final time = await getTime();
-      week = DateTime.now()
-                  .difference(DateTime.parse(time.startTime!))
-                  .inDays ~/
-              7 +
-          1;
+      week =
+          DateTime.now().difference(DateTime.parse(time.startTime!)).inDays ~/
+                  7 +
+              1;
     }
     return allCourse
         .where((course) => course.weekIndexes.contains(week))

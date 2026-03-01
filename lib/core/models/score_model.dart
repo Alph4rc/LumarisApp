@@ -85,7 +85,8 @@ class ScoreList {
         }).toList(),
         semester = (() {
           try {
-            return SemesterModel.fromJson(json['semester'] as Map<String, dynamic>);
+            return SemesterModel.fromJson(
+                json['semester'] as Map<String, dynamic>);
           } catch (_) {
             return SemesterModel(semester: '', name: '');
           }

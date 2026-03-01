@@ -46,18 +46,19 @@ class _VersionSettingState extends State<VersionSetting> {
 
   void _handleTap() {
     final now = DateTime.now();
-    if (lastTapTime == null || now.difference(lastTapTime!) > const Duration(seconds: 1)) {
+    if (lastTapTime == null ||
+        now.difference(lastTapTime!) > const Duration(seconds: 1)) {
       // 重置计数器
       tapCount = 0;
     }
-    
+
     tapCount++;
     lastTapTime = now;
-    
+
     if (tapCount >= 5) {
       // 显示彩蛋页面
       Get.toNamed('/Egg');
-      
+
       // 重置计数器
       tapCount = 0;
       lastTapTime = null;
@@ -107,7 +108,7 @@ class _VersionSettingState extends State<VersionSetting> {
               ),
               onTap: () async {
                 _handleTap(); // 处理点击事件
-                
+
                 if (isNeedUpdate) {
                   final result = await PlatformDialog.showConfirmDialog(
                     context,

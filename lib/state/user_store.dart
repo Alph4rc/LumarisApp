@@ -74,13 +74,13 @@ class UserStore extends GetxController {
 
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
-    
+
     await prefs.remove(PrefsKeys.USER_DATA);
     await prefs.remove(PrefsKeys.COURSE_LAST_FETCH_TIME);
     await prefs.remove(PrefsKeys.EXAM_DATA);
     await prefs.remove(PrefsKeys.INFO_DATA);
     await prefs.remove(PrefsKeys.COURSE_DATA);
-    
+
     await secureStorage.delete(key: PrefsKeys.USERNAME);
     await secureStorage.delete(key: PrefsKeys.PASSWORD);
 
@@ -108,9 +108,9 @@ class UserStore extends GetxController {
 
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
-    
+
     await prefs.remove(PrefsKeys.MEMBER_DATA);
-    
+
     await secureStorage.delete(key: PrefsKeys.MEMBER_JWT);
     await secureStorage.delete(key: PrefsKeys.CLUB_NAME);
     await secureStorage.delete(key: PrefsKeys.CLUB_ID);

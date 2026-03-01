@@ -20,7 +20,10 @@ class DepartmentModel {
       key: json['key'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      staffs: (json['staffs'] as List?)?.map((e) => StaffModel.fromJson(e as Map<String, dynamic>)).toList() ?? [],
+      staffs: (json['staffs'] as List?)
+              ?.map((e) => StaffModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       projects: json['projects'] as List? ?? [],
     );
   }

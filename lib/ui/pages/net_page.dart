@@ -80,7 +80,8 @@ class _DataContent extends StatelessWidget {
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[600];
 
     return CustomScrollView(
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      physics:
+          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       slivers: [
         SliverAppBar.large(
           title: const Text('校园网数据'),
@@ -95,7 +96,8 @@ class _DataContent extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const NetPage(),
+                    pageBuilder: (context, animation1, animation2) =>
+                        const NetPage(),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
@@ -106,7 +108,8 @@ class _DataContent extends StatelessWidget {
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               children: [
                 // 顶部大卡片 - 流量使用
@@ -124,7 +127,8 @@ class _DataContent extends StatelessWidget {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: cardColor,
-                            borderRadius: BorderRadius.circular(20), // Apple 风格圆角
+                            borderRadius:
+                                BorderRadius.circular(20), // Apple 风格圆角
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.05),
@@ -167,7 +171,8 @@ class _DataContent extends StatelessWidget {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: theme.primaryColor.withValues(alpha: 0.1),
+                                  color:
+                                      theme.primaryColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -226,7 +231,8 @@ class _DataContent extends StatelessWidget {
                                 iconColor: Colors.green,
                                 title: 'IP 地址',
                                 value: data['online_ip'] ?? '未知',
-                                onTap: () => _copyToClipboard(context, data['online_ip']),
+                                onTap: () => _copyToClipboard(
+                                    context, data['online_ip']),
                                 showArrow: true,
                               ),
                               const _Divider(),
@@ -244,7 +250,7 @@ class _DataContent extends StatelessWidget {
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 40),
               ],
             ),
@@ -286,7 +292,7 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -401,7 +407,8 @@ class _ErrorView extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) => const NetPage(),
+                  pageBuilder: (context, animation1, animation2) =>
+                      const NetPage(),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),

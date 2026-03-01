@@ -22,7 +22,8 @@ class CreateClientAppModel {
       applicationName: json['applicationName'] as String?,
       description: json['description'] as String?,
       homepageUrl: json['homepageUrl'] as String?,
-      redirectUris: (json['redirectUris'] as List?)?.map((e) => e as String).toList(),
+      redirectUris:
+          (json['redirectUris'] as List?)?.map((e) => e as String).toList(),
       logoUrl: json['logoUrl'] as String?,
       isNeedEMail: json['isNeedEMail'] as bool?,
       supportsPkce: json['supportsPkce'] as bool?,

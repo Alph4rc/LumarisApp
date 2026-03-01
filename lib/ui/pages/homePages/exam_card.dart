@@ -280,62 +280,62 @@ class _ExamCardState extends State<ExamCard> {
                   return AnimatedListItem(
                     index: index,
                     child: Material(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    onTap: () {
-                      if (isTablet) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  content: _buildExamTip(exam),
-                                ));
-                      } else {
-                        showClubModalBottomSheet(
-                          context,
-                          _buildExamTip(exam),
-                        );
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 20),
-                          Container(
-                            width: 5,
-                            height: isTablet ? 42 : 52,
-                            decoration: BoxDecoration(
-                              color: exam.color,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exam.title,
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      child: InkWell(
+                        onTap: () {
+                          if (isTablet) {
+                            showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      content: _buildExamTip(exam),
+                                    ));
+                          } else {
+                            showClubModalBottomSheet(
+                              context,
+                              _buildExamTip(exam),
+                            );
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 20),
+                              Container(
+                                width: 5,
+                                height: isTablet ? 42 : 52,
+                                decoration: BoxDecoration(
+                                  color: exam.color,
+                                  borderRadius: BorderRadius.circular(3),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: examWrap(exam),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      exam.title,
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: examWrap(exam),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 16),
+                            ],
                           ),
-                          const SizedBox(width: 16),
-                        ],
+                        ),
                       ),
                     ),
-                    ),
-                  ),
                   );
                 },
               ),

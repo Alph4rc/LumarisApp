@@ -25,9 +25,11 @@ class ArticleService {
   }
 
   /// 创建文章
-  static Future<ArticleModel?> createArticle(ArticleCreateDto articleData) async {
+  static Future<ArticleModel?> createArticle(
+      ArticleCreateDto articleData) async {
     try {
-      final response = await ApiClient.post('/Article', body: articleData.toJson());
+      final response =
+          await ApiClient.post('/Article', body: articleData.toJson());
       return ApiResponseHelper.parseSingleObject(
         response,
         ArticleModel.fromJson,
@@ -59,9 +61,11 @@ class ArticleService {
   }
 
   /// 更新文章
-  static Future<bool> updateArticle(String path, ArticleUpdateDto articleData) async {
+  static Future<bool> updateArticle(
+      String path, ArticleUpdateDto articleData) async {
     try {
-      final response = await ApiClient.post('/Article/update/$path', body: articleData.toJson());
+      final response = await ApiClient.post('/Article/update/$path',
+          body: articleData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating article',
@@ -91,9 +95,11 @@ class ArticleService {
   }
 
   /// 搜索文章（带高亮）
-  static Future<List<dynamic>?> searchArticlesWithHighlights(String keyword) async {
+  static Future<List<dynamic>?> searchArticlesWithHighlights(
+      String keyword) async {
     try {
-      final response = await ApiClient.get('/Article/search/highlights?keyword=$keyword');
+      final response =
+          await ApiClient.get('/Article/search/highlights?keyword=$keyword');
       return ApiResponseHelper.parseRaw<List<dynamic>>(
         response,
         errorMessage: 'Error searching articles with highlights',
@@ -127,7 +133,8 @@ class ArticleService {
   /// @param orders 文章路径到顺序的映射，例如 {"article1": 1, "article2": 2}
   static Future<bool> updateArticleOrders(Map<String, int> orders) async {
     try {
-      final response = await ApiClient.post('/Article/update-orders', body: orders);
+      final response =
+          await ApiClient.post('/Article/update-orders', body: orders);
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating article orders',

@@ -42,15 +42,13 @@ class ProgramController extends GetxController {
       isError(false);
       final result = await EduService.getPrograms();
       programs.assignAll(result);
-      
+
       // Initialize TabController after data is loaded
       if (_tabController == null || _tabController!.length != programs.length) {
         _tabController?.dispose();
         // 使用 RootBundle 的 TickerProvider
         _tabController = TabController(
-          length: programs.length, 
-          vsync: const _FakeTickerProvider()
-        );
+            length: programs.length, vsync: const _FakeTickerProvider());
       }
     } catch (e) {
       isError(true);

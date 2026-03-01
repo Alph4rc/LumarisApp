@@ -219,8 +219,6 @@ class _DepartmentPageState extends State<DepartmentPage> {
 
   Widget _buildDivider() {
     return Container(
-      height: 0.5,
-      color: CupertinoColors.separator.withValues(alpha: 0.3)
-    );
+        height: 0.5, color: CupertinoColors.separator.withValues(alpha: 0.3));
   }
 }

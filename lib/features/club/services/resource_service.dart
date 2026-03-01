@@ -23,9 +23,11 @@ class ResourceService {
   }
 
   /// 创建资源
-  static Future<ResourceModel?> createResource(ResourceModel resourceData) async {
+  static Future<ResourceModel?> createResource(
+      ResourceModel resourceData) async {
     try {
-      final response = await ApiClient.post('/Resource', body: resourceData.toJson());
+      final response =
+          await ApiClient.post('/Resource', body: resourceData.toJson());
       return ApiResponseHelper.parseSingleObject(
         response,
         ResourceModel.fromJson,
@@ -42,7 +44,8 @@ class ResourceService {
   /// 更新资源
   static Future<bool> updateResource(ResourceModel resourceData) async {
     try {
-      final response = await ApiClient.put('/Resource', body: resourceData.toJson());
+      final response =
+          await ApiClient.put('/Resource', body: resourceData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating resource',

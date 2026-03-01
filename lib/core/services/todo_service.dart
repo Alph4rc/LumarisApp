@@ -48,14 +48,16 @@ class TodoService {
   static Future<void> clearLocalData() async {
     try {
       final secureStorage = SecureStorageService.instance;
-      final String? username = await secureStorage.read(key: PrefsKeys.USERNAME);
-      
+      final String? username =
+          await secureStorage.read(key: PrefsKeys.USERNAME);
+
       if (username != null) {
         final box = await _getBox();
         await box.delete(username);
       }
     } catch (e, stackTrace) {
-      AppLogger.error('Failed to clear local todo data', error: e, stackTrace: stackTrace);
+      AppLogger.error('Failed to clear local todo data',
+          error: e, stackTrace: stackTrace);
     }
   }
 
@@ -69,13 +71,13 @@ class TodoService {
     if (username != null) {
       final box = await _getBox();
       final dynamic data = box.get(username);
-      
+
       if (data != null) {
         if (data is List) {
           return data.cast<TodoItem>();
         }
       }
-      
+
       // 尝试迁移
       return await _migrateFromPrefs(username);
     } else {
@@ -93,14 +95,16 @@ class TodoService {
       try {
         final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
         if (jsonMap.containsKey(username)) {
-          AppLogger.info('Migrating todo data for $username from SharedPreferences to Hive...');
+          AppLogger.info(
+              'Migrating todo data for $username from SharedPreferences to Hive...');
           final d = jsonMap[username] as List;
           final List<TodoItem> list = [];
           for (final i in d) {
             try {
               list.add(TodoItem.fromJson(i as Map<String, dynamic>));
             } catch (itemErr) {
-              AppLogger.warning('Skipping corrupt todo entry during migration', error: itemErr);
+              AppLogger.warning('Skipping corrupt todo entry during migration',
+                  error: itemErr);
             }
           }
 
@@ -108,7 +112,8 @@ class TodoService {
           final box = await _getBox();
           await box.put(username, list);
 
-          AppLogger.info('Todo data migration completed. Count: ${list.length}');
+          AppLogger.info(
+              'Todo data migration completed. Count: ${list.length}');
           return list;
         }
       } catch (e) {
@@ -117,7 +122,6 @@ class TodoService {
     }
     return [];
   }
-
 
   /// 从俱乐部服务器获取待办事项列表
   ///

@@ -169,8 +169,6 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
     });
   }
 
-
-
   Widget _buildHideButton(TileEditController controller) {
     return GestureDetector(
       onTap: () async {

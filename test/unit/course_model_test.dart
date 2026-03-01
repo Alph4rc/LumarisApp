@@ -5,7 +5,7 @@ void main() {
   group('CourseModel', () {
     test('should create instance with default values', () {
       final course = CourseModel();
-      
+
       expect(course.weekIndexes, isEmpty);
       expect(course.teachers, isEmpty);
       expect(course.room, isEmpty);
@@ -98,7 +98,7 @@ void main() {
       final courseMin = CourseModel(weekday: -1);
       final courseMax = CourseModel(weekday: 7);
       final courseValid = CourseModel(weekday: 6);
-      
+
       expect(courseMin.weekday, -1);
       expect(courseMax.weekday, 7);
       expect(courseValid.weekday, 6);
@@ -109,7 +109,7 @@ void main() {
         startUnit: -1,
         endUnit: 10,
       );
-      
+
       expect(course.startUnit, -1);
       expect(course.endUnit, 10);
     });
@@ -143,7 +143,8 @@ void main() {
     });
 
     test('should handle large week numbers', () {
-      expect(CourseModel.formatWeekRanges([10, 11, 12, 15, 16, 20]), '10-12,15-16,20');
+      expect(CourseModel.formatWeekRanges([10, 11, 12, 15, 16, 20]),
+          '10-12,15-16,20');
       expect(CourseModel.formatWeekRanges([100]), '100');
       expect(CourseModel.formatWeekRanges([99, 100, 101]), '99-101');
     });

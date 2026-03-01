@@ -72,9 +72,11 @@ class CategoryService {
   }
 
   /// 创建或更新分类
-  static Future<String?> createOrUpdateCategory(Map<String, dynamic> categoryData) async {
+  static Future<String?> createOrUpdateCategory(
+      Map<String, dynamic> categoryData) async {
     try {
-      final response = await ApiClient.post('/Category/CreateOrUpdate', body: categoryData);
+      final response =
+          await ApiClient.post('/Category/CreateOrUpdate', body: categoryData);
       return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error creating or updating category',
@@ -106,7 +108,8 @@ class CategoryService {
   /// 更新分类顺序
   static Future<String?> updateCategoryOrder(String name, int order) async {
     try {
-      final response = await ApiClient.post('/Category/UpdateOrder/$name/$order');
+      final response =
+          await ApiClient.post('/Category/UpdateOrder/$name/$order');
       return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error updating category order',
@@ -124,7 +127,8 @@ class CategoryService {
   /// @param orders 分类名称到顺序的映射，例如 {"category1": 1, "category2": 2}
   static Future<String?> updateCategoryOrders(Map<String, int> orders) async {
     try {
-      final response = await ApiClient.post('/Category/UpdateOrders', body: orders);
+      final response =
+          await ApiClient.post('/Category/UpdateOrders', body: orders);
       return ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error updating category orders',

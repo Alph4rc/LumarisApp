@@ -212,13 +212,17 @@ class _LoginPageState extends State<LoginPage> {
 
     if (_isOnlyLoginMember) {
       // 仅登录社团账号
-      await secureStorage.write(key: PrefsKeys.CLUB_NAME, value: _usernameController.text);
-      await secureStorage.write(key: PrefsKeys.CLUB_ID, value: _passwordController.text);
+      await secureStorage.write(
+          key: PrefsKeys.CLUB_NAME, value: _usernameController.text);
+      await secureStorage.write(
+          key: PrefsKeys.CLUB_ID, value: _passwordController.text);
       userStore.setLoginMember();
     } else if (!_isOnlyLoginMember && !_isLoginMember) {
       // 仅登录教务系统
-      await secureStorage.write(key: PrefsKeys.USERNAME, value: _usernameController.text);
-      await secureStorage.write(key: PrefsKeys.PASSWORD, value: _passwordController.text);
+      await secureStorage.write(
+          key: PrefsKeys.USERNAME, value: _usernameController.text);
+      await secureStorage.write(
+          key: PrefsKeys.PASSWORD, value: _passwordController.text);
       final userDataString = prefs.getString(PrefsKeys.USER_DATA);
       if (userDataString != null) {
         final userData = jsonDecode(userDataString);
@@ -228,8 +232,10 @@ class _LoginPageState extends State<LoginPage> {
 
     // 同时登录两个账号的情况
     if (_isLoginMember) {
-      await secureStorage.write(key: PrefsKeys.CLUB_NAME, value: _nameController.text);
-      await secureStorage.write(key: PrefsKeys.CLUB_ID, value: _passwordController.text);
+      await secureStorage.write(
+          key: PrefsKeys.CLUB_NAME, value: _nameController.text);
+      await secureStorage.write(
+          key: PrefsKeys.CLUB_ID, value: _passwordController.text);
       userStore.setLoginMember();
     }
   }
@@ -455,15 +461,21 @@ class _LoginPageState extends State<LoginPage> {
       obscureText: obscureText,
       style: const TextStyle(fontSize: 17),
       decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color:
-                Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
-          ),
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.withValues(alpha: 0.4),
+        ),
         prefixIcon: Icon(
           icon,
-          color:
-              Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.withValues(alpha: 0.5),
           size: 22,
         ),
         suffixIcon: isPassword

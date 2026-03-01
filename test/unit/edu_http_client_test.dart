@@ -53,10 +53,12 @@ void main() {
       // 所有请求都返回401
       // 预期：通过全局锁机制，只有1个登录请求被发送
 
-      final requests = List.generate(5, (index) => {
-        'id': 'request_$index',
-        'status': 401,
-      });
+      final requests = List.generate(
+          5,
+          (index) => {
+                'id': 'request_$index',
+                'status': 401,
+              });
 
       // 在实际应用中，这些请求会通过 _reLoginWithLock 被序列化
       // 只有第一个请求会真正执行登录，其他请求会等待

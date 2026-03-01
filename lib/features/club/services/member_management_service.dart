@@ -22,8 +22,10 @@ class MemberManagementService {
   /// 批量更新成员
   static Future<bool> updateManyMembers(List<StudentModel> membersData) async {
     try {
-      final List<Map<String, dynamic>> jsonData = membersData.map((e) => e.toJson()).toList();
-      final response = await ApiClient.post('/MemberManagement/update-many', body: jsonData);
+      final List<Map<String, dynamic>> jsonData =
+          membersData.map((e) => e.toJson()).toList();
+      final response =
+          await ApiClient.post('/MemberManagement/update-many', body: jsonData);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -38,7 +40,8 @@ class MemberManagementService {
   /// 更新成员
   static Future<bool> updateMember(StudentModel memberData) async {
     try {
-      final response = await ApiClient.post('/MemberManagement/update', body: memberData.toJson());
+      final response = await ApiClient.post('/MemberManagement/update',
+          body: memberData.toJson());
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
@@ -51,7 +54,8 @@ class MemberManagementService {
   /// 重置密码
   static Future<bool> resetPassword(ResetPasswordData resetData) async {
     try {
-      final response = await ApiClient.post('/MemberManagement/reset-password', body: resetData.toJson());
+      final response = await ApiClient.post('/MemberManagement/reset-password',
+          body: resetData.toJson());
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {

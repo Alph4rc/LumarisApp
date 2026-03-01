@@ -10,7 +10,8 @@ void main() {
     test('reorder_tile_should_finish_within_regression_budget', () {
       final tiles = List<TileConfiguration>.generate(
         1000,
-        (index) => TileConfiguration(id: 'tile_$index', order: index, isVisible: true),
+        (index) =>
+            TileConfiguration(id: 'tile_$index', order: index, isVisible: true),
       );
       var config = TileConfigurationList(
         configurations: tiles,
@@ -34,7 +35,8 @@ void main() {
     test('toggle_and_normalize_should_finish_within_regression_budget', () {
       final tiles = List<TileConfiguration>.generate(
         250,
-        (index) => TileConfiguration(id: 'tile_$index', order: index, isVisible: true),
+        (index) =>
+            TileConfiguration(id: 'tile_$index', order: index, isVisible: true),
       );
       var config = TileConfigurationList(
         configurations: tiles,
@@ -57,13 +59,16 @@ void main() {
       }
     });
 
-    test('payment_data_from_json_large_payload_should_finish_within_budget', () {
-      final records = List.generate(10000, (index) => {
-            'turnoverType': index.isEven ? '消费' : '充值',
-            'datetimeStr': '2023-01-01 12:00:00',
-            'resume': '交易$index',
-            'tranamt': index,
-          });
+    test('payment_data_from_json_large_payload_should_finish_within_budget',
+        () {
+      final records = List.generate(
+          10000,
+          (index) => {
+                'turnoverType': index.isEven ? '消费' : '充值',
+                'datetimeStr': '2023-01-01 12:00:00',
+                'resume': '交易$index',
+                'tranamt': index,
+              });
 
       final payload = <String, dynamic>{
         'records': records,

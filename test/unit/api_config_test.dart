@@ -8,7 +8,8 @@ void main() {
       expect(defaultSchool, isNotNull);
       expect(defaultSchool.id, equals('xauat'));
       expect(defaultSchool.name, equals('西安建筑科技大学'));
-      expect(defaultSchool.eduApiBaseUrl, equals('https://xauatapi.xauat.site'));
+      expect(
+          defaultSchool.eduApiBaseUrl, equals('https://xauatapi.xauat.site'));
     });
 
     test('should get school by id', () {

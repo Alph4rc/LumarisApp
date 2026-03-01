@@ -113,8 +113,7 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar('错误', '加载日志失败: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('错误', '加载日志失败: $e', snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -145,8 +144,7 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
         _loadLogs();
         _loadStatistics();
       } catch (e) {
-        Get.snackbar('错误', '清理失败: $e',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('错误', '清理失败: $e', snackPosition: SnackPosition.BOTTOM);
       }
     }
   }
@@ -237,8 +235,10 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
                     ),
                     items: const [
                       DropdownMenuItem(value: null, child: Text('全部')),
-                      DropdownMenuItem(value: 'Information', child: Text('Info')),
-                      DropdownMenuItem(value: 'Warning', child: Text('Warning')),
+                      DropdownMenuItem(
+                          value: 'Information', child: Text('Info')),
+                      DropdownMenuItem(
+                          value: 'Warning', child: Text('Warning')),
                       DropdownMenuItem(value: 'Error', child: Text('Error')),
                     ],
                     onChanged: (value) {
@@ -290,11 +290,14 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
                         children: [
                           Icon(Icons.description_outlined,
                               size: 64,
-                              color: isDarkMode ? Colors.grey : Colors.grey[400]),
+                              color:
+                                  isDarkMode ? Colors.grey : Colors.grey[400]),
                           const SizedBox(height: 16),
                           Text('暂无日志',
                               style: TextStyle(
-                                  color: isDarkMode ? Colors.grey : Colors.grey[600])),
+                                  color: isDarkMode
+                                      ? Colors.grey
+                                      : Colors.grey[600])),
                         ],
                       ),
                     ),
@@ -475,8 +478,7 @@ class _PerformanceTabState extends State<_PerformanceTab>
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar('错误', '加载监控数据失败: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('错误', '加载监控数据失败: $e', snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -509,17 +511,23 @@ class _PerformanceTabState extends State<_PerformanceTab>
                       child: Column(
                         children: [
                           if (_performanceData!.cpuUsage != null)
-                            _buildStatRow('CPU使用率', '${(_performanceData!.cpuUsage! * 100).toStringAsFixed(1)}%'),
+                            _buildStatRow('CPU使用率',
+                                '${(_performanceData!.cpuUsage! * 100).toStringAsFixed(1)}%'),
                           if (_performanceData!.memoryUsage != null)
-                            _buildStatRow('内存使用率', '${(_performanceData!.memoryUsage! * 100).toStringAsFixed(1)}%'),
+                            _buildStatRow('内存使用率',
+                                '${(_performanceData!.memoryUsage! * 100).toStringAsFixed(1)}%'),
                           if (_performanceData!.diskUsage != null)
-                            _buildStatRow('磁盘使用率', '${(_performanceData!.diskUsage! * 100).toStringAsFixed(1)}%'),
+                            _buildStatRow('磁盘使用率',
+                                '${(_performanceData!.diskUsage! * 100).toStringAsFixed(1)}%'),
                           if (_performanceData!.requestCount != null)
-                            _buildStatRow('请求数', _performanceData!.requestCount.toString()),
+                            _buildStatRow('请求数',
+                                _performanceData!.requestCount.toString()),
                           if (_performanceData!.errorCount != null)
-                            _buildStatRow('错误数', _performanceData!.errorCount.toString()),
+                            _buildStatRow(
+                                '错误数', _performanceData!.errorCount.toString()),
                           if (_performanceData!.avgResponseTime != null)
-                            _buildStatRow('平均响应时间', '${_performanceData!.avgResponseTime!.toStringAsFixed(2)}ms'),
+                            _buildStatRow('平均响应时间',
+                                '${_performanceData!.avgResponseTime!.toStringAsFixed(2)}ms'),
                         ],
                       ),
                     ),
@@ -539,19 +547,26 @@ class _PerformanceTabState extends State<_PerformanceTab>
                       child: Column(
                         children: [
                           if (_httpStats!.totalRequests != null)
-                            _buildStatRow('总请求数', _httpStats!.totalRequests.toString()),
+                            _buildStatRow(
+                                '总请求数', _httpStats!.totalRequests.toString()),
                           if (_httpStats!.successfulRequests != null)
-                            _buildStatRow('成功请求', _httpStats!.successfulRequests.toString()),
+                            _buildStatRow('成功请求',
+                                _httpStats!.successfulRequests.toString()),
                           if (_httpStats!.failedRequests != null)
-                            _buildStatRow('失败请求', _httpStats!.failedRequests.toString()),
+                            _buildStatRow(
+                                '失败请求', _httpStats!.failedRequests.toString()),
                           if (_httpStats!.avgResponseTime != null)
-                            _buildStatRow('平均响应时间', '${_httpStats!.avgResponseTime!.toStringAsFixed(2)}ms'),
+                            _buildStatRow('平均响应时间',
+                                '${_httpStats!.avgResponseTime!.toStringAsFixed(2)}ms'),
                           if (_httpStats!.minResponseTime != null)
-                            _buildStatRow('最小响应时间', '${_httpStats!.minResponseTime!.toStringAsFixed(2)}ms'),
+                            _buildStatRow('最小响应时间',
+                                '${_httpStats!.minResponseTime!.toStringAsFixed(2)}ms'),
                           if (_httpStats!.maxResponseTime != null)
-                            _buildStatRow('最大响应时间', '${_httpStats!.maxResponseTime!.toStringAsFixed(2)}ms'),
+                            _buildStatRow('最大响应时间',
+                                '${_httpStats!.maxResponseTime!.toStringAsFixed(2)}ms'),
                           if (_httpStats!.requestsPerSecond != null)
-                            _buildStatRow('每秒请求数', _httpStats!.requestsPerSecond.toString()),
+                            _buildStatRow('每秒请求数',
+                                _httpStats!.requestsPerSecond.toString()),
                         ],
                       ),
                     ),
@@ -615,8 +630,7 @@ class _IpBlacklistTabState extends State<_IpBlacklistTab>
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar('错误', '加载统计失败: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('错误', '加载统计失败: $e', snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -658,14 +672,13 @@ class _IpBlacklistTabState extends State<_IpBlacklistTab>
       try {
         await IpBlacklistService.addIp(
           ipController.text,
-          reason: reasonController.text.isNotEmpty ? reasonController.text : null,
+          reason:
+              reasonController.text.isNotEmpty ? reasonController.text : null,
         );
-        Get.snackbar('成功', 'IP已添加到黑名单',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('成功', 'IP已添加到黑名单', snackPosition: SnackPosition.BOTTOM);
         _loadStats();
       } catch (e) {
-        Get.snackbar('错误', '添加失败: $e',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('错误', '添加失败: $e', snackPosition: SnackPosition.BOTTOM);
       }
     }
   }
@@ -796,8 +809,7 @@ class _DataStatsTabState extends State<_DataStatsTab>
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      Get.snackbar('错误', '加载统计失败: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('错误', '加载统计失败: $e', snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -847,17 +859,18 @@ class _DataStatsTabState extends State<_DataStatsTab>
                       child: Column(
                         children: [
                           if (_accessStats!.totalAccessCount != null)
-                            _buildStatRow('总访问数', _accessStats!.totalAccessCount.toString()),
+                            _buildStatRow('总访问数',
+                                _accessStats!.totalAccessCount.toString()),
                           if (_accessStats!.topAccessedEntities != null &&
                               _accessStats!.topAccessedEntities!.isNotEmpty)
                             const SizedBox(height: 12),
                           if (_accessStats!.topAccessedEntities != null)
-                            ...(_accessStats!.topAccessedEntities!.map((entity) =>
-                                _buildStatRow(
-                                  entity.entityName ?? entity.entityId ?? '未知',
-                                  '访问 ${entity.accessCount} 次',
-                                ),
-                              )),
+                            ...(_accessStats!.topAccessedEntities!.map(
+                              (entity) => _buildStatRow(
+                                entity.entityName ?? entity.entityId ?? '未知',
+                                '访问 ${entity.accessCount} 次',
+                              ),
+                            )),
                         ],
                       ),
                     ),
@@ -875,17 +888,18 @@ class _DataStatsTabState extends State<_DataStatsTab>
                       child: Column(
                         children: [
                           if (_changeStats!.totalChangeCount != null)
-                            _buildStatRow('总变更数', _changeStats!.totalChangeCount.toString()),
+                            _buildStatRow('总变更数',
+                                _changeStats!.totalChangeCount.toString()),
                           if (_changeStats!.topChangedEntities != null &&
                               _changeStats!.topChangedEntities!.isNotEmpty)
                             const SizedBox(height: 12),
                           if (_changeStats!.topChangedEntities != null)
-                            ...(_changeStats!.topChangedEntities!.map((entity) =>
-                                _buildStatRow(
-                                  entity.entityName ?? entity.entityId ?? '未知',
-                                  '变更 ${entity.changeCount} 次',
-                                ),
-                              )),
+                            ...(_changeStats!.topChangedEntities!.map(
+                              (entity) => _buildStatRow(
+                                entity.entityName ?? entity.entityId ?? '未知',
+                                '变更 ${entity.changeCount} 次',
+                              ),
+                            )),
                         ],
                       ),
                     ),

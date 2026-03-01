@@ -44,7 +44,8 @@ class CourseRepository {
       }
       await box.putAll(entries);
     } catch (e, stackTrace) {
-      AppLogger.error('Failed to save courses to Hive', error: e, stackTrace: stackTrace);
+      AppLogger.error('Failed to save courses to Hive',
+          error: e, stackTrace: stackTrace);
     }
   }
 
@@ -70,7 +71,8 @@ class CourseRepository {
       // Hive 中无数据，尝试从 SharedPreferences 迁移
       return await _migrateFromPrefs();
     } catch (e, stackTrace) {
-      AppLogger.error('Failed to get courses from Hive', error: e, stackTrace: stackTrace);
+      AppLogger.error('Failed to get courses from Hive',
+          error: e, stackTrace: stackTrace);
       return [];
     }
   }
@@ -81,7 +83,8 @@ class CourseRepository {
       final courses = await getCourses();
       return courses.where((c) => c.lessonId == id).toList();
     } catch (e, stackTrace) {
-      AppLogger.error('Failed to get course by id', error: e, stackTrace: stackTrace);
+      AppLogger.error('Failed to get course by id',
+          error: e, stackTrace: stackTrace);
       return [];
     }
   }
@@ -98,7 +101,8 @@ class CourseRepository {
         await box.delete(_legacyKey);
       }
     } catch (e, stackTrace) {
-      AppLogger.error('Failed to clear courses from Hive', error: e, stackTrace: stackTrace);
+      AppLogger.error('Failed to clear courses from Hive',
+          error: e, stackTrace: stackTrace);
     }
   }
 
@@ -115,7 +119,8 @@ class CourseRepository {
       }
       // saveCourses 会自动删除旧 key
       await saveCourses(courses);
-      AppLogger.info('Legacy Hive migration completed. Count: ${courses.length}');
+      AppLogger.info(
+          'Legacy Hive migration completed. Count: ${courses.length}');
       return courses;
     } catch (e) {
       AppLogger.warning('Failed to migrate from legacy Hive format', error: e);
@@ -131,20 +136,23 @@ class CourseRepository {
 
     if (jsonString != null && jsonString.isNotEmpty) {
       try {
-        AppLogger.info('Migrating course data from SharedPreferences to Hive...');
+        AppLogger.info(
+            'Migrating course data from SharedPreferences to Hive...');
         final List<dynamic> jsonList = jsonDecode(jsonString);
         final courses = <CourseModel>[];
         for (final e in jsonList) {
           try {
             courses.add(CourseModel.fromJson(e as Map<String, dynamic>));
           } catch (itemErr) {
-            AppLogger.warning('Skipping corrupt course entry during migration', error: itemErr);
+            AppLogger.warning('Skipping corrupt course entry during migration',
+                error: itemErr);
           }
         }
 
         await saveCourses(courses);
 
-        AppLogger.info('Course data migration completed. Count: ${courses.length}');
+        AppLogger.info(
+            'Course data migration completed. Count: ${courses.length}');
         return courses;
       } catch (e) {
         AppLogger.warning('Failed to migrate course data', error: e);

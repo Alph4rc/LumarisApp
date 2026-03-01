@@ -21,8 +21,14 @@ class StaffModel {
       userId: json['userId'] as String,
       name: json['name'] as String,
       identity: json['identity'] as String,
-      projects: (json['projects'] as List?)?.map((e) => ProjectModel.fromJson(e as Map<String, dynamic>)).toList() ?? [],
-      tasks: (json['tasks'] as List?)?.map((e) => TaskModel.fromJson(e as Map<String, dynamic>)).toList() ?? [],
+      projects: (json['projects'] as List?)
+              ?.map((e) => ProjectModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      tasks: (json['tasks'] as List?)
+              ?.map((e) => TaskModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 

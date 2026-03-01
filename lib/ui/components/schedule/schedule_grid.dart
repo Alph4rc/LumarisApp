@@ -127,9 +127,8 @@ class ScheduleGrid extends StatelessWidget {
         height: height,
         style: cardStyle,
         onTap: onCourseTap != null ? () => onCourseTap!(course) : null,
-        onLongPress: onCourseLongPress != null
-            ? () => onCourseLongPress!(course)
-            : null,
+        onLongPress:
+            onCourseLongPress != null ? () => onCourseLongPress!(course) : null,
       ),
     );
   }
@@ -232,7 +231,9 @@ class ScheduleGrid extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           onTap: onConflictCourseTap != null
               ? () => onConflictCourseTap!(courses)
-              : (onCourseTap != null ? () => onCourseTap!(courses.first) : null),
+              : (onCourseTap != null
+                  ? () => onCourseTap!(courses.first)
+                  : null),
           onLongPress: null,
           child: Padding(
             padding: EdgeInsets.all(isTablet ? 8 : 4),

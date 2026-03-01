@@ -42,7 +42,8 @@ class AppLogger {
   }
 
   /// 警告日志
-  static void warning(dynamic message, {Object? error, StackTrace? stackTrace}) {
+  static void warning(dynamic message,
+      {Object? error, StackTrace? stackTrace}) {
     _logger.w(message, error: error, stackTrace: stackTrace);
   }
 

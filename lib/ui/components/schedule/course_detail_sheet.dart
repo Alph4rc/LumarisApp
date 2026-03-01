@@ -23,7 +23,8 @@ class CourseDetailSheet extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    final isDesktop = isTablet && !PlatformUtils.isAndroid && !PlatformUtils.isIOS;
+    final isDesktop =
+        isTablet && !PlatformUtils.isAndroid && !PlatformUtils.isIOS;
 
     return Container(
       padding: EdgeInsets.all(isTablet ? 24 : 20),
