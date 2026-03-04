@@ -31,7 +31,9 @@ class TodoModel {
       endTime: json['endTime'] as String,
       status: json['status'] as bool,
       id: json['id'] as String,
-      student: json['student'] != null ? StudentModel.fromJson(json['student'] as Map<String, dynamic>) : null,
+      student: json['student'] != null
+          ? StudentModel.fromJson(json['student'] as Map<String, dynamic>)
+          : null,
       studentId: json['studentId'] as String,
       createdTime: DateTime.parse(json['createdTime'] as String),
     );

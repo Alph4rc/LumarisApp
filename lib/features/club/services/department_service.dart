@@ -42,7 +42,8 @@ class DepartmentService {
   /// 更新部门
   static Future<bool> updateDepartment(DepartmentModel departmentData) async {
     try {
-      final response = await ApiClient.post('/Department/Update', body: departmentData.toJson());
+      final response = await ApiClient.post('/Department/Update',
+          body: departmentData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating department',
@@ -58,7 +59,8 @@ class DepartmentService {
   /// 创建部门
   static Future<bool> createDepartment(DepartmentModel departmentData) async {
     try {
-      final response = await ApiClient.post('/Department/Create', body: departmentData.toJson());
+      final response = await ApiClient.post('/Department/Create',
+          body: departmentData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error creating department',

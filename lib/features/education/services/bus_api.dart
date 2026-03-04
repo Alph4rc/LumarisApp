@@ -11,7 +11,9 @@ class BusApi {
         '/Bus/${dayDate ?? ''}',
       );
       // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List ? jsonEncode(response) : response.toString();
+      return response is Map || response is List
+          ? jsonEncode(response)
+          : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -26,7 +28,9 @@ class BusApi {
         queryParameters: {'loc': loc},
       );
       // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List ? jsonEncode(response) : response.toString();
+      return response is Map || response is List
+          ? jsonEncode(response)
+          : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -34,14 +38,17 @@ class BusApi {
   }
 
   /// 获取旧的校巴数据
-  static Future<String> getBusOldData(String time, {bool isShow = false}) async {
+  static Future<String> getBusOldData(String time,
+      {bool isShow = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Bus/OldData/$time',
         queryParameters: {'isShow': isShow},
       );
       // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List ? jsonEncode(response) : response.toString();
+      return response is Map || response is List
+          ? jsonEncode(response)
+          : response.toString();
     } catch (e) {
       _handleError(e);
       rethrow;

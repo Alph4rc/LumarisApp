@@ -69,8 +69,8 @@ class AppRouter {
         /// 登录页面
         GetPage(
           name: '/Login',
-          page: () => PageRenderTimeMonitor(
-              pageName: '登录页面', child: const LoginPage()),
+          page: () =>
+              PageRenderTimeMonitor(pageName: '登录页面', child: const LoginPage()),
         ),
 
         /// 链接页面

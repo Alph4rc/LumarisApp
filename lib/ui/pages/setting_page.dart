@@ -526,7 +526,11 @@ class SettingPage extends StatelessWidget {
             if (context.mounted) {
               showClubSnackBar(context, const Text('正在清除缓存...'));
             }
+            // 使用 EduService.clearEduCache() 进行全面清理
+            await EduService.clearEduCache();
+            // 同时也清理 RequestCache 以防万一 (EduService 内部已经调用了，这里可以保留或移除，保留无害)
             await RequestCache.instance.clear();
+
             if (context.mounted) {
               showClubSnackBar(context, const Text('缓存清除成功'));
             }

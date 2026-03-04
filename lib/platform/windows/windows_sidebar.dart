@@ -34,13 +34,12 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Apple 风格配色
-    final backgroundColor = isDark 
+    final backgroundColor = isDark
         ? const Color(0xFF1E1E1E) // macOS Dark Sidebar
         : const Color(0xFFF2F2F7); // macOS Light Sidebar (System Grey 6)
-        
-    final dividerColor = isDark
-        ? Colors.black.withValues(alpha: 0.2)
-        : const Color(0xFFE5E5E5);
+
+    final dividerColor =
+        isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0xFFE5E5E5);
 
     return Container(
       width: widget.width,
@@ -191,7 +190,9 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                   size: 20,
                   color: isSelected
                       ? selectedTextColor
-                      : (isDark ? const Color(0xFF636366) : const Color(0xFF98989D)), // Apple System Grey
+                      : (isDark
+                          ? const Color(0xFF636366)
+                          : const Color(0xFF98989D)), // Apple System Grey
                 ),
                 const SizedBox(width: 12),
                 // 标签
@@ -200,10 +201,13 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                     item.label,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                      fontWeight:
+                          isSelected ? FontWeight.w500 : FontWeight.w400,
                       color: isSelected
                           ? selectedTextColor
-                          : (isDark ? const Color(0xFFDDDDDD) : const Color(0xFF1C1C1E)),
+                          : (isDark
+                              ? const Color(0xFFDDDDDD)
+                              : const Color(0xFF1C1C1E)),
                       letterSpacing: -0.2,
                     ),
                     maxLines: 1,
@@ -220,7 +224,9 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Colors.white.withValues(alpha: 0.2)
-                          : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5EA)),
+                          : (isDark
+                              ? const Color(0xFF3A3A3C)
+                              : const Color(0xFFE5E5EA)),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

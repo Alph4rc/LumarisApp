@@ -26,7 +26,9 @@ class TaskExecutor {
 
   /// 检查缓存是否有效
   static bool _isCacheValid() {
-    if (_cachedCourses == null || _cachedTime == null || _cacheTimestamp == null) {
+    if (_cachedCourses == null ||
+        _cachedTime == null ||
+        _cacheTimestamp == null) {
       return false;
     }
     return DateTime.now().difference(_cacheTimestamp!) < _cacheValidDuration;
@@ -69,7 +71,8 @@ class TaskExecutor {
   }
 
   /// 从缓存获取今日或明日课程
-  static (bool, List<CourseModel>) _getTodayOrTomorrowCourseFromCache({bool isTomorrow = false}) {
+  static (bool, List<CourseModel>) _getTodayOrTomorrowCourseFromCache(
+      {bool isTomorrow = false}) {
     if (_cachedCourses == null || _cachedTime == null) {
       return (false, <CourseModel>[]);
     }
@@ -80,9 +83,11 @@ class TaskExecutor {
       return (false, <CourseModel>[]);
     }
 
-    var weekNow = now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+    var weekNow =
+        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
     var filteredCourses = _cachedCourses!.where((course) {
-      return course.weekIndexes.contains(weekNow) && course.weekday == now.weekday;
+      return course.weekIndexes.contains(weekNow) &&
+          course.weekday == now.weekday;
     }).toList();
 
     if (filteredCourses.isEmpty) {
@@ -95,7 +100,8 @@ class TaskExecutor {
           weekDay = 1;
         }
         filteredCourses = _cachedCourses!.where((course) {
-          return course.weekIndexes.contains(weekNow) && course.weekday == weekDay;
+          return course.weekIndexes.contains(weekNow) &&
+              course.weekday == weekDay;
         }).toList();
         filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
         return (true, filteredCourses);
@@ -107,7 +113,8 @@ class TaskExecutor {
     filteredCourses = filteredCourses.where((course) {
       final courseTime = TimeService.getStartAndEnd(course);
       final l = courseTime.end.split(':');
-      var end = DateTime(now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
+      var end = DateTime(
+          now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
       return now.isBefore(end);
     }).toList();
 
@@ -128,18 +135,21 @@ class TaskExecutor {
       return {'today': <CourseModel>[], 'tomorrow': <CourseModel>[]};
     }
 
-    var weekNow = now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+    var weekNow =
+        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
 
     // 获取今天的课程
     var todayCourses = _cachedCourses!.where((course) {
-      return course.weekIndexes.contains(weekNow) && course.weekday == now.weekday;
+      return course.weekIndexes.contains(weekNow) &&
+          course.weekday == now.weekday;
     }).toList();
 
     // 过滤掉已经结束的课程
     todayCourses = todayCourses.where((course) {
       final courseTime = TimeService.getStartAndEnd(course);
       final l = courseTime.end.split(':');
-      var end = DateTime(now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
+      var end = DateTime(
+          now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
       return now.isBefore(end);
     }).toList();
 
@@ -158,7 +168,8 @@ class TaskExecutor {
 
     // 获取明天的课程
     var tomorrowCourses = _cachedCourses!.where((course) {
-      return course.weekIndexes.contains(weekTomorrow) && course.weekday == tomorrowWeekday;
+      return course.weekIndexes.contains(weekTomorrow) &&
+          course.weekday == tomorrowWeekday;
     }).toList();
 
     tomorrowCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
@@ -204,7 +215,8 @@ class TaskExecutor {
         await NotificationService.remindList(result.$2);
 
         // 记录提醒时间（使用ISO格式字符串）
-        await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
+        await prefs.setString(
+            PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
         AppLogger.debug('课程提醒发送成功: ${now.toIso8601String()}');
       } else {
         AppLogger.debug('没有需要提醒的课程');
@@ -242,7 +254,8 @@ class TaskExecutor {
   /// 从缓存更新今日课程小组件
   static Future<void> _updateTodayWidgetFromCache() async {
     try {
-      final (_, courses) = _getTodayOrTomorrowCourseFromCache(isTomorrow: false);
+      final (_, courses) =
+          _getTodayOrTomorrowCourseFromCache(isTomorrow: false);
 
       if (courses.isNotEmpty) {
         final scheduleItems = _convertToScheduleItems(courses);
@@ -305,7 +318,7 @@ class TaskExecutor {
         items.add(ScheduleItem(
           title: course.courseName,
           time:
-          '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
+              '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
           location: course.room,
           teacher: course.teachers.join(','),
         ));

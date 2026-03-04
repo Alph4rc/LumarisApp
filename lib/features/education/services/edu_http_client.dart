@@ -26,6 +26,10 @@ class EduHttpClient {
   /// 登录失败后的冷却时间（毫秒）
   static const int _loginCooldownMs = 5000;
 
+  // Test hook: allows injecting deterministic login behavior in unit tests.
+  static Future<Map<String, dynamic>> Function(String, String)?
+      _loginHandlerForTest;
+
   EduHttpClient({Dio? dio, String? baseUrl})
       : _dio = dio ?? Dio(),
         _baseUrl = baseUrl ?? ApiConfig.getDefaultSchool().eduApiBaseUrl {
@@ -120,6 +124,9 @@ class EduHttpClient {
 
   /// 获取当前基础 URL
   String get baseUrl => _baseUrl;
+
+  /// 暴露 Dio 实例，便于在测试中注入拦截器和验证请求。
+  Dio get dio => _dio;
 
   /// 更新基础 URL
   ///
@@ -222,7 +229,9 @@ class EduHttpClient {
         return false;
       }
 
-      final loginResult = await LoginService.login(username, password);
+      final loginResult = _loginHandlerForTest != null
+          ? await _loginHandlerForTest!(username, password)
+          : await LoginService.login(username, password);
 
       if (loginResult['success'] == true) {
         await prefs.setString(PrefsKeys.USER_DATA, jsonEncode(loginResult));
@@ -310,5 +319,24 @@ class EduHttpClient {
 
   void dispose() {
     _dio.close();
+  }
+
+  static void setLoginHandlerForTest(
+      Future<Map<String, dynamic>> Function(String, String)? handler) {
+    _loginHandlerForTest = handler;
+  }
+
+  static void resetReloginStateForTest() {
+    _loginCompleter = null;
+    _lastLoginFailTime = null;
+    _loginHandlerForTest = null;
+  }
+
+  static void setLastLoginFailTimeForTest(int? timestampMs) {
+    _lastLoginFailTime = timestampMs;
+  }
+
+  Future<bool> reLoginWithLockForTest() {
+    return _reLoginWithLock();
   }
 }

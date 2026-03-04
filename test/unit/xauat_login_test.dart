@@ -1,224 +1,295 @@
+import 'dart:collection';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/xauat_login.dart';
 
+typedef _Step = void Function(
+  RequestOptions options,
+  RequestInterceptorHandler handler,
+);
+
+class _ScriptedInterceptor extends Interceptor {
+  _ScriptedInterceptor(this.steps);
+
+  final Queue<_Step> steps;
+  final List<RequestOptions> seen = <RequestOptions>[];
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    seen.add(options);
+    if (steps.isEmpty) {
+      handler.reject(
+        DioException(
+          requestOptions: options,
+          error: 'No scripted response',
+          type: DioExceptionType.unknown,
+        ),
+      );
+      return;
+    }
+    final step = steps.removeFirst();
+    step(options, handler);
+  }
+}
+
+Response<dynamic> _response(
+  RequestOptions options, {
+  int statusCode = 200,
+  dynamic data = '',
+  Map<String, List<String>> headers = const <String, List<String>>{},
+  String? statusMessage,
+}) {
+  return Response<dynamic>(
+    requestOptions: options,
+    statusCode: statusCode,
+    data: data,
+    headers: Headers.fromMap(headers),
+    statusMessage: statusMessage,
+  );
+}
+
 void main() {
-  group('XAUATLogin', () {
-    late XAUATLogin xauatLogin;
+  group('XAUATLogin basic helpers', () {
+    late XAUATLogin loginClient;
 
     setUp(() {
-      xauatLogin = XAUATLogin();
+      loginClient = XAUATLogin();
     });
 
     tearDown(() {
-      xauatLogin.dispose();
+      loginClient.dispose();
     });
 
-    test('should create instance', () {
-      expect(xauatLogin, isNotNull);
-    });
-
-    test('should create LoginTokenModel with default values', () {
+    test('LoginTokenModel should use defaults and serialize', () {
       final token = LoginTokenModel();
-      
       expect(token.eduCookie, '');
       expect(token.ssoCookie, '');
-      expect(token.success, true);
+      expect(token.success, isTrue);
       expect(token.message, '');
-    });
 
-    test('should create LoginTokenModel with provided values', () {
-      final token = LoginTokenModel(
-        eduCookie: 'edu_cookie',
-        ssoCookie: 'sso_cookie',
+      final custom = LoginTokenModel(
+        eduCookie: 'edu',
+        ssoCookie: 'sso',
         success: false,
-        message: 'error message',
+        message: 'err',
       );
-      
-      expect(token.eduCookie, 'edu_cookie');
-      expect(token.ssoCookie, 'sso_cookie');
-      expect(token.success, false);
-      expect(token.message, 'error message');
+      expect(custom.toJson(), <String, dynamic>{
+        'eduCookie': 'edu',
+        'ssoCookie': 'sso',
+        'success': false,
+        'message': 'err',
+      });
     });
 
-    test('should convert LoginTokenModel to JSON', () {
-      final token = LoginTokenModel(
-        eduCookie: 'edu_cookie',
-        ssoCookie: 'sso_cookie',
-        success: false,
-        message: 'error message',
+    test('randomStringTest should honor length bounds', () {
+      expect(loginClient.randomStringTest(0), isEmpty);
+      expect(loginClient.randomStringTest(1).length, 1);
+      expect(loginClient.randomStringTest(64).length, 64);
+    });
+
+    test('buildCookieStringTest should join cookies', () {
+      expect(
+        loginClient.buildCookieStringTest(<String, String>{'a': '1', 'b': '2'}),
+        anyOf(<Matcher>[equals('a=1; b=2'), equals('b=2; a=1')]),
       );
-      
-      final json = token.toJson();
-      
-      expect(json['eduCookie'], 'edu_cookie');
-      expect(json['ssoCookie'], 'sso_cookie');
-      expect(json['success'], false);
-      expect(json['message'], 'error message');
-    });
-
-    test('_randomString should generate string with correct length', () {
-      final randomString = xauatLogin.randomStringTest(10);
-      expect(randomString.length, 10);
-    });
-
-    test('_randomString should generate different strings on multiple calls', () {
-      final string1 = xauatLogin.randomStringTest(10);
-      final string2 = xauatLogin.randomStringTest(10);
-      final string3 = xauatLogin.randomStringTest(10);
-      
-      // 虽然理论上可能重复，但概率极低
-      expect(string1, isNot(equals(string2)));
-      expect(string1, isNot(equals(string3)));
-      expect(string2, isNot(equals(string3)));
-    });
-
-    test('_randomString should handle edge cases for length', () {
-      // 长度为0
-      final emptyString = xauatLogin.randomStringTest(0);
-      expect(emptyString, isEmpty);
-      expect(emptyString.length, 0);
-      
-      // 非常长的字符串
-      final longString = xauatLogin.randomStringTest(1000);
-      expect(longString.length, 1000);
-      
-      // 长度为1
-      final singleCharString = xauatLogin.randomStringTest(1);
-      expect(singleCharString.length, 1);
-    });
-
-    test('_buildCookieString should build correct cookie string', () {
-      final cookies = <String, String>{
-        'cookie1': 'value1',
-        'cookie2': 'value2',
-      };
-      
-      final cookieString = xauatLogin.buildCookieStringTest(cookies);
-      // 顺序可能不同，所以我们需要检查是否包含这些值
-      expect(cookieString, contains('cookie1=value1'));
-      expect(cookieString, contains('cookie2=value2'));
-      expect(cookieString, contains('; '));
-    });
-
-    test('_buildCookieString should handle empty cookies map', () {
-      final cookies = <String, String>{};
-      final cookieString = xauatLogin.buildCookieStringTest(cookies);
-      expect(cookieString, isEmpty);
-    });
-
-    test('_buildCookieString should handle single cookie', () {
-      final cookies = <String, String>{
-        'singleCookie': 'singleValue',
-      };
-      final cookieString = xauatLogin.buildCookieStringTest(cookies);
-      expect(cookieString, 'singleCookie=singleValue');
-      expect(cookieString, isNot(contains('; ')));
-    });
-
-    test('_buildCookieString should handle cookies with special characters', () {
-      final cookies = <String, String>{
-        'cookie with spaces': 'value with spaces',
-        'cookie=with=equals': 'value=with=equals',
-        'cookie;with;semicolons': 'value;with;semicolons',
-      };
-      final cookieString = xauatLogin.buildCookieStringTest(cookies);
-      expect(cookieString, contains('cookie with spaces=value with spaces'));
-      expect(cookieString, contains('cookie=with=equals=value=with=equals'));
-      expect(cookieString, contains('cookie;with;semicolons=value;with;semicolons'));
-    });
-
-    test('LoginTokenModel should handle empty messages', () {
-      final token = LoginTokenModel(
-        success: false,
-        message: '',
-      );
-      expect(token.message, '');
-      expect(token.success, false);
-    });
-
-    test('LoginTokenModel should handle long messages', () {
-      final longMessage = 'a' * 1000;
-      final token = LoginTokenModel(
-        success: false,
-        message: longMessage,
-      );
-      expect(token.message, longMessage);
-      expect(token.message.length, 1000);
-    });
-
-    test('LoginTokenModel should correctly serialize boolean success field', () {
-      final successToken = LoginTokenModel(success: true);
-      final failureToken = LoginTokenModel(success: false);
-      
-      expect(successToken.toJson()['success'], true);
-      expect(failureToken.toJson()['success'], false);
-    });
-
-    // Test the dispose method
-    test('should dispose correctly', () {
-      // Just verify it doesn't throw an exception
-      expect(() => xauatLogin.dispose(), returnsNormally);
-    });
-
-    // Test that the instance has correct initial state
-    test('should have correct initial state', () {
-      // Verify that the instance is properly initialized
-      expect(() => xauatLogin.randomStringTest(5), returnsNormally);
-      expect(() => xauatLogin.buildCookieStringTest({'test': 'value'}), returnsNormally);
+      expect(loginClient.buildCookieStringTest(<String, String>{}), isEmpty);
     });
   });
-  
-  group('LoginTokenModel', () {
-    test('should have correct equality behavior', () {
-      final token1 = LoginTokenModel(
-        eduCookie: 'edu1',
-        ssoCookie: 'sso1',
-        success: true,
-        message: 'success',
-      );
-      
-      final token2 = LoginTokenModel(
-        eduCookie: 'edu1',
-        ssoCookie: 'sso1',
-        success: true,
-        message: 'success',
-      );
-      
-      final token3 = LoginTokenModel(
-        eduCookie: 'edu2',
-        ssoCookie: 'sso2',
-        success: false,
-        message: 'failure',
-      );
-      
-      // Same values should be equal
-      expect(token1.toJson(), equals(token2.toJson()));
-      
-      // Different values should not be equal
-      expect(token1.toJson(), isNot(equals(token3.toJson())));
+
+  group('XAUATLogin scripted requests', () {
+    test('login should return success and parse redirect cookies', () async {
+      final steps = Queue<_Step>.from(<_Step>[
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              data: '''
+<html><body>
+<input name="lt" value="LT-1"/>
+<input name="execution" value="EXE-1"/>
+<input name="_eventId" value="submit"/>
+<input id="pwdEncryptSalt" value="1234567890abcdef"/>
+</body></html>
+''',
+              headers: <String, List<String>>{
+                'set-cookie': <String>['JSESSIONID=sid1; Path=/']
+              },
+            ),
+          );
+        },
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              statusCode: 302,
+              headers: <String, List<String>>{
+                'set-cookie': <String>['CASTGC=tgc1; Path=/'],
+                'location': <String>['https://swjw.xauat.edu.cn/redirect']
+              },
+            ),
+          );
+        },
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              headers: <String, List<String>>{
+                'set-cookie': <String>['JSESSIONID=edu1; Path=/']
+              },
+            ),
+          );
+        },
+      ]);
+
+      final interceptor = _ScriptedInterceptor(steps);
+      final dio = Dio()..interceptors.add(interceptor);
+      final loginClient = XAUATLogin(dio: dio);
+
+      final result = await loginClient.login('u1', 'p1');
+
+      expect(result.success, isTrue);
+      expect(result.eduCookie, contains('JSESSIONID=edu1'));
+      expect(result.ssoCookie, contains('CASTGC=tgc1'));
+      expect(result.message, '登录成功');
+
+      expect(interceptor.seen.length, 3);
+      expect(interceptor.seen[1].method, 'POST');
+      expect(interceptor.seen[2].method, 'GET');
+      loginClient.dispose();
     });
-    
-    test('should have correct default values', () {
-      // Test that the model has correct default values
-      final token = LoginTokenModel();
-      
-      expect(token.eduCookie, equals(''));
-      expect(token.ssoCookie, equals(''));
-      expect(token.success, equals(true));
-      expect(token.message, equals(''));
+
+    test('login should map 401/403 to credential error', () async {
+      final steps = Queue<_Step>.from(<_Step>[
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              data: '''
+<html><body>
+<input name="lt" value="LT-1"/>
+<input name="execution" value="EXE-1"/>
+</body></html>
+''',
+            ),
+          );
+        },
+        (options, handler) {
+          handler.resolve(_response(options, statusCode: 403));
+        },
+      ]);
+      final dio = Dio()..interceptors.add(_ScriptedInterceptor(steps));
+      final loginClient = XAUATLogin(dio: dio);
+
+      final result = await loginClient.login('u2', 'bad');
+
+      expect(result.success, isFalse);
+      expect(result.message, contains('账号或密码错误'));
+      loginClient.dispose();
     });
-    
-    test('should handle boolean values correctly', () {
-      // Test that the success field handles both true and false values correctly
-      final successToken = LoginTokenModel(success: true);
-      final failureToken = LoginTokenModel(success: false);
-      
-      expect(successToken.success, isTrue);
-      expect(failureToken.success, isFalse);
-      
-      // Verify that the JSON conversion handles booleans correctly
-      expect(successToken.toJson()['success'], isTrue);
-      expect(failureToken.toJson()['success'], isFalse);
+
+    test('login should parse server error message from html', () async {
+      final steps = Queue<_Step>.from(<_Step>[
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              data: '''
+<html><body>
+<input name="lt" value="LT-1"/>
+<input name="execution" value="EXE-1"/>
+</body></html>
+''',
+            ),
+          );
+        },
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              statusCode: 418,
+              data: '<span id="msg">bad state</span>',
+            ),
+          );
+        },
+      ]);
+      final dio = Dio()..interceptors.add(_ScriptedInterceptor(steps));
+      final loginClient = XAUATLogin(dio: dio);
+
+      final result = await loginClient.login('u3', 'p3');
+
+      expect(result.success, isFalse);
+      expect(result.message, contains('bad state'));
+      loginClient.dispose();
+    });
+
+    test('login should return catch-all error message on transport exception',
+        () async {
+      final steps = Queue<_Step>.from(<_Step>[
+        (options, handler) {
+          handler.reject(
+            DioException(
+              requestOptions: options,
+              error: 'offline',
+              type: DioExceptionType.connectionError,
+            ),
+          );
+        },
+      ]);
+      final dio = Dio()..interceptors.add(_ScriptedInterceptor(steps));
+      final loginClient = XAUATLogin(dio: dio);
+
+      final result = await loginClient.login('u4', 'p4');
+
+      expect(result.success, isFalse);
+      expect(result.message, contains('登录出错'));
+      loginClient.dispose();
+    });
+
+    test('loginFromSSO should return success and parse edu cookie', () async {
+      final steps = Queue<_Step>.from(<_Step>[
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              statusCode: 200,
+              headers: <String, List<String>>{
+                'set-cookie': <String>['JSESSIONID=edu2; Path=/']
+              },
+            ),
+          );
+        },
+      ]);
+
+      final dio = Dio()..interceptors.add(_ScriptedInterceptor(steps));
+      final loginClient = XAUATLogin(dio: dio);
+      final result = await loginClient.loginFromSSO('CASTGC=abc');
+
+      expect(result.success, isTrue);
+      expect(result.eduCookie, contains('JSESSIONID=edu2'));
+      expect(result.ssoCookie, 'CASTGC=abc');
+      loginClient.dispose();
+    });
+
+    test('loginFromSSO should return failure on non-200 response', () async {
+      final steps = Queue<_Step>.from(<_Step>[
+        (options, handler) {
+          handler.resolve(
+            _response(
+              options,
+              statusCode: 500,
+              statusMessage: 'Server error',
+            ),
+          );
+        },
+      ]);
+      final dio = Dio()..interceptors.add(_ScriptedInterceptor(steps));
+      final loginClient = XAUATLogin(dio: dio);
+
+      final result = await loginClient.loginFromSSO('CASTGC=abc');
+      expect(result.success, isFalse);
+      expect(result.message, contains('SSO登录失败'));
+      loginClient.dispose();
     });
   });
 }

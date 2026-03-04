@@ -44,7 +44,8 @@ class UserService {
   /// 创建用户待办事项
   static Future<TodoModel?> createUserTodo(TodoModel todoData) async {
     try {
-      final response = await ApiClient.post('/User/todos', body: todoData.toJson());
+      final response =
+          await ApiClient.post('/User/todos', body: todoData.toJson());
       return ApiResponseHelper.parseSingleObject(
         response,
         TodoModel.fromJson,
@@ -61,7 +62,8 @@ class UserService {
   /// 更新用户待办事项
   static Future<bool> updateUserTodo(TodoModel todoData) async {
     try {
-      final response = await ApiClient.put('/User/todos', body: todoData.toJson());
+      final response =
+          await ApiClient.put('/User/todos', body: todoData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating user todo',
@@ -110,7 +112,8 @@ class UserService {
   /// 更新用户资料
   static Future<bool> updateUserProfile(StudentModel profileData) async {
     try {
-      final response = await ApiClient.put('/User/profile', body: profileData.toJson());
+      final response =
+          await ApiClient.put('/User/profile', body: profileData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating user profile',

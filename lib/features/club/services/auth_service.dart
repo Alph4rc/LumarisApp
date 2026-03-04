@@ -21,7 +21,8 @@ class AuthService {
   /// @param clientId 客户端ID（可选，用于OAuth2认证）
   /// @param scope 权限范围（可选，用于OAuth2认证）
   /// @return 登录成功返回JWT令牌，失败返回null
-  static Future<String?> login(String userId, String password, {String clientId = '', String scope = ''}) async {
+  static Future<String?> login(String userId, String password,
+      {String clientId = '', String scope = ''}) async {
     try {
       final response = await ApiClient.post(
         '/Auth/login',
@@ -57,7 +58,8 @@ class AuthService {
   /// @return 注册成功返回true，失败返回false
   static Future<bool> signup(StudentModel studentData) async {
     try {
-      final response = await ApiClient.post('/Auth/signup', body: studentData.toJson());
+      final response =
+          await ApiClient.post('/Auth/signup', body: studentData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error during signup',
@@ -121,10 +123,11 @@ class AuthService {
   /// @param oldPassword 旧密码
   /// @param newPassword 新密码
   /// @return 密码更改成功返回true，失败返回false
-  static Future<bool> changePassword(String userId, String oldPassword, String newPassword) async {
+  static Future<bool> changePassword(
+      String userId, String oldPassword, String newPassword) async {
     try {
       final response = await ApiClient.put(
-        '/Auth/change-password?userId=$userId&oldPassword=$oldPassword&newPassword=$newPassword');
+          '/Auth/change-password?userId=$userId&oldPassword=$oldPassword&newPassword=$newPassword');
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error changing password',
@@ -146,7 +149,8 @@ class AuthService {
   /// @return 请求成功返回true，失败返回false
   static Future<bool> requestPasswordReset(String userId) async {
     try {
-      final response = await ApiClient.post('/Auth/request-password-reset?userId=$userId');
+      final response =
+          await ApiClient.post('/Auth/request-password-reset?userId=$userId');
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error requesting password reset',
@@ -168,10 +172,11 @@ class AuthService {
   /// @param code 验证码
   /// @param newPassword 新密码
   /// @return 密码重置成功返回true，失败返回false
-  static Future<bool> resetPassword(String userId, String code, String newPassword) async {
+  static Future<bool> resetPassword(
+      String userId, String code, String newPassword) async {
     try {
       final response = await ApiClient.post(
-        '/Auth/reset-password?userId=$userId&code=$code&newPassword=$newPassword');
+          '/Auth/reset-password?userId=$userId&code=$code&newPassword=$newPassword');
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error resetting password',
@@ -193,10 +198,11 @@ class AuthService {
   /// @param clientId 客户端ID（可选）
   /// @param scope 权限范围（可选）
   /// @return 刷新成功返回新的JWT令牌，失败返回null
-  static Future<String?> refreshToken(String userId, String refreshToken, {String clientId = '', String scope = ''}) async {
+  static Future<String?> refreshToken(String userId, String refreshToken,
+      {String clientId = '', String scope = ''}) async {
     try {
       final response = await ApiClient.post(
-        '/Auth/refresh-token?userId=$userId&refreshToken=$refreshToken&clientId=$clientId&scope=$scope');
+          '/Auth/refresh-token?userId=$userId&refreshToken=$refreshToken&clientId=$clientId&scope=$scope');
       final jwt = ApiResponseHelper.parseString(
         response,
         errorMessage: 'Error refreshing token',

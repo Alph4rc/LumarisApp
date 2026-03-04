@@ -40,7 +40,7 @@ class PerformanceMonitor {
       _pageRenderTimes[pageName] = [];
     }
     _pageRenderTimes[pageName]!.add(renderTime);
-    
+
     AppLogger.debug('页面渲染时间 - $pageName: $renderTime ms');
   }
 
@@ -54,7 +54,8 @@ class PerformanceMonitor {
 
   /// 获取页面平均渲染时间
   double getAveragePageRenderTime(String pageName) {
-    if (!_pageRenderTimes.containsKey(pageName) || _pageRenderTimes[pageName]!.isEmpty) {
+    if (!_pageRenderTimes.containsKey(pageName) ||
+        _pageRenderTimes[pageName]!.isEmpty) {
       return 0;
     }
     final times = _pageRenderTimes[pageName]!;
@@ -84,7 +85,8 @@ class PerformanceMonitorWidget extends StatelessWidget {
 
 /// 页面渲染时间监控小部件
 class PageRenderTimeMonitor extends StatefulWidget {
-  const PageRenderTimeMonitor({super.key, required this.pageName, required this.child});
+  const PageRenderTimeMonitor(
+      {super.key, required this.pageName, required this.child});
 
   final String pageName;
   final Widget child;

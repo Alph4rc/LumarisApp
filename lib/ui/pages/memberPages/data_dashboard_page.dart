@@ -61,7 +61,10 @@ class _DataDashboardPageState extends State<DataDashboardPage>
       setState(() {
         _yearData = (results[0] as List<YearCount>?) ?? [];
         _collegeData = (results[1] as List<AcademyCount>?) ?? [];
-        _gradeData = (results[2] as List<LandscapeCount>?)?.map((e) => GradeCount(grade: e.type, value: e.sales)).toList() ?? [];
+        _gradeData = (results[2] as List<LandscapeCount>?)
+                ?.map((e) => GradeCount(grade: e.type, value: e.sales))
+                .toList() ??
+            [];
         _landscapeData = (results[3] as List<LandscapeCount>?) ?? [];
         _genderData = (results[4] as List<GenderCount>?) ?? [];
         _isLoading = false;

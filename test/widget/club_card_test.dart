@@ -6,7 +6,7 @@ void main() {
   group('ClubCard', () {
     testWidgets('should display child widget', (WidgetTester tester) async {
       const childText = '测试内容';
-      
+
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -22,7 +22,7 @@ void main() {
 
     testWidgets('should apply custom margin', (WidgetTester tester) async {
       const margin = EdgeInsets.all(16.0);
-      
+
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -43,7 +43,7 @@ void main() {
 
     testWidgets('should apply custom padding', (WidgetTester tester) async {
       const padding = EdgeInsets.symmetric(horizontal: 20, vertical: 10);
-      
+
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -74,9 +74,9 @@ void main() {
       );
 
       final containerFinder = find.byWidgetPredicate((Widget widget) {
-        return widget is Container && 
-               widget.decoration is BoxDecoration &&
-               (widget.decoration as BoxDecoration).borderRadius != null;
+        return widget is Container &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).borderRadius != null;
       });
 
       expect(containerFinder, findsOneWidget);

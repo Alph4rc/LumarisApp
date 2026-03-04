@@ -9,6 +9,8 @@ import 'prefs_keys.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
+import 'package:ios_club_app/features/education/services/edu_service.dart';
+
 class UserStore extends GetxController {
   static UserStore get to => Get.find();
 
@@ -72,15 +74,18 @@ class UserStore extends GetxController {
 
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
-    
+
     await prefs.remove(PrefsKeys.USER_DATA);
     await prefs.remove(PrefsKeys.COURSE_LAST_FETCH_TIME);
     await prefs.remove(PrefsKeys.EXAM_DATA);
     await prefs.remove(PrefsKeys.INFO_DATA);
     await prefs.remove(PrefsKeys.COURSE_DATA);
-    
+
     await secureStorage.delete(key: PrefsKeys.USERNAME);
     await secureStorage.delete(key: PrefsKeys.PASSWORD);
+
+    // 调用 EduService 清除所有相关缓存 (包括 Hive 和 RequestCache)
+    await EduService.clearEduCache();
 
     final courseStore = Get.put(CourseStore());
     courseStore.clearCourseData();
@@ -103,9 +108,9 @@ class UserStore extends GetxController {
 
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
-    
+
     await prefs.remove(PrefsKeys.MEMBER_DATA);
-    
+
     await secureStorage.delete(key: PrefsKeys.MEMBER_JWT);
     await secureStorage.delete(key: PrefsKeys.CLUB_NAME);
     await secureStorage.delete(key: PrefsKeys.CLUB_ID);

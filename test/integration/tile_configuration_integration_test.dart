@@ -34,12 +34,14 @@ void main() {
         print('\n2. Reordering tiles...');
       }
       if (kDebugMode) {
-        print('   Before: ${config.getVisibleTiles().map((t) => t.id).toList()}');
+        print(
+            '   Before: ${config.getVisibleTiles().map((t) => t.id).toList()}');
       }
       await TileService.reorderTile('电费', 0, 2);
       config = await TileService.getTileConfigurations();
       if (kDebugMode) {
-        print('   After: ${config.getVisibleTiles().map((t) => t.id).toList()}');
+        print(
+            '   After: ${config.getVisibleTiles().map((t) => t.id).toList()}');
       }
       expect(config.getVisibleTiles()[0].id, '校车');
       expect(config.getVisibleTiles()[2].id, '电费');

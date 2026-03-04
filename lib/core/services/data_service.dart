@@ -11,6 +11,8 @@ import 'package:ios_club_app/core/models/course_time.dart';
 import 'package:ios_club_app/core/models/semester_model.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/repositories/course_repository.dart';
+import 'package:ios_club_app/core/repositories/score_repository.dart';
 
 /// 数据服务类，负责处理应用程序的各种数据操作
 ///
@@ -42,20 +44,14 @@ class DataService {
 
     final List<CourseModel> allCourses = [];
 
-    // 加载服务器课程
-    final String? serverJsonString = prefs.getString(PrefsKeys.COURSE_DATA);
-    if (serverJsonString != null) {
-      try {
-        var serverJsonList = jsonDecode(serverJsonString);
-        serverJsonList = serverJsonList["data"];
-        for (var json in serverJsonList) {
-          var course = CourseModel.fromJson(json);
-          if (ig.isEmpty || !ig.any((x) => x == course.courseName)) {
-            allCourses.add(course);
-          }
+    // 从 Hive 加载服务器课程
+    final courseRepo = CourseRepository();
+    final serverCourses = await courseRepo.getCourses();
+    for (var course in serverCourses) {
+      if (!course.isCustom) {
+        if (ig.isEmpty || !ig.any((x) => x == course.courseName)) {
+          allCourses.add(course);
         }
-      } catch (e) {
-        AppLogger.debug('解析服务器课程数据失败: $e');
       }
     }
 
@@ -84,15 +80,11 @@ class DataService {
   ///
   /// @return 不重复的课程名称列表
   static Future<List<String>> getCourseName() async {
-    final prefs = PrefsService.instance;
-    final String? jsonString = prefs.getString(PrefsKeys.COURSE_DATA);
+    final courseRepo = CourseRepository();
+    final courses = await courseRepo.getCourses();
     final List<String> list = [];
-    if (jsonString != null) {
-      var jsonList = jsonDecode(jsonString);
-      jsonList = jsonList["data"];
-      for (var json in jsonList) {
-        final c = CourseModel.fromJson(json);
-        if (list.any((x) => x == c.courseName)) continue;
+    for (var c in courses) {
+      if (!c.isCustom && !list.any((x) => x == c.courseName)) {
         list.add(c.courseName);
       }
     }
@@ -181,11 +173,10 @@ class DataService {
     final allCourse = await getAllCourse();
     if (week == 0) {
       final time = await getTime();
-      week = DateTime.now()
-                  .difference(DateTime.parse(time.startTime!))
-                  .inDays ~/
-              7 +
-          1;
+      week =
+          DateTime.now().difference(DateTime.parse(time.startTime!)).inDays ~/
+                  7 +
+              1;
     }
     return allCourse
         .where((course) => course.weekIndexes.contains(week))
@@ -325,22 +316,8 @@ class DataService {
   ///
   /// @return 按学期分组的成绩列表
   static Future<List<ScoreList>> getScore() async {
-    final prefs = PrefsService.instance;
-    final String? jsonString = prefs.getString('all_score_data');
-    final s = await getSemester();
-    final List<ScoreList> list = [];
-    if (jsonString != null) {
-      final Map<String, dynamic> jsonList = jsonDecode(jsonString);
-      jsonList.forEach((String key, value) {
-        final scoreList = jsonDecode(value);
-        list.add(ScoreList(
-          semester: s.firstWhere((x) => x.semester == key),
-          list: (scoreList as List).map((e) => ScoreModel.fromJson(e)).toList(),
-        ));
-      });
-    }
-
-    return list;
+    final scoreRepo = ScoreRepository();
+    return await scoreRepo.getScores();
   }
 
   /// 获取学期信息

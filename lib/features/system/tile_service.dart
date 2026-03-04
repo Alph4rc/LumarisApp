@@ -24,7 +24,7 @@ class TileConfigurationException implements Exception {
 }
 
 class TileService {
-  static final Dio _dio = Dio(BaseOptions(
+  static Dio _dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));
@@ -100,16 +100,16 @@ class TileService {
       final maxOrder = visibleTiles.isEmpty
           ? -1
           : visibleTiles.map((t) => t.order).reduce((a, b) => a > b ? a : b);
-      
+
       final newTile = TileConfiguration(
         id: tileId,
         order: maxOrder + 1,
         isVisible: true,
       );
-      
+
       final newConfigs = List<TileConfiguration>.from(config.configurations)
         ..add(newTile);
-      
+
       final newList = config.copyWith(configurations: newConfigs);
       await saveTileConfigurations(newList.normalizeOrders());
     }
@@ -314,5 +314,16 @@ class TileService {
       configurations: configurations,
       lastModified: DateTime.now(),
     );
+  }
+
+  static void setDioForTest(Dio dio) {
+    _dio = dio;
+  }
+
+  static void resetDioForTest() {
+    _dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ));
   }
 }

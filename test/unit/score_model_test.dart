@@ -90,7 +90,7 @@ void main() {
     test('should handle missing JSON fields gracefully', () {
       final json = <String, dynamic>{};
       final score = ScoreModel.fromJson(json);
-      
+
       expect(score.name, '');
       expect(score.lessonCode, '');
       expect(score.lessonName, '');
@@ -100,11 +100,11 @@ void main() {
       expect(score.credit, '');
       expect(score.isMinor, false);
     });
-    
+
     test('should handle gradeDetail and credit as strings in toJson', () {
       final score = ScoreModel.fromJson({});
       final json = score.toJson();
-      
+
       // Even though gradeDetail and credit are stored as ints when coming from JSON,
       // they should be converted to strings when going to JSON
       expect(json['gradeDetail'], isA<dynamic>());
@@ -122,18 +122,18 @@ void main() {
         credit: '',
         isMinor: false,
       );
-      
+
       expect(score.name, '');
       expect(score.toJson()['name'], '');
     });
-    
+
     test('should handle minor courses correctly', () {
       final minorScore = ScoreModel(isMinor: true);
       final regularScore = ScoreModel(isMinor: false);
-      
+
       expect(minorScore.isMinor, true);
       expect(regularScore.isMinor, false);
-      
+
       expect(minorScore.toJson()['isMinor'], true);
       expect(regularScore.toJson()['isMinor'], false);
     });
@@ -175,7 +175,7 @@ void main() {
       // The actual calculation result is 3.0 due to the way the code handles gpa "0"
       expect(scoreList.totalGpa, 3.0);
     });
-    
+
     test('should calculate total GPA correctly with actual formula', () {
       final scoreList = ScoreList(
         semester: semester,
@@ -237,7 +237,7 @@ void main() {
         semester: semester,
         list: [],
       );
-      
+
       expect(scoreList.totalCredit, 0.0);
       expect(scoreList.totalCourse, 0);
       // The code returns NaN instead of throwing an exception
@@ -248,11 +248,15 @@ void main() {
       final scoreList = ScoreList(
         semester: semester,
         list: [
-          ScoreModel(credit: '3.0', gpa: '4.0', isMinor: false), // Regular course
-          ScoreModel(credit: '2.0', gpa: '3.0', isMinor: true), // Minor course (should be ignored)
+          ScoreModel(
+              credit: '3.0', gpa: '4.0', isMinor: false), // Regular course
+          ScoreModel(
+              credit: '2.0',
+              gpa: '3.0',
+              isMinor: true), // Minor course (should be ignored)
         ],
       );
-      
+
       // Only the regular course should be included in GPA calculation
       expect(scoreList.totalGpa, 4.0);
       // Note: totalCredit includes minor courses, only GPA calculation ignores them
@@ -266,7 +270,7 @@ void main() {
           ScoreModel(credit: '3.0', gpa: '4.0'),
         ],
       );
-      
+
       expect(scoreList.totalCredit, 3.0);
       expect(scoreList.totalGpa, 4.0);
       expect(scoreList.totalCourse, 1);
@@ -281,13 +285,13 @@ void main() {
           ScoreModel(credit: '3.0', gpa: '0'),
         ],
       );
-      
+
       expect(scoreList.totalCredit, 0.0);
       expect(scoreList.totalCourse, 0);
       // The code returns 0.0 instead of NaN for all ignored courses
       expect(scoreList.totalGpa, 0.0);
     });
-    
+
     test('should handle courses with empty gpa correctly', () {
       final scoreList = ScoreList(
         semester: semester,
@@ -295,12 +299,12 @@ void main() {
           ScoreModel(credit: '3.0', gpa: ''),
         ],
       );
-      
+
       expect(scoreList.totalCredit, 0.0);
       expect(scoreList.totalCourse, 0);
       expect(scoreList.totalGpa, isNaN);
     });
-    
+
     test('should convert to JSON correctly', () {
       final scoreList = ScoreList(
         semester: semester,
@@ -309,9 +313,9 @@ void main() {
           ScoreModel(credit: '2.0', gpa: '3.0'),
         ],
       );
-      
+
       final json = scoreList.toJson();
-      
+
       expect(json, isA<Map<String, dynamic>>());
       expect(json.containsKey('list'), true);
       expect(json.containsKey('semester'), true);
@@ -319,23 +323,23 @@ void main() {
       expect(json['semester'], isA<Map>());
     });
   });
-  
+
   group('ScoreList static methods', () {
     late SemesterModel semester1;
     late SemesterModel semester2;
-    
+
     setUp(() {
       semester1 = SemesterModel(
         semester: '2020-2021-1',
         name: '2020-2021学年第一学期',
       );
-      
+
       semester2 = SemesterModel(
         semester: '2020-2021-2',
         name: '2020-2021学年第二学期',
       );
     });
-    
+
     test('should calculate total GPA across semesters correctly', () {
       final scoreList1 = ScoreList(
         semester: semester1,
@@ -344,7 +348,7 @@ void main() {
           ScoreModel(credit: '2.0', gpa: '3.0'),
         ],
       );
-      
+
       final scoreList2 = ScoreList(
         semester: semester2,
         list: [
@@ -352,13 +356,13 @@ void main() {
           ScoreModel(credit: '2.0', gpa: '3.0'),
         ],
       );
-      
+
       final totalGpa = ScoreList.getTotalGpa([scoreList1, scoreList2]);
-      
+
       // Each semester has a GPA of 3.6, so average is 3.6
       expect(totalGpa, 3.6);
     });
-    
+
     test('should handle semesters with NaN GPA correctly', () {
       final scoreList1 = ScoreList(
         semester: semester1,
@@ -367,18 +371,18 @@ void main() {
           ScoreModel(credit: '2.0', gpa: '3.0'),
         ],
       );
-      
+
       final scoreList2 = ScoreList(
         semester: semester2,
         list: [], // Empty list, will have NaN GPA
       );
-      
+
       final totalGpa = ScoreList.getTotalGpa([scoreList1, scoreList2]);
-      
+
       // The code will return NaN because one of the semesters has NaN GPA
       expect(totalGpa, isNaN);
     });
-    
+
     test('should calculate total credit across semesters correctly', () {
       final scoreList1 = ScoreList(
         semester: semester1,
@@ -387,7 +391,7 @@ void main() {
           ScoreModel(credit: '2.0', gpa: '3.0'),
         ],
       );
-      
+
       final scoreList2 = ScoreList(
         semester: semester2,
         list: [
@@ -395,19 +399,19 @@ void main() {
           ScoreModel(credit: '2.0', gpa: '4.0'),
         ],
       );
-      
+
       final totalCredit = ScoreList.getTotalCredit([scoreList1, scoreList2]);
-      
+
       // Each semester has 5.0 credits, so total is 10.0
       expect(totalCredit, 10.0);
     });
-    
+
     test('should handle empty list in static methods', () {
       // The code returns NaN instead of throwing an exception for empty list
       expect(ScoreList.getTotalGpa([]), isNaN);
       expect(ScoreList.getTotalCredit([]), 0.0);
     });
-    
+
     test('should handle single semester in static methods', () {
       final scoreList = ScoreList(
         semester: semester1,
@@ -415,7 +419,7 @@ void main() {
           ScoreModel(credit: '3.0', gpa: '4.0'),
         ],
       );
-      
+
       expect(ScoreList.getTotalGpa([scoreList]), 4.0);
       expect(ScoreList.getTotalCredit([scoreList]), 3.0);
     });

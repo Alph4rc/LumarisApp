@@ -541,7 +541,8 @@ class _ReorderCategoriesDialogState extends State<_ReorderCategoriesDialog> {
                     key: ValueKey(category.id),
                     leading: const Icon(Icons.drag_handle),
                     title: Text(category.name),
-                    subtitle: category.description != null && category.description!.isNotEmpty
+                    subtitle: category.description != null &&
+                            category.description!.isNotEmpty
                         ? Text(category.description!)
                         : null,
                   );

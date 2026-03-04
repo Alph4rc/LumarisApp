@@ -281,9 +281,7 @@ class _ProjectPageState extends State<ProjectPage> {
 
   Widget _buildDivider() {
     return Container(
-      height: 0.5,
-      color: CupertinoColors.separator.withValues(alpha: 0.3)
-    );
+        height: 0.5, color: CupertinoColors.separator.withValues(alpha: 0.3));
   }
 
   String _formatDate(String dateStr) {

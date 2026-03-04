@@ -23,8 +23,13 @@ void main() {
       expect(PlatformUtils.getDesktopFontFamily(''), isNull);
     });
 
-    test('should return non-null for valid font family', () {
-      expect(PlatformUtils.getDesktopFontFamily('Roboto'), equals('Roboto'));
+    test('should return desktop font family only on desktop platforms', () {
+      final result = PlatformUtils.getDesktopFontFamily('Roboto');
+      if (PlatformUtils.isDesktop) {
+        expect(result, equals('Roboto'));
+      } else {
+        expect(result, isNull);
+      }
     });
   });
 }

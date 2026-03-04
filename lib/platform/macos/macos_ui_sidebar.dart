@@ -5,7 +5,6 @@ import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:get/get.dart';
 
-
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
 Sidebar macosUISidebar({
@@ -41,7 +40,8 @@ Sidebar macosUISidebar({
                     destination.label,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                   leading: MacosIcon(

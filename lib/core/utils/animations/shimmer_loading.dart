@@ -264,7 +264,8 @@ class CardSkeleton extends StatelessWidget {
         children: [
           Row(
             children: [
-              const SkeletonCircle(size: 40, margin: EdgeInsets.only(right: 12)),
+              const SkeletonCircle(
+                  size: 40, margin: EdgeInsets.only(right: 12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,8 +285,12 @@ class CardSkeleton extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          const SkeletonLine(width: double.infinity, height: 14, margin: EdgeInsets.only(bottom: 8)),
-          SkeletonLine(width: MediaQuery.of(context).size.width * 0.7, height: 14),
+          const SkeletonLine(
+              width: double.infinity,
+              height: 14,
+              margin: EdgeInsets.only(bottom: 8)),
+          SkeletonLine(
+              width: MediaQuery.of(context).size.width * 0.7, height: 14),
         ],
       ),
     );

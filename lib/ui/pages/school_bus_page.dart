@@ -19,16 +19,16 @@ class SchoolBusPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Obx(() => CupertinoButton(
-          onPressed: busController.toggleCampus,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(busController.isCaoTang.value ? '草堂校区' : '雁塔校区'),
-              Icon(Icons.arrow_forward),
-              Text(busController.isCaoTang.value ? '雁塔校区' : '草堂校区')
-            ],
-          ),
-        )),
+              onPressed: busController.toggleCampus,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(busController.isCaoTang.value ? '草堂校区' : '雁塔校区'),
+                  Icon(Icons.arrow_forward),
+                  Text(busController.isCaoTang.value ? '雁塔校区' : '草堂校区')
+                ],
+              ),
+            )),
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight),
@@ -86,7 +86,7 @@ class SchoolBusPage extends StatelessWidget {
               final bus = busController.busData[index];
 
               var bottom =
-              index == busController.busData.length - 1 ? 12.0 : 0.0;
+                  index == busController.busData.length - 1 ? 12.0 : 0.0;
 
               return Padding(
                 padding: EdgeInsets.only(
@@ -123,38 +123,38 @@ class SchoolBusPage extends StatelessWidget {
                             Expanded(
                                 child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Text(bus.description,
-                                          style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontWeight: FontWeight.bold)),
-                                      Divider(
-                                        thickness: 1,
-                                      ),
-                                      Text(bus.arrivalStationTime,
-                                          style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontWeight: FontWeight.bold))
-                                    ])),
+                                  Text(bus.description,
+                                      style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.bold)),
+                                  Divider(
+                                    thickness: 1,
+                                  ),
+                                  Text(bus.arrivalStationTime,
+                                      style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.bold))
+                                ])),
                             Expanded(
                                 child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        bus.arrivalStation,
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        bus.totalTime,
-                                        style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ]))
+                                  Text(
+                                    bus.arrivalStation,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    bus.totalTime,
+                                    style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ]))
                           ],
                         ),
                       ),
@@ -197,26 +197,26 @@ class SchoolBusPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Obx(() => ListTile(
-                title: const Text('是否显示校车磁贴'),
-                trailing: CupertinoSwitch(
-                  value: busController.isShowBus.value,
-                  onChanged: (bool value) async {
-                    busController.toggleShowBus(value);
-                  },
-                ),
-              )),
+                    title: const Text('是否显示校车磁贴'),
+                    trailing: CupertinoSwitch(
+                      value: busController.isShowBus.value,
+                      onChanged: (bool value) async {
+                        busController.toggleShowBus(value);
+                      },
+                    ),
+                  )),
               if (!kIsWeb) const SizedBox(height: 10),
               if (!kIsWeb)
                 Obx(() => ListTile(
-                  title: const Text('是否使用新API'),
-                  subtitle: const Text('新的API接口只能在校园网内使用'),
-                  trailing: CupertinoSwitch(
-                    value: busController.useNewApi.value,
-                    onChanged: (bool value) async {
-                      busController.toggleUseNewApi(value);
-                    },
-                  ),
-                )),
+                      title: const Text('是否使用新API'),
+                      subtitle: const Text('新的API接口只能在校园网内使用'),
+                      trailing: CupertinoSwitch(
+                        value: busController.useNewApi.value,
+                        onChanged: (bool value) async {
+                          busController.toggleUseNewApi(value);
+                        },
+                      ),
+                    )),
             ],
           );
         },

@@ -23,8 +23,10 @@ class GiteeService {
       final response = await _client.get('/App');
 
       if (response != null) {
-        final jsonResponse = response is String ? jsonDecode(response) : response;
-        final data = jsonResponse is String ? jsonDecode(jsonResponse) : jsonResponse;
+        final jsonResponse =
+            response is String ? jsonDecode(response) : response;
+        final data =
+            jsonResponse is String ? jsonDecode(jsonResponse) : jsonResponse;
         final re = ReleaseModel.fromJson(data[0] as Map<String, dynamic>);
 
         if (re.body.contains('[强制更新]')) {

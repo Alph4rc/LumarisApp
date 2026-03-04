@@ -167,203 +167,200 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      appBar: ClubAppBar(
-        titleWidget: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '自定义课程',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            if (customCourses.isNotEmpty)
+        appBar: ClubAppBar(
+          titleWidget: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                '${customCourses.length} 门课程',
+                '自定义课程',
                 style: TextStyle(
-                  fontSize: 13,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showAddCourseDialog,
-            tooltip: '添加课程',
+              if (customCourses.isNotEmpty)
+                Text(
+                  '${customCourses.length} 门课程',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+            ],
           ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(
-        child: CircularProgressIndicator(strokeWidth: 2),
-      )
-          : customCourses.isEmpty
-          ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.event_available,
-                size: 48,
-                color: primaryColor,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              '暂无自定义课程',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '点击右上角 + 号添加课程',
-              style: TextStyle(
-                fontSize: 15,
-                color: isDarkMode
-                    ? Colors.grey[400]
-                    : Colors.grey[600],
-              ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _showAddCourseDialog,
+              tooltip: '添加课程',
             ),
           ],
         ),
-      )
-          : ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: customCourses.length,
-        itemBuilder: (context, index) {
-          final course = customCourses[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () => _showEditCourseDialog(course),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              course.courseName,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                _buildInfoChip(
-                                  Icons.location_on_outlined,
-                                  course.room.isEmpty
-                                      ? '无地点'
-                                      : course.room,
-                                  Colors.blue,
-                                  isDarkMode,
-                                ),
-                                _buildInfoChip(
-                                  Icons.schedule_outlined,
-                                  _formatCourseTime(course),
-                                  Colors.green,
-                                  isDarkMode,
-                                ),
-                              ],
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : customCourses.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(
+                            Icons.event_available,
+                            size: 48,
+                            color: primaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          '暂无自定义课程',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '点击右上角 + 号添加课程',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: customCourses.length,
+                    itemBuilder: (context, index) {
+                      final course = customCourses[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      IconButton(
-                        icon: Icon(
-                          Icons.more_horiz,
-                          color: isDarkMode
-                              ? Colors.grey[400]
-                              : Colors.grey[600],
-                        ),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: cardColor,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.vertical(
-                                top: Radius.circular(20),
-                              ),
-                            ),
-                            builder: (context) => SafeArea(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => _showEditCourseDialog(course),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
                                 children: [
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.edit_outlined,
-                                      color: isDarkMode
-                                          ? Colors.blue[300]
-                                          : Colors.blue[600],
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          course.courseName,
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: [
+                                            _buildInfoChip(
+                                              Icons.location_on_outlined,
+                                              course.room.isEmpty
+                                                  ? '无地点'
+                                                  : course.room,
+                                              Colors.blue,
+                                              isDarkMode,
+                                            ),
+                                            _buildInfoChip(
+                                              Icons.schedule_outlined,
+                                              _formatCourseTime(course),
+                                              Colors.green,
+                                              isDarkMode,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    title: const Text('编辑课程'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      _showEditCourseDialog(
-                                          course);
-                                    },
                                   ),
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.delete_outline,
-                                      color: Colors.red[600],
+                                  const SizedBox(width: 12),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.more_horiz,
+                                      color: isDarkMode
+                                          ? Colors.grey[400]
+                                          : Colors.grey[600],
                                     ),
-                                    title: const Text('删除课程'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      _deleteCourse(course);
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: cardColor,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(20),
+                                          ),
+                                        ),
+                                        builder: (context) => SafeArea(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ListTile(
+                                                leading: Icon(
+                                                  Icons.edit_outlined,
+                                                  color: isDarkMode
+                                                      ? Colors.blue[300]
+                                                      : Colors.blue[600],
+                                                ),
+                                                title: const Text('编辑课程'),
+                                                onTap: () {
+                                                  Navigator.pop(context);
+                                                  _showEditCourseDialog(course);
+                                                },
+                                              ),
+                                              ListTile(
+                                                leading: Icon(
+                                                  Icons.delete_outline,
+                                                  color: Colors.red[600],
+                                                ),
+                                                title: const Text('删除课程'),
+                                                onTap: () {
+                                                  Navigator.pop(context);
+                                                  _deleteCourse(course);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     },
                                   ),
                                 ],
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      )
-    );
+                          ),
+                        ),
+                      );
+                    },
+                  ));
   }
 
   Widget _buildInfoChip(

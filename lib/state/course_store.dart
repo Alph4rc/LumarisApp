@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
-import 'prefs_keys.dart';
+import 'package:ios_club_app/core/repositories/course_repository.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'dart:convert';
 
 /// 课程数据存储管理类
 ///
@@ -11,6 +12,8 @@ import 'prefs_keys.dart';
 class CourseStore extends GetxController {
   /// 获取CourseStore实例
   static CourseStore get to => Get.find();
+
+  final CourseRepository _repository = CourseRepository();
 
   /// 存储所有课程的响应式列表
   final _courses = <CourseModel>[].obs;
@@ -33,46 +36,16 @@ class CourseStore extends GetxController {
 
   /// 从本地存储加载所有课程数据
   ///
-  /// 从SharedPreferences中读取课程数据，解析为CourseModel列表并存储到响应式列表中。
-  /// 同时加载自定义课程数据并合并到课程列表中。
-  /// 如果解析失败，会清除本地存储中的课程数据。
+  /// 从Hive中读取课程数据，并存储到响应式列表中。
   Future<void> loadCourses() async {
-    final prefs = PrefsService.instance;
-    final List<CourseModel> allCourses = [];
+    final courses = await _repository.getCourses();
+    _courses.assignAll(courses);
+  }
 
-    // 加载系统课程数据
-    final String? systemJsonString = prefs.getString(PrefsKeys.COURSE_DATA);
-    if (systemJsonString != null) {
-      try {
-        var jsonList = jsonDecode(systemJsonString);
-        jsonList = jsonList["data"];
-        for (var json in jsonList) {
-          allCourses.add(CourseModel.fromJson(json));
-        }
-      } catch (e) {
-        // 解析失败，清除数据
-        await prefs.remove(PrefsKeys.COURSE_DATA);
-      }
-    }
-
-    // 加载自定义课程数据
-    final String? customJsonString = prefs.getString('custom_courses');
-    if (customJsonString != null) {
-      try {
-        final List<dynamic> jsonList = jsonDecode(customJsonString);
-        for (var json in jsonList) {
-          final course = CourseModel.fromJson(json);
-          if (course.isCustom) {
-            allCourses.add(course);
-          }
-        }
-      } catch (e) {
-        // 解析失败，清除自定义课程数据
-        await prefs.remove('custom_courses');
-      }
-    }
-
-    _courses.assignAll(allCourses);
+  /// 保存课程数据
+  Future<void> saveCourses(List<CourseModel> courses) async {
+    await _repository.saveCourses(courses);
+    _courses.assignAll(courses);
   }
 
   /// 从本地存储加载被忽略的课程数据

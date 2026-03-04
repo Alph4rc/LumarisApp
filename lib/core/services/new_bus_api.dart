@@ -46,7 +46,7 @@ Future<BusModel> getBusFromNewData({
     if (jsonData == null || jsonData['data'] == null) {
       return BusModel(records: [], total: 0);
     }
-    
+
     final data = jsonData['data'];
     final dfBusPlans = data['dfBusPlans'] as List<dynamic>?;
 
@@ -72,13 +72,13 @@ Future<BusModel> getBusFromNewData({
         continue; // 跳过当前循环，避免空值错误
       }
       final arrival = '$fecamp校区';
-      
+
       // 添加fstime字段的空值检查
       final fstime = j['fstime'];
       if (fstime == null) {
         continue; // 跳过当前循环，避免空值错误
       }
-      
+
       final timestamp = int.parse(fstime.toString()) * 10000;
 
       // 计算时间（考虑时区）
@@ -87,7 +87,8 @@ Future<BusModel> getBusFromNewData({
       final timeTricks = tricks1970 + timestamp;
 
       final runTime = DateTime.fromMillisecondsSinceEpoch(timeTricks ~/ 10000);
-      final formattedTime = '${runTime.hour.toString().padLeft(2, '0')}:${runTime.minute.toString().padLeft(2, '0')}';
+      final formattedTime =
+          '${runTime.hour.toString().padLeft(2, '0')}:${runTime.minute.toString().padLeft(2, '0')}';
 
       // 添加fbusNo字段的空值检查
       final fbusNo = j['fbusNo'];

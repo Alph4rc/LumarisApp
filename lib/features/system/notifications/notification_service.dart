@@ -232,7 +232,7 @@ class NotificationService {
     if (!isInit) {
       await initialize();
     }
-    
+
     // 先取消之前的通知
     await notifications.cancel(todo.id.hashCode);
     // 再根据新状态决定是否重新安排通知

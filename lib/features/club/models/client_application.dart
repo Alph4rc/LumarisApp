@@ -39,8 +39,12 @@ class ClientApplication {
       isActive: json['isActive'] as bool?,
       supportsPkce: json['supportsPkce'] as bool?,
       isNeedEMail: json['isNeedEMail'] as bool?,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
     );
   }
 

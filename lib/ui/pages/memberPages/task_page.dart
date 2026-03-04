@@ -166,9 +166,8 @@ class _TaskPageState extends State<TaskPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            decoration: task.status
-                                ? TextDecoration.lineThrough
-                                : null,
+                            decoration:
+                                task.status ? TextDecoration.lineThrough : null,
                           ),
                         ),
                         const SizedBox(height: 4),

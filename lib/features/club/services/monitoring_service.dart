@@ -73,7 +73,8 @@ class MonitoringService {
           .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
           .join('&');
 
-      final response = await ApiClient.get('/Monitoring/data-access-stats?$queryString');
+      final response =
+          await ApiClient.get('/Monitoring/data-access-stats?$queryString');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
         if (apiResponse['data'] != null) {
@@ -110,7 +111,8 @@ class MonitoringService {
           .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
           .join('&');
 
-      final response = await ApiClient.get('/Monitoring/data-change-stats?$queryString');
+      final response =
+          await ApiClient.get('/Monitoring/data-change-stats?$queryString');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
         if (apiResponse['data'] != null) {
@@ -135,7 +137,8 @@ class MonitoringService {
           ? '?entityType=${Uri.encodeComponent(entityType)}'
           : '';
 
-      final response = await ApiClient.post('/Monitoring/reset-data-stats$queryString');
+      final response =
+          await ApiClient.post('/Monitoring/reset-data-stats$queryString');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
         return apiResponse['data'] ?? false;

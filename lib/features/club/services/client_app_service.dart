@@ -14,7 +14,9 @@ class ClientAppService {
       final response = await ApiClient.get('/ClientApp');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map((e) => ClientApplication.fromJson(e as Map<String, dynamic>)).toList();
+        return data
+            .map((e) => ClientApplication.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     } catch (e) {
       if (kDebugMode) {
@@ -25,9 +27,11 @@ class ClientAppService {
   }
 
   /// 创建客户端应用
-  static Future<ClientApplication?> createClientApp(CreateClientAppModel appData) async {
+  static Future<ClientApplication?> createClientApp(
+      CreateClientAppModel appData) async {
     try {
-      final response = await ApiClient.post('/ClientApp', body: appData.toJson());
+      final response =
+          await ApiClient.post('/ClientApp', body: appData.toJson());
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return ClientApplication.fromJson(data);
@@ -57,9 +61,11 @@ class ClientAppService {
   }
 
   /// 更新客户端应用
-  static Future<bool> updateClientApp(String clientId, UpdateClientAppModel appData) async {
+  static Future<bool> updateClientApp(
+      String clientId, UpdateClientAppModel appData) async {
     try {
-      final response = await ApiClient.put('/ClientApp/$clientId', body: appData.toJson());
+      final response =
+          await ApiClient.put('/ClientApp/$clientId', body: appData.toJson());
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
@@ -83,9 +89,11 @@ class ClientAppService {
   }
 
   /// 重新生成客户端密钥
-  static Future<RegenerateSecretResult?> regenerateClientSecret(String clientId) async {
+  static Future<RegenerateSecretResult?> regenerateClientSecret(
+      String clientId) async {
     try {
-      final response = await ApiClient.post('/ClientApp/$clientId/regenerate-secret');
+      final response =
+          await ApiClient.post('/ClientApp/$clientId/regenerate-secret');
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return RegenerateSecretResult.fromJson(data);

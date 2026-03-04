@@ -60,7 +60,8 @@ class StaffService {
   /// 创建员工
   static Future<bool> createStaff(StaffModel staffData) async {
     try {
-      final response = await ApiClient.post('/Staff/Create', body: staffData.toJson());
+      final response =
+          await ApiClient.post('/Staff/Create', body: staffData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error creating staff',
@@ -76,7 +77,8 @@ class StaffService {
   /// 更新员工
   static Future<bool> updateStaff(StaffModel staffData) async {
     try {
-      final response = await ApiClient.post('/Staff/Update', body: staffData.toJson());
+      final response =
+          await ApiClient.post('/Staff/Update', body: staffData.toJson());
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error updating staff',
@@ -123,9 +125,11 @@ class StaffService {
   }
 
   /// 更改员工部门
-  static Future<bool> changeStaffDepartment(String userId, String departmentName) async {
+  static Future<bool> changeStaffDepartment(
+      String userId, String departmentName) async {
     try {
-      final response = await ApiClient.post('/Staff/change-department/$userId?departmentName=$departmentName');
+      final response = await ApiClient.post(
+          '/Staff/change-department/$userId?departmentName=$departmentName');
       return ApiResponseHelper.parseBool(
         response,
         errorMessage: 'Error changing staff department',

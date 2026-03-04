@@ -42,12 +42,13 @@ class _MemberDataPageState extends State<MemberDataPage> {
 
       if (result != null) {
         // 移除首尾字符后再解压缩（模拟原来的 result[1..-1] 切片操作）
-        String trimmedResult = result.length > 2 ? result.substring(1, result.length - 1) : '';
+        String trimmedResult =
+            result.length > 2 ? result.substring(1, result.length - 1) : '';
         result = await GzipService.decompress(trimmedResult);
         // 解析数据
         final jsonData = jsonDecode(result);
         final data = MemberData.fromJson(jsonData);
-        
+
         setState(() {
           _members = data.data;
           _totalPages = data.totalPages;
@@ -170,7 +171,8 @@ class _MemberDataPageState extends State<MemberDataPage> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
+                            color: CupertinoColors.systemBlue
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -292,9 +294,7 @@ class _MemberDataPageState extends State<MemberDataPage> {
 
   Widget _buildDivider() {
     return Container(
-      height: 0.5,
-      color: CupertinoColors.separator.withValues(alpha: 0.3)
-    );
+        height: 0.5, color: CupertinoColors.separator.withValues(alpha: 0.3));
   }
 
   Widget _buildPaginationWidget() {

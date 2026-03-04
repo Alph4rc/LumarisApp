@@ -6,11 +6,17 @@ import 'edu_http_client.dart';
 /// 登录服务
 class LoginService {
   static final EduHttpClient _client = EduHttpClient();
+  static Future<Map<String, dynamic>> Function(String, String)?
+      _loginOverrideForTest;
 
   /// 登录
   /// [username] 用户名
   /// [password] 密码
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
+    if (_loginOverrideForTest != null) {
+      return await _loginOverrideForTest!(username, password);
+    }
     try {
       final response = await _client.post(
         '/Login',
@@ -33,5 +39,10 @@ class LoginService {
         throw NetworkException('登录失败: $e', -1);
       }
     }
+  }
+
+  static void setLoginOverrideForTest(
+      Future<Map<String, dynamic>> Function(String, String)? handler) {
+    _loginOverrideForTest = handler;
   }
 }

@@ -58,8 +58,7 @@ class HttpStats {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = {
       if (totalRequests != null) 'totalRequests': totalRequests,
-      if (successfulRequests != null)
-        'successfulRequests': successfulRequests,
+      if (successfulRequests != null) 'successfulRequests': successfulRequests,
       if (failedRequests != null) 'failedRequests': failedRequests,
       if (avgResponseTime != null) 'avgResponseTime': avgResponseTime,
       if (minResponseTime != null) 'minResponseTime': minResponseTime,

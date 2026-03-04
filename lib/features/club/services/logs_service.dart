@@ -96,9 +96,11 @@ class LogsService {
   ///
   /// @param timeRange 时间范围（默认为"today"）
   /// @return 日志分布数据
-  static Future<List<dynamic>?> getDistribution({String timeRange = 'today'}) async {
+  static Future<List<dynamic>?> getDistribution(
+      {String timeRange = 'today'}) async {
     try {
-      final response = await ApiClient.get('/Logs/distribution?timeRange=$timeRange');
+      final response =
+          await ApiClient.get('/Logs/distribution?timeRange=$timeRange');
       if (response.statusCode == 200) {
         final Map<String, dynamic> apiResponse = jsonDecode(response.body);
         return apiResponse['data'];

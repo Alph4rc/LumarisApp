@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../state/payment_store.dart';
@@ -14,52 +15,47 @@ class PaymentTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          child: Obx(() {
-            // Show data if available
-            if (!controller.isLoading.value &&
-                controller.totalRecharge.value != 0) {
-              final amount = controller.totalRecharge.value;
-              final isLow = amount <= 10;
+          borderRadius: BorderRadius.circular(24),
+          onTap: () => Get.toNamed('/Payment'),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Obx(() {
+              // Loading state
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-              return Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isLow
-                        ? [
-                            Colors.red.withValues(alpha: 0.1),
-                            Colors.orange.withValues(alpha: 0.05)
-                          ]
-                        : [
-                            Colors.yellow.withValues(alpha: 0.1),
-                            Colors.green.withValues(alpha: 0.05)
-                          ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
+              // Has Data state
+              if (!controller.isLoading.value &&
+                  controller.totalRecharge.value != 0) {
+                final amount = controller.totalRecharge.value;
+                final isLow = amount <= 10;
+                final primaryColor = isLow
+                    ? CupertinoColors.destructiveRed
+                    : CupertinoColors.systemOrange;
+
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: isLow
-                                ? Colors.red.withValues(alpha: 0.15)
-                                : Colors.orange.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
+                            color: primaryColor.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
                           ),
                           child: Hero(
-                              tag: '饭卡',
-                              child: Icon(
-                                Icons.monetization_on_outlined,
-                                color: isLow ? Colors.red : Colors.orange,
-                                size: 24,
-                              )),
+                            tag: '饭卡',
+                            child: Icon(
+                              Icons.monetization_on_rounded,
+                              color: primaryColor,
+                              size: 24,
+                            ),
+                          ),
                         ),
                         const Spacer(),
                         if (isLow)
@@ -67,110 +63,95 @@ class PaymentTile extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              color: CupertinoColors.destructiveRed
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Text(
                               '余额不足',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.red,
+                                color: CupertinoColors.destructiveRed,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    const Spacer(),
+                    Text(
                       '当前余额',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w500,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey.shade600,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 2),
                     Text(
                       '¥${amount.toStringAsFixed(2)}',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: isLow ? Colors.red : Colors.orange,
+                        letterSpacing: -0.5,
+                        color: isLow
+                            ? CupertinoColors.destructiveRed
+                            : Theme.of(context).colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ),
-              );
-            }
+                );
+              }
 
-            // Show loading indicator while loading
-            if (controller.isLoading.value) {
-              return Container(
-                padding: const EdgeInsets.all(20),
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            // Show unsubscribed state (errorMessage is set when not bound)
-            return Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.grey.withValues(alpha: 0.1),
-                    Colors.grey.withValues(alpha: 0.05)
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
+              // Unsubscribed / Unbound state
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      Icons.monetization_on_outlined,
+                      Icons.monetization_on_rounded,
                       color: Colors.grey,
                       size: 24,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  const Spacer(),
+                  Text(
                     '饭卡余额',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
+                      color: Theme.of(context).textTheme.bodySmall?.color ??
+                          Colors.grey.shade600,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 2),
                   Text(
                     controller.errorMessage.value.isNotEmpty
                         ? controller.errorMessage.value
                         : '点击绑定',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
+                      letterSpacing: -0.5,
+                      color: controller.errorMessage.value.isNotEmpty
+                          ? CupertinoColors.destructiveRed
+                          : Colors.grey,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ),
-            );
-          }),
-          onTap: () {
-            Get.toNamed('/Payment');
-          },
+              );
+            }),
+          ),
         ),
       ),
     );

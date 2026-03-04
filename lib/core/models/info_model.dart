@@ -18,10 +18,10 @@ class TotalData {
   }
 
   Map<String, dynamic> toJson() => {
-    'name': name,
-    'actual': actual,
-    'full': full,
-  };
+        'name': name,
+        'actual': actual,
+        'full': full,
+      };
 }
 
 // 主数据模型类
@@ -42,16 +42,15 @@ class InfoModel {
       type: json['type'],
       total: TotalData.fromJson(json['total']),
       other: List<TotalData>.from(
-        (json['other'] as List)
-            .map((item) => TotalData.fromJson(item)),
+        (json['other'] as List).map((item) => TotalData.fromJson(item)),
       ),
     );
   }
 
   // 转换为JSON格式的Map
   Map<String, dynamic> toJson() => {
-    'type': type,
-    'total': total.toJson(),
-    'other': other.map((item) => item.toJson()).toList(),
-  };
+        'type': type,
+        'total': total.toJson(),
+        'other': other.map((item) => item.toJson()).toList(),
+      };
 }

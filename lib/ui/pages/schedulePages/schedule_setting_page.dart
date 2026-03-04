@@ -576,7 +576,9 @@ class CourseIgnoreItem extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    ignore.isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+                    ignore.isCompleted
+                        ? Icons.check_box
+                        : Icons.check_box_outline_blank,
                     color: ignore.isCompleted
                         ? Theme.of(context).colorScheme.primary
                         : (isDark ? Colors.grey[600] : Colors.grey[400]),

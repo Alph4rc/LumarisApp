@@ -36,7 +36,10 @@ class CheckUpdateManager {
   static bool shouldCheckForUpdates() {
     // 在Web平台上总是不检查更新(使用Docker自更新)
     // 在iOS、MacOS、Windows平台中不更新(使用各平台的App Store)
-    if (PlatformUtils.isWeb || PlatformUtils.isIOS || PlatformUtils.isMacOS || PlatformUtils.isWindows) {
+    if (PlatformUtils.isWeb ||
+        PlatformUtils.isIOS ||
+        PlatformUtils.isMacOS ||
+        PlatformUtils.isWindows) {
       return false;
     }
 

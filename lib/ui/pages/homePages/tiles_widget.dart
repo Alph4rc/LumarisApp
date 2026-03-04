@@ -38,8 +38,10 @@ class _TilesWidgetState extends State<TilesWidget>
     WidgetsBinding.instance.removeObserver(this);
 
     // Auto-exit edit mode when navigating away
-    final controller = Get.find<TileEditController>();
-    controller.forceExitEditMode();
+    if (Get.isRegistered<TileEditController>()) {
+      final controller = Get.find<TileEditController>();
+      controller.forceExitEditMode();
+    }
     super.dispose();
   }
 

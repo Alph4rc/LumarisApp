@@ -82,7 +82,8 @@ class RetryInterceptor extends Interceptor {
 
     if (attempt < policy.maxRetries && policy.shouldRetry(err)) {
       final delay = policy.delayFactor(attempt);
-      AppLogger.debug('请求失败，${delay.inMilliseconds}ms 后重试 (${attempt + 1}/${policy.maxRetries})');
+      AppLogger.debug(
+          '请求失败，${delay.inMilliseconds}ms 后重试 (${attempt + 1}/${policy.maxRetries})');
 
       await Future.delayed(delay);
 

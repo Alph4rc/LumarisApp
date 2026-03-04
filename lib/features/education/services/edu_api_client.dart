@@ -21,8 +21,7 @@ class EduApiClient {
   }
 
   /// 获取成绩信息
-  static Future<String> getScore(
-      String studentId, String semester) async {
+  static Future<String> getScore(String studentId, String semester) async {
     return await ScoreApi.getScore(studentId, semester);
   }
 
@@ -62,32 +61,33 @@ class EduApiClient {
   }
 
   // 新增方法
-  
+
   /// 获取App相关信息
   static Future<String> getAppInfo({String? token}) async {
     return await AppApi.getAppInfo(token: token);
   }
-  
+
   /// 获取新的校巴数据
   static Future<String> getBusNewData(String time, {String loc = 'ALL'}) async {
     return await BusApi.getBusNewData(time, loc: loc);
   }
-  
+
   /// 获取旧的校巴数据
-  static Future<String> getBusOldData(String time, {bool isShow = false}) async {
+  static Future<String> getBusOldData(String time,
+      {bool isShow = false}) async {
     return await BusApi.getBusOldData(time, isShow: isShow);
   }
-  
+
   /// 登录
   static Future<LoginResponse> login(String username, String password) async {
     return await LoginApi.login(username, password);
   }
-  
+
   /// 获取缴费信息
   static Future<String> getPayment(String id) async {
     return await PaymentApi.getPayment(id);
   }
-  
+
   /// 获取缴费流水
   static Future<String> getPaymentTurnover(String id) async {
     return await PaymentApi.getPaymentTurnover(id);

@@ -2,6 +2,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _InMemoryPaymentStorage implements PaymentStorage {
+  final Map<String, String?> _memory = <String, String?>{};
+
+  @override
+  Future<String?> read(String key) async => _memory[key];
+
+  @override
+  Future<void> write(String key, String? value) async {
+    if (value == null) {
+      _memory.remove(key);
+      return;
+    }
+    _memory[key] = value;
+  }
+}
+
 void main() {
   group('PaymentModel', () {
     test('should create instance with provided values', () {
@@ -127,7 +143,7 @@ void main() {
         '2023-01-01 12:00:00 | 消费 | 0.15 元 | 食堂午餐',
       );
     });
-    
+
     test('should handle negative amount correctly', () {
       final payment = PaymentModel(
         turnoverType: '消费',
@@ -193,12 +209,14 @@ void main() {
     });
 
     test('should handle large number of records in JSON', () {
-      final records = List.generate(100, (index) => {
-        'turnoverType': index % 2 == 0 ? '消费' : '充值',
-        'datetimeStr': '2023-01-01 12:00:00',
-        'resume': '交易$index',
-        'tranamt': index * 10,
-      });
+      final records = List.generate(
+          100,
+          (index) => {
+                'turnoverType': index % 2 == 0 ? '消费' : '充值',
+                'datetimeStr': '2023-01-01 12:00:00',
+                'resume': '交易$index',
+                'tranamt': index * 10,
+              });
 
       final json = {
         'records': records,
@@ -211,6 +229,27 @@ void main() {
       expect(paymentData.total, 1000.0);
       expect(paymentData.payments[0].resume, '交易0');
       expect(paymentData.payments[99].resume, '交易99');
+    });
+
+    test('should handle extreme record count in JSON', () {
+      final records = List.generate(
+          10000,
+          (index) => {
+                'turnoverType': index.isEven ? '消费' : '充值',
+                'datetimeStr': '2023-01-01 12:00:00',
+                'resume': '极限交易$index',
+                'tranamt': index,
+              });
+
+      final json = {
+        'records': records,
+        'total': 49995000.0,
+      };
+
+      final paymentData = PaymentData.fromJson(json);
+      expect(paymentData.payments.length, 10000);
+      expect(paymentData.payments.first.resume, '极限交易0');
+      expect(paymentData.payments.last.resume, '极限交易9999');
     });
 
     test('should handle missing total field in JSON', () {
@@ -244,7 +283,16 @@ void main() {
 
       expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
     });
-    
+
+    test('should throw when records type is invalid', () {
+      final json = {
+        'records': 'invalid-records',
+        'total': 1.0,
+      };
+
+      expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
+    });
+
     test('should handle zero total correctly', () {
       final json = {
         'records': [],
@@ -255,7 +303,7 @@ void main() {
       expect(paymentData.total, 0.0);
       expect(paymentData.payments, isEmpty);
     });
-    
+
     test('should handle negative total correctly', () {
       final json = {
         'records': [],
@@ -271,29 +319,35 @@ void main() {
     setUp(() {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
+      PaymentAnalyzer.setStorageForTest(_InMemoryPaymentStorage());
+    });
+
+    tearDown(() {
+      PaymentAnalyzer.resetStorage();
     });
 
     test('should set and get payment number correctly', () async {
       const testCardId = '123456789';
-      
+
       // Set payment number
       await PaymentAnalyzer.setPayment(testCardId);
-      
+
       // Get payment number
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify the payment number was saved and retrieved correctly
       expect(cardId, testCardId);
     });
 
-    test('should return empty string for non-existent payment number', () async {
+    test('should return empty string for non-existent payment number',
+        () async {
       // Clear any existing payment number
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('payment_num');
-      
+
       // Get payment number (should return empty string)
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify returns empty string
       expect(cardId, '');
     });
@@ -301,25 +355,31 @@ void main() {
     test('should handle empty payment number', () async {
       // Set empty payment number
       await PaymentAnalyzer.setPayment('');
-      
+
       // Get payment number
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify returns empty string
       expect(cardId, '');
     });
-    
+
     test('should handle large payment number', () async {
       const largeCardId = '12345678901234567890';
-      
+
       // Set large payment number
       await PaymentAnalyzer.setPayment(largeCardId);
-      
+
       // Get payment number
       final cardId = await PaymentAnalyzer.getPayment();
-      
+
       // Verify returns the large card id
       expect(cardId, largeCardId);
+    });
+
+    test('should overwrite payment number correctly', () async {
+      await PaymentAnalyzer.setPayment('first');
+      await PaymentAnalyzer.setPayment('second');
+      expect(await PaymentAnalyzer.getPayment(), 'second');
     });
   });
 }

@@ -27,8 +27,7 @@ class UnderMaintenanceScreen extends StatelessWidget {
               const Spacer(flex: 2),
               ErrorInfo(
                 title: "正在维护！",
-                description:
-                    "我们目前正在进行定期维护。请稍后再查看。感谢您的耐心等待。",
+                description: "我们目前正在进行定期维护。请稍后再查看。感谢您的耐心等待。",
                 // button: you can pass your custom button,
                 btnText: "返回",
                 press: () {},

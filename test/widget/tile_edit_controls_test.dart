@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -9,13 +10,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  Future<void> pumpFrames(WidgetTester tester, {int count = 6}) async {
+    for (var i = 0; i < count; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+  }
+
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
     Get.testMode = true;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async => null,
+    );
   });
 
   tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null);
     Get.reset();
   });
 
@@ -32,7 +46,7 @@ void main() {
         (WidgetTester tester) async {
       Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const TileEditControls()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('编辑'), findsOneWidget);
       expect(find.text('完成'), findsNothing);
@@ -43,34 +57,37 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const TileEditControls()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('完成'), findsOneWidget);
       expect(find.text('编辑'), findsNothing);
       expect(find.byIcon(Icons.check), findsOneWidget);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
 
     testWidgets('should_toggle_edit_mode_when_button_tapped',
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const TileEditControls()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isEditMode.value, false);
 
       // Tap edit button
       await tester.tap(find.text('编辑'));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isEditMode.value, true);
 
       // Tap done button
       await tester.tap(find.text('完成'));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isEditMode.value, false);
     });
@@ -79,7 +96,7 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const TileEditControls()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Tap edit button
       await tester.tap(find.text('编辑'));
@@ -89,14 +106,17 @@ void main() {
       // Should be animating
       expect(controller.isEditMode.value, true);
 
-      await tester.pumpAndSettle(); // Complete animation
+      await pumpFrames(tester); // Complete animation
       expect(find.text('完成'), findsOneWidget);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
 
     testWidgets('should_display_title_text', (WidgetTester tester) async {
       Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const TileEditControls()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('快捷功能'), findsOneWidget);
     });
@@ -106,7 +126,7 @@ void main() {
     testWidgets('should_display_empty_state_message',
         (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget(const EmptyTilesMessage()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('暂无快捷功能'), findsOneWidget);
       expect(find.text('请在编辑模式中添加'), findsOneWidget);
@@ -119,23 +139,23 @@ void main() {
         (WidgetTester tester) async {
       Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const AvailableTilesList()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // All tiles visible by default, so list should be hidden
-      expect(find.text('已隐藏的磁贴'), findsNothing);
+      expect(find.text('更多功能'), findsNothing);
     });
 
     testWidgets('should_display_hidden_tiles_list',
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const AvailableTilesList()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Hide a tile
       await controller.toggleVisibility('电费');
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
-      expect(find.text('已隐藏的磁贴'), findsOneWidget);
+      expect(find.text('更多功能'), findsOneWidget);
       expect(find.text('电费'), findsOneWidget);
     });
 
@@ -143,25 +163,24 @@ void main() {
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget(const AvailableTilesList()));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Hide a tile
       await controller.toggleVisibility('电费');
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), false);
 
       // Tap the chip to show it again
       await tester.tap(find.text('电费'));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), true);
     });
   });
 
   group('EditModeIndicator', () {
-    testWidgets('should_show_border_in_edit_mode',
-        (WidgetTester tester) async {
+    testWidgets('should_show_border_in_edit_mode', (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(
         createTestWidget(
@@ -174,11 +193,11 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Find the AnimatedContainer
       final container = tester.widget<AnimatedContainer>(
@@ -188,6 +207,9 @@ void main() {
       expect(container.decoration, isA<BoxDecoration>());
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.border, isNotNull);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
 
     testWidgets('should_not_show_border_when_not_in_edit_mode',
@@ -204,7 +226,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       final container = tester.widget<AnimatedContainer>(
         find.byType(AnimatedContainer),

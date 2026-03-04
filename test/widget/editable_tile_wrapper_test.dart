@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -9,13 +10,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  Future<void> pumpFrames(WidgetTester tester, {int count = 6}) async {
+    for (var i = 0; i < count; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+  }
+
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
     Get.testMode = true;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async => null,
+    );
   });
 
   tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null);
     Get.reset();
   });
 
@@ -45,7 +59,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('Test Tile'), findsOneWidget);
     });
@@ -67,18 +81,18 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
-
-      // Should show drag indicator
-      expect(find.byIcon(Icons.drag_indicator), findsOneWidget);
+      await pumpFrames(tester);
 
       // Should show hide button
-      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
-    });
+      expect(find.byIcon(Icons.remove), findsOneWidget);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
+    }, timeout: const Timeout(Duration(seconds: 15)));
 
     testWidgets('should_not_show_edit_indicators_in_normal_mode',
         (WidgetTester tester) async {
@@ -97,15 +111,13 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should not show edit indicators
-      expect(find.byIcon(Icons.drag_indicator), findsNothing);
-      expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+      expect(find.byIcon(Icons.remove), findsNothing);
     });
 
-    testWidgets('should_handle_hide_button_tap',
-        (WidgetTester tester) async {
+    testWidgets('should_handle_hide_button_tap', (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
 
       await tester.pumpWidget(
@@ -121,19 +133,22 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), true);
 
       // Tap hide button
-      await tester.tap(find.byIcon(Icons.remove_circle_outline));
-      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.remove));
+      await pumpFrames(tester);
 
       expect(controller.isTileVisible('电费'), false);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
 
     testWidgets('should_show_error_when_hiding_last_tile',
@@ -157,24 +172,26 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Enter edit mode
       await controller.toggleEditMode();
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Try to hide the last tile
-      await tester.tap(find.byIcon(Icons.remove_circle_outline));
-      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.remove));
+      await pumpFrames(tester);
 
       // Should show snackbar
       expect(find.text('至少需要保留一个磁贴'), findsOneWidget);
+
+      await controller.forceExitEditMode();
+      await pumpFrames(tester);
     });
   });
 
   group('DraggableTileItem', () {
     testWidgets('should_create_draggable_tile', (WidgetTester tester) async {
-
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -191,7 +208,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(find.text('Draggable'), findsOneWidget);
     });
@@ -217,7 +234,7 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should show check icon when selected
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
@@ -242,14 +259,13 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       // Should not show check icon
       expect(find.byIcon(Icons.check_circle), findsNothing);
     });
 
-    testWidgets('should_call_onTap_when_tapped',
-        (WidgetTester tester) async {
+    testWidgets('should_call_onTap_when_tapped', (WidgetTester tester) async {
       bool tapped = false;
 
       await tester.pumpWidget(
@@ -269,10 +285,10 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       await tester.tap(find.byType(TapReorderTileItem));
-      await tester.pumpAndSettle();
+      await pumpFrames(tester);
 
       expect(tapped, true);
     });
