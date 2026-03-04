@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+    <key>NSLocationUsageDescription</key>
+    <string>我们需要使用地理位置在校园地图上显示您的当前坐标</string>
 </dict>
 </plist>

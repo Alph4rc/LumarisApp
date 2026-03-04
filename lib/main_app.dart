@@ -132,6 +132,11 @@ class _MainAppState extends State<MainApp> {
       label: '课表',
     ),
     SidebarDestination(
+      icon: (CupertinoIcons.map),
+      selectedIcon: (CupertinoIcons.map_fill),
+      label: '地图',
+    ),
+    SidebarDestination(
       icon: (CupertinoIcons.creditcard),
       selectedIcon: (CupertinoIcons.creditcard_fill),
       label: '成绩',
@@ -161,11 +166,12 @@ class _MainAppState extends State<MainApp> {
   static const Map<int, String> _routeMap = {
     0: '/',
     1: '/Schedule',
-    2: '/Score',
-    3: '/Profile',
-    4: '/Electricity',
-    5: '/SchoolBus',
-    6: '/Payment',
+    2: '/Map',
+    3: '/Score',
+    4: '/Profile',
+    5: '/Electricity',
+    6: '/SchoolBus',
+    7: '/Payment',
   };
 
   Widget _app(bool isTablet) => PerformanceMonitorWidget(
@@ -324,7 +330,7 @@ class _MainAppState extends State<MainApp> {
     return Scaffold(
       body: SafeArea(child: _app(false)),
       bottomNavigationBar: BottomNavigation(
-        destinations: _destinations.sublist(0, 4).map((destination) {
+        destinations: _destinations.sublist(0, 5).map((destination) {
           return NavigationDestination(
             icon: Icon(destination.icon),
             selectedIcon: Icon(destination.selectedIcon),

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:ios_club_app/ui/pages/author_page.dart';
+import 'package:ios_club_app/ui/pages/campus_map_screen.dart';
 import 'package:ios_club_app/ui/pages/easter_egg_page.dart';
 import 'package:ios_club_app/ui/pages/helper_page.dart';
 import 'package:ios_club_app/ui/pages/license_page.dart';
@@ -210,6 +211,13 @@ class AppRouter {
           name: '/ClientAppManagement',
           page: () => PageRenderTimeMonitor(
               pageName: '客户端应用管理', child: const ClientAppManagementPage()),
+        ),
+
+        /// 课程表管理
+        GetPage(
+          name: '/Map',
+          page: () => PageRenderTimeMonitor(
+              pageName: '地图', child: const CampusMapScreen()),
         ),
       ];
 }
