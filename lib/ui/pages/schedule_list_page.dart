@@ -77,33 +77,46 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   Widget build(BuildContext context) {
     final isDesktop = PlatformUtils.isDesktop;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasCustomBackground =
+        settingsStore.scheduleBackground == 'custom' &&
+            settingsStore.customBackgroundImage.isNotEmpty;
+
+    final content = Column(
+      children: [
+        // 顶部工具栏
+        _buildTopBar(context, isDesktop, isDark),
+        // 课表内容
+        Expanded(
+          child: Obx(() {
+            if (scheduleStore.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                scheduleStore.setCurrentPage(index);
+              },
+              itemCount: scheduleStore.allCourses.length,
+              itemBuilder: (context, index) {
+                return _buildSchedulePage(context, index);
+              },
+            );
+          }),
+        ),
+      ],
+    );
 
     return Scaffold(
-      body: Column(
-        children: [
-          // 顶部工具栏
-          _buildTopBar(context, isDesktop, isDark),
-          // 课表内容
-          Expanded(
-            child: Obx(() {
-              if (scheduleStore.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              return PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  scheduleStore.setCurrentPage(index);
-                },
-                itemCount: scheduleStore.allCourses.length,
-                itemBuilder: (context, index) {
-                  return _buildSchedulePage(context, index);
-                },
-              );
-            }),
-          ),
-        ],
-      ),
+      body: hasCustomBackground
+          ? Stack(
+              fit: StackFit.expand,
+              children: [
+                _buildBackgroundImage(settingsStore.customBackgroundImage),
+                content,
+              ],
+            )
+          : content,
     );
   }
 
@@ -323,29 +336,8 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         ],
       );
 
-      // 如果设置了自定义背景，则添加背景图片
-      if (settingsStore.scheduleBackground == 'custom' &&
-          settingsStore.customBackgroundImage.isNotEmpty) {
-        return _buildScheduleWithBackground(scheduleContent);
-      }
-
       return scheduleContent;
     });
-  }
-
-  /// 构建带背景图片的课表
-  Widget _buildScheduleWithBackground(Widget child) {
-    final imagePath = settingsStore.customBackgroundImage;
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // 背景图片
-        _buildBackgroundImage(imagePath),
-        // 课表内容
-        child,
-      ],
-    );
   }
 
   /// 构建背景图片
