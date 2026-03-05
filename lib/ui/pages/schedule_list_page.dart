@@ -76,39 +76,46 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = PlatformUtils.isDesktop;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final content = Column(
-      children: [
-        // 顶部工具栏
-        _buildTopBar(context, isDesktop, isDark),
-        // 课表内容
-        Expanded(
-          child: Obx(() {
-            if (scheduleStore.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                scheduleStore.setCurrentPage(index);
-              },
-              itemCount: scheduleStore.allCourses.length,
-              itemBuilder: (context, index) {
-                return _buildSchedulePage(context, index);
-              },
-            );
-          }),
-        ),
-      ],
-    );
+    final systemIsDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Obx(() {
         final hasCustomBackground =
             settingsStore.scheduleBackground == 'custom' &&
                 settingsStore.customBackgroundImage.isNotEmpty;
+
+        // 有自定义背景时，根据背景亮暗决定字体颜色（异步计算后自动更新）
+        // 未计算完成前回退到系统主题
+        final isDark = hasCustomBackground
+            ? (settingsStore.customBackgroundIsDark ?? systemIsDark)
+            : systemIsDark;
+
+        final content = Column(
+          children: [
+            // 顶部工具栏
+            _buildTopBar(context, isDesktop, isDark),
+            // 课表内容
+            Expanded(
+              child: Obx(() {
+                if (scheduleStore.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    scheduleStore.setCurrentPage(index);
+                  },
+                  itemCount: scheduleStore.allCourses.length,
+                  itemBuilder: (context, index) {
+                    return _buildSchedulePage(context, index);
+                  },
+                );
+              }),
+            ),
+          ],
+        );
+
         return hasCustomBackground
             ? Stack(
                 fit: StackFit.expand,

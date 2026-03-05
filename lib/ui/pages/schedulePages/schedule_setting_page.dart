@@ -15,6 +15,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/image_brightness.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -454,7 +455,12 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
       if (result != null) {
         String filePath = result.files.single.path ?? result.files.single.name;
-        settingsStore.setCustomBackgroundImage(filePath);
+        await settingsStore.setCustomBackgroundImage(filePath);
+
+        // 异步计算图片亮暗，完成后更新 store
+        computeImageIsDark(filePath).then((isDark) {
+          settingsStore.setCustomBackgroundIsDark(isDark);
+        });
 
         if (mounted) {
           showClubSnackBar(

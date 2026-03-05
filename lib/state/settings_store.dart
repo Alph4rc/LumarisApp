@@ -39,6 +39,7 @@ class SettingsStore extends GetxController {
   // 课表背景设置
   final _scheduleBackground = ''.obs; // 空字符串表示无背景，其他值表示不同背景
   final _customBackgroundImage = ''.obs; // 自定义背景图片路径
+  final _customBackgroundIsDark = Rxn<bool>(); // 自定义背景图片是否为暗色，null 表示未计算
 
   // 学校配置
   final _schoolId = ApiConfig.defaultSchoolId.obs;
@@ -66,6 +67,8 @@ class SettingsStore extends GetxController {
   String get scheduleBackground => _scheduleBackground.value;
 
   String get customBackgroundImage => _customBackgroundImage.value;
+
+  bool? get customBackgroundIsDark => _customBackgroundIsDark.value;
 
   String get schoolId => _schoolId.value;
 
@@ -101,6 +104,8 @@ class SettingsStore extends GetxController {
         prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND) ?? '';
     _customBackgroundImage.value =
         prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE) ?? '';
+    _customBackgroundIsDark.value =
+        prefs.getBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK);
     _schoolId.value =
         prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolId;
   }
@@ -187,6 +192,17 @@ class SettingsStore extends GetxController {
     _customBackgroundImage.value = value;
     final prefs = PrefsService.instance;
     await prefs.setString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE, value);
+  }
+
+  /// 设置自定义背景图片的亮暗值
+  Future<void> setCustomBackgroundIsDark(bool? value) async {
+    _customBackgroundIsDark.value = value;
+    final prefs = PrefsService.instance;
+    if (value == null) {
+      await prefs.remove(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK);
+    } else {
+      await prefs.setBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK, value);
+    }
   }
 
   /// 设置学校配置
