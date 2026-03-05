@@ -77,9 +77,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   Widget build(BuildContext context) {
     final isDesktop = PlatformUtils.isDesktop;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final hasCustomBackground =
-        settingsStore.scheduleBackground == 'custom' &&
-            settingsStore.customBackgroundImage.isNotEmpty;
 
     final content = Column(
       children: [
@@ -108,15 +105,20 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     );
 
     return Scaffold(
-      body: hasCustomBackground
-          ? Stack(
-              fit: StackFit.expand,
-              children: [
-                _buildBackgroundImage(settingsStore.customBackgroundImage),
-                content,
-              ],
-            )
-          : content,
+      body: Obx(() {
+        final hasCustomBackground =
+            settingsStore.scheduleBackground == 'custom' &&
+                settingsStore.customBackgroundImage.isNotEmpty;
+        return hasCustomBackground
+            ? Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildBackgroundImage(settingsStore.customBackgroundImage),
+                  content,
+                ],
+              )
+            : content;
+      }),
     );
   }
 
