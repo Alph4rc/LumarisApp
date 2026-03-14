@@ -590,9 +590,12 @@ class CourseIgnoreItem extends StatelessWidget {
                         : (isDark ? Colors.grey[600] : Colors.grey[400]),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    ignore.title,
-                    style: const TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      ignore.title,
+                      style: const TextStyle(fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_model.dart';
 import 'package:ios_club_app/core/models/week_info.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
@@ -11,6 +12,8 @@ import 'package:ios_club_app/state/settings_store.dart';
 
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/platform/android/background_service.dart';
+import 'package:ios_club_app/platform/ios/background_service.dart';
 
 class ScheduleStore extends GetxController {
   static ScheduleStore get to => Get.find();
@@ -165,6 +168,9 @@ class ScheduleStore extends GetxController {
       await _loadCourses();
       AppLogger.debug('[ScheduleStore] _loadCourses 完成');
 
+      await _syncHomeWidget();
+      AppLogger.debug('[ScheduleStore] 小组件同步完成');
+
       AppLogger.debug('[ScheduleStore] 刷新课程成功');
     } on TimeoutException catch (e) {
       AppLogger.warning('[ScheduleStore] 刷新课程超时: $e');
@@ -177,6 +183,18 @@ class ScheduleStore extends GetxController {
     } finally {
       AppLogger.debug('[ScheduleStore] 设置 _isLoading = false');
       _isLoading.value = false;
+    }
+  }
+
+  Future<void> _syncHomeWidget() async {
+    try {
+      if (PlatformUtils.isAndroid) {
+        await BackgroundService.updateWidget();
+      } else if (PlatformUtils.isIOS) {
+        await IOSBackgroundService.updateWidget();
+      }
+    } catch (e) {
+      AppLogger.warning('[ScheduleStore] 同步小组件失败', error: e);
     }
   }
 

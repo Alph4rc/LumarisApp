@@ -7,6 +7,8 @@ import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/pages/settingPages/version_setting.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/platform/android/background_service.dart';
+import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
@@ -223,6 +225,9 @@ class SettingPage extends StatelessWidget {
         onTap: () async {
           showClubSnackBar(context, const Text('正在刷新数据...'));
           final re = await EduService.refresh();
+          if (re) {
+            await _syncHomeWidget();
+          }
           if (context.mounted) {
             showClubSnackBar(context, Text('刷新数据${re ? '成功' : '失败'}'));
           }
@@ -255,6 +260,17 @@ class SettingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _syncHomeWidget() async {
+    if (PlatformUtils.isAndroid) {
+      await BackgroundService.updateWidget();
+      return;
+    }
+
+    if (PlatformUtils.isIOS) {
+      await IOSBackgroundService.updateWidget();
+    }
   }
 
   Widget _buildTeamTile(bool isDark) {

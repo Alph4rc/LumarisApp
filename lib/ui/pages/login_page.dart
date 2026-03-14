@@ -356,7 +356,7 @@ class _LoginPageState extends State<LoginPage> {
                         _buildCupertinoLikeTextField(
                           context,
                           controller: _nameController,
-                          hintText: '姓名（登录社团账号时必填）',
+                          hintText: 'iMember密码（登录社团账号时必填）',
                           icon: Icons.badge_outlined,
                           isFirst: false,
                           isLast: true,
