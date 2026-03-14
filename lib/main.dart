@@ -14,6 +14,7 @@ import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -52,6 +53,10 @@ void main() async {
 
   // 初始化 SharedPreferences（最先初始化，其他服务可能依赖它）
   await PrefsService.init();
+
+  if (PlatformUtils.isIOS) {
+    await WidgetService.initialize();
+  }
 
   // 尝试迁移旧的凭证数据到安全存储
   await EduService.migrateCredentials();

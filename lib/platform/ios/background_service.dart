@@ -92,7 +92,7 @@ class IOSBackgroundService {
 
   /// 手动触发小组件更新
   static Future<void> updateWidget() async {
-    await TaskExecutor.updateTodayWidget();
+    await TaskExecutor.updateWidget();
   }
 }
 

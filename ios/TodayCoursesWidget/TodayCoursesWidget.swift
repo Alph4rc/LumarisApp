@@ -11,6 +11,24 @@ import Foundation
 
 private let widgetGroupId = "group.com.example.iosClubApp.widget"
 
+private enum WidgetStorage {
+    static func sharedDefaults() -> UserDefaults? {
+        UserDefaults(suiteName: widgetGroupId)
+    }
+
+    static func decodeCourses(forKey key: String) -> [Course] {
+        guard
+            let courseString = sharedDefaults()?.string(forKey: key),
+            let courseData = courseString.data(using: .utf8),
+            let rawCourses = try? JSONSerialization.jsonObject(with: courseData) as? [[String: Any]]
+        else {
+            return []
+        }
+
+        return rawCourses.compactMap(Course.fromJson)
+    }
+}
+
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> CourseEntry {
         CourseEntry(
@@ -24,24 +42,18 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CourseEntry) -> Void) {
-        let data = UserDefaults.init(suiteName: widgetGroupId)
-        
         let title = "今日课表"
-        let dateStr = data?.string(forKey: "flutter.date") ?? ""
-        
-        var courses: [Course] = []
-        if let coursesData = data?.string(forKey: "flutter.courses"),
-           let coursesJson = try? JSONSerialization.jsonObject(with: coursesData.data(using: .utf8)!) as? [[String: Any]] {
-            courses = coursesJson.compactMap { Course.fromJson($0) }
-        }
-        
+        let dateStr = WidgetStorage.sharedDefaults()?.string(forKey: "flutter.date") ?? ""
+        let courses = WidgetStorage.decodeCourses(forKey: "flutter.courses")
+
         let entry = CourseEntry(date: Date(), title: title, dateString: dateStr, courses: courses)
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         getSnapshot(in: context) { (entry) in
-            let timeline = Timeline(entries: [entry], policy: .atEnd)
+            let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: Date()) ?? Date().addingTimeInterval(1800)
+            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
             completion(timeline)
         }
     }

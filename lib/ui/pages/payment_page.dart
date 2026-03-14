@@ -246,6 +246,7 @@ class PaymentPage extends StatelessWidget {
                   });
                 },
                 child: CupertinoButton(
+                  color: CupertinoColors.systemBlue,
                   borderRadius: BorderRadius.circular(8),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,

@@ -2,6 +2,26 @@ import WidgetKit
 import SwiftUI
 import Intents
 
+private let widgetGroupId = "group.com.example.iosClubApp.widget"
+
+private enum WidgetStorage {
+    static func sharedDefaults() -> UserDefaults? {
+        UserDefaults(suiteName: widgetGroupId)
+    }
+
+    static func decodeCourses(forKey key: String) -> [Course] {
+        guard
+            let courseString = sharedDefaults()?.string(forKey: key),
+            let courseData = courseString.data(using: .utf8),
+            let rawCourses = try? JSONSerialization.jsonObject(with: courseData) as? [[String: Any]]
+        else {
+            return []
+        }
+
+        return rawCourses.compactMap(Course.fromJson)
+    }
+}
+
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> CourseEntry {
         let today = Date()
@@ -32,25 +52,12 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CourseEntry) -> Void) {
-        let data = UserDefaults.init(suiteName: "group.com.example.iosClubApp.widget")
-
         let title = "近日课表"
-        let todayStr = data?.string(forKey: "flutter.tomorrow.date") ?? getCurrentDateString()
-        let tomorrowStr = data?.string(forKey: "flutter.tomorrow.tomorrowDate") ?? getTomorrowDateString()
-
-        var todayCourses: [Course] = []
-        if let coursesData = data?.string(forKey: "flutter.tomorrow.courses"),
-           let coursesData = coursesData.data(using: .utf8),
-           let coursesJson = try? JSONSerialization.jsonObject(with: coursesData) as? [[String: Any]] {
-            todayCourses = coursesJson.compactMap { Course.fromJson($0) }
-        }
-
-        var tomorrowCourses: [Course] = []
-        if let coursesData = data?.string(forKey: "flutter.tomorrow.tomorrowCourses"),
-           let coursesData = coursesData.data(using: .utf8),
-           let coursesJson = try? JSONSerialization.jsonObject(with: coursesData) as? [[String: Any]] {
-            tomorrowCourses = coursesJson.compactMap { Course.fromJson($0) }
-        }
+        let sharedDefaults = WidgetStorage.sharedDefaults()
+        let todayStr = sharedDefaults?.string(forKey: "flutter.tomorrow.date") ?? getCurrentDateString()
+        let tomorrowStr = sharedDefaults?.string(forKey: "flutter.tomorrow.tomorrowDate") ?? getTomorrowDateString()
+        let todayCourses = WidgetStorage.decodeCourses(forKey: "flutter.tomorrow.courses")
+        let tomorrowCourses = WidgetStorage.decodeCourses(forKey: "flutter.tomorrow.tomorrowCourses")
 
         let entry = CourseEntry(date: Date(), title: title, todayDateString: todayStr, tomorrowDateString: tomorrowStr, todayCourses: todayCourses, tomorrowCourses: tomorrowCourses)
         completion(entry)

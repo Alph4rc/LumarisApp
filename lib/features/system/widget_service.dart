@@ -6,10 +6,29 @@ import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class WidgetService {
+  static const String iOSWidgetGroupId = 'group.com.example.iosClubApp.widget';
+  static bool _isInitialized = false;
+
+  static Future<void> initialize() async {
+    if (_isInitialized) {
+      return;
+    }
+
+    try {
+      await HomeWidget.setAppGroupId(iOSWidgetGroupId);
+      _isInitialized = true;
+      AppLogger.debug('iOS 小组件 App Group 初始化完成');
+    } catch (e) {
+      AppLogger.warning('iOS 小组件 App Group 初始化失败', error: e);
+    }
+  }
+
   // 更新小组件数据
   @pragma('vm:entry-point')
   static Future<void> updateTodayCourses(
       List<ScheduleItem> todayCourses) async {
+    await initialize();
+
     final now = DateTime.now();
 
     final week = await DataService.getWeek();
@@ -37,10 +56,19 @@ class WidgetService {
   @pragma('vm:entry-point')
   static Future<void> updateTodayAndTomorrowCourses(
       Map<String, List<ScheduleItem>> courses) async {
+    await initialize();
+
+    final now = DateTime.now();
+    final tomorrow = now.add(const Duration(days: 1));
+
     await HomeWidget.saveWidgetData<String>(
         'flutter.tomorrow.courses', jsonEncode(courses['today']));
     await HomeWidget.saveWidgetData<String>(
         'flutter.tomorrow.tomorrowCourses', jsonEncode(courses['tomorrow']));
+    await HomeWidget.saveWidgetData<String>(
+        'flutter.tomorrow.date', _formatMonthDayWeekday(now));
+    await HomeWidget.saveWidgetData<String>(
+        'flutter.tomorrow.tomorrowDate', _formatMonthDayWeekday(tomorrow));
 
     AppLogger.debug('小组件数据更新完成');
 
@@ -52,5 +80,12 @@ class WidgetService {
       qualifiedAndroidName:
           'com.example.ios_club_app.TomorrowCoursesWidgetProvider',
     );
+  }
+
+  static String _formatMonthDayWeekday(DateTime date) {
+    const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '$month月$day日 ${weekdays[date.weekday - 1]}';
   }
 }
