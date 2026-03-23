@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
-import 'package:ios_club_app/core/models/exam_result.dart';
+import 'package:ios_club_app/features/education/models/exam_result.dart';
 import 'package:ios_club_app/core/services/exam_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 

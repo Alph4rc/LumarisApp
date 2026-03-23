@@ -1,7 +1,9 @@
-import 'package:ios_club_app/core/models/bus_model.dart';
-import 'package:ios_club_app/core/models/plan_course.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/features/education/models/plan_course.dart';
+import 'package:ios_club_app/features/education/models/raw_string_response.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'edu_service.dart';
 import 'app_api.dart';
 import 'bus_api.dart';
@@ -143,8 +145,8 @@ class EduApiService {
   /// 获取App相关信息
   ///
   /// @param token 令牌（可选，用于身份验证）
-  /// @return App信息JSON字符串
-  static Future<String> getAppInfo({String? token}) async {
+  /// @return App信息字符串包装模型
+  static Future<RawStringResponse> getAppInfo({String? token}) async {
     return await AppApi.getAppInfo(token: token);
   }
 
@@ -152,8 +154,9 @@ class EduApiService {
   ///
   /// @param time 时间（格式：yyyy-MM-dd）
   /// @param loc 位置（可选，默认'ALL'表示所有位置）
-  /// @return 校巴数据JSON字符串
-  static Future<String> getBusNewData(String time, {String loc = 'ALL'}) async {
+  /// @return 校巴数据模型
+  static Future<BusModel> getBusNewData(String time,
+      {String loc = 'ALL'}) async {
     return await BusApi.getBusNewData(time, loc: loc);
   }
 
@@ -161,8 +164,8 @@ class EduApiService {
   ///
   /// @param time 时间（格式：yyyy-MM-dd）
   /// @param isShow 是否显示（可选，默认false）
-  /// @return 校巴数据JSON字符串
-  static Future<String> getBusOldData(String time,
+  /// @return 校巴数据模型
+  static Future<BusModel> getBusOldData(String time,
       {bool isShow = false}) async {
     return await BusApi.getBusOldData(time, isShow: isShow);
   }
@@ -170,16 +173,16 @@ class EduApiService {
   /// 获取缴费信息
   ///
   /// @param id 用户ID
-  /// @return 缴费信息JSON字符串
-  static Future<String> getPayment(String id) async {
+  /// @return 缴费信息字符串包装模型
+  static Future<RawStringResponse> getPayment(String id) async {
     return await PaymentApi.getPayment(id);
   }
 
   /// 获取缴费流水
   ///
   /// @param id 用户ID
-  /// @return 缴费流水JSON字符串
-  static Future<String> getPaymentTurnover(String id) async {
+  /// @return 缴费流水模型
+  static Future<PaymentData> getPaymentTurnover(String id) async {
     return await PaymentApi.getPaymentTurnover(id);
   }
 }

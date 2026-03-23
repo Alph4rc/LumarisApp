@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 
 /// 课程卡片组件
 ///

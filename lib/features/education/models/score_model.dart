@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 
 part 'score_model.g.dart';
 
@@ -36,11 +36,11 @@ class ScoreModel {
   // 如果需要从 JSON 创建对象
   factory ScoreModel.fromJson(Map<String, dynamic> json) {
     return ScoreModel(
-      name: json['name'] ?? '',
-      lessonCode: json['lessonCode'] ?? '',
-      lessonName: json['lessonName'] ?? '',
-      grade: json['grade'] ?? '',
-      gpa: json['gpa'] ?? '',
+      name: json['name']?.toString() ?? '',
+      lessonCode: json['lessonCode']?.toString() ?? '',
+      lessonName: json['lessonName']?.toString() ?? '',
+      grade: json['grade']?.toString() ?? '',
+      gpa: json['gpa']?.toString() ?? '',
       gradeDetail: (json['gradeDetail'] ?? '').toString(),
       credit: (json['credit'] ?? '').toString(),
       isMinor: json['isMinor'] ?? false,

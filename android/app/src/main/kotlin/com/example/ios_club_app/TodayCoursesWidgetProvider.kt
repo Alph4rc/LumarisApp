@@ -77,6 +77,7 @@ class TodayCoursesWidgetProvider : AppWidgetProvider() {
                 val intent = Intent(context, CourseListRemoteViewsService::class.java)
                 intent.putExtra("courses", coursesJson)
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                intent.data = android.net.Uri.parse("widget://today_courses?appWidgetId=" + appWidgetId + "&t=" + System.currentTimeMillis())
                 views.setRemoteAdapter(R.id.widget_courses_list, intent)
             }
 

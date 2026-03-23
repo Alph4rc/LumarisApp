@@ -1,4 +1,5 @@
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
@@ -20,70 +21,6 @@ class SecurePaymentStorage implements PaymentStorage {
   @override
   Future<String?> read(String key) {
     return _secureStorage.read(key: key);
-  }
-}
-
-/// 支付数据模型类
-/// 包含支付记录列表和总金额
-class PaymentData {
-  /// 支付记录列表
-  final List<PaymentModel> payments;
-
-  /// 总金额
-  final double total;
-
-  /// 构造函数
-  PaymentData(this.payments, this.total);
-
-  /// 从JSON数据创建PaymentData实例
-  factory PaymentData.fromJson(Map<String, dynamic> json) {
-    return PaymentData(
-      (json['records'] as List).map((e) => PaymentModel.fromJson(e)).toList(),
-      (json['total'] as num).toDouble(),
-    );
-  }
-}
-
-/// 单条支付记录模型类
-///
-/// 表示一条具体的支付记录信息
-class PaymentModel {
-  /// 交易类型
-  final String turnoverType;
-
-  /// 交易日期时间字符串
-  final String datetimeStr;
-
-  /// 交易摘要
-  final String resume;
-
-  /// 交易金额（分为单位）
-  final double amount;
-
-  /// 构造函数
-  PaymentModel({
-    required this.turnoverType,
-    required this.datetimeStr,
-    required this.resume,
-    required this.amount,
-  });
-
-  /// 重写toString方法，格式化输出支付记录信息
-  ///
-  /// 格式：日期时间 | 交易类型 | 金额(元) | 摘要
-  @override
-  String toString() {
-    return '$datetimeStr | $turnoverType | ${(amount / 100).toStringAsFixed(2)} 元 | ${resume.trim()}';
-  }
-
-  /// 从JSON数据创建PaymentModel实例
-  factory PaymentModel.fromJson(Map<String, dynamic> json) {
-    return PaymentModel(
-      turnoverType: json['turnoverType'],
-      datetimeStr: json['datetimeStr'],
-      resume: json['resume'],
-      amount: (json['tranamt'] as num).toDouble(),
-    );
   }
 }
 

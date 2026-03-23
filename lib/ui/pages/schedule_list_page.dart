@@ -8,7 +8,7 @@ import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/image_helper.dart';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';

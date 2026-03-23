@@ -1,20 +1,22 @@
-import 'dart:convert';
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 import '../../../core/services/network_exception.dart';
 import 'edu_http_client_manager.dart';
 
 /// Score相关API
 class ScoreApi {
   /// 获取学期信息
-  static Future<String> getSemester(String studentId) async {
+  static Future<SemesterResult> getSemester(String studentId) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Score/Semester',
         queryParameters: {'studentId': studentId},
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! Map<String, dynamic>) {
+        throw NetworkException('学期返回格式错误', -1);
+      }
+      return SemesterResult.fromJson(response);
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -22,7 +24,8 @@ class ScoreApi {
   }
 
   /// 获取成绩信息
-  static Future<String> getScore(String studentId, String semester) async {
+  static Future<List<ScoreModel>> getScore(
+      String studentId, String semester) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Score',
@@ -31,10 +34,12 @@ class ScoreApi {
           'semester': semester,
         },
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! List<dynamic>) {
+        throw NetworkException('成绩返回格式错误', -1);
+      }
+      return response
+          .map((item) => ScoreModel.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -42,15 +47,15 @@ class ScoreApi {
   }
 
   /// 获取本学期成绩
-  static Future<String> getThisSemester() async {
+  static Future<SemesterModel> getThisSemester() async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Score/ThisSemester',
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! Map<String, dynamic>) {
+        throw NetworkException('当前学期返回格式错误', -1);
+      }
+      return SemesterModel.fromJson(response);
     } catch (e) {
       _handleError(e);
       rethrow;

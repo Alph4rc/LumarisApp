@@ -5,15 +5,14 @@ import 'dart:convert' show jsonDecode, jsonEncode;
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:ios_club_app/core/models/bus_model.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
-import 'package:ios_club_app/core/models/plan_course.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'edu_api_client.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -327,7 +326,10 @@ class EduService {
     try {
       final response = await EduApiClient.getThisSemester();
       final prefs = PrefsService.instance;
-      await prefs.setString(PrefsKeys.THIS_SEMESTER_DATA, response);
+      await prefs.setString(
+        PrefsKeys.THIS_SEMESTER_DATA,
+        jsonEncode(response.toJson()),
+      );
     } catch (e, stackTrace) {
       AppLogger.error('获取本学期成绩失败', error: e, stackTrace: stackTrace);
     }
@@ -347,7 +349,8 @@ class EduService {
     try {
       final response = await EduApiClient.getSemester(cookieData.studentId);
       final prefs = PrefsService.instance;
-      await prefs.setString(PrefsKeys.SEMESTER_DATA, response);
+      await prefs.setString(
+          PrefsKeys.SEMESTER_DATA, jsonEncode(response.toJson()));
 
       final now = DateTime.now().microsecondsSinceEpoch;
       await prefs.setInt(PrefsKeys.SEMESTER_TIME, now);
@@ -402,17 +405,7 @@ class EduService {
 
     try {
       final response = await EduApiClient.getCourse(cookieData.studentId);
-      final data = jsonDecode(response);
-      var dataList = [];
-      if (data is List) {
-        dataList = data;
-      } else if (data is Map) {
-        dataList = data["data"];
-      }
-      final courses = dataList
-          .map((e) => CourseModel.fromJson(e))
-          .toList()
-          .cast<CourseModel>();
+      final courses = response.data;
 
       // 即使是空数组也需要更新，因为可能原本有课现在退课了，或者学期切换了
       // 存储到 Hive
@@ -443,11 +436,8 @@ class EduService {
       final List<ScoreList> scores = [];
 
       for (var item in list) {
-        final response =
+        final scoreList =
             await EduApiClient.getScore(cookieData.studentId, item.semester);
-        final scoreList = (jsonDecode(response) as List)
-            .map((e) => ScoreModel.fromJson(e))
-            .toList();
 
         scores.add(ScoreList(semester: item, list: scoreList));
       }
@@ -523,12 +513,8 @@ class EduService {
     if (semestersToUpdate.isNotEmpty) {
       try {
         for (var semester in semestersToUpdate) {
-          final response = await EduApiClient.getScore(
+          final list = await EduApiClient.getScore(
               cookieData.studentId, semester.semester);
-
-          final list = (jsonDecode(response) as List)
-              .map((e) => ScoreModel.fromJson(e))
-              .toList();
           final scoreList = ScoreList(semester: semester, list: list);
 
           updatedScores.add(scoreList);
@@ -581,8 +567,7 @@ class EduService {
     try {
       final response = await EduApiClient.getExam(cookieData.studentId);
       final prefs = PrefsService.instance;
-      await prefs.setString(
-          PrefsKeys.EXAM_DATA, jsonEncode(jsonDecode(response)));
+      await prefs.setString(PrefsKeys.EXAM_DATA, jsonEncode(response.toJson()));
     } catch (e, stackTrace) {
       AppLogger.error('获取考试信息失败', error: e, stackTrace: stackTrace);
     }
@@ -597,8 +582,7 @@ class EduService {
     try {
       final response = await EduApiClient.getTime();
       final prefs = PrefsService.instance;
-      await prefs.setString(
-          PrefsKeys.TIME_DATA, jsonEncode(jsonDecode(response)));
+      await prefs.setString(PrefsKeys.TIME_DATA, jsonEncode(response.toJson()));
       final now = DateTime.now().millisecondsSinceEpoch;
       await prefs.setInt(PrefsKeys.TIME_LAST_UPDATED, now);
     } catch (e, stackTrace) {
@@ -621,7 +605,9 @@ class EduService {
       final response = await EduApiClient.getInfoCompletion();
       final prefs = PrefsService.instance;
       await prefs.setString(
-          PrefsKeys.INFO_DATA, jsonEncode(jsonDecode(response)));
+        PrefsKeys.INFO_DATA,
+        jsonEncode(response.map((item) => item.toJson()).toList()),
+      );
     } catch (e, stackTrace) {
       AppLogger.error('获取学生信息完成度失败', error: e, stackTrace: stackTrace);
     }
@@ -637,7 +623,7 @@ class EduService {
     try {
       final response = await EduApiClient.getBus(dayDate: dayDate);
       final now = DateTime.now();
-      var result = BusModel.fromJson(jsonDecode(response));
+      var result = response;
       if (result.records.isNotEmpty &&
           (dayDate == null ||
               dayDate.isEmpty ||
@@ -675,12 +661,11 @@ class EduService {
     }
 
     try {
-      final response = await EduApiClient.getProgram(cookieData.studentId);
-      var result = jsonDecode(response);
+      final result = await EduApiClient.getProgram(cookieData.studentId);
       if (kDebugMode) {
         AppLogger.debug('找到了培养方案：${result.length}');
       }
-      return result.map<PlanCourse>((e) => PlanCourse.fromJson(e)).toList();
+      return result;
     } catch (e, stackTrace) {
       AppLogger.error('获取培养方案失败', error: e, stackTrace: stackTrace);
     }
@@ -699,8 +684,7 @@ class EduService {
     }
 
     try {
-      final response = await EduApiClient.getProgramDic(cookieData.studentId);
-      var result = jsonDecode(response);
+      final result = await EduApiClient.getProgramDic(cookieData.studentId);
       if (kDebugMode) {
         AppLogger.debug('找到了培养方案：${result.length}');
       }

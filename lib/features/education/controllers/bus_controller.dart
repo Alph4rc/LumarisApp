@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:ios_club_app/core/models/bus_model.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/services/new_bus_api.dart';

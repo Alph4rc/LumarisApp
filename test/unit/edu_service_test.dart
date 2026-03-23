@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -315,7 +315,7 @@ void main() {
         path: '/Score/Semester',
         data: <String, dynamic>{
           'data': <Map<String, String>>[
-            <String, String>{'semester': '2025-2', 'name': '2025-2'}
+            <String, String>{'value': '2025-2', 'text': '2025-2'}
           ]
         },
       );
@@ -324,13 +324,26 @@ void main() {
         data: <String, dynamic>{
           'startTime': '2026-02-20T00:00:00.000',
           'endTime': '2026-07-20T00:00:00.000',
-          'semester': '2025-2026-2',
         },
       );
-      _mockEduResponse(path: '/Exam', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(
+        path: '/Exam',
+        data: <String, dynamic>{
+          'exams': <Map<String, dynamic>>[],
+          'canClick': false,
+          'error': null,
+        },
+      );
       _mockEduResponse(
           path: '/Info/Completion', data: <Map<String, dynamic>>[]);
-      _mockEduResponse(path: '/Course', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(
+        path: '/Course',
+        data: <String, dynamic>{
+          'success': true,
+          'data': <Map<String, dynamic>>[],
+          'expirationTime': '2026-03-23T00:00:00.000',
+        },
+      );
 
       final result = await EduService.refresh();
       expect(result, isTrue);
@@ -354,7 +367,7 @@ void main() {
         path: '/Score/Semester',
         data: <String, dynamic>{
           'data': <Map<String, String>>[
-            <String, String>{'semester': '2025-2', 'name': '2025-2'}
+            <String, String>{'value': '2025-2', 'text': '2025-2'}
           ]
         },
       );
@@ -363,13 +376,26 @@ void main() {
         data: <String, dynamic>{
           'startTime': '2026-02-20T00:00:00.000',
           'endTime': '2026-07-20T00:00:00.000',
-          'semester': '2025-2026-2',
         },
       );
-      _mockEduResponse(path: '/Exam', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(
+        path: '/Exam',
+        data: <String, dynamic>{
+          'exams': <Map<String, dynamic>>[],
+          'canClick': false,
+          'error': null,
+        },
+      );
       _mockEduResponse(
           path: '/Info/Completion', data: <Map<String, dynamic>>[]);
-      _mockEduResponse(path: '/Course', data: <Map<String, dynamic>>[]);
+      _mockEduResponse(
+        path: '/Course',
+        data: <String, dynamic>{
+          'success': true,
+          'data': <Map<String, dynamic>>[],
+          'expirationTime': '2026-03-23T00:00:00.000',
+        },
+      );
 
       final ok = await EduService.loginFromData('u3', 'p3');
       expect(ok, isTrue);
@@ -426,10 +452,7 @@ void main() {
         () async {
       final prefs = PrefsService.instance;
       await prefs.setString(
-          PrefsKeys.TIME_DATA,
-          jsonEncode(<String, String>{
-            'semester': '2025-2026-2',
-          }));
+          PrefsKeys.TIME_DATA, jsonEncode(<String, String>{}));
       await prefs.setInt(
         PrefsKeys.TIME_LAST_UPDATED,
         DateTime.now().millisecondsSinceEpoch,
@@ -451,7 +474,6 @@ void main() {
         data: <String, dynamic>{
           'startTime': '2026-02-20T00:00:00.000',
           'endTime': '2026-07-20T00:00:00.000',
-          'semester': '2025-2026-2',
         },
       );
 
@@ -459,7 +481,7 @@ void main() {
 
       final stored = PrefsService.instance.getString(PrefsKeys.TIME_DATA);
       expect(stored, isNotNull);
-      expect(stored!, contains('2025-2026-2'));
+      expect(stored!, contains('startTime'));
       expect(
           PrefsService.instance.getInt(PrefsKeys.TIME_LAST_UPDATED), isNotNull);
     });
@@ -470,7 +492,7 @@ void main() {
         path: '/Score/Semester',
         data: <String, dynamic>{
           'data': <Map<String, String>>[
-            <String, String>{'semester': '2025-2', 'name': '2025-2'}
+            <String, String>{'value': '2025-2', 'text': '2025-2'}
           ]
         },
       );
@@ -500,18 +522,25 @@ void main() {
 
       _mockEduResponse(
         path: '/Course',
-        data: <Map<String, dynamic>>[
-          <String, dynamic>{
-            'lessonId': 'L1',
-            'courseName': 'Math',
-            'weekIndexes': <int>[1, 2],
-            'teachers': <String>['T1'],
-            'room': 'A101',
-            'weekday': 1,
-            'startUnit': 1,
-            'endUnit': 2,
-          }
-        ],
+        data: <String, dynamic>{
+          'success': true,
+          'data': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'lessonId': 'L1',
+              'courseName': 'Math',
+              'weekIndexes': <int>[1, 2],
+              'teachers': <String>['T1'],
+              'room': 'A101',
+              'weekday': 1,
+              'startUnit': 1,
+              'endUnit': 2,
+              'credits': '3.0',
+              'courseCode': 'M101',
+              'campus': 'Main',
+            }
+          ],
+          'expirationTime': '2026-03-23T00:00:00.000',
+        },
       );
 
       await EduService.getCourse(
@@ -537,7 +566,7 @@ void main() {
           PrefsKeys.SEMESTER_DATA,
           jsonEncode(<String, List>{
             'data': <Map<String, String>>[
-              <String, String>{'semester': '2025-2', 'name': '2025-2'}
+              <String, String>{'value': '2025-2', 'text': '2025-2'}
             ],
           }));
 
@@ -643,15 +672,13 @@ void main() {
     test('getThisSemester should persist response string', () async {
       _mockEduResponse(
         path: '/Score/ThisSemester',
-        data: <Map<String, dynamic>>[
-          <String, dynamic>{'name': 'Math', 'grade': '95'}
-        ],
+        data: <String, dynamic>{'value': '2025-2', 'text': '2025-2'},
       );
 
       await EduService.getThisSemester();
       expect(
         PrefsService.instance.getString(PrefsKeys.THIS_SEMESTER_DATA),
-        contains('Math'),
+        contains('2025-2'),
       );
     });
 

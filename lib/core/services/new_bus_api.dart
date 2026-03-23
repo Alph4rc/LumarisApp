@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
 
 import 'package:ios_club_app/features/education/services/edu_service.dart';
-import '../models/bus_model.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 新数据平台

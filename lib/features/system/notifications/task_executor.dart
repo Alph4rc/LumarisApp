@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
@@ -8,6 +8,8 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:flutter/widgets.dart';
+import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 任务执行器 - 实际的业务逻辑
@@ -178,7 +180,14 @@ class TaskExecutor {
   }
 
   /// 检查并发送课程提醒
+  static Future<void> _ensureInitialized() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await HiveManager.init();
+    await PrefsService.init();
+  }
+
   static Future<void> checkAndSendCourseReminder() async {
+    await _ensureInitialized();
     try {
       final prefs = await PrefsService.getInstanceAsync();
 
@@ -228,6 +237,7 @@ class TaskExecutor {
 
   @pragma('vm:entry-point')
   static Future<void> updateWidget() async {
+    await _ensureInitialized();
     // 防止重复执行
     if (_isExecuting) {
       AppLogger.debug('后台任务正在执行中，跳过本次调用');
@@ -288,6 +298,7 @@ class TaskExecutor {
   /// 更新今日课程小组件（公开方法，用于外部调用）
   @pragma('vm:entry-point')
   static Future<void> updateTodayWidget() async {
+    await _ensureInitialized();
     try {
       await _preloadData();
       await _updateTodayWidgetFromCache();
@@ -299,6 +310,7 @@ class TaskExecutor {
   /// 更新近日课程小组件（公开方法，用于外部调用）
   @pragma('vm:entry-point')
   static Future<void> updateTodayAndTomorrowWidget() async {
+    await _ensureInitialized();
     try {
       await _preloadData();
       await _updateTodayAndTomorrowWidgetFromCache();

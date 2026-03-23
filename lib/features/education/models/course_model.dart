@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'schema_parsers.dart';
 
 part 'course_model.g.dart';
 
@@ -104,17 +105,22 @@ class CourseModel {
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
       weekIndexes: json['weekIndexes'] != null
-          ? List<int>.from(json['weekIndexes'])
+          ? (json['weekIndexes'] as List<dynamic>)
+              .map((item) => parseSchemaInt(item))
+              .toList()
           : [],
-      teachers:
-          json['teachers'] != null ? List<String>.from(json['teachers']) : [],
+      teachers: json['teachers'] != null
+          ? (json['teachers'] as List<dynamic>)
+              .map((item) => item as String)
+              .toList()
+          : [],
       room: json['room'] ?? '',
       courseName: json['courseName'] ?? '',
       courseCode: json['courseCode'] ?? '',
-      weekday: json['weekday'] ?? 0,
-      startUnit: json['startUnit'] ?? 0,
-      endUnit: json['endUnit'] ?? 0,
-      credits: json['credits'] ?? '',
+      weekday: parseSchemaInt(json['weekday']),
+      startUnit: parseSchemaInt(json['startUnit']),
+      endUnit: parseSchemaInt(json['endUnit']),
+      credits: json['credits']?.toString() ?? '',
       lessonId: json['lessonId'] ?? '',
       campus: json['campus'] ?? '',
       isCustom: json['isCustom'] ?? false,

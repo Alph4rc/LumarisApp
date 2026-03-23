@@ -7,7 +7,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:intl/intl.dart';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';

@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 
 /// Hive 数据库管理类

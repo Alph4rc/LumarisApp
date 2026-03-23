@@ -4,7 +4,7 @@ import 'package:ios_club_app/features/education/controllers/program_controller.d
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'prefs_keys.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';

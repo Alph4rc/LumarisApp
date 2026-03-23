@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 

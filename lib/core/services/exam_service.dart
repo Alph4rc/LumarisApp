@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/features/education/services/exam_api.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
-import 'package:ios_club_app/core/models/exam_model.dart';
-import 'package:ios_club_app/core/models/exam_result.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/exam_model.dart';
+import 'package:ios_club_app/features/education/models/exam_result.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,9 +43,9 @@ class ExamService {
 
     // HTTP请求
     final result = await _fetchExamData(cookieData, now);
-    if (result.$1) {
-      await _updateCache(prefs, result.$2, now);
-      final exams = _parseExamItems(result.$2, now);
+    if (result.$1 && result.$2 != null) {
+      await _updateCache(prefs, result.$2!, now);
+      final exams = _parseExamItemsFromResponse(result.$2!, now);
       return exams.isEmpty ? ExamResult.empty() : ExamResult.success(exams);
     }
 
@@ -91,7 +92,8 @@ class ExamService {
   /// 返回一个元组，第一个元素表示是否成功，第二个元素是JSON响应字符串，第三个元素是错误结果
   ///
   /// 注意：EduHttpClient 已内置重试和重登录机制，这里不再额外处理
-  static Future<(bool isSuccess, String jsonString, ExamResult errorResult)>
+  static Future<
+          (bool isSuccess, ExamResponse? response, ExamResult errorResult)>
       _fetchExamData(UserData cookieData, DateTime now) async {
     try {
       // 使用ExamApi获取考试数据
@@ -107,13 +109,13 @@ class ExamService {
       return (true, mergedData, ExamResult.empty());
     } on AuthenticationException catch (e) {
       AppLogger.debug('认证失败: $e');
-      return (false, '', ExamResult.error('认证失败，请重新登录'));
+      return (false, null, ExamResult.error('认证失败，请重新登录'));
     } on NetworkException catch (e) {
       AppLogger.debug('网络错误: $e');
-      return (false, '', ExamResult.networkError(e.message));
+      return (false, null, ExamResult.networkError(e.message));
     } catch (e) {
       AppLogger.debug('获取考试数据失败: $e');
-      return (false, '', ExamResult.error('获取考试信息失败: $e'));
+      return (false, null, ExamResult.error('获取考试信息失败: $e'));
     }
   }
 
@@ -123,13 +125,13 @@ class ExamService {
   /// [jsonString] 要缓存的JSON字符串
   /// [now] 当前时间
   static Future<void> _updateCache(
-      SharedPreferences prefs, String jsonString, DateTime now) async {
+      SharedPreferences prefs, ExamResponse response, DateTime now) async {
     // 解析新获取的考试数据，只缓存未来的考试
-    final parsedExams = _parseExamItems(jsonString, now);
+    final parsedExams = _parseExamItemsFromResponse(response, now);
 
     // 如果有有效考试，才更新缓存
     if (parsedExams.isNotEmpty) {
-      await prefs.setString(PrefsKeys.EXAM_DATA, jsonString);
+      await prefs.setString(PrefsKeys.EXAM_DATA, jsonEncode(response.toJson()));
       await prefs.setInt(PrefsKeys.EXAM_TIME, now.microsecondsSinceEpoch);
     } else {
       // 如果没有有效考试，清理缓存
@@ -144,28 +146,34 @@ class ExamService {
   /// [now] 当前时间
   /// 返回有效的考试项目列表
   static List<ExamItem> _parseExamItems(String jsonString, DateTime now) {
-    final List<ExamItem> list = [];
-    if (jsonString.isEmpty) return list;
+    if (jsonString.isEmpty) return <ExamItem>[];
 
     try {
-      final jsonList = jsonDecode(jsonString)['exams'];
-
-      for (final json in jsonList) {
-        final item = ExamItem.fromJson(json);
-
-        try {
-          final endTime = _parseExamTime(item.examTime, now);
-          // 只添加未过期的考试
-          if (endTime != null && !now.isAfter(endTime)) {
-            list.add(item);
-          }
-        } catch (e) {
-          AppLogger.debug('时间解析失败: $e');
-          continue;
-        }
-      }
+      return _parseExamItemsFromResponse(
+        ExamResponse.fromJson(jsonDecode(jsonString) as Map<String, dynamic>),
+        now,
+      );
     } catch (e) {
       AppLogger.debug('JSON解析失败: $e');
+      return <ExamItem>[];
+    }
+  }
+
+  static List<ExamItem> _parseExamItemsFromResponse(
+      ExamResponse response, DateTime now) {
+    final List<ExamItem> list = [];
+
+    for (final item in response.exams) {
+      try {
+        final endTime = _parseExamTime(item.examTime, now);
+        // 只添加未过期的考试
+        if (endTime != null && !now.isAfter(endTime)) {
+          list.add(item);
+        }
+      } catch (e) {
+        AppLogger.debug('时间解析失败: $e');
+        continue;
+      }
     }
 
     AppLogger.debug('解析完成，找到${list.length}个有效考试');
@@ -175,26 +183,18 @@ class ExamService {
   /// 合并考试数据，实现增量更新
   ///
   /// [existingExams] 现有考试数据JSON字符串
-  /// [newExams] 新获取的考试数据JSON字符串
+  /// [newExams] 新获取的考试数据响应
   /// [now] 当前时间
-  /// 返回合并后的考试数据JSON字符串
-  static String _mergeExamData(
-      String existingExams, String newExams, DateTime now) {
+  /// 返回合并后的考试数据响应
+  static ExamResponse _mergeExamData(
+      String existingExams, ExamResponse newExams, DateTime now) {
     if (existingExams.isEmpty) return newExams;
-    if (newExams.isEmpty) return existingExams;
 
     try {
-      // 解析现有和新的考试数据
-      final existingJson = jsonDecode(existingExams);
-      final newJson = jsonDecode(newExams);
-
-      // 获取现有和新的考试列表
-      final existingExamList = (existingJson['exams'] as List<dynamic>)
-          .map((e) => ExamItem.fromJson(e))
-          .toList();
-      final newExamList = (newJson['exams'] as List<dynamic>)
-          .map((e) => ExamItem.fromJson(e))
-          .toList();
+      final existingExamList = ExamResponse.fromJson(
+        jsonDecode(existingExams) as Map<String, dynamic>,
+      ).exams;
+      final newExamList = newExams.exams;
 
       // 创建考试项的唯一标识符映射，用于去重
       // 使用课程名称+考试时间+考试地点作为唯一标识符
@@ -222,23 +222,13 @@ class ExamService {
         }
       }).toList();
 
-      // 转换回JSON格式
-      // 直接使用原始数据结构，不依赖toJson方法
-      final mergedJson = {
-        'exams': validExams
-            .map((exam) => {
-                  'name': exam.name,
-                  'time': exam.examTime,
-                  'location': exam.room,
-                  'seat': exam.seatNo,
-                })
-            .toList()
-      };
-
-      return jsonEncode(mergedJson);
+      return ExamResponse(
+        exams: validExams,
+        canClick: newExams.canClick,
+        error: newExams.error,
+      );
     } catch (e) {
       AppLogger.debug('合并考试数据失败: $e');
-      // 合并失败时返回新数据
       return newExams;
     }
   }

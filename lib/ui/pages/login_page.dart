@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/club_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';

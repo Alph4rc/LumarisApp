@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
-import 'package:ios_club_app/core/models/week_info.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/week_info.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';

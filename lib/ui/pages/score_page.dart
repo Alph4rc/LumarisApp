@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
@@ -16,7 +15,7 @@ import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/core/repositories/score_repository.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -238,12 +237,10 @@ class _ScorePageState extends State<ScorePage>
     required SemesterModel semester,
   }) async {
     try {
-      final response =
-          await EduApiClient.getScore(studentId, semester.semester);
-      final list = jsonDecode(response) as List;
+      final list = await EduApiClient.getScore(studentId, semester.semester);
       return ScoreList(
         semester: semester,
-        list: list.map((e) => ScoreModel.fromJson(e)).toList(),
+        list: list,
       );
     } catch (e) {
       if (kDebugMode) {

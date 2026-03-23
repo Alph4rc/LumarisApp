@@ -9,11 +9,12 @@ class BusModel {
 
   // 从JSON构造方法
   factory BusModel.fromJson(Map<String, dynamic> json) {
+    final rawRecords = json['records'] as List<dynamic>? ?? <dynamic>[];
     return BusModel(
-      records: (json['records'] as List)
-          .map((item) => BusItem.fromJson(item))
+      records: rawRecords
+          .map((item) => BusItem.fromJson(item as Map<String, dynamic>))
           .toList(),
-      total: json['total'] as int,
+      total: int.parse((json['total'] ?? 0).toString()),
     );
   }
 
@@ -77,12 +78,12 @@ class BusItem {
   // 从JSON构造方法
   factory BusItem.fromJson(Map<String, dynamic> json) {
     return BusItem(
-      lineName: json['lineName'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      departureStation: json['departureStation'] as String? ?? '',
-      arrivalStation: json['arrivalStation'] as String? ?? '',
-      runTime: json['runTime'] as String? ?? '',
-      arrivalStationTime: json['arrivalStationTime'] as String? ?? '',
+      lineName: json['lineName']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      departureStation: json['departureStation']?.toString() ?? '',
+      arrivalStation: json['arrivalStation']?.toString() ?? '',
+      runTime: json['runTime']?.toString() ?? '',
+      arrivalStationTime: json['arrivalStationTime']?.toString() ?? '',
     );
   }
 

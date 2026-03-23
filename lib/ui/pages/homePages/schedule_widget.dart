@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';

@@ -4,7 +4,7 @@ import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/services/auth_state_notifier.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';

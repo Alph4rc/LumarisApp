@@ -1,20 +1,17 @@
-import 'dart:convert';
+import 'package:ios_club_app/features/education/models/raw_string_response.dart';
 import '../../../core/services/network_exception.dart';
 import 'edu_http_client_manager.dart';
 
 /// App相关API
 class AppApi {
   /// 获取App相关信息
-  static Future<String> getAppInfo({String? token}) async {
+  static Future<RawStringResponse> getAppInfo({String? token}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/App',
         queryParameters: {'token': token},
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      return RawStringResponse.fromResponse(response);
     } catch (e) {
       _handleError(e);
       rethrow;

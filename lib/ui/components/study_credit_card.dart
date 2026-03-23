@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/models/info_model.dart';
+import 'package:ios_club_app/features/education/models/info_model.dart';
 
 import 'club_card.dart';
 

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,7 +59,7 @@ void main() {
         // 'tranamt' field missing
       };
 
-      expect(() => PaymentModel.fromJson(json), throwsA(isA<TypeError>()));
+      expect(() => PaymentModel.fromJson(json), throwsArgumentError);
     });
 
     test('should handle empty string values in JSON', () {
@@ -265,7 +266,7 @@ void main() {
         // 'total' field missing
       };
 
-      expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
+      expect(() => PaymentData.fromJson(json), throwsArgumentError);
     });
 
     test('should handle non-numeric total in JSON', () {
@@ -281,7 +282,7 @@ void main() {
         'total': 'not_a_number',
       };
 
-      expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
+      expect(() => PaymentData.fromJson(json), throwsA(isA<FormatException>()));
     });
 
     test('should throw when records type is invalid', () {

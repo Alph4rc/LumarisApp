@@ -2,8 +2,8 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
-import 'package:ios_club_app/core/services/payment_analyzer.dart';
 
 void main() {
   group('Core Logic Performance', () {

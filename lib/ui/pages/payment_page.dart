@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/services/payment_analyzer.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/core/utils/animations/animated_button.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';

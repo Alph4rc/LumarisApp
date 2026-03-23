@@ -13,8 +13,8 @@ class SemesterModel {
 
   factory SemesterModel.fromJson(Map<String, dynamic> json) {
     return SemesterModel(
-      semester: (json['value'] ?? '').toString(),
-      name: (json['text'] ?? '').toString(),
+      semester: json['value']?.toString() ?? '',
+      name: json['text']?.toString() ?? '',
     );
   }
 

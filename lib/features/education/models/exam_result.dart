@@ -1,4 +1,4 @@
-import 'package:ios_club_app/core/models/exam_model.dart';
+import 'package:ios_club_app/features/education/models/exam_model.dart';
 
 /// 考试数据获取结果
 /// 用于区分不同的获取状态：成功、失败、无数据

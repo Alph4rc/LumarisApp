@@ -1,6 +1,6 @@
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/plan_course.dart';
+import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:flutter/material.dart';
 

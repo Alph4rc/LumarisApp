@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/course_time.dart';
 import 'package:ios_club_app/core/models/member_info.dart';
-import 'package:ios_club_app/core/models/user_data.dart';
-import 'package:ios_club_app/core/models/week_info.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/features/education/models/week_info.dart';
 
 void main() {
   group('UserData', () {

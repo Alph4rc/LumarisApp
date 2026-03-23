@@ -11,9 +11,9 @@ class TotalData {
 
   factory TotalData.fromJson(Map<String, dynamic> json) {
     return TotalData(
-      name: json['name'],
-      actual: json['actual']?.toDouble() ?? 0.0,
-      full: json['full']?.toDouble() ?? 0.0,
+      name: json['name'] as String,
+      actual: double.parse((json['actual'] ?? 0).toString()),
+      full: double.parse((json['full'] ?? 0).toString()),
     );
   }
 
@@ -39,10 +39,11 @@ class InfoModel {
   // 从JSON Map构建实例的工厂构造函数
   factory InfoModel.fromJson(Map<String, dynamic> json) {
     return InfoModel(
-      type: json['type'],
-      total: TotalData.fromJson(json['total']),
+      type: json['type'] as String,
+      total: TotalData.fromJson(json['total'] as Map<String, dynamic>),
       other: List<TotalData>.from(
-        (json['other'] as List).map((item) => TotalData.fromJson(item)),
+        (json['other'] as List<dynamic>)
+            .map((item) => TotalData.fromJson(item as Map<String, dynamic>)),
       ),
     );
   }

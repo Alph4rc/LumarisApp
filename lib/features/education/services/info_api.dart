@@ -1,19 +1,22 @@
-import 'dart:convert';
+import 'package:ios_club_app/features/education/models/info_model.dart';
+import 'package:ios_club_app/features/education/models/time_info.dart';
 import '../../../core/services/network_exception.dart';
 import 'edu_http_client_manager.dart';
 
 /// Info相关API
 class InfoApi {
   /// 获取学生信息完成度
-  static Future<String> getInfoCompletion() async {
+  static Future<List<InfoModel>> getInfoCompletion() async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Info/Completion',
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! List<dynamic>) {
+        throw NetworkException('信息完成度返回格式错误', -1);
+      }
+      return response
+          .map((item) => InfoModel.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -21,15 +24,15 @@ class InfoApi {
   }
 
   /// 获取时间信息
-  static Future<String> getTime() async {
+  static Future<TimeInfo> getTime() async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Info/Time',
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! Map<String, dynamic>) {
+        throw NetworkException('时间返回格式错误', -1);
+      }
+      return TimeInfo.fromJson(response);
     } catch (e) {
       _handleError(e);
       rethrow;

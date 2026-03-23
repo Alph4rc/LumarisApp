@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';

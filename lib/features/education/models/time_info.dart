@@ -1,3 +1,5 @@
+import 'edu_api_models.dart';
+
 class TimeInfo {
   final String? startTime;
   final String? endTime;
@@ -12,19 +14,23 @@ class TimeInfo {
   });
 
   factory TimeInfo.fromJson(Map<String, dynamic> json) {
-    final Map<String, String> extra = <String, String>{};
-    for (final key in json.keys) {
-      if (!['startTime', 'endTime', 'semester'].contains(key)) {
-        final value = json[key];
-        if (value is String) {
-          extra[key] = value;
-        }
+    final timeModel = TimeModel.fromJson(json);
+    final extra = <String, String>{};
+    for (final entry in json.entries) {
+      if (entry.key == 'startTime' ||
+          entry.key == 'endTime' ||
+          entry.key == 'semester') {
+        continue;
+      }
+      final value = entry.value;
+      if (value is String) {
+        extra[entry.key] = value;
       }
     }
 
     return TimeInfo(
-      startTime: json['startTime'] as String?,
-      endTime: json['endTime'] as String?,
+      startTime: timeModel.startTime,
+      endTime: timeModel.endTime,
       semester: json['semester'] as String?,
       extra: extra.isEmpty ? null : extra,
     );

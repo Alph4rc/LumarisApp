@@ -19,29 +19,25 @@ class PlanCourse {
 
   // 将对象转换为Map以便JSON编码
   Map<String, dynamic> toJson() => {
-        'Name': name,
-        'LessonType': lessonType,
-        'ExamMode': examMode,
-        'CourseTypeName': courseTypeName,
-        'Credits': credits,
-        'TermStr': termStr,
+        'name': name,
+        'lessonType': lessonType,
+        'examMode': examMode,
+        'courseTypeName': courseTypeName,
+        'credits': credits,
+        'termStr': termStr,
       };
 
   // 从Map创建PlanCourse对象
   factory PlanCourse.fromJson(Map<String, dynamic> json) {
     return PlanCourse(
-      name: json['Name'] as String? ?? json['name'] as String? ?? "",
-      lessonType:
-          json['LessonType'] as String? ?? json['lessonType'] as String? ?? "",
-      examMode:
-          json['ExamMode'] as String? ?? json['examMode'] as String? ?? "",
-      courseTypeName: json['CourseTypeName'] as String? ??
-          json['courseTypeName'] as String? ??
-          "",
-      credits: (json['Credits'] as num?)?.toDouble() ??
-          (json['credits'] as num?)?.toDouble() ??
-          0.0,
-      termStr: json['TermStr'] as String? ?? json['termStr'] as String? ?? "",
+      name: json['name'] as String? ?? "",
+      lessonType: json['lessonType'] as String? ?? "",
+      examMode: json['examMode'] as String? ?? "",
+      courseTypeName: json['courseTypeName'] as String? ?? "",
+      credits: json['credits'] == null
+          ? 0.0
+          : double.parse(json['credits'].toString()),
+      termStr: json['termStr'] as String? ?? "",
     );
   }
 
@@ -88,7 +84,11 @@ class PlanCourseList {
   factory PlanCourseList.fromMap(String term, List<dynamic> courses) =>
       PlanCourseList(
         term: term,
-        courses:
-            courses.map<PlanCourse>((e) => PlanCourse.fromJson(e)).toList(),
+        courses: courses.map<PlanCourse>((e) {
+          if (e is PlanCourse) {
+            return e;
+          }
+          return PlanCourse.fromJson(e as Map<String, dynamic>);
+        }).toList(),
       );
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 
 void main() {
   group('ScoreModel', () {

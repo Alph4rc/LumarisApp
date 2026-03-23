@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
