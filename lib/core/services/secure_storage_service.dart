@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 安全存储服务
@@ -6,6 +10,8 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 /// 使用 flutter_secure_storage 存储敏感信息（如密码、Token等）
 class SecureStorageService {
   SecureStorageService._();
+
+  static const String _macOsFallbackPrefix = 'secure_storage_fallback.';
 
   static final SecureStorageService _instance = SecureStorageService._();
 
@@ -16,19 +22,112 @@ class SecureStorageService {
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock,
     ),
+    mOptions: MacOsOptions(
+      accessibility: KeychainAccessibility.first_unlock,
+      usesDataProtectionKeychain: false,
+    ),
   );
 
+  bool get _shouldUseMacOsFallback => !kIsWeb && Platform.isMacOS;
+
+  String _fallbackKey(String key) => '$_macOsFallbackPrefix$key';
+
+  Future<bool> _writeFallback({
+    required String key,
+    required String? value,
+  }) async {
+    try {
+      final prefs = PrefsService.instance;
+      final fallbackKey = _fallbackKey(key);
+
+      if (value == null) {
+        await prefs.remove(fallbackKey);
+      } else {
+        await prefs.setString(fallbackKey, value);
+      }
+
+      return true;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'SecureStorage macOS fallback write error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
+  }
+
+  Future<String?> _readFallback({required String key}) async {
+    try {
+      final prefs = PrefsService.instance;
+      return prefs.getString(_fallbackKey(key));
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'SecureStorage macOS fallback read error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return null;
+    }
+  }
+
+  Future<bool> _deleteFallback({required String key}) async {
+    try {
+      final prefs = PrefsService.instance;
+      await prefs.remove(_fallbackKey(key));
+      return true;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'SecureStorage macOS fallback delete error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> _deleteAllFallback() async {
+    try {
+      final prefs = PrefsService.instance;
+      final keys = prefs
+          .getKeys()
+          .where((key) => key.startsWith(_macOsFallbackPrefix))
+          .toList();
+
+      for (final key in keys) {
+        await prefs.remove(key);
+      }
+
+      return true;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'SecureStorage macOS fallback deleteAll error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
+  }
+
   /// 保存字符串
-  Future<void> write({required String key, required String? value}) async {
+  Future<bool> write({required String key, required String? value}) async {
     try {
       if (value == null) {
         await _storage.delete(key: key);
       } else {
         await _storage.write(key: key, value: value);
       }
+      return true;
     } catch (e, stackTrace) {
       AppLogger.error('SecureStorage write error',
           error: e, stackTrace: stackTrace);
+      if (_shouldUseMacOsFallback) {
+        AppLogger.warning(
+          'SecureStorage write fallback to SharedPreferences on macOS',
+        );
+        return _writeFallback(key: key, value: value);
+      }
+      return false;
     }
   }
 
@@ -39,27 +138,49 @@ class SecureStorageService {
     } catch (e, stackTrace) {
       AppLogger.error('SecureStorage read error',
           error: e, stackTrace: stackTrace);
+      if (_shouldUseMacOsFallback) {
+        AppLogger.warning(
+          'SecureStorage read fallback to SharedPreferences on macOS',
+        );
+        return _readFallback(key: key);
+      }
       return null;
     }
   }
 
   /// 删除
-  Future<void> delete({required String key}) async {
+  Future<bool> delete({required String key}) async {
     try {
       await _storage.delete(key: key);
+      return true;
     } catch (e, stackTrace) {
       AppLogger.error('SecureStorage delete error',
           error: e, stackTrace: stackTrace);
+      if (_shouldUseMacOsFallback) {
+        AppLogger.warning(
+          'SecureStorage delete fallback to SharedPreferences on macOS',
+        );
+        return _deleteFallback(key: key);
+      }
+      return false;
     }
   }
 
   /// 清除所有
-  Future<void> deleteAll() async {
+  Future<bool> deleteAll() async {
     try {
       await _storage.deleteAll();
+      return true;
     } catch (e, stackTrace) {
       AppLogger.error('SecureStorage deleteAll error',
           error: e, stackTrace: stackTrace);
+      if (_shouldUseMacOsFallback) {
+        AppLogger.warning(
+          'SecureStorage deleteAll fallback to SharedPreferences on macOS',
+        );
+        return _deleteAllFallback();
+      }
+      return false;
     }
   }
 }

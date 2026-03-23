@@ -113,7 +113,14 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       // 保存登录信息
-      await _saveLoginInfo();
+      final saveLoginInfoSuccess = await _saveLoginInfo();
+
+      if (!saveLoginInfoSuccess && mounted) {
+        showClubSnackBar(
+          context,
+          const Text('登录成功，但安全存储不可用，下次启动后可能需要重新输入账号密码'),
+        );
+      }
 
       // 登录成功，返回上一页并传递成功标志
       if (mounted) {
@@ -206,16 +213,23 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   /// 保存登录信息
-  Future<void> _saveLoginInfo() async {
+  Future<bool> _saveLoginInfo() async {
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
+    var saveSuccess = true;
 
     if (!_isOnlyLoginMember) {
       await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
-      await secureStorage.write(
-          key: PrefsKeys.USERNAME, value: _usernameController.text);
-      await secureStorage.write(
-          key: PrefsKeys.PASSWORD, value: _passwordController.text);
+      saveSuccess = await secureStorage.write(
+            key: PrefsKeys.USERNAME,
+            value: _usernameController.text,
+          ) &&
+          saveSuccess;
+      saveSuccess = await secureStorage.write(
+            key: PrefsKeys.PASSWORD,
+            value: _passwordController.text,
+          ) &&
+          saveSuccess;
 
       final userDataString = prefs.getString(PrefsKeys.USER_DATA);
       if (userDataString != null) {
@@ -226,20 +240,34 @@ class _LoginPageState extends State<LoginPage> {
 
     if (_isOnlyLoginMember) {
       // 仅登录社团账号
-      await secureStorage.write(
-          key: PrefsKeys.CLUB_NAME, value: _usernameController.text);
-      await secureStorage.write(
-          key: PrefsKeys.CLUB_ID, value: _passwordController.text);
+      saveSuccess = await secureStorage.write(
+            key: PrefsKeys.CLUB_NAME,
+            value: _usernameController.text,
+          ) &&
+          saveSuccess;
+      saveSuccess = await secureStorage.write(
+            key: PrefsKeys.CLUB_ID,
+            value: _passwordController.text,
+          ) &&
+          saveSuccess;
       await userStore.setLoginMember();
     }
 
     if (_isLoginMember) {
-      await secureStorage.write(
-          key: PrefsKeys.CLUB_NAME, value: _nameController.text);
-      await secureStorage.write(
-          key: PrefsKeys.CLUB_ID, value: _usernameController.text);
+      saveSuccess = await secureStorage.write(
+            key: PrefsKeys.CLUB_NAME,
+            value: _nameController.text,
+          ) &&
+          saveSuccess;
+      saveSuccess = await secureStorage.write(
+            key: PrefsKeys.CLUB_ID,
+            value: _usernameController.text,
+          ) &&
+          saveSuccess;
       await userStore.setLoginMember();
     }
+
+    return saveSuccess;
   }
 
   @override

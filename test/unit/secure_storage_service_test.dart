@@ -43,15 +43,15 @@ void main() {
       });
 
       final service = SecureStorageService.instance;
-      await service.write(key: 'k1', value: 'v1');
+      expect(await service.write(key: 'k1', value: 'v1'), isTrue);
       expect(await service.read(key: 'k1'), 'v1');
 
-      await service.delete(key: 'k1');
+      expect(await service.delete(key: 'k1'), isTrue);
       expect(await service.read(key: 'k1'), isNull);
 
-      await service.write(key: 'a', value: '1');
-      await service.write(key: 'b', value: '2');
-      await service.deleteAll();
+      expect(await service.write(key: 'a', value: '1'), isTrue);
+      expect(await service.write(key: 'b', value: '2'), isTrue);
+      expect(await service.deleteAll(), isTrue);
       expect(await service.read(key: 'a'), isNull);
       expect(await service.read(key: 'b'), isNull);
     });
@@ -78,14 +78,14 @@ void main() {
       });
 
       final service = SecureStorageService.instance;
-      await service.write(key: 'k2', value: 'v2');
+      expect(await service.write(key: 'k2', value: 'v2'), isTrue);
       expect(await service.read(key: 'k2'), 'v2');
 
-      await service.write(key: 'k2', value: null);
+      expect(await service.write(key: 'k2', value: null), isTrue);
       expect(await service.read(key: 'k2'), isNull);
     });
 
-    test('should swallow platform exceptions and return null on read',
+    test('should swallow platform exceptions and expose failure status',
         () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (call) async {
@@ -93,9 +93,9 @@ void main() {
       });
 
       final service = SecureStorageService.instance;
-      await service.write(key: 'k3', value: 'v3');
-      await service.delete(key: 'k3');
-      await service.deleteAll();
+      expect(await service.write(key: 'k3', value: 'v3'), isFalse);
+      expect(await service.delete(key: 'k3'), isFalse);
+      expect(await service.deleteAll(), isFalse);
 
       final result = await service.read(key: 'k3');
       expect(result, isNull);
