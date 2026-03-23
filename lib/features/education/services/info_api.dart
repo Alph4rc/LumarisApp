@@ -24,10 +24,11 @@ class InfoApi {
   }
 
   /// 获取时间信息
-  static Future<TimeInfo> getTime() async {
+  static Future<TimeInfo> getTime({bool forceRefresh = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Info/Time',
+        bypassCache: forceRefresh,
       );
       if (response is! Map<String, dynamic>) {
         throw NetworkException('时间返回格式错误', -1);

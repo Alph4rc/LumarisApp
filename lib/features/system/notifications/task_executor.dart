@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/time_info.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
@@ -20,7 +21,7 @@ class TaskExecutor {
 
   /// 缓存的课程数据
   static List<CourseModel>? _cachedCourses;
-  static Map<String, String>? _cachedTime;
+  static TimeInfo? _cachedTime;
   static DateTime? _cacheTimestamp;
 
   /// 缓存有效期（5分钟）
@@ -62,7 +63,7 @@ class TaskExecutor {
       );
 
       _cachedCourses = results[0] as List<CourseModel>;
-      _cachedTime = results[1] as Map<String, String>;
+      _cachedTime = results[1] as TimeInfo;
       _cacheTimestamp = DateTime.now();
       AppLogger.debug('后台任务数据预加载完成');
     } catch (e) {
@@ -81,12 +82,12 @@ class TaskExecutor {
 
     final time = _cachedTime!;
     var now = DateTime.now();
-    if (time["startTime"] == null) {
+    if (time.startTime == null) {
       return (false, <CourseModel>[]);
     }
 
     var weekNow =
-        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
     var filteredCourses = _cachedCourses!.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
@@ -133,12 +134,12 @@ class TaskExecutor {
     final time = _cachedTime!;
     var now = DateTime.now();
 
-    if (time["startTime"] == null) {
+    if (time.startTime == null) {
       return {'today': <CourseModel>[], 'tomorrow': <CourseModel>[]};
     }
 
     var weekNow =
-        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
 
     // 获取今天的课程
     var todayCourses = _cachedCourses!.where((course) {

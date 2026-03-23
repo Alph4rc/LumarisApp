@@ -347,8 +347,8 @@ void main() {
 
       final result = await EduService.refresh();
       expect(result, isTrue);
-      expect(PrefsService.instance.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME),
-          isNotNull);
+      final courses = await CourseRepository().getCourses();
+      expect(courses, isEmpty);
     });
 
     test('loginFromData should return false on empty credentials', () async {
@@ -482,8 +482,6 @@ void main() {
       final stored = PrefsService.instance.getString(PrefsKeys.TIME_DATA);
       expect(stored, isNotNull);
       expect(stored!, contains('startTime'));
-      expect(
-          PrefsService.instance.getInt(PrefsKeys.TIME_LAST_UPDATED), isNotNull);
     });
 
     test('getSemester should persist semester payload when user data provided',
@@ -504,7 +502,6 @@ void main() {
       final stored = PrefsService.instance.getString(PrefsKeys.SEMESTER_DATA);
       expect(stored, isNotNull);
       expect(stored!, contains('2025-2'));
-      expect(PrefsService.instance.getInt(PrefsKeys.SEMESTER_TIME), isNotNull);
     });
 
     test('getCourse should persist parsed courses in refresh mode', () async {
@@ -552,8 +549,6 @@ void main() {
       final courses = await courseRepo.getCourses();
       expect(courses, hasLength(1));
       expect(courses.first.courseName, 'Math');
-      expect(PrefsService.instance.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME),
-          isNotNull);
     });
 
     test('getAllScore should save parsed score lists', () async {
@@ -570,6 +565,14 @@ void main() {
             ],
           }));
 
+      _mockEduResponse(
+        path: '/Score/Semester',
+        data: <String, dynamic>{
+          'data': <Map<String, String>>[
+            <String, String>{'value': '2025-2', 'text': '2025-2'}
+          ]
+        },
+      );
       _mockEduResponse(
         path: '/Score',
         data: <Map<String, dynamic>>[

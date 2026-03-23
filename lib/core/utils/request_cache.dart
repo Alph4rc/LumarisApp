@@ -313,12 +313,15 @@ class RequestCache {
 /// 缓存拦截器
 class CacheInterceptor extends Interceptor {
   final RequestCache _cache = RequestCache();
+  static const String bypassCacheKey = 'bypassCache';
 
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
+    final bypassCache = options.extra[bypassCacheKey] == true;
+
     // 只有GET请求才使用缓存
-    if (options.method == 'GET') {
+    if (options.method == 'GET' && !bypassCache) {
       final cachedData = await _cache.get(options.uri.toString(),
           params: options.queryParameters);
       if (cachedData != null) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -42,14 +43,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _checkLoginStatus() async {
     // 检查是否已有登录信息
+    final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
-    final username = await secureStorage.read(key: PrefsKeys.USERNAME);
+    final username = await secureStorage.read(key: PrefsKeys.USERNAME) ??
+        prefs.getString(PrefsKeys.USERNAME);
     final iosName = await secureStorage.read(key: PrefsKeys.CLUB_NAME);
 
     // 重置 _username
     _username = '';
 
-    if (userStore.isLogin && username != null) {
+    if (username != null && username.isNotEmpty) {
       _username = username;
     }
     if (userStore.isLoginMember && iosName != null) {

@@ -4,8 +4,12 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
+import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/features/education/services/edu_fetch_models.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,6 +42,7 @@ CourseModel _course({
 void main() {
   late Directory tempDir;
   late CourseRepository courseRepo;
+  late ScoreRepository scoreRepo;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -53,8 +58,18 @@ void main() {
     if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(CourseModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(ScoreModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(ScoreListAdapter());
+    }
+    if (!Hive.isAdapterRegistered(3)) {
+      Hive.registerAdapter(SemesterModelAdapter());
+    }
 
     courseRepo = CourseRepository();
+    scoreRepo = ScoreRepository();
   });
 
   tearDown(() async {
@@ -311,6 +326,54 @@ void main() {
       expect(list, hasLength(1));
       expect(list.first.type, 'electricity');
       expect(list.first.total.name, '宿舍');
+    });
+
+    test('should_return_local_snapshot_for_scores', () async {
+      final semester = SemesterModel(
+        semester: '2025-2026-2',
+        name: '2025-2026学年第二学期',
+      );
+      await scoreRepo.saveScores([
+        ScoreList(
+          semester: semester,
+          list: [
+            ScoreModel(
+              lessonName: '高数',
+              grade: '95',
+              gpa: '4.8',
+              credit: '3',
+            ),
+          ],
+        ),
+      ]);
+
+      final snapshot =
+          await DataService.getScores(policy: FetchPolicy.localFirst);
+
+      expect(snapshot.isFromLocal, isTrue);
+      expect(snapshot.isStale, isFalse);
+      expect(snapshot.data, hasLength(1));
+      expect(snapshot.data.first.semester.semester, '2025-2026-2');
+      expect(snapshot.data.first.list.first.lessonName, '高数');
+    });
+
+    test('should_return_local_snapshot_for_semesters', () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.SEMESTER_DATA,
+        jsonEncode({
+          'data': [
+            {'value': '2025-2026-2', 'text': '2025-2026学年第二学期'}
+          ]
+        }),
+      );
+
+      final snapshot =
+          await DataService.getSemesters(policy: FetchPolicy.localFirst);
+
+      expect(snapshot.isFromLocal, isTrue);
+      expect(snapshot.isStale, isFalse);
+      expect(snapshot.data, hasLength(1));
+      expect(snapshot.data.first.semester, '2025-2026-2');
     });
   });
 

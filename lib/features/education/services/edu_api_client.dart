@@ -20,19 +20,32 @@ import 'score_api.dart';
 
 class EduApiClient {
   /// 获取学期信息
-  static Future<SemesterResult> getSemester(String studentId) async {
-    return await ScoreApi.getSemester(studentId);
+  static Future<SemesterResult> getSemester(
+    String studentId, {
+    bool forceRefresh = false,
+  }) async {
+    return await ScoreApi.getSemester(studentId, forceRefresh: forceRefresh);
   }
 
   /// 获取课程信息
-  static Future<CourseResultResponse> getCourse(String studentId) async {
-    return await CourseApi.getCourse(studentId);
+  static Future<CourseResultResponse> getCourse(
+    String studentId, {
+    bool forceRefresh = false,
+  }) async {
+    return await CourseApi.getCourse(studentId, forceRefresh: forceRefresh);
   }
 
   /// 获取成绩信息
   static Future<List<ScoreModel>> getScore(
-      String studentId, String semester) async {
-    return await ScoreApi.getScore(studentId, semester);
+    String studentId,
+    String semester, {
+    bool forceRefresh = false,
+  }) async {
+    return await ScoreApi.getScore(
+      studentId,
+      semester,
+      forceRefresh: forceRefresh,
+    );
   }
 
   /// 获取考试信息
@@ -46,8 +59,9 @@ class EduApiClient {
   }
 
   /// 获取本学期成绩
-  static Future<SemesterModel> getThisSemester() async {
-    return await ScoreApi.getThisSemester();
+  static Future<SemesterModel> getThisSemester(
+      {bool forceRefresh = false}) async {
+    return await ScoreApi.getThisSemester(forceRefresh: forceRefresh);
   }
 
   /// 获取培养方案
@@ -62,8 +76,8 @@ class EduApiClient {
   }
 
   /// 获取时间信息
-  static Future<TimeInfo> getTime() async {
-    return await InfoApi.getTime();
+  static Future<TimeInfo> getTime({bool forceRefresh = false}) async {
+    return await InfoApi.getTime(forceRefresh: forceRefresh);
   }
 
   /// 获取校巴信息

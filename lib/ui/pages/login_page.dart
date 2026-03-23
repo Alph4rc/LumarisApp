@@ -210,33 +210,35 @@ class _LoginPageState extends State<LoginPage> {
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
 
+    if (!_isOnlyLoginMember) {
+      await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
+      await secureStorage.write(
+          key: PrefsKeys.USERNAME, value: _usernameController.text);
+      await secureStorage.write(
+          key: PrefsKeys.PASSWORD, value: _passwordController.text);
+
+      final userDataString = prefs.getString(PrefsKeys.USER_DATA);
+      if (userDataString != null) {
+        final userData = jsonDecode(userDataString);
+        await userStore.setUserData(UserData.fromJson(userData));
+      }
+    }
+
     if (_isOnlyLoginMember) {
       // 仅登录社团账号
       await secureStorage.write(
           key: PrefsKeys.CLUB_NAME, value: _usernameController.text);
       await secureStorage.write(
           key: PrefsKeys.CLUB_ID, value: _passwordController.text);
-      userStore.setLoginMember();
-    } else if (!_isOnlyLoginMember && !_isLoginMember) {
-      // 仅登录教务系统
-      await secureStorage.write(
-          key: PrefsKeys.USERNAME, value: _usernameController.text);
-      await secureStorage.write(
-          key: PrefsKeys.PASSWORD, value: _passwordController.text);
-      final userDataString = prefs.getString(PrefsKeys.USER_DATA);
-      if (userDataString != null) {
-        final userData = jsonDecode(userDataString);
-        userStore.setUserData(UserData.fromJson(userData));
-      }
+      await userStore.setLoginMember();
     }
 
-    // 同时登录两个账号的情况
     if (_isLoginMember) {
       await secureStorage.write(
           key: PrefsKeys.CLUB_NAME, value: _nameController.text);
       await secureStorage.write(
-          key: PrefsKeys.CLUB_ID, value: _passwordController.text);
-      userStore.setLoginMember();
+          key: PrefsKeys.CLUB_ID, value: _usernameController.text);
+      await userStore.setLoginMember();
     }
   }
 

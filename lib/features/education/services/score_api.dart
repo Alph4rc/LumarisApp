@@ -7,11 +7,15 @@ import 'edu_http_client_manager.dart';
 /// Score相关API
 class ScoreApi {
   /// 获取学期信息
-  static Future<SemesterResult> getSemester(String studentId) async {
+  static Future<SemesterResult> getSemester(
+    String studentId, {
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Score/Semester',
         queryParameters: {'studentId': studentId},
+        bypassCache: forceRefresh,
       );
       if (response is! Map<String, dynamic>) {
         throw NetworkException('学期返回格式错误', -1);
@@ -25,7 +29,10 @@ class ScoreApi {
 
   /// 获取成绩信息
   static Future<List<ScoreModel>> getScore(
-      String studentId, String semester) async {
+    String studentId,
+    String semester, {
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Score',
@@ -33,6 +40,7 @@ class ScoreApi {
           'studentId': studentId,
           'semester': semester,
         },
+        bypassCache: forceRefresh,
       );
       if (response is! List<dynamic>) {
         throw NetworkException('成绩返回格式错误', -1);
@@ -47,10 +55,12 @@ class ScoreApi {
   }
 
   /// 获取本学期成绩
-  static Future<SemesterModel> getThisSemester() async {
+  static Future<SemesterModel> getThisSemester(
+      {bool forceRefresh = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Score/ThisSemester',
+        bypassCache: forceRefresh,
       );
       if (response is! Map<String, dynamic>) {
         throw NetworkException('当前学期返回格式错误', -1);

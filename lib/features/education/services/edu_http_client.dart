@@ -284,12 +284,24 @@ class EduHttpClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
+    bool bypassCache = false,
   }) async {
     try {
+      final mergedOptions = options?.copyWith(
+            extra: <String, dynamic>{
+              ...?options.extra,
+              if (bypassCache) CacheInterceptor.bypassCacheKey: true,
+            },
+          ) ??
+          Options(
+            extra: bypassCache
+                ? <String, dynamic>{CacheInterceptor.bypassCacheKey: true}
+                : null,
+          );
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,
-        options: options,
+        options: mergedOptions,
       );
       return response.data;
     } on DioException catch (e) {

@@ -6,14 +6,18 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/time_info.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'edu_api_client.dart';
+import 'edu_fetch_models.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
@@ -169,9 +173,6 @@ class EduService {
       // 更新 Store
       final courseStore = Get.put(CourseStore());
       courseStore.loadCourses();
-
-      await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME,
-          DateTime.now().millisecondsSinceEpoch);
 
       return true;
     } catch (e, stackTrace) {
@@ -341,22 +342,32 @@ class EduService {
   /// @param userData 用户数据，如果为null则尝试从本地获取
   /// @return Future<void> 无返回值
   static Future<void> getSemester({UserData? userData}) async {
+    await fetchSemestersFromRemote(userData: userData);
+  }
+
+  static Future<List<SemesterModel>> fetchSemestersFromRemote({
+    UserData? userData,
+    bool forceRefresh = false,
+  }) async {
     UserData? cookieData = userData ?? await getUserData();
     if (cookieData == null) {
-      return;
+      return [];
     }
 
     try {
-      final response = await EduApiClient.getSemester(cookieData.studentId);
+      final response = await EduApiClient.getSemester(
+        cookieData.studentId,
+        forceRefresh: forceRefresh,
+      );
       final prefs = PrefsService.instance;
       await prefs.setString(
           PrefsKeys.SEMESTER_DATA, jsonEncode(response.toJson()));
-
-      final now = DateTime.now().microsecondsSinceEpoch;
-      await prefs.setInt(PrefsKeys.SEMESTER_TIME, now);
+      return response.data;
     } catch (e, stackTrace) {
       AppLogger.error('获取学期信息失败', error: e, stackTrace: stackTrace);
     }
+
+    return [];
   }
 
   /// 获取课程信息
@@ -368,56 +379,37 @@ class EduService {
   /// @return Future<void> 无返回值
   static Future<void> getCourse(
       {UserData? userData, bool isRefresh = false}) async {
-    final time = await DataService.getTime();
-    final week = await DataService.getWeek();
-    if (!isRefresh && (time.startTime == null || time.endTime == null)) {
-      return;
-    }
+    await fetchCoursesFromRemote(
+      userData: userData,
+      forceRefresh: isRefresh,
+    );
+  }
 
-    final startTime = DateTime.parse(time.startTime!);
-    final endTime = DateTime.parse(time.endTime!);
-
-    if (!isRefresh &&
-        (DateTime.now().isBefore(startTime) ||
-            DateTime.now().isAfter(endTime))) {
-      return;
-    }
-
-    final prefs = PrefsService.instance;
+  static Future<List<CourseModel>> fetchCoursesFromRemote({
+    UserData? userData,
+    bool forceRefresh = false,
+  }) async {
     final courseRepo = CourseRepository();
-    // 检查缓存逻辑暂时略过，因为 repository 内部没有暴露时间检查，
-    // 这里如果 isRefresh 为 false，我们可以先尝试从 repo 获取，如果为空再请求
-    // 但原逻辑是根据 PrefsKeys.COURSE_DATA 是否存在且周次>2 来判断
-    // 我们保留这个逻辑，但改为检查 Hive 中是否有数据
-
-    // 注意：这里为了兼容，我们还是检查 prefs 中的时间戳
-    final lastFetchTime = prefs.getInt(PrefsKeys.COURSE_LAST_FETCH_TIME);
-    final hasData = (await courseRepo.getCourses()).isNotEmpty;
-
-    if (hasData && lastFetchTime != null && week.week > 2 && !isRefresh) {
-      return;
-    }
-
     UserData? cookieData = userData ?? await getUserData();
     if (cookieData == null) {
-      return;
+      return [];
     }
 
     try {
-      final response = await EduApiClient.getCourse(cookieData.studentId);
+      final response = await EduApiClient.getCourse(
+        cookieData.studentId,
+        forceRefresh: forceRefresh,
+      );
       final courses = response.data;
 
-      // 即使是空数组也需要更新，因为可能原本有课现在退课了，或者学期切换了
-      // 存储到 Hive
       await courseRepo.saveCourses(courses);
-
       await DataService.setIgnore([]);
-      // 更新课程数据刷新时间
-      await prefs.setInt(PrefsKeys.COURSE_LAST_FETCH_TIME,
-          DateTime.now().millisecondsSinceEpoch);
+      return courses;
     } catch (e, stackTrace) {
       AppLogger.error('获取课程信息失败', error: e, stackTrace: stackTrace);
     }
+
+    return await courseRepo.getCourses();
   }
 
   /// 获取所有学期成绩
@@ -426,27 +418,7 @@ class EduService {
   /// @param userData 用户数据，如果为null则尝试从本地获取
   /// @return Future<void> 无返回值
   static Future<void> getAllScore({UserData? userData}) async {
-    var cookieData = userData ?? await getUserData();
-    if (cookieData == null) {
-      return;
-    }
-
-    try {
-      final list = await DataService.getSemester();
-      final List<ScoreList> scores = [];
-
-      for (var item in list) {
-        final scoreList =
-            await EduApiClient.getScore(cookieData.studentId, item.semester);
-
-        scores.add(ScoreList(semester: item, list: scoreList));
-      }
-
-      final scoreRepo = ScoreRepository();
-      await scoreRepo.saveScores(scores);
-    } catch (e, stackTrace) {
-      AppLogger.error('获取所有学期成绩失败', error: e, stackTrace: stackTrace);
-    }
+    await fetchScoresFromRemote(userData: userData, forceRefresh: true);
   }
 
   /// 从本地获取所有学期成绩
@@ -456,101 +428,69 @@ class EduService {
   /// @return Future<List<ScoreList>> 返回所有学期的成绩列表
   static Future<List<ScoreList>> getAllScoreFromLocal(
       {bool isRefresh = false}) async {
-    final prefs = PrefsService.instance;
+    final snapshot = await DataService.getScores(
+      policy: isRefresh ? FetchPolicy.refresh : FetchPolicy.localFirst,
+    );
+    return snapshot.data;
+  }
+
+  static Future<List<ScoreList>> fetchScoresFromRemote({
+    UserData? userData,
+    bool forceRefresh = false,
+  }) async {
     final scoreRepo = ScoreRepository();
-
-    var now = DateTime.now().millisecondsSinceEpoch;
-    final semesters = await DataService.getSemester();
-
-    // 从 Repository 获取缓存
     final cachedScoresList = await scoreRepo.getScores();
-    final Map<String, ScoreList> cachedScores = {
-      for (var s in cachedScoresList) s.semester.semester: s
+    final cachedScores = {
+      for (final score in cachedScoresList) score.semester.semester: score,
     };
 
-    UserData? cookieData = await getUserData();
+    UserData? cookieData = userData ?? await getUserData();
     if (cookieData == null) {
-      // 没有用户数据时，返回缓存数据
-      return cachedScoresList;
+      return _sortScores(cachedScoresList);
     }
 
-    // 缓存检查和增量更新
-    final List<ScoreList> updatedScores = [];
-
-    // 获取每个学期的缓存时间戳
-    final String? scoreTimestampsString =
-        prefs.getString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS');
-    final Map<String, int> scoreTimestamps = scoreTimestampsString != null
-        ? Map<String, int>.from(jsonDecode(scoreTimestampsString))
-        : {};
-
-    // 确定需要更新的学期
-    final List<dynamic> semestersToUpdate = [];
-
-    // 按学期排序，最新学期在前
-    final sortedSemesters = List.from(semesters);
-    sortedSemesters.sort((a, b) => b.semester.compareTo(a.semester));
-
-    for (var semester in sortedSemesters) {
-      final lastUpdate = scoreTimestamps[semester.semester];
-
-      // 为不同学期设置不同的缓存过期时间
-      // 最新学期：1小时过期
-      // 其他学期：7天过期
-      final isLatestSemester = semester == sortedSemesters.first;
-      final expiryTime =
-          isLatestSemester ? 1000 * 60 * 60 : 1000 * 60 * 60 * 24 * 7;
-      final isExpired = lastUpdate == null || now - lastUpdate > expiryTime;
-
-      if (isRefresh ||
-          isExpired ||
-          !cachedScores.containsKey(semester.semester)) {
-        semestersToUpdate.add(semester);
-      }
+    var semesters = await fetchSemestersFromRemote(
+      userData: cookieData,
+      forceRefresh: forceRefresh,
+    );
+    if (semesters.isEmpty) {
+      semesters = _readSemestersFromPrefs();
     }
 
-    // 只更新需要刷新的学期
-    if (semestersToUpdate.isNotEmpty) {
+    if (semesters.isEmpty) {
+      return _sortScores(cachedScoresList);
+    }
+
+    final mergedScores = Map<String, ScoreList>.from(cachedScores);
+    var fetchedAny = false;
+
+    for (final semester in semesters) {
       try {
-        for (var semester in semestersToUpdate) {
-          final list = await EduApiClient.getScore(
-              cookieData.studentId, semester.semester);
-          final scoreList = ScoreList(semester: semester, list: list);
-
-          updatedScores.add(scoreList);
-          // 更新时间戳
-          scoreTimestamps[semester.semester] = now;
-        }
-
-        // 合并更新的数据到缓存
-        final Map<String, ScoreList> mergedScoresMap = Map.from(cachedScores);
-        for (var s in updatedScores) {
-          mergedScoresMap[s.semester.semester] = s;
-        }
-
-        final mergedScoresList = mergedScoresMap.values.toList();
-
-        // 排序
-        mergedScoresList
-            .sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
-
-        // 保存更新后的数据和时间戳
-        await scoreRepo.saveScores(mergedScoresList);
-
-        await prefs.setString('${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS',
-            jsonEncode(scoreTimestamps));
-        await prefs.setInt(PrefsKeys.LAST_SCORE_TIME, now);
-
-        return mergedScoresList;
+        final list = await EduApiClient.getScore(
+          cookieData.studentId,
+          semester.semester,
+          forceRefresh: forceRefresh,
+        );
+        mergedScores[semester.semester] = ScoreList(
+          semester: semester,
+          list: list,
+        );
+        fetchedAny = true;
       } catch (e, stackTrace) {
-        AppLogger.error('获取成绩数据失败', error: e, stackTrace: stackTrace);
+        AppLogger.error(
+          '获取学期 ${semester.semester} 成绩失败',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
 
-    // 返回缓存数据 (需确保排序)
-    cachedScoresList
-        .sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
-    return cachedScoresList;
+    final mergedScoresList = _sortScores(mergedScores.values.toList());
+    if (fetchedAny) {
+      await scoreRepo.saveScores(mergedScoresList);
+    }
+
+    return mergedScoresList;
   }
 
   /// 获取考试信息
@@ -579,15 +519,22 @@ class EduService {
   ///
   /// @return Future<void> 无返回值
   static Future<void> getTime() async {
+    await fetchTimeInfoFromRemote();
+  }
+
+  static Future<TimeInfo?> fetchTimeInfoFromRemote({
+    bool forceRefresh = false,
+  }) async {
     try {
-      final response = await EduApiClient.getTime();
+      final response = await EduApiClient.getTime(forceRefresh: forceRefresh);
       final prefs = PrefsService.instance;
       await prefs.setString(PrefsKeys.TIME_DATA, jsonEncode(response.toJson()));
-      final now = DateTime.now().millisecondsSinceEpoch;
-      await prefs.setInt(PrefsKeys.TIME_LAST_UPDATED, now);
+      return response;
     } catch (e, stackTrace) {
       AppLogger.error('获取时间信息失败', error: e, stackTrace: stackTrace);
     }
+
+    return null;
   }
 
   /// 获取学生信息完成度
@@ -697,5 +644,35 @@ class EduService {
     }
 
     return [];
+  }
+
+  static List<SemesterModel> _readSemestersFromPrefs() {
+    final prefs = PrefsService.instance;
+    final jsonString = prefs.getString(PrefsKeys.SEMESTER_DATA);
+    if (jsonString == null || jsonString.isEmpty) {
+      return [];
+    }
+
+    try {
+      final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
+      final data = decoded['data'];
+      if (data is! List) {
+        return [];
+      }
+
+      return data
+          .whereType<Map>()
+          .map((item) => SemesterModel.fromJson(
+              Map<String, dynamic>.from(item)))
+          .toList();
+    } catch (e, stackTrace) {
+      AppLogger.error('读取本地学期数据失败', error: e, stackTrace: stackTrace);
+      return [];
+    }
+  }
+
+  static List<ScoreList> _sortScores(List<ScoreList> scores) {
+    scores.sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
+    return scores;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -135,11 +136,13 @@ Sidebar macosUISidebar({
 
 Future<String> _getUsername() async {
   final UserStore userStore = UserStore.to;
+  final prefs = PrefsService.instance;
   final secureStorage = SecureStorageService.instance;
   var name = '未登录';
 
   if (userStore.isLogin) {
-    final iosName = await secureStorage.read(key: PrefsKeys.USERNAME);
+    final iosName = await secureStorage.read(key: PrefsKeys.USERNAME) ??
+        prefs.getString(PrefsKeys.USERNAME);
     if (iosName != null) {
       name = iosName;
     }

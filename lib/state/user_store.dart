@@ -76,6 +76,8 @@ class UserStore extends GetxController {
     final secureStorage = SecureStorageService.instance;
 
     await prefs.remove(PrefsKeys.USER_DATA);
+    await prefs.remove(PrefsKeys.USERNAME);
+    await prefs.remove(PrefsKeys.PASSWORD);
     await prefs.remove(PrefsKeys.COURSE_LAST_FETCH_TIME);
     await prefs.remove(PrefsKeys.EXAM_DATA);
     await prefs.remove(PrefsKeys.INFO_DATA);
