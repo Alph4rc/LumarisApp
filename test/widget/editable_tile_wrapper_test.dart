@@ -190,30 +190,6 @@ void main() {
     });
   });
 
-  group('DraggableTileItem', () {
-    testWidgets('should_create_draggable_tile', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DraggableTileItem(
-              tileId: '电费',
-              index: 0,
-              child: Container(
-                width: 100,
-                height: 100,
-                color: Colors.red,
-                child: const Text('Draggable'),
-              ),
-            ),
-          ),
-        ),
-      );
-      await pumpFrames(tester);
-
-      expect(find.text('Draggable'), findsOneWidget);
-    });
-  });
-
   group('TapReorderTileItem', () {
     testWidgets('should_show_selection_indicator_when_selected',
         (WidgetTester tester) async {
