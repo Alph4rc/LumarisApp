@@ -254,18 +254,17 @@ void main() {
       );
     });
 
-    test('should_throw_error_when_hiding_all_tiles', () {
+    test('should_allow_hiding_all_tiles', () {
       final config = TileConfigurationList(
         configurations: [
-          const TileConfiguration(id: '电费', order: 0, isVisible: true),
+          TileConfiguration(id: '电费', order: 0, isVisible: true),
         ],
         lastModified: DateTime.now(),
       );
 
-      expect(
-        () => config.toggleVisibility('电费'),
-        throwsA(isA<StateError>()),
-      );
+      final newConfig = config.toggleVisibility('电费');
+      expect(newConfig.getVisibleTiles().length, 0);
+      expect(newConfig.configurations[0].isVisible, false);
     });
 
     test('should_normalize_orders_correctly', () {

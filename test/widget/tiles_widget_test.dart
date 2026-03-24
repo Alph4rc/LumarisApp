@@ -8,6 +8,7 @@ import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/pages/homePages/tiles_widget.dart';
+import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _TestElectricityStore extends ElectricityStore {
@@ -244,25 +245,21 @@ void main() {
   });
 
   group('TilesWidget - Error Handling', () {
-    testWidgets('should_show_error_when_hiding_all_tiles',
+    testWidgets('should_show_empty_state_when_all_tiles_hidden',
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
       await tester.pumpWidget(createTestWidget());
       await pumpFrames(tester);
 
-      // Hide tiles until only one left
+      // Hide all tiles
       final visibleIds = controller.visibleTiles.map((t) => t.id).toList();
-      for (var i = 0; i < visibleIds.length - 1; i++) {
-        await controller.toggleVisibility(visibleIds[i]);
+      for (var id in visibleIds) {
+        await controller.toggleVisibility(id);
       }
       await pumpFrames(tester);
 
-      // Try to hide the last tile
-      final lastVisible = controller.visibleTiles.single.id;
-      await expectLater(
-        controller.toggleVisibility(lastVisible),
-        throwsA(isA<StateError>()),
-      );
+      // Verify empty state is shown
+      expect(find.byType(EmptyTilesMessage), findsOneWidget);
     });
 
     testWidgets('should_handle_invalid_reorder_gracefully',

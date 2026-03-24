@@ -162,12 +162,10 @@ class TileConfigurationList {
 
     final tile = configurations[tileIndex];
     final nextVisible = !tile.isVisible;
-
-    // Enforce at least one visible tile.
     final visibleCount = configurations.where((t) => t.isVisible).length;
-    if (!nextVisible && visibleCount <= 1) {
-      throw StateError('At least one tile must remain visible');
-    }
+
+    // We allow hiding all tiles, so no restriction is needed.
+    // The UI handles empty state.
 
     final newConfigurations = List<TileConfiguration>.from(configurations);
     if (nextVisible) {

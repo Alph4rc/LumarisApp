@@ -151,7 +151,7 @@ void main() {
       await pumpFrames(tester);
     });
 
-    testWidgets('should_show_error_when_hiding_last_tile',
+    testWidgets('should_allow_hiding_last_tile',
         (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
 
@@ -182,8 +182,8 @@ void main() {
       await tester.tap(find.byIcon(Icons.remove));
       await pumpFrames(tester);
 
-      // Should show snackbar
-      expect(find.text('至少需要保留一个磁贴'), findsOneWidget);
+      // Verify that it was hidden successfully (visibility is false)
+      expect(controller.isTileVisible('饭卡'), isFalse);
 
       await controller.forceExitEditMode();
       await pumpFrames(tester);

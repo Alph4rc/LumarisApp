@@ -175,9 +175,7 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
         try {
           await controller.toggleVisibility(widget.tileId);
         } catch (e) {
-          if (mounted) {
-            showClubSnackBar(context, const Text('至少需要保留一个磁贴'));
-          }
+          // Ignore error, or log it if needed
         }
       },
       child: Container(
