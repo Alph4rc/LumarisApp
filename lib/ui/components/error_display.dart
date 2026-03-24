@@ -92,16 +92,16 @@ class ErrorBanner extends StatelessWidget {
 /// 使用示例：
 /// ```dart
 /// Obx(() {
-///   if (controller.isLoading.value) {
+///   if (controllers.isLoading.value) {
 ///     return LoadingWidget();
 ///   }
-///   if (controller.errorMessage.value.isNotEmpty) {
+///   if (controllers.errorMessage.value.isNotEmpty) {
 ///     return RetryableErrorWidget(
-///       message: controller.errorMessage.value,
-///       onRetry: () => controller.loadData(),
+///       message: controllers.errorMessage.value,
+///       onRetry: () => controllers.loadData(),
 ///     );
 ///   }
-///   return DataWidget(data: controller.data);
+///   return DataWidget(data: controllers.data);
 /// })
 /// ```
 class RetryableErrorWidget extends StatelessWidget {

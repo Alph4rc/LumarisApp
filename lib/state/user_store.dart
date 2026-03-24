@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:ios_club_app/features/education/controllers/program_controller.dart';
+import 'package:ios_club_app/ui/controllers/program_controller.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';

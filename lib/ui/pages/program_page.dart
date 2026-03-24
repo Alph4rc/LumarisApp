@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:ios_club_app/features/education/controllers/program_controller.dart';
+import 'package:ios_club_app/ui/controllers/program_controller.dart';
 
 class ProgramPage extends StatelessWidget {
   const ProgramPage({super.key});
