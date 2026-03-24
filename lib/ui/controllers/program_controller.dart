@@ -1,7 +1,7 @@
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/features/education/services/program_service.dart';
 import 'package:flutter/material.dart';
 
 class ProgramController extends GetxController {
@@ -40,7 +40,7 @@ class ProgramController extends GetxController {
     try {
       isLoading(true);
       isError(false);
-      final result = await EduService.getPrograms();
+      final result = await ProgramService.getPrograms();
       programs.assignAll(result);
 
       // Initialize TabController after data is loaded

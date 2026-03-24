@@ -1,0 +1,268 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart' hide Response;
+import 'package:hive/hive.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/core/repositories/course_repository.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/models/todo_item.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/features/education/services/auth_service.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/education/services/edu_time_service.dart';
+import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/features/education/services/login_service.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void registerHiveAdapters() {
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(CourseModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(ScoreModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(ScoreListAdapter());
+  }
+  if (!Hive.isAdapterRegistered(3)) {
+    Hive.registerAdapter(SemesterModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(4)) {
+    Hive.registerAdapter(TodoItemAdapter());
+  }
+}
+
+void mockEduResponse({
+  required String path,
+  required dynamic data,
+  int statusCode = 200,
+}) {
+  EduHttpClientManager.instance.dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) {
+        if (options.path == path) {
+          handler.resolve(
+            Response<dynamic>(
+              requestOptions: options,
+              statusCode: statusCode,
+              data: data,
+            ),
+          );
+          return;
+        }
+        handler.next(options);
+      },
+    ),
+  );
+}
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  final secureStore = <String, String>{};
+  late Directory tempDir;
+
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await PrefsService.init();
+    Get.testMode = true;
+
+    tempDir = await Directory.systemTemp.createTemp(
+      'education_domain_services_test_',
+    );
+    Hive.init(tempDir.path);
+    registerHiveAdapters();
+  });
+
+  setUp(() async {
+    secureStore.clear();
+    await PrefsService.instance.clear();
+    Get.reset();
+    LoginService.setLoginOverrideForTest(null);
+
+    for (final boxName in <String>[
+      'request_cache',
+      'courses',
+      'scores',
+      'todos'
+    ]) {
+      final box = await Hive.openBox(boxName);
+      await box.clear();
+    }
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+      final key = call.arguments['key'] as String?;
+      switch (call.method) {
+        case 'write':
+          final value = call.arguments['value'] as String?;
+          if (key != null && value != null) {
+            secureStore[key] = value;
+          }
+          return null;
+        case 'read':
+          if (key == null) {
+            return null;
+          }
+          return secureStore[key];
+        case 'delete':
+          if (key != null) {
+            secureStore.remove(key);
+          }
+          return null;
+        case 'deleteAll':
+          secureStore.clear();
+          return null;
+      }
+      return null;
+    });
+
+    final manager = Get.put(EduHttpClientManager());
+    manager.updateSchoolConfig(
+      const SchoolConfig(
+        id: 'offline',
+        name: 'Offline',
+        eduApiBaseUrl: 'http://127.0.0.1:1',
+      ),
+    );
+  });
+
+  tearDown(() async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
+    LoginService.setLoginOverrideForTest(null);
+    Get.reset();
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    if (await tempDir.exists()) {
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  group('education domain services', () {
+    test('AuthService.loginFromData should persist login payload', () async {
+      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
+            'success': true,
+            'studentId': '2026888',
+            'cookie': 'cookie-auth-service',
+          });
+
+      final ok = await AuthService.loginFromData('u', 'p');
+
+      expect(ok, isTrue);
+      expect(
+        PrefsService.instance.getString(PrefsKeys.USER_DATA),
+        contains('cookie-auth-service'),
+      );
+      expect(
+          PrefsService.instance.getInt(PrefsKeys.LAST_FETCH_TIME), isNotNull);
+    });
+
+    test('CourseService.fetchCoursesFromRemote should persist repository data',
+        () async {
+      await CourseService.setIgnore(<String>['旧忽略']);
+      mockEduResponse(
+        path: '/Course',
+        data: <String, dynamic>{
+          'success': true,
+          'data': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'lessonId': 'L1',
+              'courseName': '软件工程',
+              'weekIndexes': <int>[1, 2],
+              'teachers': <String>['Teacher'],
+              'room': 'A101',
+              'weekday': 1,
+              'startUnit': 1,
+              'endUnit': 2,
+              'campus': '雁塔校区',
+            },
+          ],
+          'expirationTime': '2026-03-23T00:00:00.000',
+        },
+      );
+
+      final courses = await CourseService.fetchCoursesFromRemote(
+        userData: UserData(studentId: '2026001', cookie: 'cookie'),
+      );
+
+      expect(courses, hasLength(1));
+      expect(courses.first.courseName, '软件工程');
+      expect(await CourseRepository().getCourses(), hasLength(1));
+      expect(await CourseService.getIgnore(), isEmpty);
+    });
+
+    test(
+        'EducationRefreshService.loginAndRefresh should preload time and courses',
+        () async {
+      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
+            'success': true,
+            'studentId': '2026999',
+            'cookie': 'cookie-refresh-service',
+          });
+      mockEduResponse(
+        path: '/Score/Semester',
+        data: <String, dynamic>{
+          'data': <Map<String, String>>[
+            <String, String>{'value': '2025-2', 'text': '2025-2'}
+          ]
+        },
+      );
+      mockEduResponse(
+        path: '/Info/Time',
+        data: <String, dynamic>{
+          'startTime': '2026-02-20T00:00:00.000',
+          'endTime': '2026-07-20T00:00:00.000',
+        },
+      );
+      mockEduResponse(
+        path: '/Exam',
+        data: <String, dynamic>{
+          'exams': <Map<String, dynamic>>[],
+          'canClick': false,
+          'error': null,
+        },
+      );
+      mockEduResponse(path: '/Info/Completion', data: <Map<String, dynamic>>[]);
+      mockEduResponse(
+        path: '/Course',
+        data: <String, dynamic>{
+          'success': true,
+          'data': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'lessonId': 'L2',
+              'courseName': '数据库系统',
+              'weekIndexes': <int>[1, 2],
+              'teachers': <String>['Teacher'],
+              'room': 'B202',
+              'weekday': 2,
+              'startUnit': 3,
+              'endUnit': 4,
+              'campus': '雁塔校区',
+            },
+          ],
+          'expirationTime': '2026-03-23T00:00:00.000',
+        },
+      );
+
+      final ok = await EducationRefreshService.loginAndRefresh('u', 'p');
+      final week = await EduTimeService.getWeek();
+
+      expect(ok, isTrue);
+      expect(PrefsService.instance.getString(PrefsKeys.TIME_DATA), isNotNull);
+      expect(await CourseRepository().getCourses(), hasLength(1));
+      expect(week.maxWeek, greaterThan(0));
+    });
+  });
+}

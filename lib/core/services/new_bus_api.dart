@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
-
-import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 新数据平台
@@ -52,7 +51,7 @@ Future<BusModel> getBusFromNewData({
 
     // 如果没有数据，调用旧数据接口
     if (dfBusPlans == null || dfBusPlans.isEmpty) {
-      return await EduService.getBus(dayDate: time);
+      return await BusService.getBus(dayDate: time);
     }
 
     // 处理数据

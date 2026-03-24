@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/time_info.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
@@ -53,8 +54,8 @@ class TaskExecutor {
     try {
       // 并行获取课程和时间数据
       final results = await Future.wait([
-        DataService.getAllCourse(),
-        DataService.getTime(),
+        CourseService.getAllCourse(),
+        EduTimeService.getTime(),
       ]).timeout(
         const Duration(seconds: 30),
         onTimeout: () {

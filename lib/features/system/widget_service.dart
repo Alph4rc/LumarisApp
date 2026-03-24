@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:home_widget/home_widget.dart';
 
 import 'package:ios_club_app/core/models/schedule_item.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 
 class WidgetService {
   static const String iOSWidgetGroupId = 'group.com.example.iosClubApp.widget';
@@ -31,7 +31,7 @@ class WidgetService {
 
     final now = DateTime.now();
 
-    final week = await DataService.getWeek();
+    final week = await EduTimeService.getWeek();
     const a = ['日', '一', '二', '三', '四', '五', '六', '日'];
     final weekNow = week.week;
 

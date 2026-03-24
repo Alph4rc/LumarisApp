@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/services/info_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 
@@ -230,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
             FutureBuilder(
                 key: ValueKey('info_data_$_dataRefreshKey'),
                 // 添加超时保护：最多10秒
-                future: DataService.getInfoList().timeout(
+                future: InfoService.getInfoList().timeout(
                   const Duration(seconds: 10),
                   onTimeout: () {
                     AppLogger.warning('[ProfilePage] 获取信息列表超时');

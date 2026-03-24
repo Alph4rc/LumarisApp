@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
-import 'package:ios_club_app/features/education/services/edu_fetch_models.dart';
+import 'package:ios_club_app/features/education/models/edu_fetch_models.dart';
+import 'package:ios_club_app/features/education/services/score_service.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
@@ -64,7 +64,7 @@ class _ScorePageState extends State<ScorePage>
     }
 
     final localSnapshot =
-        await DataService.getScores(policy: FetchPolicy.localFirst);
+        await ScoreService.getScores(policy: FetchPolicy.localFirst);
     if (localSnapshot.data.isNotEmpty) {
       _applyScoreData(localSnapshot.data, isLoading: false);
       unawaited(_loadScores(
@@ -91,7 +91,7 @@ class _ScorePageState extends State<ScorePage>
     });
 
     try {
-      final snapshot = await DataService.getScores(policy: policy).timeout(
+      final snapshot = await ScoreService.getScores(policy: policy).timeout(
         const Duration(seconds: 15),
         onTimeout: () {
           throw TimeoutException('获取成绩数据超时');

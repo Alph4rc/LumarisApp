@@ -22,7 +22,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'main_app.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
 import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
@@ -59,7 +59,7 @@ void main() async {
   }
 
   // 尝试迁移旧的凭证数据到安全存储
-  await EduService.migrateCredentials();
+  await AuthService.migrateCredentials();
 
   // 初始化性能监控
   PerformanceMonitor().initialize();

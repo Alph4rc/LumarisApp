@@ -9,9 +9,9 @@ import 'package:intl/intl.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
@@ -279,7 +279,7 @@ class NotificationService {
       await NotificationService.instance.initialize();
     }
 
-    final a = await DataService.getTodayOrTomorrowCourse();
+    final a = await CourseService.getTodayOrTomorrowCourse();
     final now = DateTime.now();
 
     for (var course in a.$2) {

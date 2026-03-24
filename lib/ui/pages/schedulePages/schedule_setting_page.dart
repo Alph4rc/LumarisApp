@@ -4,7 +4,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
@@ -70,7 +70,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   Future<void> _loadCourseData() async {
     try {
       await courseStore.loadIgnoreCourses();
-      final courseNames = await DataService.getCourseName();
+      final courseNames = await CourseService.getCourseName();
 
       final ignores = courseNames
           .map((i) => CourseIgnore(
@@ -490,7 +490,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
       }
 
       courseStore.setIgnoreCourses(ignoreList);
-      return DataService.setIgnore(ignoreList);
+      return CourseService.setIgnore(ignoreList);
     });
   }
 

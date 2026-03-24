@@ -8,7 +8,8 @@ import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/club_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/features/education/services/education_cache_service.dart';
+import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
@@ -149,7 +150,8 @@ class _LoginPageState extends State<LoginPage> {
 
   /// 登录教务系统
   Future<bool> _loginToEduSystem() async {
-    final result = await EduService.loginFromData(
+    await EducationCacheService.clearEduCache();
+    final result = await EducationRefreshService.loginAndRefresh(
       _usernameController.text,
       _passwordController.text,
     );

@@ -9,7 +9,6 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/course_api.dart';
-import 'package:ios_club_app/features/education/services/edu_api_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/exam_api.dart';
 import 'package:ios_club_app/features/education/services/info_api.dart';
@@ -81,33 +80,6 @@ void main() {
       ];
 
       for (final call in calls) {
-        await expectStringOrNetworkException(call);
-      }
-    });
-
-    test(
-        'EduApiClient delegated methods should execute without unexpected type',
-        () async {
-      final delegatedCalls = <Future<dynamic> Function()>[
-        () => EduApiClient.getSemester('2026001'),
-        () => EduApiClient.getCourse('2026001'),
-        () => EduApiClient.getScore('2026001', '2025-2'),
-        () => EduApiClient.getExam('2026001'),
-        () => EduApiClient.getInfoCompletion(),
-        () => EduApiClient.getThisSemester(),
-        () => EduApiClient.getProgram('2026001'),
-        () => EduApiClient.getProgramDic('2026001'),
-        () => EduApiClient.getTime(),
-        () => EduApiClient.getBus(dayDate: '2026-03-02'),
-        () => EduApiClient.getAppInfo(token: 'x'),
-        () => EduApiClient.getBusNewData('0830', loc: 'ALL'),
-        () => EduApiClient.getBusOldData('0830', isShow: false),
-        () => EduApiClient.login('u1', 'p1'),
-        () => EduApiClient.getPayment('p1'),
-        () => EduApiClient.getPaymentTurnover('p1'),
-      ];
-
-      for (final call in delegatedCalls) {
         await expectStringOrNetworkException(call);
       }
     });

@@ -1,671 +1,90 @@
-import 'dart:convert';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/core/models/course_time.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
-import 'package:ios_club_app/features/education/models/week_info.dart';
-import 'package:ios_club_app/features/education/models/time_info.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/features/education/models/course_model.dart';
-import 'package:ios_club_app/core/models/course_time.dart';
 import 'package:ios_club_app/features/education/models/semester_model.dart';
-import 'package:ios_club_app/core/services/time_service.dart';
-import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/core/repositories/course_repository.dart';
-import 'package:ios_club_app/core/repositories/score_repository.dart';
-import 'package:ios_club_app/features/education/services/edu_fetch_models.dart';
+import 'package:ios_club_app/features/education/models/time_info.dart';
+import 'package:ios_club_app/features/education/models/week_info.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/education/models/edu_fetch_models.dart';
+import 'package:ios_club_app/features/education/services/edu_time_service.dart';
+import 'package:ios_club_app/features/education/services/info_service.dart';
+import 'package:ios_club_app/features/education/services/score_service.dart';
 
-/// 数据服务类，负责处理应用程序的各种数据操作
-///
-/// 包括课程、成绩、学期、时间等数据的获取和管理，是应用数据层的核心组件。
-/// 封装了与本地存储和网络请求相关的复杂逻辑，提供简洁的API供上层调用。
+/// 兼容层，勿新增逻辑。
+@Deprecated('Use education domain services instead.')
 class DataService {
   static Future<FetchSnapshot<List<CourseModel>>> getCourses({
     FetchPolicy policy = FetchPolicy.localFirst,
     bool includeIgnored = false,
-  }) async {
-    final localCourses = await _readCoursesFromLocal(
+  }) {
+    return CourseService.getCourses(
+      policy: policy,
       includeIgnored: includeIgnored,
     );
-
-    switch (policy) {
-      case FetchPolicy.localFirst:
-        if (localCourses.isNotEmpty) {
-          return FetchSnapshot<List<CourseModel>>(
-            data: localCourses,
-            isFromLocal: true,
-            isStale: false,
-          );
-        }
-
-        return _refreshCourses(includeIgnored: includeIgnored);
-      case FetchPolicy.refresh:
-        return _refreshCourses(
-          includeIgnored: includeIgnored,
-          fallbackCourses: localCourses,
-        );
-      case FetchPolicy.fallbackToLocal:
-        return _refreshCourses(
-          includeIgnored: includeIgnored,
-          fallbackCourses: localCourses,
-        );
-    }
   }
 
-  /// 获取所有课程数据
-  ///
-  /// 从本地存储获取课程数据，如果超过一周未更新，则自动从服务器刷新。
-  ///
-  /// @param isNeedIgnore 是否需要忽略某些课程，默认为true
-  /// @return 课程模型列表
-  static Future<List<CourseModel>> getAllCourse(
-      {bool isNeedIgnore = true}) async {
-    final snapshot = await getCourses(
-      includeIgnored: !isNeedIgnore,
-    );
-    return snapshot.data;
+  static Future<List<CourseModel>> getAllCourse({
+    bool isNeedIgnore = true,
+  }) {
+    return CourseService.getAllCourse(isNeedIgnore: isNeedIgnore);
   }
 
-  /// 获取所有课程名称
-  ///
-  /// 从本地存储获取所有课程的名称，去除重复项。
-  ///
-  /// @return 不重复的课程名称列表
-  static Future<List<String>> getCourseName() async {
-    final courseRepo = CourseRepository();
-    final courses = await courseRepo.getCourses();
-    final List<String> list = [];
-    for (var c in courses) {
-      if (!c.isCustom && !list.any((x) => x == c.courseName)) {
-        list.add(c.courseName);
-      }
-    }
-    return list;
+  static Future<List<String>> getCourseName() => CourseService.getCourseName();
+
+  static Future<void> setIgnore(List<String> list) =>
+      CourseService.setIgnore(list);
+
+  static Future<List<String>> getIgnore() => CourseService.getIgnore();
+
+  static Future<WeekInfo> getWeek({bool isRefresh = false}) {
+    return EduTimeService.getWeek(isRefresh: isRefresh);
   }
 
-  /// 设置需要忽略的课程列表
-  ///
-  /// 将需要忽略的课程名称列表保存到本地存储。
-  ///
-  /// @param list 需要忽略的课程名称列表
-  static Future<void> setIgnore(List<String> list) async {
-    final prefs = PrefsService.instance;
-    prefs.setString(PrefsKeys.IGNORE_DATA, jsonEncode({"data": list}));
+  static Future<List<CourseModel>> getCourseByWeek({int week = 0}) {
+    return CourseService.getCourseByWeek(week: week);
   }
 
-  /// 获取被忽略的课程列表
-  ///
-  /// 从本地存储获取被忽略的课程名称列表。
-  ///
-  /// @return 被忽略的课程名称列表
-  static Future<List<String>> getIgnore() async {
-    final prefs = PrefsService.instance;
-    final String? jsonString = prefs.getString(PrefsKeys.IGNORE_DATA);
-    final List<String> list = [];
-    if (jsonString != null) {
-      var jsonList = jsonDecode(jsonString);
-      jsonList = jsonList["data"];
-      for (var json in jsonList) {
-        list.add(json);
-      }
-    }
-    return list;
+  static Future<(bool, List<CourseModel>)> getTodayOrTomorrowCourse({
+    bool isTomorrow = false,
+  }) {
+    return CourseService.getTodayOrTomorrowCourse(isTomorrow: isTomorrow);
   }
 
-  /// 计算当前周数和总周数
-  ///
-  /// 根据学期开始时间和结束时间计算当前是第几周以及学期总周数。
-  ///
-  /// @param isRefresh 是否强制刷新时间数据
-  /// @return 包含当前周数(week)和最大周数(maxWeek)的WeekInfo
-  static Future<WeekInfo> getWeek({bool isRefresh = false}) async {
-    final time = await getTimeInfo(
-      policy: isRefresh ? FetchPolicy.refresh : FetchPolicy.localFirst,
-    );
-    final timeInfo = time.data;
-    if (timeInfo.startTime == null) {
-      return WeekInfo(week: 0, maxWeek: 0);
-    }
-
-    final startTime = DateTime.parse(timeInfo.startTime!);
-    final endTime = DateTime.parse(timeInfo.endTime!);
-    final now = DateTime.now();
-
-    // 获取某个日期所在周的周日（一周的第一天）
-    DateTime getWeekStart(DateTime date) {
-      // DateTime.weekday: 1=Monday, 2=Tuesday, ..., 7=Sunday
-      // 我们需要调整为：0=Sunday, 1=Monday, ..., 6=Saturday
-      int daysSinceWeekStart = date.weekday == 7 ? 0 : date.weekday;
-      return DateTime(date.year, date.month, date.day)
-          .subtract(Duration(days: daysSinceWeekStart));
-    }
-
-    // 计算开学时间所在周的周日
-    final startWeekSunday = getWeekStart(startTime);
-
-    // 计算当前时间所在周的周日
-    final currentWeekSunday = getWeekStart(now);
-
-    // 计算周数差 + 1（第一周为第1周）
-    final weekDiff = currentWeekSunday.difference(startWeekSunday).inDays ~/ 7;
-    final week = weekDiff + 1;
-
-    // 计算最大周数
-    final endWeekSunday = getWeekStart(endTime);
-    final maxWeekDiff = endWeekSunday.difference(startWeekSunday).inDays ~/ 7;
-    final maxWeek = maxWeekDiff + 1;
-
-    return WeekInfo(week: week, maxWeek: maxWeek);
+  static Future<Map<String, List<CourseModel>>> getTodayAndTomorrowCourses() {
+    return CourseService.getTodayAndTomorrowCourses();
   }
 
-  /// 根据指定周数获取课程
-  ///
-  /// 获取指定周数的所有课程，如果未指定周数，则获取当前周的课程。
-  ///
-  /// @param week 指定的周数，如果为0则计算当前周数
-  /// @return 指定周数的课程列表
-  static Future<List<CourseModel>> getCourseByWeek({int week = 0}) async {
-    final allCourse = await getAllCourse();
-    if (week == 0) {
-      final time = (await getTimeInfo()).data;
-      if (time.startTime == null) {
-        return [];
-      }
-      week =
-          DateTime.now().difference(DateTime.parse(time.startTime!)).inDays ~/
-                  7 +
-              1;
-    }
-    return allCourse
-        .where((course) => course.weekIndexes.contains(week))
-        .toList();
-  }
-
-  /// 获取当天或第二天的课程
-  ///
-  /// 获取当天的课程，如果当天没有课程且isTomorrow为true，则获取第二天的课程。
-  ///
-  /// @param isTomorrow 是否获取第二天的课程，默认为false（获取当天课程）
-  /// @return 一个元组，第一个元素表示是否是明天的课程，第二个元素是课程列表
-  static Future<(bool, List<CourseModel>)> getTodayOrTomorrowCourse(
-      {bool isTomorrow = false}) async {
-    final allCourse = await getAllCourse();
-    final time = (await getTimeInfo()).data;
-    var now = DateTime.now();
-    if (time.startTime == null) {
-      return (false, List<CourseModel>.unmodifiable([]));
-    }
-    var weekNow =
-        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
-    var filteredCourses = allCourse.where((course) {
-      return course.weekIndexes.contains(weekNow) &&
-          course.weekday == now.weekday;
-    }).toList();
-
-    if (filteredCourses.isEmpty) {
-      if (isTomorrow) {
-        filteredCourses = allCourse.where((course) {
-          var weekDay = now.weekday + 1;
-          if (weekDay == 7) {
-            weekNow++;
-          }
-          if (weekDay > 7) {
-            weekDay = 1;
-          }
-          return course.weekIndexes.contains(weekNow) &&
-              course.weekday == weekDay;
-        }).toList();
-        if (filteredCourses.isEmpty) {
-          return (true, filteredCourses);
-        }
-        filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-
-        return (true, filteredCourses);
-      } else {
-        return (false, filteredCourses);
-      }
-    }
-
-    filteredCourses = filteredCourses.where((course) {
-      final time = TimeService.getStartAndEnd(course);
-
-      final l = time.end.split(':');
-      var end = DateTime(
-          now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
-
-      return now.isBefore(end);
-    }).toList();
-
-    filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-
-    return (false, filteredCourses);
-  }
-
-  /// 获取今天和明天的课程
-  ///
-  /// 同时获取今天和明天的课程，并按开始节次排序。
-  ///
-  /// @return 一个Map，包含今天(today)和明天(tomorrow)的课程列表
-  static Future<Map<String, List<CourseModel>>>
-      getTodayAndTomorrowCourses() async {
-    final allCourse = await getAllCourse();
-    final time = (await getTimeInfo()).data;
-    var now = DateTime.now();
-
-    if (time.startTime == null) {
-      return {
-        'today': List<CourseModel>.unmodifiable([]),
-        'tomorrow': List<CourseModel>.unmodifiable([])
-      };
-    }
-
-    // 计算当前周数
-    var weekNow =
-        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
-
-    // 获取今天的课程
-    var todayCourses = allCourse.where((course) {
-      return course.weekIndexes.contains(weekNow) &&
-          course.weekday == now.weekday;
-    }).toList();
-
-    // 过滤掉已经结束的课程
-    todayCourses = todayCourses.where((course) {
-      final time = TimeService.getStartAndEnd(course);
-      final l = time.end.split(':');
-      var end = DateTime(
-          now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
-      return now.isBefore(end);
-    }).toList();
-
-    // 按开始节次排序
-    todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-
-    // 计算明天日期和周数
-    var weekTomorrow = weekNow;
-    var tomorrowWeekday = now.weekday + 1;
-
-    // 处理跨周情况
-    if (tomorrowWeekday >= 7) {
-      // 如果今天是周六或者周日
-      weekTomorrow++; //周日是一周的第一天
-    }
-
-    if (tomorrowWeekday > 7) {
-      // 如果今天是周日
-      tomorrowWeekday = 1; // 明天为周一
-    }
-
-    // 获取明天的课程
-    var tomorrowCourses = allCourse.where((course) {
-      return course.weekIndexes.contains(weekTomorrow) &&
-          course.weekday == tomorrowWeekday;
-    }).toList();
-
-    // 按开始节次排序
-    tomorrowCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-
-    return {'today': todayCourses, 'tomorrow': tomorrowCourses};
-  }
-
-  /// 获取成绩数据
-  ///
-  /// 从本地存储获取成绩数据，并按学期分组。
-  ///
-  /// @return 按学期分组的成绩列表
-  static Future<List<ScoreList>> getScore() async {
-    final snapshot = await getScores();
-    return snapshot.data;
-  }
+  static Future<List<ScoreList>> getScore() =>
+      ScoreService.getAllScoreFromLocal();
 
   static Future<FetchSnapshot<List<ScoreList>>> getScores({
     FetchPolicy policy = FetchPolicy.localFirst,
-  }) async {
-    final scoreRepo = ScoreRepository();
-    final localScores = await scoreRepo.getScores();
-
-    switch (policy) {
-      case FetchPolicy.localFirst:
-        if (localScores.isNotEmpty) {
-          return FetchSnapshot<List<ScoreList>>(
-            data: _sortScores(localScores),
-            isFromLocal: true,
-            isStale: false,
-          );
-        }
-        return _refreshScores(fallbackScores: localScores);
-      case FetchPolicy.refresh:
-      case FetchPolicy.fallbackToLocal:
-        return _refreshScores(fallbackScores: localScores);
-    }
+  }) {
+    return ScoreService.getScores(policy: policy);
   }
 
-  /// 获取学期信息
-  ///
-  /// 从本地存储获取学期信息，如果数据超过1小时未更新，则自动刷新。
-  ///
-  /// @param isRefresh 是否强制刷新数据，默认为false
-  /// @return 学期模型列表
-  static Future<List<SemesterModel>> getSemester(
-      {bool isRefresh = false}) async {
-    final snapshot = await getSemesters(
-      policy: isRefresh ? FetchPolicy.refresh : FetchPolicy.localFirst,
-    );
-    return snapshot.data;
+  static Future<List<SemesterModel>> getSemester({bool isRefresh = false}) {
+    return ScoreService.getSemesterList(isRefresh: isRefresh);
   }
 
   static Future<FetchSnapshot<List<SemesterModel>>> getSemesters({
     FetchPolicy policy = FetchPolicy.localFirst,
-  }) async {
-    final localSemesters = _readSemestersFromPrefs();
-
-    switch (policy) {
-      case FetchPolicy.localFirst:
-        if (localSemesters.isNotEmpty) {
-          return FetchSnapshot<List<SemesterModel>>(
-            data: localSemesters,
-            isFromLocal: true,
-            isStale: false,
-          );
-        }
-        return _refreshSemesters(fallbackSemesters: localSemesters);
-      case FetchPolicy.refresh:
-      case FetchPolicy.fallbackToLocal:
-        return _refreshSemesters(fallbackSemesters: localSemesters);
-    }
+  }) {
+    return ScoreService.getSemesters(policy: policy);
   }
 
-  /// 获取时间信息
-  ///
-  /// 从本地存储获取时间信息，包括学期开始时间、结束时间等。
-  /// 如果数据超过24小时未更新，则自动从服务器刷新。
-  ///
-  /// @param isRefresh 是否强制刷新，默认为false
-  /// @return 包含时间信息的TimeInfo
-  static Future<TimeInfo> getTime({bool isRefresh = false}) async {
-    final snapshot = await getTimeInfo(
-      policy: isRefresh ? FetchPolicy.refresh : FetchPolicy.localFirst,
-    );
-    return snapshot.data;
+  static Future<TimeInfo> getTime({bool isRefresh = false}) {
+    return EduTimeService.getTime(isRefresh: isRefresh);
   }
 
   static Future<FetchSnapshot<TimeInfo>> getTimeInfo({
     FetchPolicy policy = FetchPolicy.localFirst,
-  }) async {
-    final localTime = _readTimeInfoFromPrefs();
-
-    switch (policy) {
-      case FetchPolicy.localFirst:
-        if (localTime.startTime != null || localTime.endTime != null) {
-          return FetchSnapshot<TimeInfo>(
-            data: localTime,
-            isFromLocal: true,
-            isStale: false,
-          );
-        }
-        return _refreshTimeInfo(fallbackTime: localTime);
-      case FetchPolicy.refresh:
-      case FetchPolicy.fallbackToLocal:
-        return _refreshTimeInfo(fallbackTime: localTime);
-    }
+  }) {
+    return EduTimeService.getTimeSnapshot(policy: policy);
   }
 
-  /// 获取信息列表
-  ///
-  /// 从缓存或网络获取通知公告等信息。如果缓存数据超过3小时未更新，则从网络获取。
-  ///
-  /// @return 信息模型列表
-  static Future<List<InfoModel>> getInfoList() async {
-    List<InfoModel> list = [];
-    final prefs = PrefsService.instance;
-    final String? jsonString = prefs.getString(PrefsKeys.INFO_DATA);
-    final time = prefs.getInt(PrefsKeys.INFO_DATA_TIME);
+  static Future<List<InfoModel>> getInfoList() => InfoService.getInfoList();
 
-    final date = DateTime.now().millisecondsSinceEpoch;
-
-    if (jsonString != null &&
-        time != null &&
-        (time - date).abs() < 1000 * 60 * 60 * 3) {
-      // 3小时
-      final jsonList = jsonDecode(jsonString);
-      for (var i in jsonList) {
-        list.add(InfoModel.fromJson(i));
-      }
-      return list;
-    } else {
-      // 从网络获取数据
-      await EduService.getInfoCompletion();
-      final String? jsonString = prefs.getString(PrefsKeys.INFO_DATA);
-
-      if (jsonString != null) {
-        final jsonList = jsonDecode(jsonString);
-        for (var i in jsonList) {
-          list.add(InfoModel.fromJson(i));
-        }
-
-        await prefs.setInt(PrefsKeys.INFO_DATA_TIME, date);
-      }
-
-      return list;
-    }
-  }
-
-  /// 获取所有课程时间安排
-  ///
-  /// 获取本周剩余天数的课程时间安排，按时间顺序排序。
-  ///
-  /// @return 本周剩余天数的课程时间安排列表
-  static Future<List<CourseTime>> getAllTime() async {
-    final allCourse = await getAllCourse();
-    final weekData = await getWeek();
-    var now = DateTime.now();
-
-    final List<CourseTime> timeList = [];
-    final weekCourses = allCourse.where((course) {
-      return course.weekIndexes.contains(weekData.week);
-    }).toList();
-
-    for (var j = now.weekday; j < 7; j++) {
-      final dayCourses = weekCourses.where((course) {
-        return course.weekday == j;
-      }).toList();
-
-      dayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
-
-      for (var courseToday in dayCourses) {
-        final time = TimeService.getStartAndEnd(courseToday);
-        var l = time.start.split(':');
-
-        var start = DateTime(
-            now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
-
-        if (start.compareTo(now) <= 0) continue;
-
-        if (timeList.isNotEmpty && timeList.last.startTime == start) continue;
-
-        l = time.end.split(':');
-        var end = DateTime(
-            now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
-
-        timeList.add(CourseTime(
-            startTime: start,
-            courseName: courseToday.courseName,
-            endTime: end));
-      }
-      now = DateTime(now.year, now.month, now.day + 1, 0, 0, 0);
-    }
-    return timeList;
-  }
-
-  static Future<List<CourseModel>> _readCoursesFromLocal({
-    required bool includeIgnored,
-  }) async {
-    final ignoredCourses = includeIgnored ? <String>[] : await getIgnore();
-    final allCourses = <CourseModel>[];
-    final courseRepo = CourseRepository();
-    final serverCourses = await courseRepo.getCourses();
-
-    for (final course in serverCourses) {
-      if (course.isCustom) continue;
-      if (ignoredCourses.isNotEmpty &&
-          ignoredCourses.any((name) => name == course.courseName)) {
-        continue;
-      }
-      allCourses.add(course);
-    }
-
-    final prefs = PrefsService.instance;
-    final customJsonString = prefs.getString('custom_courses');
-    if (customJsonString != null) {
-      try {
-        final List<dynamic> customJsonList = jsonDecode(customJsonString);
-        for (final json in customJsonList) {
-          final course = CourseModel.fromJson(json);
-          if (course.isCustom) {
-            allCourses.add(course);
-          }
-        }
-      } catch (e) {
-        AppLogger.debug('解析自定义课程数据失败: $e');
-      }
-    }
-
-    return allCourses;
-  }
-
-  static Future<FetchSnapshot<List<CourseModel>>> _refreshCourses({
-    required bool includeIgnored,
-    List<CourseModel> fallbackCourses = const [],
-  }) async {
-    try {
-      await EduService.fetchCoursesFromRemote(forceRefresh: true);
-      final refreshedCourses = await _readCoursesFromLocal(
-        includeIgnored: includeIgnored,
-      );
-      return FetchSnapshot<List<CourseModel>>(
-        data: refreshedCourses,
-        isFromLocal: false,
-        isStale: false,
-      );
-    } catch (e) {
-      AppLogger.debug('刷新课程数据失败: $e');
-      return FetchSnapshot<List<CourseModel>>(
-        data: fallbackCourses,
-        isFromLocal: true,
-        isStale: fallbackCourses.isNotEmpty,
-      );
-    }
-  }
-
-  static Future<FetchSnapshot<List<ScoreList>>> _refreshScores({
-    required List<ScoreList> fallbackScores,
-  }) async {
-    try {
-      final scores = await EduService.fetchScoresFromRemote(forceRefresh: true);
-      return FetchSnapshot<List<ScoreList>>(
-        data: _sortScores(scores),
-        isFromLocal: false,
-        isStale: false,
-      );
-    } catch (e) {
-      AppLogger.debug('刷新成绩数据失败: $e');
-      return FetchSnapshot<List<ScoreList>>(
-        data: _sortScores(fallbackScores),
-        isFromLocal: true,
-        isStale: fallbackScores.isNotEmpty,
-      );
-    }
-  }
-
-  static Future<FetchSnapshot<List<SemesterModel>>> _refreshSemesters({
-    required List<SemesterModel> fallbackSemesters,
-  }) async {
-    try {
-      final semesters = await EduService.fetchSemestersFromRemote(
-        forceRefresh: true,
-      );
-      return FetchSnapshot<List<SemesterModel>>(
-        data: semesters,
-        isFromLocal: false,
-        isStale: false,
-      );
-    } catch (e) {
-      AppLogger.debug('刷新学期数据失败: $e');
-      return FetchSnapshot<List<SemesterModel>>(
-        data: fallbackSemesters,
-        isFromLocal: true,
-        isStale: fallbackSemesters.isNotEmpty,
-      );
-    }
-  }
-
-  static Future<FetchSnapshot<TimeInfo>> _refreshTimeInfo({
-    required TimeInfo fallbackTime,
-  }) async {
-    try {
-      final time = await EduService.fetchTimeInfoFromRemote(forceRefresh: true);
-      if (time != null) {
-        return FetchSnapshot<TimeInfo>(
-          data: time,
-          isFromLocal: false,
-          isStale: false,
-        );
-      }
-    } catch (e) {
-      AppLogger.debug('刷新时间数据失败: $e');
-    }
-
-    final hasFallback =
-        fallbackTime.startTime != null || fallbackTime.endTime != null;
-    return FetchSnapshot<TimeInfo>(
-      data: fallbackTime,
-      isFromLocal: true,
-      isStale: hasFallback,
-    );
-  }
-
-  static List<SemesterModel> _readSemestersFromPrefs() {
-    final prefs = PrefsService.instance;
-    final jsonString = prefs.getString(PrefsKeys.SEMESTER_DATA);
-    if (jsonString == null || jsonString.isEmpty) {
-      return [];
-    }
-
-    try {
-      final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
-      final data = decoded['data'];
-      if (data is! List) {
-        return [];
-      }
-
-      return data
-          .map((json) => SemesterModel.fromJson(
-              Map<String, dynamic>.from(json as Map<dynamic, dynamic>)))
-          .toList();
-    } catch (e) {
-      AppLogger.debug('解析学期数据失败: $e');
-      return [];
-    }
-  }
-
-  static TimeInfo _readTimeInfoFromPrefs() {
-    final prefs = PrefsService.instance;
-    final jsonString = prefs.getString(PrefsKeys.TIME_DATA);
-    if (jsonString == null || jsonString.isEmpty) {
-      return TimeInfo();
-    }
-
-    try {
-      final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
-      return TimeInfo.fromJson(decoded);
-    } catch (e) {
-      AppLogger.debug('解析时间数据失败: $e');
-      return TimeInfo();
-    }
-  }
-
-  static List<ScoreList> _sortScores(List<ScoreList> scores) {
-    scores.sort((a, b) => b.semester.semester.compareTo(a.semester.semester));
-    return scores;
-  }
+  static Future<List<CourseTime>> getAllTime() => CourseService.getAllTime();
 }

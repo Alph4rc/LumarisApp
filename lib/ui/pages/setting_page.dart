@@ -6,7 +6,8 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/pages/settingPages/version_setting.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
+import 'package:ios_club_app/features/education/services/education_cache_service.dart';
+import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:android_intent_plus/android_intent.dart';
@@ -224,7 +225,7 @@ class SettingPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         onTap: () async {
           showClubSnackBar(context, const Text('正在刷新数据...'));
-          final re = await EduService.refresh();
+          final re = await EducationRefreshService.refresh();
           if (re) {
             await _syncHomeWidget();
           }
@@ -543,7 +544,7 @@ class SettingPage extends StatelessWidget {
               showClubSnackBar(context, const Text('正在清除缓存...'));
             }
             // 使用 EduService.clearEduCache() 进行全面清理
-            await EduService.clearEduCache();
+            await EducationCacheService.clearEduCache();
             // 同时也清理 RequestCache 以防万一 (EduService 内部已经调用了，这里可以保留或移除，保留无害)
             await RequestCache.instance.clear();
 

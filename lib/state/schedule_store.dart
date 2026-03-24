@@ -3,14 +3,13 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/week_info.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-
-import 'package:ios_club_app/features/education/services/edu_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
@@ -64,7 +63,7 @@ class ScheduleStore extends GetxController {
   /// 初始化数据
   Future<void> initializeData() async {
     try {
-      final weekData = await DataService.getWeek();
+      final weekData = await EduTimeService.getWeek();
       _handleWeekData(weekData);
       await getRemindCourses();
       await _loadCourses();
@@ -84,7 +83,7 @@ class ScheduleStore extends GetxController {
   }
 
   Future<void> getRemindCourses() async {
-    _allCoursesRemind = await DataService.getAllCourse(isNeedIgnore: false);
+    _allCoursesRemind = await CourseService.getAllCourse(isNeedIgnore: false);
   }
 
   Future<void> refreshCourseData() async {
@@ -111,7 +110,7 @@ class ScheduleStore extends GetxController {
 
   /// 加载课程数据
   Future<void> _loadCourses() async {
-    final courses = await DataService.getAllCourse();
+    final courses = await CourseService.getAllCourse();
     _allCourses.value = List.generate(_maxWeek.value + 1, (i) {
       return i == 0
           ? courses
@@ -140,16 +139,16 @@ class ScheduleStore extends GetxController {
     AppLogger.debug('[ScheduleStore] 开始刷新课程');
     _isLoading.value = true;
     try {
-      AppLogger.debug('[ScheduleStore] 调用 EduService.getCourse');
+      AppLogger.debug('[ScheduleStore] 调用 CourseService.getCourse');
 
       // 获取最新时间数据
       // 传入 isRefresh: true 以强制从服务器获取最新时间
-      final weekData = await DataService.getWeek(isRefresh: true);
+      final weekData = await EduTimeService.getWeek(isRefresh: true);
       _handleWeekData(weekData);
 
       // 添加超时保护：最多等待20秒
       // 考虑到可能需要重登录（3-5秒）+ 请求时间（5-10秒）
-      await EduService.getCourse(isRefresh: true).timeout(
+      await CourseService.getCourse(isRefresh: true).timeout(
         const Duration(seconds: 20),
         onTimeout: () {
           AppLogger.warning('[ScheduleStore] 刷新课程超时');
@@ -157,7 +156,7 @@ class ScheduleStore extends GetxController {
         },
       );
 
-      AppLogger.debug('[ScheduleStore] EduService.getCourse 完成');
+      AppLogger.debug('[ScheduleStore] CourseService.getCourse 完成');
 
       await getRemindCourses();
       AppLogger.debug('[ScheduleStore] getRemindCourses 完成');

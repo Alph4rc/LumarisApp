@@ -9,7 +9,7 @@ import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/data_service.dart';
-import 'package:ios_club_app/features/education/services/edu_fetch_models.dart';
+import 'package:ios_club_app/features/education/models/edu_fetch_models.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
