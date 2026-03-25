@@ -213,7 +213,7 @@ class _TodoWidgetState extends State<TodoWidget> {
                                       // 删除时取消提醒
                                       await NotificationService
                                           .instance.notifications
-                                          .cancel(todo.id.hashCode);
+                                          .cancel(id: todo.id.hashCode);
 
                                       // 刷新列表
                                       await _refreshTodos();

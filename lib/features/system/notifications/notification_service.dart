@@ -60,7 +60,7 @@ class NotificationService {
     );
 
     await notifications.initialize(
-      initSettings,
+      settings: initSettings,
     );
 
     await notifications
@@ -119,11 +119,11 @@ class NotificationService {
 
     try {
       await notifications.zonedSchedule(
-        id,
-        title,
-        '$body 将在$notificationTime分钟后开始',
-        tzDateTime,
-        NotificationDetails(
+        id: id,
+        title: title,
+        body: '$body 将在$notificationTime分钟后开始',
+        scheduledDate:   tzDateTime,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_course_reminders',
             '课程通知',
@@ -154,7 +154,7 @@ class NotificationService {
 
     // 如果待办事项已完成，取消提醒
     if (todo.isCompleted) {
-      await notifications.cancel(todo.id.hashCode);
+      await notifications.cancel(id: todo.id.hashCode);
       return;
     }
 
@@ -198,11 +198,11 @@ class NotificationService {
 
     try {
       await notifications.zonedSchedule(
-        todo.id.hashCode, // 使用唯一ID作为通知ID
-        '待办事务提醒',
-        '您的待办事务 ${todo.title} 已到期',
-        tzNotificationTime,
-        const NotificationDetails(
+        id: todo.id.hashCode, // 使用唯一ID作为通知ID
+        title: '待办事务提醒',
+        body:  '您的待办事务 ${todo.title} 已到期',
+        scheduledDate: tzNotificationTime,
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_todo_reminders',
             '待办事务提醒',
@@ -234,7 +234,7 @@ class NotificationService {
     }
 
     // 先取消之前的通知
-    await notifications.cancel(todo.id.hashCode);
+    await notifications.cancel(id: todo.id.hashCode);
     // 再根据新状态决定是否重新安排通知
     await scheduleTodoNotification(todo, todoRemindEnabled);
   }
