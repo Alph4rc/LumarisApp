@@ -1,78 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/course_item_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="6dp"
+    android:paddingHorizontal="4dp">
+
+    <!-- 圆角状态条 (类 iOS 日历样式) -->
+    <ImageView
+        android:id="@+id/course_divider"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:src="@drawable/rounded_accent_bar"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
 
-        <!-- 分隔线 -->
+        <!-- 课程名称 (加粗，主标题) -->
         <TextView
-            android:id="@+id/course_divider"
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:background="@color/widget_divider_light" />
+            android:id="@+id/course_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="高等数学"
+            android:textColor="@color/course_title_text_light"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
+        <!-- 详细信息容器 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <!-- 课程标题 -->
-            <TextView
-                android:id="@+id/course_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="高等数学"
-                android:textColor="@color/course_title_text_light"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal">
 
-            <!-- 时间信息 -->
+            <!-- 时间 -->
             <TextView
                 android:id="@+id/course_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/course_title"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="2dp"
                 android:text="09:00 - 10:30"
                 android:textColor="@color/course_info_text_light"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
-            <!-- 地点信息 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="6dp"
+                android:text="•"
+                android:textColor="@color/course_info_text_light"
+                android:textSize="12sp" />
+
+            <!-- 地点 -->
             <TextView
                 android:id="@+id/course_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/course_time"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="教学楼 A101"
                 android:textColor="@color/course_info_text_light"
-                android:textSize="11sp" />
-
-            <!-- 教师信息 -->
-            <TextView
-                android:id="@+id/course_teacher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/course_location"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="2dp"
-                android:text="张教授"
-                android:textColor="@color/course_info_text_light"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
         </LinearLayout>
+
+        <!-- 教师 (次要信息) -->
+        <TextView
+            android:id="@+id/course_teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:text="张教授"
+            android:textColor="@color/course_info_text_light"
+            android:textSize="11sp"
+            android:alpha="0.8" />
+            
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

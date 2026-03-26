@@ -45,15 +45,15 @@ class CourseListRemoteViewsFactory(
             views.setTextViewText(R.id.course_location, course.location)
             views.setTextViewText(R.id.course_teacher, course.teacher)
 
-            // 根据课程名称生成颜色并设置给分隔线
+            // 根据课程名称生成颜色并设置给分隔线 (ImageView)
             val color = CourseColorManager.generateSoftColor(course.title)
+            views.setInt(R.id.course_divider, "setColorFilter", color)
+            
             views.setTextViewTextSize(
                 R.id.course_title,
                 android.util.TypedValue.COMPLEX_UNIT_SP,
                 14f
             )
-            // 设置分隔线颜色
-            views.setInt(R.id.course_divider, "setBackgroundColor", color)
 
             // 移除了点击事件处理
         }

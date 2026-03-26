@@ -58,7 +58,8 @@ class TodayCoursesWidgetProvider : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.today_courses_widget)
 
         try {
-            views.setTextViewText(R.id.widget_title, "今日课表")
+            views.setTextViewText(R.id.widget_title, "TODAY")
+            views.setTextViewText(R.id.widget_date, getCurrentDate())
 
             // 解析课程数据
             val coursesJson = widgetData.getString("flutter.courses", null) ?: "[]"
@@ -87,7 +88,7 @@ class TodayCoursesWidgetProvider : AppWidgetProvider() {
                 Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widget_title, pendingIntent)
+            views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -103,7 +104,7 @@ class TodayCoursesWidgetProvider : AppWidgetProvider() {
     }
 
     private fun getCurrentDate(): String {
-        val formatter = SimpleDateFormat("MM月 dd日", Locale.getDefault())
+        val formatter = SimpleDateFormat("M月d日 EEEE", Locale.getDefault())
         return formatter.format(Date())
     }
 

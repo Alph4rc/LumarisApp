@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_modern_background"
@@ -9,94 +10,103 @@
     <!-- 课表区域 - 水平排列 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:baselineAligned="false">
 
         <!-- 今日课程区域 -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingRight="8dp">
+            android:paddingRight="10dp">
 
             <TextView
                 android:id="@+id/today_section_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="今日课程"
-                android:textColor="@color/widget_section_text_light"
-                android:textSize="14sp" />
+                android:layout_marginBottom="12dp"
+                android:text="TODAY"
+                android:textColor="@color/time_indicator_text_light"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05" />
 
             <!-- 今日课程列表 -->
             <ListView
                 android:id="@+id/today_courses_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:divider="@null"
-                android:dividerHeight="8dp" />
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="4dp"
+                android:scrollbars="none" />
 
             <!-- 今日无课视图 -->
             <TextView
                 android:id="@+id/today_empty_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingVertical="16dp"
+                android:gravity="left"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:text="今日无课"
                 android:textColor="@color/widget_empty_text_light"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:visibility="gone" />
         </LinearLayout>
 
-        <!-- 分隔线 -->
+        <!-- 垂直分隔线 (使用 TextView 替代 View 提高兼容性) -->
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
             android:background="@color/widget_divider_light" />
 
         <!-- 明日课程区域 -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingLeft="8dp">
+            android:paddingLeft="10dp">
 
             <TextView
                 android:id="@+id/tomorrow_section_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="明日课程"
-                android:textColor="@color/widget_section_text_light"
-                android:textSize="14sp" />
+                android:layout_marginBottom="12dp"
+                android:text="TOMORROW"
+                android:textColor="@color/widget_empty_text_secondary_light"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05" />
 
             <!-- 明日课程列表 -->
             <ListView
                 android:id="@+id/tomorrow_courses_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:divider="@null"
-                android:dividerHeight="8dp" />
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="4dp"
+                android:scrollbars="none" />
 
             <!-- 明日无课视图 -->
             <TextView
                 android:id="@+id/tomorrow_empty_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingVertical="16dp"
+                android:gravity="left"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:text="明日无课"
                 android:textColor="@color/widget_empty_text_light"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

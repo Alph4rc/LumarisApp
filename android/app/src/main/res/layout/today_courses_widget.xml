@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_modern_background"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- 标题栏 -->
-    <RelativeLayout
+    <!-- 标题栏 (iOS 风格) -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/widget_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="今日课程"
+            android:textColor="@color/time_indicator_text_light"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:letterSpacing="0.05" />
+
+        <TextView
+            android:id="@+id/widget_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3月26日 星期四"
             android:textColor="@color/widget_title_text_light"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginTop="-2dp" />
 
-    </RelativeLayout>
-
-    <!-- 分隔线 -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="12dp"
-        android:background="@color/widget_divider_light" />
+    </LinearLayout>
 
     <!-- 课程列表容器 -->
     <FrameLayout
@@ -42,7 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@android:color/transparent"
-            android:dividerHeight="8dp" />
+            android:dividerHeight="4dp"
+            android:scrollbars="none" />
 
         <!-- 空状态视图 -->
         <LinearLayout
@@ -59,15 +67,15 @@
                 android:layout_marginBottom="4dp"
                 android:text="今天没有课程"
                 android:textColor="@color/widget_empty_text_primary_light"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="享受你的自由时光吧！"
+                android:text="享受你的自由时光"
                 android:textColor="@color/widget_empty_text_secondary_light"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
         </LinearLayout>
 
