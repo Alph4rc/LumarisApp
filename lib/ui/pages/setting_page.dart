@@ -61,7 +61,7 @@ class SettingPage extends StatelessWidget {
                   if (PlatformUtils.isMobile) const RemindSetting(),
                   const TodoListSetting(),
                   const TodoRemindSetting(), // 添加待办提醒设置
-                  const HomePageSetting(),
+                  const HomePageSetting(), // 添加首页设置
                   if (PlatformUtils.isMobile)
                     const HapticFeedbackSetting(), // 添加触觉反馈设置
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)

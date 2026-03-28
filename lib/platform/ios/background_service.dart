@@ -17,7 +17,7 @@ void backgroundTask() async {
 /// iOS后台服务管理类
 class IOSBackgroundService {
   static Timer? _timer;
-  static const int _updateInterval = 3600; // 1小时更新一次，单位秒
+  static const int _updateInterval = 1800; // 30分钟更新一次，单位秒
 
   /// 初始化后台服务
   static Future<void> initializeService() async {

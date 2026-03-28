@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -10,6 +11,7 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 @pragma('vm:entry-point')
 void backgroundTask() async {
   WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
 
   // 执行课程提醒检查
   await TaskExecutor.checkAndSendCourseReminder();
@@ -30,6 +32,22 @@ class BackgroundService {
 
   /// 启动服务
   static Future<void> startService() async {
+    await startReminderService();
+    await startWidgetRefreshService();
+
+    // 立即执行一次任务，确保首次进入或重新拉起后小组件数据是最新的
+    Future.delayed(const Duration(seconds: 1), () {
+      backgroundTask();
+      TaskExecutor.updateWidget();
+    });
+
+    AppLogger.debug('后台任务已启动');
+  }
+
+  /// 启动课程提醒服务
+  static Future<void> startReminderService() async {
+    await AndroidAlarmManager.cancel(_reminderAlarmId);
+
     // 启动周期性任务
     await AndroidAlarmManager.periodic(
       const Duration(hours: 8),
@@ -40,8 +58,15 @@ class BackgroundService {
       rescheduleOnReboot: true,
     );
 
+    AppLogger.debug('课程提醒后台任务已注册');
+  }
+
+  /// 启动小组件自动刷新服务
+  static Future<void> startWidgetRefreshService() async {
+    await AndroidAlarmManager.cancel(_widgetAlarmId);
+
     await AndroidAlarmManager.periodic(
-      const Duration(minutes: 5),
+      const Duration(minutes: 10),
       _widgetAlarmId,
       TaskExecutor.updateWidget,
       wakeup: false, // 小组件更新不需要唤醒设备
@@ -49,20 +74,26 @@ class BackgroundService {
       rescheduleOnReboot: true,
     );
 
-    // 立即执行一次任务以测试功能
-    Future.delayed(const Duration(seconds: 1), () {
-      backgroundTask();
-      TaskExecutor.updateWidget();
-    });
-
-    AppLogger.debug('周期性任务已注册');
+    AppLogger.debug('小组件自动刷新任务已注册');
   }
 
   /// 停止服务
   static Future<void> stopService() async {
-    await AndroidAlarmManager.cancel(_reminderAlarmId);
-    await AndroidAlarmManager.cancel(_widgetAlarmId);
+    await stopReminderService();
+    await stopWidgetRefreshService();
     AppLogger.debug('所有后台任务已取消');
+  }
+
+  /// 停止课程提醒服务
+  static Future<void> stopReminderService() async {
+    await AndroidAlarmManager.cancel(_reminderAlarmId);
+    AppLogger.debug('课程提醒后台任务已取消');
+  }
+
+  /// 停止小组件自动刷新服务
+  static Future<void> stopWidgetRefreshService() async {
+    await AndroidAlarmManager.cancel(_widgetAlarmId);
+    AppLogger.debug('小组件自动刷新任务已取消');
   }
 
   /// 手动触发课程提醒检查
@@ -124,11 +155,11 @@ class CourseReminderService {
     await prefs.setBool(PrefsKeys.IS_REMIND, enabled);
 
     if (enabled) {
-      // 启用时启动服务
-      await BackgroundService.startService();
+      // 启用时仅启动提醒任务，小组件刷新保持独立运行
+      await BackgroundService.startReminderService();
     } else {
-      // 禁用时停止服务
-      await BackgroundService.stopService();
+      // 禁用时仅停止提醒任务，不影响小组件自动刷新
+      await BackgroundService.stopReminderService();
     }
   }
 

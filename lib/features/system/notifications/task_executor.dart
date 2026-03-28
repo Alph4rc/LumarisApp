@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/time_info.dart';
@@ -184,6 +185,7 @@ class TaskExecutor {
   /// 检查并发送课程提醒
   static Future<void> _ensureInitialized() async {
     WidgetsFlutterBinding.ensureInitialized();
+    DartPluginRegistrant.ensureInitialized();
     await HiveManager.init();
     await PrefsService.init();
   }
