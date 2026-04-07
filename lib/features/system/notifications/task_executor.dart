@@ -88,8 +88,8 @@ class TaskExecutor {
       return (false, <CourseModel>[]);
     }
 
-    var weekNow =
-        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
+    final startTime = DateTime.parse(time.startTime!);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
     var filteredCourses = _cachedCourses!.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
@@ -97,16 +97,13 @@ class TaskExecutor {
 
     if (filteredCourses.isEmpty) {
       if (isTomorrow) {
-        var weekDay = now.weekday + 1;
-        if (weekDay == 7) {
-          weekNow++;
-        }
-        if (weekDay > 7) {
-          weekDay = 1;
-        }
+        final tomorrow = now.add(const Duration(days: 1));
+        var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+        var tomorrowWeekday = tomorrow.weekday;
+
         filteredCourses = _cachedCourses!.where((course) {
-          return course.weekIndexes.contains(weekNow) &&
-              course.weekday == weekDay;
+          return course.weekIndexes.contains(weekTomorrow) &&
+              course.weekday == tomorrowWeekday;
         }).toList();
         filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
         return (true, filteredCourses);
@@ -140,8 +137,8 @@ class TaskExecutor {
       return {'today': <CourseModel>[], 'tomorrow': <CourseModel>[]};
     }
 
-    var weekNow =
-        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
+    final startTime = DateTime.parse(time.startTime!);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
 
     // 获取今天的课程
     var todayCourses = _cachedCourses!.where((course) {
@@ -161,15 +158,9 @@ class TaskExecutor {
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
     // 计算明天日期和周数
-    var weekTomorrow = weekNow;
-    var tomorrowWeekday = now.weekday + 1;
-
-    if (tomorrowWeekday >= 7) {
-      weekTomorrow++;
-    }
-    if (tomorrowWeekday > 7) {
-      tomorrowWeekday = 1;
-    }
+    final tomorrow = now.add(const Duration(days: 1));
+    var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var tomorrowWeekday = tomorrow.weekday;
 
     // 获取明天的课程
     var tomorrowCourses = _cachedCourses!.where((course) {

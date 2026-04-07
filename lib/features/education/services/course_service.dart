@@ -145,11 +145,12 @@ class CourseService {
     final time = await EduTimeService.getTime();
     final now = DateTime.now();
     if (time.startTime == null) {
-      return (false, List<CourseModel>.unmodifiable([]));
+      return (false, <CourseModel>[]);
     }
 
-    var weekNow =
-        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
+    final startTime = DateTime.parse(time.startTime!);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
+
     var filteredCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
@@ -159,16 +160,13 @@ class CourseService {
       if (!isTomorrow) {
         return (false, filteredCourses);
       }
+      final tomorrow = now.add(const Duration(days: 1));
+      var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+      var tomorrowWeekday = tomorrow.weekday;
+
       filteredCourses = allCourse.where((course) {
-        var weekDay = now.weekday + 1;
-        if (weekDay == 7) {
-          weekNow++;
-        }
-        if (weekDay > 7) {
-          weekDay = 1;
-        }
-        return course.weekIndexes.contains(weekNow) &&
-            course.weekday == weekDay;
+        return course.weekIndexes.contains(weekTomorrow) &&
+            course.weekday == tomorrowWeekday;
       }).toList();
       if (filteredCourses.isEmpty) {
         return (true, filteredCourses);
@@ -207,8 +205,8 @@ class CourseService {
       };
     }
 
-    var weekNow =
-        now.difference(DateTime.parse(time.startTime!)).inDays ~/ 7 + 1;
+    final startTime = DateTime.parse(time.startTime!);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
 
     var todayCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekNow) &&
@@ -230,14 +228,9 @@ class CourseService {
 
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
-    var weekTomorrow = weekNow;
-    var tomorrowWeekday = now.weekday + 1;
-    if (tomorrowWeekday >= 7) {
-      weekTomorrow++;
-    }
-    if (tomorrowWeekday > 7) {
-      tomorrowWeekday = 1;
-    }
+    final tomorrow = now.add(const Duration(days: 1));
+    var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var tomorrowWeekday = tomorrow.weekday;
 
     final tomorrowCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekTomorrow) &&

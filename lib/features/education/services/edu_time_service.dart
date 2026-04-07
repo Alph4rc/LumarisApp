@@ -90,6 +90,20 @@ class EduTimeService {
     return WeekInfo(week: week, maxWeek: maxWeek);
   }
 
+  /// 统一的周数计算工具方法
+  static int getWeekIndexByStartTime(DateTime date, DateTime startTime) {
+    DateTime getWeekStart(DateTime d) {
+      final daysSinceWeekStart = d.weekday == 7 ? 0 : d.weekday;
+      return DateTime(d.year, d.month, d.day)
+          .subtract(Duration(days: daysSinceWeekStart));
+    }
+
+    final startWeekSunday = getWeekStart(startTime);
+    final targetWeekSunday = getWeekStart(date);
+
+    return targetWeekSunday.difference(startWeekSunday).inDays ~/ 7 + 1;
+  }
+
   static TimeInfo readTimeInfoFromPrefs() {
     final prefs = PrefsService.instance;
     final jsonString = prefs.getString(PrefsKeys.TIME_DATA);
