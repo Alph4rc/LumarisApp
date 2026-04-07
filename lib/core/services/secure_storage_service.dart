@@ -24,7 +24,7 @@ class SecureStorageService {
     ),
     mOptions: MacOsOptions(
       accessibility: KeychainAccessibility.first_unlock,
-      usesDataProtectionKeychain: false,
+      usesDataProtectionKeychain: true,
     ),
   );
 

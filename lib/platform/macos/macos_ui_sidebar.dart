@@ -71,20 +71,21 @@ Sidebar macosUISidebar({
                 ),
               ),
             ),
+            padding: const EdgeInsets.only(top: 8),
             child: MacosListTile(
               onClick: () {
                 Get.toNamed('/Profile');
               },
               leading: Container(
-                width: 36,
-                height: 36,
+                width: 24,
+                height: 24,
                 decoration: BoxDecoration(
                   color: CupertinoColors.systemBlue.resolveFrom(context),
                   shape: BoxShape.circle,
                 ),
                 child: const MacosIcon(
                   CupertinoIcons.person_fill,
-                  size: 20,
+                  size: 18,
                   color: CupertinoColors.white,
                 ),
               ),
