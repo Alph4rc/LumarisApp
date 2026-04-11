@@ -60,12 +60,20 @@ class GiteeService {
     final resultList = result.name.split('.').map((e) => int.parse(e)).toList();
     final currentList =
         packageInfo.version.split('.').map((e) => int.parse(e)).toList();
-    for (int i = 0; i < resultList.length; i++) {
+
+    final len = resultList.length > currentList.length
+        ? currentList.length
+        : resultList.length;
+
+    for (int i = 0; i < len; i++) {
       if (resultList[i] > currentList[i]) {
         return (true, result);
+      } else if (resultList[i] < currentList[i]) {
+        return (false, result);
       }
     }
-    return (false, result);
+
+    return (resultList.length > currentList.length, result);
   }
 
   static Future<void> updateApp(String name) async {
