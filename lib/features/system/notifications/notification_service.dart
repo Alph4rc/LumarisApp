@@ -9,9 +9,9 @@ import 'package:intl/intl.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
-import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/system/notifications/course_reminder_helper.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
@@ -122,7 +122,7 @@ class NotificationService {
         id: id,
         title: title,
         body: '$body 将在$notificationTime分钟后开始',
-        scheduledDate:   tzDateTime,
+        scheduledDate: tzDateTime,
         notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_course_reminders',
@@ -200,7 +200,7 @@ class NotificationService {
       await notifications.zonedSchedule(
         id: todo.id.hashCode, // 使用唯一ID作为通知ID
         title: '待办事务提醒',
-        body:  '您的待办事务 ${todo.title} 已到期',
+        body: '您的待办事务 ${todo.title} 已到期',
         scheduledDate: tzNotificationTime,
         notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
@@ -279,44 +279,49 @@ class NotificationService {
       await NotificationService.instance.initialize();
     }
 
-    final a = await CourseService.getTodayOrTomorrowCourse();
-    final now = DateTime.now();
+    final a = await CourseService.getTodayOrTomorrowCourse(isTomorrow: true);
+    final targetDate =
+        a.$1 ? DateTime.now().add(const Duration(days: 1)) : DateTime.now();
 
     for (var course in a.$2) {
-      final time = TimeService.getStartAndEnd(course);
-      final spilt = time.start.split(':');
-
-      if (spilt.length < 2) continue;
+      final target = CourseReminderHelper.buildTarget(
+        course: course,
+        courseDate: targetDate,
+      );
+      if (target == null) continue;
 
       await NotificationService.instance.scheduleCourseReminder(
-          id: course.hashCode,
-          title: '课程提醒',
-          body: course.courseName,
-          courseTime: DateTime(now.year, now.month, now.day,
-              int.parse(spilt[0]), int.parse(spilt[1])));
+        id: target.notificationId,
+        title: '课程提醒',
+        body: course.courseName,
+        courseTime: target.courseTime,
+      );
     }
   }
 
-  static Future<void> remindList(List<CourseModel> a) async {
+  static Future<void> remindList(
+    List<CourseModel> a, {
+    DateTime? targetDate,
+  }) async {
     if (!NotificationService.instance.isInit) {
       await NotificationService.instance.initialize();
     }
 
-    final now = DateTime.now();
+    final effectiveDate = targetDate ?? DateTime.now();
 
     for (var course in a) {
-      final time = TimeService.getStartAndEnd(course);
-
-      final spilt = time.start.split(':');
-
-      if (spilt.length < 2) continue;
+      final target = CourseReminderHelper.buildTarget(
+        course: course,
+        courseDate: effectiveDate,
+      );
+      if (target == null) continue;
 
       await NotificationService.instance.scheduleCourseReminder(
-          id: course.hashCode,
-          title: '课程提醒',
-          body: course.courseName,
-          courseTime: DateTime(now.year, now.month, now.day,
-              int.parse(spilt[0]), int.parse(spilt[1])));
+        id: target.notificationId,
+        title: '课程提醒',
+        body: course.courseName,
+        courseTime: target.courseTime,
+      );
     }
   }
 }

@@ -98,7 +98,8 @@ class TaskExecutor {
     if (filteredCourses.isEmpty) {
       if (isTomorrow) {
         final tomorrow = now.add(const Duration(days: 1));
-        var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+        var weekTomorrow =
+            EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
         var tomorrowWeekday = tomorrow.weekday;
 
         filteredCourses = _cachedCourses!.where((course) {
@@ -159,7 +160,8 @@ class TaskExecutor {
 
     // 计算明天日期和周数
     final tomorrow = now.add(const Duration(days: 1));
-    var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var weekTomorrow =
+        EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
     var tomorrowWeekday = tomorrow.weekday;
 
     // 获取明天的课程
@@ -193,38 +195,36 @@ class TaskExecutor {
         return;
       }
 
-      // 检查今天是否已经提醒过
       final now = DateTime.now();
-      final lastRemindTimeStr = prefs.getString(PrefsKeys.LAST_REMIND_DATE);
-
-      if (lastRemindTimeStr != null) {
-        try {
-          final lastRemindDate = DateTime.parse(lastRemindTimeStr);
-          if (_isSameDay(now, lastRemindDate)) {
-            AppLogger.debug('今天已经提醒过了');
-            return;
-          }
-        } catch (e) {
-          AppLogger.debug('解析上次提醒时间失败: $e');
-        }
-      }
 
       // 预加载数据
       await _preloadData();
 
-      // 从缓存获取课程数据
-      final result = _getTodayOrTomorrowCourseFromCache(isTomorrow: true);
+      final upcomingCourses = _getTodayAndTomorrowCoursesFromCache();
+      var scheduledCount = 0;
 
-      if (result.$2.isNotEmpty) {
-        await NotificationService.remindList(result.$2);
-
-        // 记录提醒时间（使用ISO格式字符串）
-        await prefs.setString(
-            PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
-        AppLogger.debug('课程提醒发送成功: ${now.toIso8601String()}');
-      } else {
-        AppLogger.debug('没有需要提醒的课程');
+      final todayCourses = upcomingCourses['today']!;
+      if (todayCourses.isNotEmpty) {
+        await NotificationService.remindList(
+          todayCourses,
+          targetDate: now,
+        );
+        scheduledCount += todayCourses.length;
       }
+
+      final tomorrowCourses = upcomingCourses['tomorrow']!;
+      if (tomorrowCourses.isNotEmpty) {
+        await NotificationService.remindList(
+          tomorrowCourses,
+          targetDate: now.add(const Duration(days: 1)),
+        );
+        scheduledCount += tomorrowCourses.length;
+      }
+
+      await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
+      AppLogger.debug(
+        '课程提醒排期完成: $scheduledCount 条, 时间=${now.toIso8601String()}',
+      );
     } catch (e) {
       AppLogger.debug('课程提醒检查失败: $e');
     }
@@ -337,12 +337,5 @@ class TaskExecutor {
     }
 
     return items;
-  }
-
-  /// 判断是否同一天
-  static bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
   }
 }

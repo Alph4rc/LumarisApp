@@ -21,6 +21,7 @@ void backgroundTask() async {
 class BackgroundService {
   static const int _reminderAlarmId = 1;
   static const int _widgetAlarmId = 2;
+  static const Duration _reminderInterval = Duration(hours: 1);
 
   /// 初始化后台服务
   static Future<void> initializeService() async {
@@ -50,7 +51,7 @@ class BackgroundService {
 
     // 启动周期性任务
     await AndroidAlarmManager.periodic(
-      const Duration(hours: 8),
+      _reminderInterval,
       _reminderAlarmId,
       backgroundTask,
       wakeup: true,
@@ -58,7 +59,7 @@ class BackgroundService {
       rescheduleOnReboot: true,
     );
 
-    AppLogger.debug('课程提醒后台任务已注册');
+    AppLogger.debug('课程提醒后台任务已注册，间隔: $_reminderInterval');
   }
 
   /// 启动小组件自动刷新服务
