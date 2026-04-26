@@ -13,6 +13,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 
 class ScheduleStore extends GetxController {
   static ScheduleStore get to => Get.find();
@@ -168,7 +169,9 @@ class ScheduleStore extends GetxController {
       AppLogger.debug('[ScheduleStore] _loadCourses 完成');
 
       await _syncHomeWidget();
-      AppLogger.debug('[ScheduleStore] 小组件同步完成');
+      // 课程刷新后，重新安排课程通知（确保使用最新的课程数据）
+      await TaskExecutor.checkAndSendCourseReminder();
+      AppLogger.debug('[ScheduleStore] 小组件同步与通知安排完成');
 
       AppLogger.debug('[ScheduleStore] 刷新课程成功');
     } on TimeoutException catch (e) {

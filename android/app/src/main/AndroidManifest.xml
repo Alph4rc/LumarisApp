@@ -102,12 +102,6 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="ios_club_app_course_reminders" />
 
-        <!-- Android Alarm Manager 配置 -->
-        <service
-            android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".YourService"
             android:foregroundServiceType="specialUse"
@@ -116,18 +110,6 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="进行小组件静默更新" />
         </service>
-
-        <receiver
-            android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmBroadcastReceiver"
-            android:exported="false" />
-        <receiver
-            android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

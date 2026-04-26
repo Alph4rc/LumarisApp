@@ -62,9 +62,9 @@ class WidgetService {
     final tomorrow = now.add(const Duration(days: 1));
 
     await HomeWidget.saveWidgetData<String>(
-        'flutter.tomorrow.courses', jsonEncode(courses['today']));
+        'flutter.tomorrow.courses', jsonEncode(courses['today'] ?? []));
     await HomeWidget.saveWidgetData<String>(
-        'flutter.tomorrow.tomorrowCourses', jsonEncode(courses['tomorrow']));
+        'flutter.tomorrow.tomorrowCourses', jsonEncode(courses['tomorrow'] ?? []));
     await HomeWidget.saveWidgetData<String>(
         'flutter.tomorrow.date', _formatMonthDayWeekday(now));
     await HomeWidget.saveWidgetData<String>(

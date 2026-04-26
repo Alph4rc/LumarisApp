@@ -15,6 +15,7 @@ import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -127,6 +128,16 @@ void main() async {
 
   // 初始化更新管理器
   await CheckUpdateManager.init();
+
+  // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
+  // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度
+  if (!PlatformUtils.isMPFlutter) {
+    // 延迟执行，确保所有 Store 和 Service 完全就绪
+    Future.delayed(const Duration(seconds: 2), () async {
+      await TaskExecutor.checkAndSendCourseReminder();
+      await TaskExecutor.updateWidget();
+    });
+  }
 
   initApp();
 }

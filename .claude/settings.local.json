@@ -25,7 +25,8 @@
       "Bash(echo fallback:*)",
       "Bash(grep:*)",
       "Bash(echo dart run needed:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(python3 *)"
     ]
   }
 }

@@ -175,12 +175,16 @@ class TaskExecutor {
     return {'today': todayCourses, 'tomorrow': tomorrowCourses};
   }
 
-  /// 检查并发送课程提醒
+  /// 确保后台环境已初始化（防重复调用）
+  static bool _backgroundInitialized = false;
+
   static Future<void> _ensureInitialized() async {
+    if (_backgroundInitialized) return;
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
     await HiveManager.init();
     await PrefsService.init();
+    _backgroundInitialized = true;
   }
 
   static Future<void> checkAndSendCourseReminder() async {

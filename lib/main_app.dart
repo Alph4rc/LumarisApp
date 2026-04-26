@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -28,13 +29,14 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   int _currentIndex = 0;
   final SettingsStore settingsStore = SettingsStore.to;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     if (PlatformUtils.isAndroid) {
       CheckUpdateManager.checkForUpdates().then((result) async {
@@ -55,6 +57,23 @@ class _MainAppState extends State<MainApp> {
         }
       });
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // App 回到前台时，刷新小组件并重新安排课程通知
+      // 这对 iOS 尤其重要，因为后台 Timer 不会运行
+      TaskExecutor.updateWidget();
+      TaskExecutor.checkAndSendCourseReminder();
+    }
   }
 
   @override

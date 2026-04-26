@@ -27,23 +27,12 @@ class TodayCoursesWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        // 处理小部件更新事件
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
-            val widgetData = HomeWidgetPlugin.getData(context)
-
-            // 解析课程数据
-            val coursesJson = widgetData.getString("flutter.courses", null) ?: "[]"
-
-            // 获取所有小部件ID
             val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
             if (appWidgetIds != null) {
                 for (appWidgetId in appWidgetIds) {
-                    // 通知数据变更
-                    appWidgetManager.notifyAppWidgetViewDataChanged(
-                        appWidgetId,
-                        R.id.widget_courses_list
-                    )
+                    updateAppWidget(context, appWidgetManager, appWidgetId)
                 }
             }
         }
