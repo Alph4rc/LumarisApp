@@ -114,16 +114,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ProfileButtonItem(icon: Icons.settings, title: '设置/关于', route: '/About'),
       ProfileButtonItem(
           title: '校车', icon: Icons.directions_bus_rounded, route: '/SchoolBus'),
-      ProfileButtonItem(
-          icon: Icons.apple,
-          title: userStore.isLoginMember ? '社团详情' : '登录社团iMember',
-          onPressed: () {
-            if (!userStore.isLoginMember) {
-              _enterLoginMode(isOnlyLoginMember: true);
-            } else {
-              Navigator.pushNamed(context, '/iMember');
-            }
-          }),
       if (!kIsWeb)
         ProfileButtonItem(
             icon: CupertinoIcons.bolt_fill, title: '电费', route: '/Electricity'),

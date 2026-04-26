@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
-import 'package:ios_club_app/core/services/club_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
@@ -30,32 +29,19 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
 
   bool _obscureText = true;
   bool _isLoading = false;
-  bool _isLoginMember = false;
-  bool _isOnlyLoginMember = false;
 
   @override
   void initState() {
     super.initState();
-    // 从路由参数获取登录模式
-    final args = Get.arguments;
-    if (args != null && args is Map && args['isOnlyLoginMember'] == true) {
-      _isOnlyLoginMember = true;
-    }
-    // 如果是仅登录社团账号，默认不需要勾选"同时登录社团账号"
-    if (_isOnlyLoginMember) {
-      _isLoginMember = false;
-    }
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
-    _nameController.dispose();
     super.dispose();
   }
 
@@ -75,41 +61,21 @@ class _LoginPageState extends State<LoginPage> {
     try {
       AppLogger.debug('[LoginPage] 开始登录');
 
-      bool eduLoginSuccess = true;
-      bool clubLoginSuccess = true;
-
       // 登录教务系统账号（添加超时保护：最多20秒）
-      if (!_isOnlyLoginMember) {
-        AppLogger.debug('[LoginPage] 登录教务系统');
-        eduLoginSuccess = await _loginToEduSystem().timeout(
-          const Duration(seconds: 20),
-          onTimeout: () {
-            AppLogger.warning('[LoginPage] 教务系统登录超时');
-            if (mounted) {
-              showClubSnackBar(context, const Text('教务系统登录超时，请检查网络连接'));
-            }
-            return false;
-          },
-        );
-      }
-
-      // 登录社团账号（添加超时保护：最多10秒）
-      if (_isOnlyLoginMember || _isLoginMember) {
-        AppLogger.debug('[LoginPage] 登录社团账号');
-        clubLoginSuccess = await _loginToClub().timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            AppLogger.warning('[LoginPage] 社团账号登录超时');
-            if (mounted) {
-              showClubSnackBar(context, const Text('社团账号登录超时，请检查网络连接'));
-            }
-            return false;
-          },
-        );
-      }
+      AppLogger.debug('[LoginPage] 登录教务系统');
+      final eduLoginSuccess = await _loginToEduSystem().timeout(
+        const Duration(seconds: 20),
+        onTimeout: () {
+          AppLogger.warning('[LoginPage] 教务系统登录超时');
+          if (mounted) {
+            showClubSnackBar(context, const Text('教务系统登录超时，请检查网络连接'));
+          }
+          return false;
+        },
+      );
 
       // 检查登录结果
-      if (!eduLoginSuccess || !clubLoginSuccess) {
+      if (!eduLoginSuccess) {
         return;
       }
 
@@ -166,107 +132,28 @@ class _LoginPageState extends State<LoginPage> {
     return result;
   }
 
-  /// 登录社团账号
-  Future<bool> _loginToClub() async {
-    // 验证输入
-    if (_isOnlyLoginMember && _usernameController.text.isEmpty) {
-      if (mounted) {
-        showClubSnackBar(
-          context,
-          const Text('登录社团账号时姓名不能为空'),
-        );
-      }
-      return false;
-    }
-
-    if (_isLoginMember && _nameController.text.isEmpty) {
-      if (mounted) {
-        showClubSnackBar(
-          context,
-          const Text('登录社团账号时姓名不能为空'),
-        );
-      }
-      return false;
-    }
-
-    bool result = false;
-    if (_isOnlyLoginMember) {
-      // 仅登录社团账号：用户名(姓名)和密码(学号)
-      result = await ClubService.loginMember(
-        _usernameController.text,
-        _passwordController.text,
-      );
-    } else if (_isLoginMember) {
-      // 同时登录两个账号：姓名和学号
-      result = await ClubService.loginMember(
-        _nameController.text,
-        _usernameController.text,
-      );
-    }
-
-    if (!result && mounted) {
-      showClubSnackBar(
-        context,
-        const Text('社团账号登陆失败'),
-      );
-    }
-
-    return result;
-  }
-
   /// 保存登录信息
   Future<bool> _saveLoginInfo() async {
     final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
     var saveSuccess = true;
 
-    if (!_isOnlyLoginMember) {
-      await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
-      saveSuccess = await secureStorage.write(
-            key: PrefsKeys.USERNAME,
-            value: _usernameController.text,
-          ) &&
-          saveSuccess;
-      saveSuccess = await secureStorage.write(
-            key: PrefsKeys.PASSWORD,
-            value: _passwordController.text,
-          ) &&
-          saveSuccess;
+    await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
+    saveSuccess = await secureStorage.write(
+          key: PrefsKeys.USERNAME,
+          value: _usernameController.text,
+        ) &&
+        saveSuccess;
+    saveSuccess = await secureStorage.write(
+          key: PrefsKeys.PASSWORD,
+          value: _passwordController.text,
+        ) &&
+        saveSuccess;
 
-      final userDataString = prefs.getString(PrefsKeys.USER_DATA);
-      if (userDataString != null) {
-        final userData = jsonDecode(userDataString);
-        await userStore.setUserData(UserData.fromJson(userData));
-      }
-    }
-
-    if (_isOnlyLoginMember) {
-      // 仅登录社团账号
-      saveSuccess = await secureStorage.write(
-            key: PrefsKeys.CLUB_NAME,
-            value: _usernameController.text,
-          ) &&
-          saveSuccess;
-      saveSuccess = await secureStorage.write(
-            key: PrefsKeys.CLUB_ID,
-            value: _passwordController.text,
-          ) &&
-          saveSuccess;
-      await userStore.setLoginMember();
-    }
-
-    if (_isLoginMember) {
-      saveSuccess = await secureStorage.write(
-            key: PrefsKeys.CLUB_NAME,
-            value: _nameController.text,
-          ) &&
-          saveSuccess;
-      saveSuccess = await secureStorage.write(
-            key: PrefsKeys.CLUB_ID,
-            value: _usernameController.text,
-          ) &&
-          saveSuccess;
-      await userStore.setLoginMember();
+    final userDataString = prefs.getString(PrefsKeys.USER_DATA);
+    if (userDataString != null) {
+      final userData = jsonDecode(userDataString);
+      await userStore.setUserData(UserData.fromJson(userData));
     }
 
     return saveSuccess;
@@ -333,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 24),
                 // Title
                 Text(
-                  _isOnlyLoginMember ? '登录社团账号' : '登录教务系统',
+                  '登录教务系统',
                   style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -375,25 +262,13 @@ class _LoginPageState extends State<LoginPage> {
                       _buildCupertinoLikeTextField(
                         context,
                         controller: _passwordController,
-                        hintText:
-                            _isOnlyLoginMember ? 'iMember 密码' : '统一身份认证密码',
+                        hintText: '统一身份认证密码',
                         icon: Icons.lock_outline,
                         obscureText: _obscureText,
                         isPassword: true,
                         isFirst: false,
-                        isLast: !_isLoginMember,
+                        isLast: true,
                       ),
-                      if (_isLoginMember) ...[
-                        const Divider(height: 1, indent: 48),
-                        _buildCupertinoLikeTextField(
-                          context,
-                          controller: _nameController,
-                          hintText: 'iMember密码（登录社团账号时必填）',
-                          icon: Icons.badge_outlined,
-                          isFirst: false,
-                          isLast: true,
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -401,39 +276,9 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16),
 
                 // Options Row
-                if (!_isOnlyLoginMember)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (!userStore.isLoginMember)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isLoginMember = !_isLoginMember;
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              Transform.scale(
-                                scale: 0.9,
-                                child: Checkbox(
-                                  value: _isLoginMember,
-                                  onChanged: (value) {
-                                    if (value == null) return;
-                                    setState(() {
-                                      _isLoginMember = value;
-                                    });
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                              ),
-                              const Text('同时登录社团账号'),
-                            ],
-                          ),
-                        ),
-                      const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
                       TextButton(
                         onPressed: () async {
                           const url =
