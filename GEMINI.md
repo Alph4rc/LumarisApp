@@ -1,16 +1,13 @@
 # iOS Club App
 
 ## Project Overview
-This is a cross-platform Flutter application developed for the iOS Club at Xi'an University of Architecture and Technology. It provides members with course management, scheduling, grades, campus bus info, electricity tracking, and more. 
-
-**Supported Platforms:** iOS, Android, macOS, Windows, Linux, Web, and WeChat Mini Program.
+This is a cross-platform Flutter application developed for the iOS Club at Xi'an University of Architecture and Technology. It provides members with course management, scheduling, grades, campus bus info, electricity tracking, and more.
 
 ## Core Technologies & Architecture
 - **Framework:** Flutter (SDK >=3.5.3 <4.0.0)
 - **State Management:** GetX (`lib/state/`) - Stores are initialized in `lib/state/init.dart` and accessed via `Get.find<T>()` or `T.to`.
 - **Networking:** Dio with custom `RequestCache` (`lib/core/services/net_service.dart`).
 - **Storage:** Transitioning from `SharedPreferences` to `Hive` and `flutter_secure_storage` for improved performance and security (see `CACHE_IMPROVEMENT_PLAN.md`).
-- **Cross-Platform Support:** Uses MPFlutter for WeChat Mini Program compatibility.
 
 ## Directory Structure
 - `lib/core/`: Platform-agnostic core functionality (models, services, utils).
@@ -39,14 +36,11 @@ dart format .                      # Format all code
 
 ## Critical Development Conventions
 
-### 1. Platform Detection (CRITICAL)
-**Never use `dart:io` `Platform.isX` directly.** Direct usage causes `TypeError` in the WeChat Mini Program environment. 
-Always use `PlatformUtils` from `lib/core/utils/platform_utils.dart`:
+### 1. Platform Detection
+Use `PlatformUtils` from `lib/core/utils/platform_utils.dart` for platform detection:
 ```dart
 import 'package:ios_club_app/core/utils/platform_utils.dart';
-
 if (PlatformUtils.isWindows) { ... }
-if (PlatformUtils.isMPFlutter) { ... } // WeChat Mini Program
 ```
 
 ### 2. Code Standards

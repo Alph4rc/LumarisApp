@@ -23,9 +23,6 @@ class _TilesWidgetState extends State<TilesWidget>
   @override
   bool get wantKeepAlive => true;
 
-  // For tap-based reordering (WeChat Mini Program fallback)
-  int? _selectedTileIndex;
-
   @override
   void initState() {
     super.initState();
@@ -80,10 +77,8 @@ class _TilesWidgetState extends State<TilesWidget>
           // Tiles grid or empty state
           if (visibleTiles.isEmpty)
             const EmptyTilesMessage()
-          else if (isEditMode && !PlatformUtils.isMPFlutter)
+          else if (isEditMode)
             _buildReorderableGrid(visibleTiles, controller)
-          else if (isEditMode && PlatformUtils.isMPFlutter)
-            _buildTapReorderGrid(visibleTiles, controller)
           else
             _buildNormalGrid(visibleTiles),
         ],
@@ -135,96 +130,6 @@ class _TilesWidgetState extends State<TilesWidget>
         },
       ),
     );
-  }
-
-  /// Build tap-based reordering grid for WeChat Mini Program
-  Widget _buildTapReorderGrid(
-      List visibleTiles, TileEditController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-      child: Column(
-        children: [
-          // Instructions
-          Container(
-            padding: const EdgeInsets.all(12),
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '点击两个磁贴以交换位置',
-                    style: TextStyle(fontSize: 14, color: Colors.blue),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Grid
-          GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16.0,
-              crossAxisSpacing: 16.0,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: visibleTiles.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final tile = visibleTiles[index];
-              final isSelected = _selectedTileIndex == index;
-
-              return TapReorderTileItem(
-                key: ValueKey(tile.id),
-                tileId: tile.id,
-                index: index,
-                isSelected: isSelected,
-                onTap: () => _handleTapReorder(index, tile.id, controller),
-                child: EditableTileWrapper(
-                  tileId: tile.id,
-                  index: index,
-                  child: buildTile(tile.id, context),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Handle tap-based reordering
-  void _handleTapReorder(
-      int index, String tileId, TileEditController controller) {
-    setState(() {
-      if (_selectedTileIndex == null) {
-        // First tap - select tile
-        _selectedTileIndex = index;
-      } else if (_selectedTileIndex == index) {
-        // Tap same tile - deselect
-        _selectedTileIndex = null;
-      } else {
-        // Second tap - swap tiles
-        final oldIndex = _selectedTileIndex!;
-        final newIndex = index;
-
-        controller.reorderTile(
-          controller.visibleTiles[oldIndex].id,
-          oldIndex,
-          newIndex,
-        );
-
-        _selectedTileIndex = null;
-      }
-    });
   }
 
   /// Build normal grid (non-edit mode)

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-iOS Club App is a cross-platform Flutter application for iOS Club members at Xi'an University of Architecture and Technology. It provides course management, scheduling, member management, exam information, grades, campus bus schedules, and more. The app supports iOS, Android, macOS, Windows, Linux, Web, and WeChat Mini Program platforms.
+iOS Club App is a cross-platform Flutter application for iOS Club members at Xi'an University of Architecture and Technology. It provides course management, scheduling, member management, exam information, grades, campus bus schedules, and more.
 
 ## Common Commands
 
@@ -41,8 +41,6 @@ flutter build web --no-tree-shake-icons --wasm
 # Windows (MSIX package for Store)
 dart run msix:create --store
 
-# WeChat Mini Program
-dart scripts/build_wechat.dart
 ```
 
 ## Architecture Overview
@@ -89,10 +87,9 @@ lib/
 
 ### Platform Detection and Cross-Platform Support
 
-**CRITICAL**: This app supports multiple platforms including WeChat Mini Program via MPFlutter. Always use `PlatformUtils` from `lib/core/utils/platform_utils.dart` for platform detection:
+Use `PlatformUtils` from `lib/core/utils/platform_utils.dart` for platform detection:
 
 ```dart
-// ✅ CORRECT - Safe for all platforms including WeChat Mini Program
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 if (PlatformUtils.isWindows) { }
@@ -101,19 +98,11 @@ if (PlatformUtils.isAndroid) { }
 if (PlatformUtils.isIOS) { }
 if (PlatformUtils.isDesktop) { }  // Windows || macOS || Linux
 if (PlatformUtils.isWeb) { }
-if (PlatformUtils.isMPFlutter) { }  // WeChat Mini Program
 
 // For fonts on desktop
 fontFamily: PlatformUtils.getWindowsFontFamily()  // Returns '微软雅黑' on Windows
 fontFamily: PlatformUtils.getDesktopFontFamily(customFont)  // Returns customFont on desktop
-
-// ❌ NEVER DO THIS - Will crash in WeChat Mini Program
-if (!kIsWeb && Platform.isWindows) { }  // TypeError in WeChat environment
 ```
-
-**Why**: WeChat Mini Program environment doesn't support `dart:io`'s `Platform` class. Direct usage causes `TypeError: Cannot read property 'toString' of undefined`. All platform checks are wrapped in try-catch blocks in `PlatformUtils`.
-
-See `WECHAT_MINIPROGRAM_FIX.md` for detailed explanation of the platform detection fix.
 
 ### Navigation Architecture
 
@@ -240,13 +229,12 @@ Update checking is handled by `CheckUpdateManager`:
 
 ## Important Notes
 
-1. **Never use `Platform.isX` directly** - Always use `PlatformUtils` to ensure WeChat Mini Program compatibility
-2. **Desktop font handling** - Use `PlatformUtils.getDesktopFontFamily()` for consistent font behavior
-3. **High refresh rate** - Android automatically sets high refresh rate mode on app launch
-4. **Background services** - Android and iOS have separate background service implementations
-5. **State persistence** - User preferences stored via `shared_preferences` with keys defined in `lib/state/prefs_keys.dart`
-6. **Network caching** - `RequestCache` provides automatic HTTP response caching with TTL
-7. **macOS window configuration** - macOS uses native window utilities configured in `_configureMacosWindowUtils()`
+1. **Desktop font handling** - Use `PlatformUtils.getDesktopFontFamily()` for consistent font behavior
+2. **High refresh rate** - Android automatically sets high refresh rate mode on app launch
+3. **Background services** - Android and iOS have separate background service implementations
+4. **State persistence** - User preferences stored via `shared_preferences` with keys defined in `lib/state/prefs_keys.dart`
+5. **Network caching** - `RequestCache` provides automatic HTTP response caching with TTL
+6. **macOS window configuration** - macOS uses native window utilities configured in `_configureMacosWindowUtils()`
 
 ## Git Repository
 

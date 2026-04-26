@@ -26,9 +26,6 @@ import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
-import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
-import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
-
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,19 +35,6 @@ void main() async {
 
   // 初始化 Hive 数据库
   await HiveManager.init();
-
-  // 在微信小程序环境中，跳过大部分平台特定的初始化
-  if (PlatformUtils.isMPFlutter) {
-    // 初始化 SharedPreferences
-    await PrefsService.init();
-    // 只初始化必要的 Stores
-    initStores();
-    // 直接启动应用
-    initApp();
-    return;
-  }
-
-  // 以下代码只在非微信小程序环境中执行
 
   // 初始化 SharedPreferences（最先初始化，其他服务可能依赖它）
   await PrefsService.init();
@@ -131,13 +115,11 @@ void main() async {
 
   // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
   // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度
-  if (!PlatformUtils.isMPFlutter) {
-    // 延迟执行，确保所有 Store 和 Service 完全就绪
-    Future.delayed(const Duration(seconds: 2), () async {
-      await TaskExecutor.checkAndSendCourseReminder();
-      await TaskExecutor.updateWidget();
-    });
-  }
+  // 延迟执行，确保所有 Store 和 Service 完全就绪
+  Future.delayed(const Duration(seconds: 2), () async {
+    await TaskExecutor.checkAndSendCourseReminder();
+    await TaskExecutor.updateWidget();
+  });
 
   initApp();
 }
@@ -160,11 +142,6 @@ String? _getFontFamily() {
 }
 
 Widget _getHomePage() {
-  // 在微信小程序环境中，直接返回 MainApp
-  if (PlatformUtils.isMPFlutter) {
-    return const MainApp();
-  }
-
   // Windows 平台返回 WindowPage
   if (PlatformUtils.isWindows) {
     return const WindowPage();
@@ -207,20 +184,6 @@ void initApp() {
     return;
   }
 
-  if (PlatformUtils.isMPFlutter) {
-    try {
-      wx.$$context$$;
-      runMPApp(MaterialApp(
-        title: 'iOS Club App',
-        debugShowCheckedModeBanner: false,
-        home: const MainApp(),
-      ));
-      return;
-    } catch (e) {
-      //
-    }
-  }
-
   runApp(MaterialApp(
     title: 'iOS Club App',
     debugShowCheckedModeBanner: false,
@@ -247,9 +210,7 @@ void initApp() {
 
 void requestPermissions() async {
   // 在 Web、微信小程序和 macOS 平台中不请求权限，避免 MissingPluginException
-  if (PlatformUtils.isWeb ||
-      PlatformUtils.isMPFlutter ||
-      PlatformUtils.isMacOS) {
+  if (PlatformUtils.isWeb || PlatformUtils.isMacOS) {
     return;
   }
 

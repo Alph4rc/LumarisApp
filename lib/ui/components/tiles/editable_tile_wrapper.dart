@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
@@ -88,7 +87,7 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
                   ),
 
                   // Make the whole card act as a drag handle in edit mode
-                  if (isEditMode && !PlatformUtils.isMPFlutter)
+                  if (isEditMode)
                     Positioned.fill(
                       child: ReorderableDragStartListener(
                         index: widget.index,
@@ -136,56 +135,6 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
           color: Colors.white,
           size: 16,
         ),
-      ),
-    );
-  }
-}
-
-/// Tap-based reordering for WeChat Mini Program
-class TapReorderTileItem extends StatelessWidget {
-  final Widget child;
-  final String tileId;
-  final int index;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const TapReorderTileItem({
-    super.key,
-    required this.child,
-    required this.tileId,
-    required this.index,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        children: [
-          child,
-          if (isSelected)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 3,
-                  ),
-                  color: Colors.blue.withValues(alpha: 0.1),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.check_circle,
-                    color: Colors.blue,
-                    size: 48,
-                  ),
-                ),
-              ),
-            ),
-        ],
       ),
     );
   }

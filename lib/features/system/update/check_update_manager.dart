@@ -43,18 +43,7 @@ class CheckUpdateManager {
       return false;
     }
 
-    // 首先检查系统环境变量
-    // 在微信小程序环境中，Platform.environment 不可用
-    if (!PlatformUtils.isMPFlutter) {
-      try {
-        // 只在非微信小程序环境中访问 Platform.environment
-        // 这里需要动态导入 dart:io，但由于已经移除了导入，我们跳过这个检查
-      } catch (e) {
-        AppLogger.debug("无法访问环境变量: $e");
-      }
-    }
-
-    // 然后检查.env文件中的配置
+    // 检查.env文件中的配置
     // 添加对 dotenv 是否已初始化的检查
     try {
       final dotenvUpdateChannel = dotenv.maybeGet('UPDATE_CHANNEL');
