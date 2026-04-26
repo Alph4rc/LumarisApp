@@ -59,11 +59,11 @@ class SettingPage extends StatelessWidget {
                   _buildRefreshTile(context, isDark),
                   const ShowTomorrowSetting(),
                   if (PlatformUtils.isMobile) const RemindSetting(),
-                  const TodoListSetting(),
+                  //const TodoListSetting(),
                   const TodoRemindSetting(), // 添加待办提醒设置
                   const HomePageSetting(), // 添加首页设置
-                  if (PlatformUtils.isMobile)
-                    const HapticFeedbackSetting(), // 添加触觉反馈设置
+                  // if (PlatformUtils.isMobile)
+                  //   const HapticFeedbackSetting(), // 添加触觉反馈设置
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
                     const FontFamilySetting(), // 添加字体设置
                 ]),

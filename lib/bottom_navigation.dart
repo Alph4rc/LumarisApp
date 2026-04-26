@@ -55,9 +55,9 @@ class BottomNavigation extends StatelessWidget {
                 destination: destinations[index],
                 isSelected: selectedIndex == index,
                 onTap: () {
-                  if (settingsStore.enableHapticFeedback) {
-                    Feedback.forLongPress(context);
-                  }
+                  // if (settingsStore.enableHapticFeedback) {
+                  //   Feedback.forLongPress(context);
+                  // }
                   onDestinationSelected(index);
                 },
                 selectedColor: selectedColor,
