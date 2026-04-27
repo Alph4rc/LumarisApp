@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -240,38 +240,14 @@ class NotificationService {
   }
 
   static Future<void> set(BuildContext context) async {
-    if (await Permission.scheduleExactAlarm.isGranted) {
-      await remind();
-      return;
-    }
-
-    if (context.mounted) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text('请允许使用闹钟'),
-                content: Text('您需要允许使用闹钟才能使用通知功能'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('取消'),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await Permission.scheduleExactAlarm.request();
-                      if (await Permission.scheduleExactAlarm.isGranted) {
-                        await remind();
-                      }
-                    },
-                    child: Text('去设置'),
-                  )
-                ]);
-          });
-    }
+    await PermissionService.request(
+      Permission.scheduleExactAlarm,
+      onGranted: remind,
+      context: context,
+      dialogTitle: '请允许使用闹钟',
+      dialogContent: '您需要允许使用闹钟才能使用通知功能',
+      settingsText: '去设置',
+    );
   }
 
   static Future<void> remind() async {

@@ -17,7 +17,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -116,10 +116,12 @@ void main() async {
   // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
   // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度
   // 延迟执行，确保所有 Store 和 Service 完全就绪
-  Future.delayed(const Duration(seconds: 2), () async {
-    await TaskExecutor.checkAndSendCourseReminder();
-    await TaskExecutor.updateWidget();
-  });
+  if (PlatformUtils.isIOS && Platform.isAndroid) {
+    Future.delayed(const Duration(seconds: 2), () async {
+      await TaskExecutor.checkAndSendCourseReminder();
+      await TaskExecutor.updateWidget();
+    });
+  }
 
   initApp();
 }
@@ -209,30 +211,16 @@ void initApp() {
 }
 
 void requestPermissions() async {
-  // 在 Web、微信小程序和 macOS 平台中不请求权限，避免 MissingPluginException
   if (PlatformUtils.isWeb || PlatformUtils.isMacOS) {
     return;
   }
 
-  List<Permission> permissions = [
+  await PermissionService.requestMultiple([
     Permission.notification,
     Permission.backgroundRefresh,
     Permission.storage,
     Permission.requestInstallPackages,
-  ];
-
-  // 只请求尚未授予的权限
-  List<Permission> permissionsToRequest = [];
-  for (var permission in permissions) {
-    PermissionStatus status = await permission.status;
-    if (status != PermissionStatus.granted) {
-      permissionsToRequest.add(permission);
-    }
-  }
-
-  if (permissionsToRequest.isNotEmpty) {
-    await permissionsToRequest.request();
-  }
+  ]);
 }
 
 class WindowPage extends StatefulWidget {
