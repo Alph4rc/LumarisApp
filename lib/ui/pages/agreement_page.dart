@@ -337,19 +337,15 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
                 textColor),
             const SizedBox(height: 8),
             _buildBodyText(
-                '1.2 社团成员信息：当您使用 iMember 社团成员功能时，我们需要收集您的社团账号和密码。该信息同样仅存储在您的设备本地。',
+                '1.2 课程与成绩信息：在您授权登录后，本应用会从学校教务系统获取您的课程表、考试成绩、培养方案等教育相关数据，并在您的设备本地进行存储和展示。',
                 textColor),
             const SizedBox(height: 8),
             _buildBodyText(
-                '1.3 课程与成绩信息：在您授权登录后，本应用会从学校教务系统获取您的课程表、考试成绩、培养方案等教育相关数据，并在您的设备本地进行存储和展示。',
+                '1.3 校园生活信息：在您使用相关功能时，本应用会从学校相关系统获取您的电费余额、饭卡消费记录、校园网流量使用情况等信息。',
                 textColor),
             const SizedBox(height: 8),
             _buildBodyText(
-                '1.4 校园生活信息：在您使用相关功能时，本应用会从学校相关系统获取您的电费余额、饭卡消费记录、校园网流量使用情况等信息。',
-                textColor),
-            const SizedBox(height: 8),
-            _buildBodyText(
-                '1.5 设备信息：为提供更好的服务体验，本应用可能收集您的设备型号、操作系统版本等，用于统计分析和问题排查。',
+                '1.4 设备信息：为提供更好的服务体验，本应用可能收集您的设备型号、操作系统版本等，用于统计分析和问题排查。',
                 textColor),
             const SizedBox(height: 24),
             _buildSectionTitle('二、我们如何使用信息', titleColor),
