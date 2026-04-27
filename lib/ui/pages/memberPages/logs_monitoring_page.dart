@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/features/club/services/logs_service.dart';
 import 'package:ios_club_app/features/club/services/monitoring_service.dart';
 import 'package:ios_club_app/features/club/services/ip_blacklist_service.dart';
-import 'package:ios_club_app/features/club/models/performance_data.dart';
 import 'package:ios_club_app/features/club/models/http_stats.dart';
 import 'package:ios_club_app/features/club/models/data_access_stats.dart';
 import 'package:ios_club_app/features/club/models/data_change_stats.dart';
@@ -28,7 +27,7 @@ class _LogsMonitoringPageState extends State<LogsMonitoringPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -47,7 +46,6 @@ class _LogsMonitoringPageState extends State<LogsMonitoringPage>
           isScrollable: true,
           tabs: const [
             Tab(text: '系统日志'),
-            Tab(text: '性能监控'),
             Tab(text: 'IP黑名单'),
             Tab(text: '数据统计'),
           ],
@@ -57,7 +55,6 @@ class _LogsMonitoringPageState extends State<LogsMonitoringPage>
         controller: _tabController,
         children: const [
           _LogsTab(),
-          _PerformanceTab(),
           _IpBlacklistTab(),
           _DataStatsTab(),
         ],
@@ -434,164 +431,6 @@ class _LogsTabState extends State<_LogsTab> with AutomaticKeepAliveClientMixin {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// 性能监控标签页
-class _PerformanceTab extends StatefulWidget {
-  const _PerformanceTab();
-
-  @override
-  State<_PerformanceTab> createState() => _PerformanceTabState();
-}
-
-class _PerformanceTabState extends State<_PerformanceTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  PerformanceData? _performanceData;
-  HttpStats? _httpStats;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-
-    try {
-      final results = await Future.wait([
-        MonitoringService.getPerformance(),
-        MonitoringService.getHttpStats(),
-      ]);
-
-      setState(() {
-        _performanceData = results[0] as PerformanceData?;
-        _httpStats = results[1] as HttpStats?;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      Get.snackbar('错误', '加载监控数据失败: $e', snackPosition: SnackPosition.BOTTOM);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadData,
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                // 性能数据
-                if (_performanceData != null) ...[
-                  const Text(
-                    '系统性能',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  ClubCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          if (_performanceData!.cpuUsage != null)
-                            _buildStatRow('CPU使用率',
-                                '${(_performanceData!.cpuUsage! * 100).toStringAsFixed(1)}%'),
-                          if (_performanceData!.memoryUsage != null)
-                            _buildStatRow('内存使用率',
-                                '${(_performanceData!.memoryUsage! * 100).toStringAsFixed(1)}%'),
-                          if (_performanceData!.diskUsage != null)
-                            _buildStatRow('磁盘使用率',
-                                '${(_performanceData!.diskUsage! * 100).toStringAsFixed(1)}%'),
-                          if (_performanceData!.requestCount != null)
-                            _buildStatRow('请求数',
-                                _performanceData!.requestCount.toString()),
-                          if (_performanceData!.errorCount != null)
-                            _buildStatRow(
-                                '错误数', _performanceData!.errorCount.toString()),
-                          if (_performanceData!.avgResponseTime != null)
-                            _buildStatRow('平均响应时间',
-                                '${_performanceData!.avgResponseTime!.toStringAsFixed(2)}ms'),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-                // HTTP统计
-                if (_httpStats != null) ...[
-                  const Text(
-                    'HTTP 统计',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  ClubCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          if (_httpStats!.totalRequests != null)
-                            _buildStatRow(
-                                '总请求数', _httpStats!.totalRequests.toString()),
-                          if (_httpStats!.successfulRequests != null)
-                            _buildStatRow('成功请求',
-                                _httpStats!.successfulRequests.toString()),
-                          if (_httpStats!.failedRequests != null)
-                            _buildStatRow(
-                                '失败请求', _httpStats!.failedRequests.toString()),
-                          if (_httpStats!.avgResponseTime != null)
-                            _buildStatRow('平均响应时间',
-                                '${_httpStats!.avgResponseTime!.toStringAsFixed(2)}ms'),
-                          if (_httpStats!.minResponseTime != null)
-                            _buildStatRow('最小响应时间',
-                                '${_httpStats!.minResponseTime!.toStringAsFixed(2)}ms'),
-                          if (_httpStats!.maxResponseTime != null)
-                            _buildStatRow('最大响应时间',
-                                '${_httpStats!.maxResponseTime!.toStringAsFixed(2)}ms'),
-                          if (_httpStats!.requestsPerSecond != null)
-                            _buildStatRow('每秒请求数',
-                                _httpStats!.requestsPerSecond.toString()),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }

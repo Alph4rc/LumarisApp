@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/features/club/services/api_client.dart';
-import 'package:ios_club_app/features/club/models/performance_data.dart';
 import 'package:ios_club_app/features/club/models/http_stats.dart';
 import 'package:ios_club_app/features/club/models/data_access_stats.dart';
 import 'package:ios_club_app/features/club/models/data_change_stats.dart';
@@ -11,26 +10,6 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 ///
 /// 负责处理系统性能监控、HTTP统计和数据访问统计等功能
 class MonitoringService {
-  /// 获取性能监控数据
-  ///
-  /// @return 性能监控数据
-  static Future<PerformanceData?> getPerformance() async {
-    try {
-      final response = await ApiClient.get('/Monitoring/performance');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> apiResponse = jsonDecode(response.body);
-        if (apiResponse['data'] != null) {
-          return PerformanceData.fromJson(apiResponse['data']);
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching performance data: $e');
-      }
-    }
-    return null;
-  }
-
   /// 获取HTTP统计数据
   ///
   /// @return HTTP请求统计数据

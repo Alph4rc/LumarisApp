@@ -9,7 +9,6 @@ import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
@@ -188,59 +187,55 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
     6: '/Payment',
   };
 
-  Widget _app(bool isTablet) => PerformanceMonitorWidget(
-        child: GetMaterialApp(
-          title: 'iOS Club App',
-          debugShowCheckedModeBanner: false,
-          defaultTransition: (kIsWeb)
-              ? Transition.fadeIn
-              : isTablet
-                  ? Transition.fadeIn
-                  : Transition.native,
-          theme: ThemeData(
-            fontFamily: SettingsStore.to.fontFamily.isEmpty
-                ? PlatformUtils.getWindowsFontFamily()
-                : PlatformUtils.getDesktopFontFamily(
-                    SettingsStore.to.fontFamily),
-          ),
-          darkTheme: ThemeData(
-            fontFamily: SettingsStore.to.fontFamily.isEmpty
-                ? PlatformUtils.getWindowsFontFamily()
-                : PlatformUtils.getDesktopFontFamily(
-                    SettingsStore.to.fontFamily),
-            brightness: Brightness.dark,
-            appBarTheme: const AppBarTheme(
-              systemOverlayStyle: SystemUiOverlayStyle.light,
-              foregroundColor: Colors.white,
-              elevation: 0,
-            ),
-          ),
-          getPages: AppRouter.getPages,
-          onUnknownRoute: (settings) {
-            return MaterialPageRoute(
-              builder: (context) => UnderMaintenanceScreen(),
-            );
-          },
-          // 添加路由监听，确保索引与路由同步
-          routingCallback: (routing) {
-            if (routing?.current != null) {
-              final route = routing!.current;
-              final index = _routeMap.entries
-                  .firstWhere((entry) => entry.value == route,
-                      orElse: () => const MapEntry(0, '/'))
-                  .key;
-              if (_currentIndex != index) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  }
-                });
-              }
-            }
-          },
+  Widget _app(bool isTablet) => GetMaterialApp(
+        title: 'iOS Club App',
+        debugShowCheckedModeBanner: false,
+        defaultTransition: (kIsWeb)
+            ? Transition.fadeIn
+            : isTablet
+                ? Transition.fadeIn
+                : Transition.native,
+        theme: ThemeData(
+          fontFamily: SettingsStore.to.fontFamily.isEmpty
+              ? PlatformUtils.getWindowsFontFamily()
+              : PlatformUtils.getDesktopFontFamily(SettingsStore.to.fontFamily),
         ),
+        darkTheme: ThemeData(
+          fontFamily: SettingsStore.to.fontFamily.isEmpty
+              ? PlatformUtils.getWindowsFontFamily()
+              : PlatformUtils.getDesktopFontFamily(SettingsStore.to.fontFamily),
+          brightness: Brightness.dark,
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+        ),
+        getPages: AppRouter.getPages,
+        onUnknownRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => UnderMaintenanceScreen(),
+          );
+        },
+        // 添加路由监听，确保索引与路由同步
+        routingCallback: (routing) {
+          if (routing?.current != null) {
+            final route = routing!.current;
+            final index = _routeMap.entries
+                .firstWhere((entry) => entry.value == route,
+                    orElse: () => const MapEntry(0, '/'))
+                .key;
+            if (_currentIndex != index) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                }
+              });
+            }
+          }
+        },
       );
 
   @override
@@ -269,8 +264,55 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
       // macOS - 使用原生 macOS UI
       if (isMacOS) {
-      return MacosWindow(
-        sidebar: macosUISidebar(
+        return MacosWindow(
+          sidebar: macosUISidebar(
+            items: _destinations,
+            selectedIndex: _currentIndex,
+            onItemSelected: (int index) {
+              setState(() {
+                _currentIndex = index;
+              });
+              Get.toNamed(_routeMap[index] ?? '/');
+            },
+          ),
+          titleBar: TitleBar(
+            title: const Text('iOS Club App'),
+            decoration: BoxDecoration(
+              color: MacosTheme.of(context).canvasColor,
+            ),
+          ),
+          child: _app(true),
+        );
+      }
+
+      // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
+      if (isWindows || isLinux) {
+        return Scaffold(
+          body: SafeArea(
+            child: Row(
+              children: [
+                WindowsSidebar(
+                  items: _destinations,
+                  selectedIndex: _currentIndex,
+                  onItemSelected: (int index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                    Get.toNamed(_routeMap[index] ?? '/');
+                  },
+                ),
+                Expanded(
+                  child: _app(true),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // 平板横屏 - 使用 NavigationRail
+      if (isTabletLandscape) {
+        return TabletNavigation(
           items: _destinations,
           selectedIndex: _currentIndex,
           onItemSelected: (int index) {
@@ -279,94 +321,47 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
             });
             Get.toNamed(_routeMap[index] ?? '/');
           },
-        ),
-        titleBar: TitleBar(
-          title: const Text('iOS Club App'),
-          decoration: BoxDecoration(
-            color: MacosTheme.of(context).canvasColor,
-          ),
-        ),
-        child: _app(true),
-      );
-    }
+          child: _app(true),
+        );
+      }
 
-    // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
-    if (isWindows || isLinux) {
+      // 平板竖屏 - 使用 Drawer
+      if (isTabletPortrait) {
+        return TabletDrawerNavigation(
+          items: _destinations,
+          selectedIndex: _currentIndex,
+          onItemSelected: (int index) {
+            setState(() {
+              _currentIndex = index;
+            });
+            Get.toNamed(_routeMap[index] ?? '/');
+          },
+          child: _app(true),
+        );
+      }
+
+      // 手机 - 使用底部导航栏
       return Scaffold(
-        body: SafeArea(
-          child: Row(
-            children: [
-              WindowsSidebar(
-                items: _destinations,
-                selectedIndex: _currentIndex,
-                onItemSelected: (int index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                  Get.toNamed(_routeMap[index] ?? '/');
-                },
-              ),
-              Expanded(
-                child: _app(true),
-              ),
-            ],
-          ),
+        body: SafeArea(child: _app(false)),
+        bottomNavigationBar: BottomNavigation(
+          destinations: _destinations.sublist(0, 4).map((destination) {
+            return NavigationDestination(
+              icon: Icon(destination.icon),
+              selectedIcon: Icon(destination.selectedIcon),
+              label: destination.label,
+            );
+          }).toList(),
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _currentIndex = index;
+            });
+            Get.toNamed(_routeMap[index] ?? '/');
+          },
+          backgroundColor:
+              Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
         ),
       );
-    }
-
-    // 平板横屏 - 使用 NavigationRail
-    if (isTabletLandscape) {
-      return TabletNavigation(
-        items: _destinations,
-        selectedIndex: _currentIndex,
-        onItemSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          Get.toNamed(_routeMap[index] ?? '/');
-        },
-        child: _app(true),
-      );
-    }
-
-    // 平板竖屏 - 使用 Drawer
-    if (isTabletPortrait) {
-      return TabletDrawerNavigation(
-        items: _destinations,
-        selectedIndex: _currentIndex,
-        onItemSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          Get.toNamed(_routeMap[index] ?? '/');
-        },
-        child: _app(true),
-      );
-    }
-
-    // 手机 - 使用底部导航栏
-    return Scaffold(
-      body: SafeArea(child: _app(false)),
-      bottomNavigationBar: BottomNavigation(
-        destinations: _destinations.sublist(0, 4).map((destination) {
-          return NavigationDestination(
-            icon: Icon(destination.icon),
-            selectedIcon: Icon(destination.selectedIcon),
-            label: destination.label,
-          );
-        }).toList(),
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          Get.toNamed(_routeMap[index] ?? '/');
-        },
-        backgroundColor:
-            Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
-      ),
-    );
     });
   }
 }

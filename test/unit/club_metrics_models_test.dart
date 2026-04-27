@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/features/club/models/data_access_stats.dart';
 import 'package:ios_club_app/features/club/models/data_centre_model.dart';
 import 'package:ios_club_app/features/club/models/data_change_stats.dart';
-import 'package:ios_club_app/features/club/models/performance_data.dart';
 import 'package:ios_club_app/features/club/models/update_client_app_model.dart';
 
 void main() {
@@ -103,25 +102,7 @@ void main() {
     });
   });
 
-  group('PerformanceData/UpdateClientAppModel', () {
-    test('should parse performance metrics and extra', () {
-      final model = PerformanceData.fromJson(<String, dynamic>{
-        'cpuUsage': 25,
-        'memoryUsage': 61.5,
-        'diskUsage': 70,
-        'requestCount': 1000,
-        'errorCount': 3,
-        'avgResponseTime': 13.2,
-        'timestamp': '2026-03-02T12:30:00.000Z',
-        'cluster': 'A',
-      });
-
-      expect(model.cpuUsage, 25.0);
-      expect(model.memoryUsage, 61.5);
-      expect(model.extra!['cluster'], 'A');
-      expect(model.toJson()['timestamp'], '2026-03-02T12:30:00.000Z');
-    });
-
+  group('UpdateClientAppModel', () {
     test('should parse update client app model with optional list', () {
       final model = UpdateClientAppModel.fromJson(<String, dynamic>{
         'applicationName': '新门户',
