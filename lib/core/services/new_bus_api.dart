@@ -3,6 +3,26 @@ import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
+typedef NewBusFallbackFetcher = Future<BusModel> Function({String? dayDate});
+
+typedef NewBusDioFactory = Dio Function();
+
+NewBusDioFactory _dioFactory = Dio.new;
+NewBusFallbackFetcher _fallbackFetcher = BusService.getBus;
+
+void setNewBusApiDioFactoryForTest(NewBusDioFactory factory) {
+  _dioFactory = factory;
+}
+
+void setNewBusApiFallbackFetcherForTest(NewBusFallbackFetcher fetcher) {
+  _fallbackFetcher = fetcher;
+}
+
+void resetNewBusApiForTest() {
+  _dioFactory = Dio.new;
+  _fallbackFetcher = BusService.getBus;
+}
+
 /// 新数据平台
 ///
 /// [loc] All,雁塔,草堂
@@ -10,7 +30,7 @@ Future<BusModel> getBusFromNewData({
   String? time,
   String loc = '雁塔',
 }) async {
-  final dio = Dio();
+  final dio = _dioFactory();
 
   // 配置dio实例
   dio.options = BaseOptions(
@@ -51,7 +71,7 @@ Future<BusModel> getBusFromNewData({
 
     // 如果没有数据，调用旧数据接口
     if (dfBusPlans == null || dfBusPlans.isEmpty) {
-      return await BusService.getBus(dayDate: time);
+      return await _fallbackFetcher(dayDate: time);
     }
 
     // 处理数据

@@ -7,6 +7,7 @@ import 'package:get/get.dart' hide Response;
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
+import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -19,6 +20,7 @@ import 'package:ios_club_app/features/education/services/edu_http_client_manager
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/features/education/services/login_service.dart';
+import 'package:ios_club_app/features/education/services/score_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,6 +63,24 @@ void mockEduResponse({
         handler.next(options);
       },
     ),
+  );
+}
+
+CourseModel courseFixture({
+  String lessonId = 'L1',
+  String courseName = '软件工程',
+  int weekday = 1,
+}) {
+  return CourseModel(
+    lessonId: lessonId,
+    courseName: courseName,
+    weekIndexes: const [1, 2],
+    teachers: const ['Teacher'],
+    room: 'A101',
+    weekday: weekday,
+    startUnit: 1,
+    endUnit: 2,
+    campus: '雁塔校区',
   );
 }
 
@@ -263,6 +283,110 @@ void main() {
       expect(PrefsService.instance.getString(PrefsKeys.TIME_DATA), isNotNull);
       expect(await CourseRepository().getCourses(), hasLength(1));
       expect(week.maxWeek, greaterThan(0));
+    });
+
+    test('CourseService.getCourses should return local snapshot first',
+        () async {
+      await CourseRepository().saveCourses([
+        courseFixture(courseName: '本地课程'),
+      ]);
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            fail('localFirst should not request remote course data');
+          },
+        ),
+      );
+
+      final snapshot = await CourseService.getCourses();
+
+      expect(snapshot.isFromLocal, isTrue);
+      expect(snapshot.isStale, isFalse);
+      expect(snapshot.data.single.courseName, '本地课程');
+    });
+
+    test(
+        'CourseService.fetchCoursesFromRemote should fallback to local data '
+        'when user data is missing', () async {
+      await CourseRepository().saveCourses([
+        courseFixture(courseName: '缓存课程'),
+      ]);
+
+      final courses = await CourseService.fetchCoursesFromRemote();
+
+      expect(courses, hasLength(1));
+      expect(courses.single.courseName, '缓存课程');
+    });
+
+    test('ScoreService.readSemestersFromPrefs should parse valid cache',
+        () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.SEMESTER_DATA,
+        '{"data":[{"value":"2025-2","text":"2025-2026 第二学期"}]}',
+      );
+
+      final semesters = ScoreService.readSemestersFromPrefs();
+
+      expect(semesters, hasLength(1));
+      expect(semesters.single.semester, '2025-2');
+      expect(semesters.single.name, '2025-2026 第二学期');
+    });
+
+    test('ScoreService.readSemestersFromPrefs should return empty on bad cache',
+        () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.SEMESTER_DATA,
+        '{"data":{}}',
+      );
+
+      expect(ScoreService.readSemestersFromPrefs(), isEmpty);
+
+      await PrefsService.instance.setString(
+        PrefsKeys.SEMESTER_DATA,
+        '{bad-json',
+      );
+
+      expect(ScoreService.readSemestersFromPrefs(), isEmpty);
+    });
+
+    test(
+        'ScoreService.fetchScoresFromRemote should return sorted cached data '
+        'when user data is missing', () async {
+      await ScoreRepository().saveScores([
+        ScoreList(
+          semester: SemesterModel(semester: '2024-1', name: 'old'),
+          list: [ScoreModel(lessonName: 'old-score')],
+        ),
+        ScoreList(
+          semester: SemesterModel(semester: '2025-2', name: 'new'),
+          list: [ScoreModel(lessonName: 'new-score')],
+        ),
+      ]);
+
+      final scores = await ScoreService.fetchScoresFromRemote();
+
+      expect(scores.map((item) => item.semester.semester), [
+        '2025-2',
+        '2024-1',
+      ]);
+    });
+
+    test('ScoreService.sortScores should order semesters descending', () {
+      final sorted = ScoreService.sortScores([
+        ScoreList(
+          semester: SemesterModel(semester: '2023-2', name: 'a'),
+          list: const [],
+        ),
+        ScoreList(
+          semester: SemesterModel(semester: '2025-1', name: 'b'),
+          list: const [],
+        ),
+      ]);
+
+      expect(sorted.map((item) => item.semester.semester), [
+        '2025-1',
+        '2023-2',
+      ]);
     });
   });
 }

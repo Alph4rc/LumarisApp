@@ -101,7 +101,7 @@ class CourseService {
     final courseRepo = CourseRepository();
     final cookieData = userData ?? await AuthService.getUserData();
     if (cookieData == null) {
-      return [];
+      return courseRepo.getCourses();
     }
 
     try {
@@ -161,7 +161,8 @@ class CourseService {
         return (false, filteredCourses);
       }
       final tomorrow = now.add(const Duration(days: 1));
-      var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+      var weekTomorrow =
+          EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
       var tomorrowWeekday = tomorrow.weekday;
 
       filteredCourses = allCourse.where((course) {
@@ -229,7 +230,8 @@ class CourseService {
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
     final tomorrow = now.add(const Duration(days: 1));
-    var weekTomorrow = EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var weekTomorrow =
+        EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
     var tomorrowWeekday = tomorrow.weekday;
 
     final tomorrowCourses = allCourse.where((course) {

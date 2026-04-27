@@ -123,9 +123,45 @@ void main() {
       expect(box.get('u2'), isNotNull);
     });
 
+    test('should_return_empty_list_when_legacy_todo_json_is_corrupt', () async {
+      secureStore[PrefsKeys.USERNAME] = 'u-corrupt';
+      await PrefsService.instance.setString(
+        PrefsKeys.TODO_DATA,
+        '{not-valid-json',
+      );
+
+      final list = await TodoService.getLocalTodoList();
+
+      expect(list, isEmpty);
+    });
+
+    test('should_return_empty_list_when_legacy_user_key_is_absent', () async {
+      secureStore[PrefsKeys.USERNAME] = 'missing-user';
+      await PrefsService.instance.setString(
+        PrefsKeys.TODO_DATA,
+        jsonEncode({
+          'other-user': [
+            {
+              'title': 'legacy',
+              'deadline': '2026-03-01',
+              'isCompleted': false,
+            }
+          ]
+        }),
+      );
+
+      final list = await TodoService.getLocalTodoList();
+
+      expect(list, isEmpty);
+    });
+
     test('should_return_empty_list_when_no_username', () async {
       final list = await TodoService.getLocalTodoList();
       expect(list, isEmpty);
+    });
+
+    test('clearLocalData should complete when username is missing', () async {
+      await expectLater(TodoService.clearLocalData(), completes);
     });
 
     test('clearLocalData should delete user key and swallow errors', () async {
@@ -138,12 +174,14 @@ void main() {
       expect(box.containsKey('u3'), isFalse);
     });
 
-    test('getClubTodoList should return empty when member data missing', () async {
+    test('getClubTodoList should return empty when member data missing',
+        () async {
       final list = await TodoService.getClubTodoList();
       expect(list, isEmpty);
     });
 
-    test('nowToUpdate should return directly when member data missing', () async {
+    test('nowToUpdate should return directly when member data missing',
+        () async {
       await TodoService.nowToUpdate();
       expect(true, isTrue);
     });
@@ -176,6 +214,16 @@ void main() {
       expect(item.title, '');
       expect(item.deadline, '');
       expect(item.isCompleted, isTrue);
+    });
+
+    test('should_treat_falsey_status_values_as_incomplete', () {
+      final boolStatus = TodoService.fromJsonClub({'status': false});
+      final intStatus = TodoService.fromJsonClub({'status': 0});
+      final missingStatus = TodoService.fromJsonClub({});
+
+      expect(boolStatus.isCompleted, isFalse);
+      expect(intStatus.isCompleted, isFalse);
+      expect(missingStatus.isCompleted, isFalse);
     });
   });
 }

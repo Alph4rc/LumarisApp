@@ -121,7 +121,7 @@ void main() {
       expect(config.getVisibleTiles().length, 1);
     });
 
-    test('should_throw_exception_when_hiding_all_tiles', () async {
+    test('should_allow_hiding_all_tiles_for_empty_state', () async {
       final initialConfig = TileConfigurationList(
         configurations: [
           const TileConfiguration(id: '电费', order: 0, isVisible: true),
@@ -130,10 +130,11 @@ void main() {
       );
       await TileService.saveTileConfigurations(initialConfig);
 
-      expect(
-        () => TileService.toggleTileVisibility('电费'),
-        throwsA(isA<TileConfigurationException>()),
-      );
+      await TileService.toggleTileVisibility('电费');
+
+      final config = await TileService.getTileConfigurations();
+      expect(config.getVisibleTiles(), isEmpty);
+      expect(config.configurations.single.isVisible, isFalse);
     });
 
     test('should_reset_to_default_configuration', () async {

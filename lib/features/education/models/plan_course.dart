@@ -30,14 +30,15 @@ class PlanCourse {
   // 从Map创建PlanCourse对象
   factory PlanCourse.fromJson(Map<String, dynamic> json) {
     return PlanCourse(
-      name: json['name'] as String? ?? "",
-      lessonType: json['lessonType'] as String? ?? "",
-      examMode: json['examMode'] as String? ?? "",
-      courseTypeName: json['courseTypeName'] as String? ?? "",
-      credits: json['credits'] == null
+      name: (json['name'] ?? json['Name']) as String? ?? "",
+      lessonType: (json['lessonType'] ?? json['LessonType']) as String? ?? "",
+      examMode: (json['examMode'] ?? json['ExamMode']) as String? ?? "",
+      courseTypeName:
+          (json['courseTypeName'] ?? json['CourseTypeName']) as String? ?? "",
+      credits: (json['credits'] ?? json['Credits']) == null
           ? 0.0
-          : double.parse(json['credits'].toString()),
-      termStr: json['termStr'] as String? ?? "",
+          : double.parse((json['credits'] ?? json['Credits']).toString()),
+      termStr: (json['termStr'] ?? json['TermStr']) as String? ?? "",
     );
   }
 
