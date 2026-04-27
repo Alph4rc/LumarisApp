@@ -44,6 +44,9 @@ class SettingsStore extends GetxController {
   // 学校配置
   final _schoolId = ApiConfig.defaultSchoolId.obs;
 
+  // 协议授权状态
+  final _hasAcceptedAgreement = false.obs;
+
   bool get isRemind => _isRemind.value;
 
   int get remindTime => _remindTime.value;
@@ -71,6 +74,8 @@ class SettingsStore extends GetxController {
   bool? get customBackgroundIsDark => _customBackgroundIsDark.value;
 
   String get schoolId => _schoolId.value;
+
+  bool get hasAcceptedAgreement => _hasAcceptedAgreement.value;
 
   /// 获取当前学校配置
   SchoolConfig get currentSchool {
@@ -108,6 +113,8 @@ class SettingsStore extends GetxController {
         prefs.getBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK);
     _schoolId.value =
         prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolId;
+    _hasAcceptedAgreement.value =
+        prefs.getBool(PrefsKeys.AGREEMENT_ACCEPTED) ?? false;
   }
 
   /// 设置课程通知开关
@@ -241,6 +248,13 @@ class SettingsStore extends GetxController {
 
     // 额外清理可能未被 EduService 覆盖的旧 Key (如果有)
     await _clearSchoolRelatedData();
+  }
+
+  /// 设置是否已接受用户协议和隐私协议
+  Future<void> setHasAcceptedAgreement(bool value) async {
+    _hasAcceptedAgreement.value = value;
+    final prefs = PrefsService.instance;
+    await prefs.setBool(PrefsKeys.AGREEMENT_ACCEPTED, value);
   }
 
   /// 清除学校相关的缓存数据 (保留作为辅助清理)

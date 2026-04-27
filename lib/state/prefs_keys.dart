@@ -91,4 +91,7 @@ class PrefsKeys {
 
   /// 学校配置相关
   static const String SCHOOL_ID = 'school_id';
+
+  /// 协议相关
+  static const String AGREEMENT_ACCEPTED = 'agreement_accepted';
 }

@@ -12,6 +12,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/performance_monitor.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'bottom_navigation.dart';
@@ -244,25 +245,30 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    return Obx(() {
+      if (!settingsStore.hasAcceptedAgreement) {
+        return const AgreementPage();
+      }
 
-    // 判断设备类型
-    final isMacOS = PlatformUtils.isMacOS;
-    final isWindows = PlatformUtils.isWindows;
-    final isLinux = !isMacOS && !isWindows && PlatformUtils.isDesktop;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
 
-    // 平板判断：宽度 > 600 且不是桌面平台
-    final isTablet = screenWidth > 600 && !PlatformUtils.isDesktop;
+      // 判断设备类型
+      final isMacOS = PlatformUtils.isMacOS;
+      final isWindows = PlatformUtils.isWindows;
+      final isLinux = !isMacOS && !isWindows && PlatformUtils.isDesktop;
 
-    // 平板横屏判断（使用 NavigationRail）
-    final isTabletLandscape = isTablet && screenWidth > screenHeight;
+      // 平板判断：宽度 > 600 且不是桌面平台
+      final isTablet = screenWidth > 600 && !PlatformUtils.isDesktop;
 
-    // 平板竖屏判断（使用 Drawer）
-    final isTabletPortrait = isTablet && screenWidth <= screenHeight;
+      // 平板横屏判断（使用 NavigationRail）
+      final isTabletLandscape = isTablet && screenWidth > screenHeight;
 
-    // macOS - 使用原生 macOS UI
-    if (isMacOS) {
+      // 平板竖屏判断（使用 Drawer）
+      final isTabletPortrait = isTablet && screenWidth <= screenHeight;
+
+      // macOS - 使用原生 macOS UI
+      if (isMacOS) {
       return MacosWindow(
         sidebar: macosUISidebar(
           items: _destinations,
@@ -361,5 +367,6 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
             Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
       ),
     );
+    });
   }
 }

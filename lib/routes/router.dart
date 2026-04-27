@@ -3,6 +3,9 @@ import 'package:ios_club_app/ui/pages/author_page.dart';
 import 'package:ios_club_app/ui/pages/easter_egg_page.dart';
 import 'package:ios_club_app/ui/pages/helper_page.dart';
 import 'package:ios_club_app/ui/pages/license_page.dart';
+import 'package:ios_club_app/ui/pages/agreement_page.dart';
+import 'package:ios_club_app/ui/pages/privacy_policy_page.dart';
+import 'package:ios_club_app/ui/pages/user_agreement_page.dart';
 import 'package:ios_club_app/ui/pages/login_page.dart';
 import 'package:ios_club_app/ui/pages/net_page.dart';
 import 'package:ios_club_app/ui/pages/electricity_page.dart';
@@ -161,6 +164,27 @@ class AppRouter {
           name: '/License',
           page: () => PageRenderTimeMonitor(
               pageName: '许可证页面', child: const LicensePage()),
+        ),
+
+        /// 协议授权页面
+        GetPage(
+          name: '/Agreement',
+          page: () => PageRenderTimeMonitor(
+              pageName: '协议授权页面', child: const AgreementPage()),
+        ),
+
+        /// 隐私协议页面
+        GetPage(
+          name: '/PrivacyPolicy',
+          page: () => PageRenderTimeMonitor(
+              pageName: '隐私协议页面', child: const PrivacyPolicyPage()),
+        ),
+
+        /// 用户协议页面
+        GetPage(
+          name: '/UserAgreement',
+          page: () => PageRenderTimeMonitor(
+              pageName: '用户协议页面', child: const UserAgreementPage()),
         ),
 
         /// 作者页面

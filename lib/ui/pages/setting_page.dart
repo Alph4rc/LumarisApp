@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -89,6 +90,8 @@ class SettingPage extends StatelessWidget {
                 _buildSettingsGroup([
                   _buildTeamTile(isDark),
                   _buildLicenseTile(isDark),
+                  _buildPrivacyPolicyTile(isDark),
+                  _buildUserAgreementTile(isDark),
                 ]),
                 const SizedBox(height: 24),
                 // 其他
@@ -129,7 +132,49 @@ class SettingPage extends StatelessWidget {
                               ),
                             ],
                           ));
-                    })
+                    }),
+                    if (kDebugMode)
+                      Obx(() {
+                        SettingsStore settingsStore = SettingsStore.to;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.checkmark_shield,
+                                size: 20,
+                                color: isDark
+                                    ? Colors.orange.withValues(alpha: 0.7)
+                                    : CupertinoColors.systemOrange,
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '协议授权状态 [Debug]',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    Text(
+                                      '关闭后下次启动将重新显示授权页',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              CupertinoSwitch(
+                                value: settingsStore.hasAcceptedAgreement,
+                                onChanged: (value) {
+                                  settingsStore
+                                      .setHasAcceptedAgreement(value);
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                   ]);
                 }),
                 const SizedBox(height: 32),
@@ -348,6 +393,98 @@ class SettingPage extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'MIT License',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPrivacyPolicyTile(bool isDark) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Get.toNamed('/PrivacyPolicy');
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.shield_fill,
+                size: 20,
+                color: CupertinoColors.systemBlue,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '隐私协议',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '了解我们如何保护你的隐私',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserAgreementTile(bool isDark) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Get.toNamed('/UserAgreement');
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.doc_text_fill,
+                size: 20,
+                color: CupertinoColors.systemPurple,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '用户协议',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '使用本应用即表示你同意本协议',
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark
