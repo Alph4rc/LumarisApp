@@ -2,7 +2,7 @@ name: ios_club_app
 description: "西建大iOS Club出品软件，包括教务系统数据查询，电费饭卡校车和社团内数据显示等内容"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.1.19+1
+version: 1.1.20+1
 
 environment:
   sdk: '>=3.5.3 <4.0.0'
