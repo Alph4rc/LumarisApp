@@ -15,6 +15,7 @@ import 'package:ios_club_app/features/system/notifications/notification_service.
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 
 class ScheduleWidget extends StatefulWidget {
   const ScheduleWidget({super.key});
@@ -150,7 +151,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                           );
                           return AnimatedListItem(
                             index: index,
-                            child: _buildScheduleItem(item, isTablet),
+                            child: _buildScheduleItem(course, item, isTablet),
                           );
                         }).toList(),
                       );
@@ -162,25 +163,14 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     );
   }
 
-  Widget _buildScheduleItem(ScheduleItem item, bool isTablet) {
+  Widget _buildScheduleItem(CourseModel course, ScheduleItem item, bool isTablet) {
     return Material(
       borderRadius: BorderRadius.circular(20),
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          if (isTablet) {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      content: buildCourse(item, isTablet),
-                    ));
-          } else {
-            showClubModalBottomSheet(
-              context,
-              buildCourse(item, isTablet),
-            );
-          }
+          CourseDetailSheet.show(context, course);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0),

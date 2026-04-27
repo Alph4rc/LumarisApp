@@ -154,14 +154,6 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
-                  icon: CupertinoIcons.person_3,
-                  title: '成员管理',
-                  description: '社团成员可查看信息和项目进度',
-                  color: const Color(0xFF00C7BE),
-                  isTablet: isTablet,
-                ),
-                _buildDivider(),
-                _buildFeatureItem(
                   icon: CupertinoIcons.book,
                   title: '培养方案',
                   description: '显示专业培养计划和学分要求',
