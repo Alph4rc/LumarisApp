@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({
@@ -24,7 +22,7 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final settingsStore = Get.find<SettingsStore>();
+    // final settingsStore = Get.find<SettingsStore>();
 
     // 定义颜色
     final bgColor = backgroundColor ?? theme.scaffoldBackgroundColor;

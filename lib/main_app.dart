@@ -31,7 +31,10 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   int _currentIndex = 0;
+  bool _showBottomNav = true;
   final SettingsStore settingsStore = SettingsStore.to;
+
+  static const _bottomNavRoutes = {'/', '/Schedule', '/Score', '/Profile'};
 
   @override
   void initState() {
@@ -225,11 +228,13 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
                 .firstWhere((entry) => entry.value == route,
                     orElse: () => const MapEntry(0, '/'))
                 .key;
-            if (_currentIndex != index) {
+            final showBottomNav = _bottomNavRoutes.contains(route);
+            if (_currentIndex != index || _showBottomNav != showBottomNav) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted) {
                   setState(() {
                     _currentIndex = index;
+                    _showBottomNav = showBottomNav;
                   });
                 }
               });
@@ -340,27 +345,30 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
         );
       }
 
-      // 手机 - 使用底部导航栏
+      // 手机 - 使用底部导航栏（仅在四个主页面显示）
       return Scaffold(
         body: SafeArea(child: _app(false)),
-        bottomNavigationBar: BottomNavigation(
-          destinations: _destinations.sublist(0, 4).map((destination) {
-            return NavigationDestination(
-              icon: Icon(destination.icon),
-              selectedIcon: Icon(destination.selectedIcon),
-              label: destination.label,
-            );
-          }).toList(),
-          selectedIndex: _currentIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _currentIndex = index;
-            });
-            Get.toNamed(_routeMap[index] ?? '/');
-          },
-          backgroundColor:
-              Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
-        ),
+        bottomNavigationBar: _showBottomNav
+            ? BottomNavigation(
+                destinations: _destinations.sublist(0, 4).map((destination) {
+                  return NavigationDestination(
+                    icon: Icon(destination.icon),
+                    selectedIcon: Icon(destination.selectedIcon),
+                    label: destination.label,
+                  );
+                }).toList(),
+                selectedIndex: _currentIndex,
+                onDestinationSelected: (int index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  Get.toNamed(_routeMap[index] ?? '/');
+                },
+                backgroundColor: Theme.of(context)
+                    .scaffoldBackgroundColor
+                    .withValues(alpha: 0.95),
+              )
+            : null,
       );
     });
   }
