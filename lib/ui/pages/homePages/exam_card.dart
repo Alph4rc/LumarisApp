@@ -8,6 +8,7 @@ import 'package:ios_club_app/features/education/services/exam_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 
 class ExamCard extends StatefulWidget {
@@ -214,23 +215,12 @@ class _ExamCardState extends State<ExamCard> {
             ),
           ),
           child: const ClubCard(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  '正在加载考试信息...',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              ],
+            child: LoadingStateView(
+              title: '正在加载考试信息',
+              subtitle: '正在同步近期考试安排、考场和座位信息',
+              icon: CupertinoIcons.calendar,
+              compact: true,
+              padding: EdgeInsets.all(20),
             ),
           ),
         ),

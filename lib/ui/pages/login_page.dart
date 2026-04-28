@@ -11,6 +11,7 @@ import 'package:ios_club_app/features/education/services/education_cache_service
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -168,7 +169,11 @@ class _LoginPageState extends State<LoginPage> {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: LoadingStateView(
+            title: '正在登录教务系统',
+            subtitle: '正在验证账号并同步课程、成绩等基础数据，首次登录可能需要几秒',
+            icon: CupertinoIcons.person_crop_circle,
+          ),
         ),
       );
     }

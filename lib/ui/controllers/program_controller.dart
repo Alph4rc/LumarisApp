@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'package:ios_club_app/features/education/services/program_service.dart';
-import 'package:flutter/material.dart';
 
 class ProgramController extends GetxController {
   TabController? _tabController;
@@ -33,10 +33,10 @@ class ProgramController extends GetxController {
   void onInit() {
     super.onInit();
     pageController = PageController();
-    _loadPrograms();
+    loadPrograms();
   }
 
-  Future<void> _loadPrograms() async {
+  Future<void> loadPrograms() async {
     try {
       isLoading(true);
       isError(false);
@@ -45,6 +45,10 @@ class ProgramController extends GetxController {
 
       // Initialize TabController after data is loaded
       if (_tabController == null || _tabController!.length != programs.length) {
+        if (_isTabListenerAdded && _tabController != null) {
+          _tabController!.removeListener(onTabChanged);
+          _isTabListenerAdded = false;
+        }
         _tabController?.dispose();
         // 使用 RootBundle 的 TickerProvider
         _tabController = TabController(
@@ -56,6 +60,10 @@ class ProgramController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> refreshPrograms() async {
+    await loadPrograms();
   }
 
   TabController? get tabController => _tabController;

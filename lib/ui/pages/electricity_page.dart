@@ -12,6 +12,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:get/get.dart';
 
@@ -202,8 +203,15 @@ class _ElectricityPageState extends State<ElectricityPage> {
                 height: 200,
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return Center(
-                      child: CupertinoActivityIndicator(),
+                    return const Center(
+                      child: LoadingStateView(
+                        title: '正在刷新用电趋势',
+                        subtitle: '正在读取最新电费记录',
+                        icon: CupertinoIcons.bolt_fill,
+                        compact: true,
+                        showCard: false,
+                        padding: EdgeInsets.zero,
+                      ),
                     );
                   }
                   return _buildChart(controller.weeklyData);

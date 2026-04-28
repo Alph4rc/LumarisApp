@@ -5,6 +5,7 @@ import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
@@ -42,7 +43,12 @@ class PaymentPage extends StatelessWidget {
           _buildStatisticsSection(),
           Obx(() {
             if (controller.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return const LoadingStateView(
+                title: '正在读取饭卡余额',
+                subtitle: '正在同步余额和近期流水，校园网络较慢时可能需要几秒',
+                icon: CupertinoIcons.creditcard_fill,
+                showCard: true,
+              );
             }
             if (controller.errorMessage.value.isNotEmpty) {
               return _buildLoginPrompt();

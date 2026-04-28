@@ -13,6 +13,7 @@ import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -216,17 +217,12 @@ class _ScorePageState extends State<ScorePage>
     if (_isLoading) {
       return Scaffold(
         body: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 10),
-            Text(
-              _loadingText,
-              style: TextStyle(fontSize: 16),
-            )
-          ],
-        )),
+          child: LoadingStateView(
+            title: _loadingText,
+            subtitle: '正在读取缓存并同步教务成绩，网络较慢时可能需要几秒',
+            icon: CupertinoIcons.chart_bar_alt_fill,
+          ),
+        ),
       );
     }
 

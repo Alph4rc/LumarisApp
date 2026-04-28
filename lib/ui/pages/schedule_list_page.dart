@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
@@ -98,7 +99,13 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             Expanded(
               child: Obx(() {
                 if (scheduleStore.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: LoadingStateView(
+                      title: '正在加载课表',
+                      subtitle: '正在读取课程、偏好设置和背景配置',
+                      icon: CupertinoIcons.calendar_today,
+                    ),
+                  );
                 }
 
                 return PageView.builder(

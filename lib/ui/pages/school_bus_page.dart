@@ -8,6 +8,7 @@ import 'package:ios_club_app/features/education/models/bus_model.dart'
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 
 class SchoolBusPage extends StatelessWidget {
@@ -61,11 +62,12 @@ class SchoolBusPage extends StatelessWidget {
   Widget _buildBuses(BusController busController) {
     return Obx(() {
       if (busController.isLoading.value) {
-        return Center(
-          child: ClubCard(
-            margin: EdgeInsets.only(top: 40),
-            padding: EdgeInsets.all(16.0),
-            child: CircularProgressIndicator(),
+        return const Center(
+          child: LoadingStateView(
+            title: '正在获取校车班次',
+            subtitle: '正在按日期整理两校区往返班车信息',
+            icon: CupertinoIcons.bus,
+            showCard: true,
           ),
         );
       } else if (busController.errorMessage.value.isNotEmpty) {

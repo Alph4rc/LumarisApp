@@ -1,0 +1,82 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
+
+Widget _wrap(
+  Widget child, {
+  ThemeMode themeMode = ThemeMode.light,
+}) {
+  return MaterialApp(
+    themeMode: themeMode,
+    theme: ThemeData.light(),
+    darkTheme: ThemeData.dark(),
+    home: Scaffold(
+      body: Center(child: child),
+    ),
+  );
+}
+
+void main() {
+  testWidgets('should_render_title_subtitle_and_icon', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const LoadingStateView(
+          title: '正在同步教务数据',
+          subtitle: '网络较慢时可能需要几秒',
+          icon: CupertinoIcons.cloud_download,
+        ),
+      ),
+    );
+
+    expect(find.text('正在同步教务数据'), findsOneWidget);
+    expect(find.text('网络较慢时可能需要几秒'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.cloud_download), findsOneWidget);
+  });
+
+  testWidgets('should_build_in_light_and_dark_themes', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const LoadingStateView(
+          title: '正在加载课表',
+          subtitle: '正在读取课程和偏好设置',
+          icon: CupertinoIcons.calendar_today,
+        ),
+      ),
+    );
+    expect(find.text('正在加载课表'), findsOneWidget);
+
+    await tester.pumpWidget(
+      _wrap(
+        const LoadingStateView(
+          title: '正在加载课表',
+          subtitle: '正在读取课程和偏好设置',
+          icon: CupertinoIcons.calendar_today,
+        ),
+        themeMode: ThemeMode.dark,
+      ),
+    );
+    expect(find.text('正在加载课表'), findsOneWidget);
+  });
+
+  testWidgets('should_keep_text_in_compact_card_layout', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const SizedBox(
+          width: 320,
+          child: LoadingStateView(
+            title: '正在刷新用电趋势',
+            subtitle: '正在读取最新电费记录',
+            icon: CupertinoIcons.bolt_fill,
+            compact: true,
+            showCard: true,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('正在刷新用电趋势'), findsOneWidget);
+    expect(find.text('正在读取最新电费记录'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.bolt_fill), findsOneWidget);
+  });
+}

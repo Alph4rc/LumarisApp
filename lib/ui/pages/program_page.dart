@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/controllers/program_controller.dart';
 
 class ProgramPage extends StatelessWidget {
@@ -21,6 +22,16 @@ class ProgramPage extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          Obx(
+            () => IconButton(
+              onPressed: controller.isLoading.value
+                  ? null
+                  : () => controller.refreshPrograms(),
+              icon: const Icon(CupertinoIcons.refresh),
+            ),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kTextTabBarHeight),
           child: Obx(() {
@@ -65,32 +76,35 @@ class ProgramPage extends StatelessWidget {
         final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
         if (controller.isLoading.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                Text('正在加载培养方案...'),
-              ],
+          return const Center(
+            child: LoadingStateView(
+              title: '正在加载培养方案',
+              subtitle: '正在整理学期课程结构和课程类别，请稍等一下',
+              icon: CupertinoIcons.square_list_fill,
             ),
           );
         }
 
         if (controller.isError.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          return RefreshIndicator(
+            onRefresh: controller.refreshPrograms,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                Icon(CupertinoIcons.exclamationmark_circle,
-                    size: 50, color: Colors.red.shade300),
-                const SizedBox(height: 16),
-                Text(
-                  '加载失败',
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: isDarkMode ? Colors.white70 : Colors.black54,
-                  ),
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
+                Column(
+                  children: [
+                    Icon(CupertinoIcons.exclamationmark_circle,
+                        size: 50, color: Colors.red.shade300),
+                    const SizedBox(height: 16),
+                    Text(
+                      '加载失败',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -98,19 +112,25 @@ class ProgramPage extends StatelessWidget {
         }
 
         if (controller.programs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          return RefreshIndicator(
+            onRefresh: controller.refreshPrograms,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                Icon(CupertinoIcons.exclamationmark_circle,
-                    size: 50, color: Colors.red.shade300),
-                const SizedBox(height: 16),
-                Text(
-                  '暂无数据',
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: isDarkMode ? Colors.white70 : Colors.black54,
-                  ),
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
+                Column(
+                  children: [
+                    Icon(CupertinoIcons.exclamationmark_circle,
+                        size: 50, color: Colors.red.shade300),
+                    const SizedBox(height: 16),
+                    Text(
+                      '暂无数据',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -124,9 +144,11 @@ class ProgramPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final program = controller.programs[index];
 
-            return Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+            return RefreshIndicator(
+              onRefresh: controller.refreshPrograms,
               child: ListView.builder(
+                padding: const EdgeInsets.only(top: 16.0),
+                physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: program.courses.length,
                 itemBuilder: (context, index) {
                   final course = program.courses[index];
