@@ -88,17 +88,12 @@ UPDATE_CHANNEL=gitee
    
 6. iOS (ipa):
    ```bash
-   flutter build ios
+   flutter build ipa
    ```
 
 7. Linux
    ```bash
    flutter build linux
-   ```
-   
-8. 微信小程序
-   ```bash
-   
    ```
 
 ## 贡献指南
