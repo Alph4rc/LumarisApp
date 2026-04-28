@@ -15,10 +15,12 @@ class CourseApi {
         queryParameters: {'studentId': studentId},
         bypassCache: forceRefresh,
       );
-      if (response is! Map<String, dynamic>) {
-        throw NetworkException('课程返回格式错误', -1);
+      if (response is! Map) {
+        throw NetworkException('课程返回格式错误: ${response.runtimeType}', -1);
       }
-      return CourseResultResponse.fromJson(response);
+      // 转换为 Map<String, dynamic> 以确保类型安全
+      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      return CourseResultResponse.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);
       rethrow;

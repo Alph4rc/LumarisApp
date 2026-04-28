@@ -136,7 +136,7 @@ class PaymentTile extends StatelessWidget {
                   Text(
                     controller.errorMessage.value.isNotEmpty
                         ? controller.errorMessage.value
-                        : '点击绑定',
+                        : '点击查看',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

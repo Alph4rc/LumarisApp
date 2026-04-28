@@ -35,10 +35,12 @@ class ProgramApi {
         '/Program/GetDic',
         queryParameters: {'id': studentId},
       );
-      if (response is! Map<String, dynamic>) {
-        throw NetworkException('培养方案字典返回格式错误', -1);
+      if (response is! Map) {
+        throw NetworkException('培养方案字典返回格式错误: ${response.runtimeType}', -1);
       }
-      return response.map((key, value) {
+      // 转换为 Map<String, dynamic> 以确保类型安全
+      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      return typedResponse.map((key, value) {
         final courses = (value as List<dynamic>)
             .map((item) => PlanCourse.fromJson(item as Map<String, dynamic>))
             .toList();

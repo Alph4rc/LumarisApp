@@ -24,10 +24,13 @@ class PaymentApi {
       final response = await EduHttpClientManager.instance.get(
         '/Payment/$id/turnover',
       );
-      if (response is! Map<String, dynamic>) {
-        throw NetworkException('缴费流水返回格式错误', -1);
+
+      if (response is! Map) {
+        throw NetworkException('缴费流水返回格式错误: ${response.runtimeType}', -1);
       }
-      return PaymentData.fromJson(response);
+      // 转换为 Map<String, dynamic> 以确保类型安全
+      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      return PaymentData.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);
       rethrow;

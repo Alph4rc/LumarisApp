@@ -1,29 +1,30 @@
 import 'package:get/get.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/core/services/payment_analyzer.dart';
+import 'package:ios_club_app/state/prefs_keys.dart' show PrefsKeys;
+import 'package:ios_club_app/state/user_store.dart';
 
-typedef PaymentNumberReader = Future<String> Function();
 typedef PaymentDataFetcher = Future<PaymentData> Function(String cardNumber);
-typedef PaymentNumberWriter = Future<void> Function(String cardNumber);
+typedef StudentIsLoginReader = bool Function();
 typedef TileVisibilityReader = Future<bool> Function(String tileId);
 typedef TileMutator = Future<void> Function(String tileId);
 
 class PaymentStore extends GetxController {
-  static PaymentNumberReader _paymentReader = PaymentAnalyzer.getPayment;
   static PaymentDataFetcher _paymentDataFetcher = PaymentAnalyzer.fetchData;
-  static PaymentNumberWriter _paymentWriter = PaymentAnalyzer.setPayment;
+  static StudentIsLoginReader _studentIsLoginReader =
+      () => UserStore.to.isLogin;
   static TileVisibilityReader _tileVisibilityReader = TileService.isTileVisible;
   static TileMutator _tileAdder = TileService.addTile;
   static TileMutator _tileRemover = TileService.removeTile;
 
-  // 响应式状态变量
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
   final RxList<PaymentModel> records = <PaymentModel>[].obs;
   final RxDouble totalRecharge = 0.0.obs;
-  final RxString num = ''.obs;
   final RxBool isShowTile = false.obs;
 
   @override
@@ -37,14 +38,23 @@ class PaymentStore extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      num.value = await _paymentReader();
+      final isLogin = _studentIsLoginReader();
 
-      if (num.value.isEmpty) {
-        errorMessage.value = '请先绑定饭卡';
+      String? studentId = "";
+
+      if (isLogin) {
+        final secureStorage = SecureStorageService.instance;
+        final prefs = PrefsService.instance;
+        studentId = await secureStorage.read(key: PrefsKeys.USERNAME) ??
+            prefs.getString(PrefsKeys.USERNAME);
+      }
+
+      if (studentId == null || studentId.isEmpty) {
+        errorMessage.value = '请先登录教务处账号';
         return;
       }
 
-      final recordsResult = await _paymentDataFetcher(num.value);
+      final recordsResult = await _paymentDataFetcher(studentId);
       final isVisible = await _tileVisibilityReader('饭卡');
 
       records.assignAll(recordsResult.payments);
@@ -53,11 +63,6 @@ class PaymentStore extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  Future<void> setPayment(String cardNumber) async {
-    await _paymentWriter(cardNumber);
-    await loadData();
   }
 
   Future<void> toggleTileShow(bool value) async {
@@ -74,16 +79,14 @@ class PaymentStore extends GetxController {
   }
 
   static void setTestOverrides({
-    PaymentNumberReader? paymentReader,
     PaymentDataFetcher? paymentDataFetcher,
-    PaymentNumberWriter? paymentWriter,
+    StudentIsLoginReader? studentIdReader,
     TileVisibilityReader? tileVisibilityReader,
     TileMutator? tileAdder,
     TileMutator? tileRemover,
   }) {
-    if (paymentReader != null) _paymentReader = paymentReader;
     if (paymentDataFetcher != null) _paymentDataFetcher = paymentDataFetcher;
-    if (paymentWriter != null) _paymentWriter = paymentWriter;
+    if (studentIdReader != null) _studentIsLoginReader = studentIdReader;
     if (tileVisibilityReader != null) {
       _tileVisibilityReader = tileVisibilityReader;
     }
@@ -92,9 +95,8 @@ class PaymentStore extends GetxController {
   }
 
   static void resetTestOverrides() {
-    _paymentReader = PaymentAnalyzer.getPayment;
     _paymentDataFetcher = PaymentAnalyzer.fetchData;
-    _paymentWriter = PaymentAnalyzer.setPayment;
+    _studentIsLoginReader = () => UserStore.to.isLogin;
     _tileVisibilityReader = TileService.isTileVisible;
     _tileAdder = TileService.addTile;
     _tileRemover = TileService.removeTile;

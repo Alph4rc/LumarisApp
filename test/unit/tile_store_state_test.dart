@@ -58,25 +58,38 @@ void main() {
   });
 
   group('PaymentStore', () {
-    test('should_set_bind_card_error_when_payment_number_is_empty', () async {
+    test('should_set_login_error_when_student_id_is_empty', () async {
       PaymentStore.setTestOverrides(
-        paymentReader: () async => '',
+        studentIdReader: () => true,
       );
       final store = PaymentStore();
 
       await store.loadData();
 
       expect(store.isLoading.value, isFalse);
-      expect(store.errorMessage.value, '请先绑定饭卡');
+      expect(store.errorMessage.value, '请先登录教务处账号');
       expect(store.records, isEmpty);
     });
 
-    test('should_load_payment_records_and_tile_visibility_when_card_exists',
+    test('should_set_login_error_when_student_id_is_null', () async {
+      PaymentStore.setTestOverrides(
+        studentIdReader: () => false,
+      );
+      final store = PaymentStore();
+
+      await store.loadData();
+
+      expect(store.isLoading.value, isFalse);
+      expect(store.errorMessage.value, '请先登录教务处账号');
+      expect(store.records, isEmpty);
+    });
+
+    test('should_load_payment_records_and_tile_visibility_when_student_exists',
         () async {
       PaymentStore.setTestOverrides(
-        paymentReader: () async => 'card-1',
+        studentIdReader: () => true,
         paymentDataFetcher: (cardNumber) async {
-          expect(cardNumber, 'card-1');
+          expect(cardNumber, 'student-1');
           return const PaymentData(
             [
               PaymentModel(
@@ -100,29 +113,9 @@ void main() {
 
       expect(store.isLoading.value, isFalse);
       expect(store.errorMessage.value, '');
-      expect(store.num.value, 'card-1');
       expect(store.records, hasLength(1));
       expect(store.totalRecharge.value, 1000);
       expect(store.isShowTile.value, isTrue);
-    });
-
-    test('should_write_card_number_then_reload_data', () async {
-      var storedCard = '';
-      PaymentStore.setTestOverrides(
-        paymentReader: () async => storedCard,
-        paymentWriter: (cardNumber) async {
-          storedCard = cardNumber;
-        },
-        paymentDataFetcher: (_) async => const PaymentData([], 0),
-        tileVisibilityReader: (_) async => false,
-      );
-      final store = PaymentStore();
-
-      await store.setPayment('card-2');
-
-      expect(storedCard, 'card-2');
-      expect(store.num.value, 'card-2');
-      expect(store.errorMessage.value, '');
     });
 
     test('should_toggle_tile_and_reload_tile_edit_controller', () async {

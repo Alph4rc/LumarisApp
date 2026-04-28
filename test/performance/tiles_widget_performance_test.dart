@@ -35,7 +35,6 @@ class _TestPaymentStore extends PaymentStore {
     isLoading.value = false;
     totalRecharge.value = 0.0;
     errorMessage.value = '';
-    this.num.value = '';
     isShowTile.value = false;
   }
 }

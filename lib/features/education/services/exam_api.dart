@@ -11,10 +11,12 @@ class ExamApi {
         '/Exam',
         queryParameters: {'studentId': studentId},
       );
-      if (response is! Map<String, dynamic>) {
-        throw NetworkException('考试返回格式错误', -1);
+      if (response is! Map) {
+        throw NetworkException('考试返回格式错误: ${response.runtimeType}', -1);
       }
-      return ExamResponse.fromJson(response);
+      // 转换为 Map<String, dynamic> 以确保类型安全
+      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      return ExamResponse.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);
       rethrow;

@@ -2,14 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
-import 'package:ios_club_app/core/utils/animations/animated_button.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 class PaymentPage extends StatelessWidget {
   final PaymentStore controller = Get.put(PaymentStore());
@@ -28,23 +26,11 @@ class PaymentPage extends StatelessWidget {
     return ClubAppBar(
       title: '饭卡余额',
       actions: [
-        _buildRefreshButton(),
-        _buildSettingButton(context),
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: controller.loadData,
+        ),
       ],
-    );
-  }
-
-  Widget _buildRefreshButton() {
-    return IconButton(
-      icon: const Icon(Icons.refresh),
-      onPressed: controller.loadData,
-    );
-  }
-
-  Widget _buildSettingButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.settings),
-      onPressed: () => _showSettingDialog(context),
     );
   }
 
@@ -54,12 +40,20 @@ class PaymentPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStatisticsSection(),
+          Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (controller.errorMessage.value.isNotEmpty) {
+              return _buildLoginPrompt();
+            }
+            return _buildRecentTransactionsSection();
+          }),
           Obx(
-            () => controller.num.value.isEmpty
-                ? _buildBindCardPrompt()
-                : _buildRecentTransactionsSection(),
+            () => controller.errorMessage.value.isEmpty
+                ? _buildSettingsSection()
+                : const SizedBox.shrink(),
           ),
-          _buildSettingsSection()
         ],
       ),
     );
@@ -140,7 +134,7 @@ class PaymentPage extends StatelessWidget {
 
   Widget _buildRecentTransactionsSection() {
     final recentRecords =
-        controller.records.where((r) => r.turnoverType == '消费').toList();
+        controller.records.where((r) => r.turnoverType.contains('支付')).toList();
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -213,7 +207,7 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBindCardPrompt() {
+  Widget _buildLoginPrompt() {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -222,6 +216,8 @@ class PaymentPage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              const Icon(Icons.person_outline, size: 48, color: Colors.grey),
+              const SizedBox(height: 16),
               const Text(
                 '暂无饭卡数据',
                 style: TextStyle(
@@ -231,37 +227,12 @@ class PaymentPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                '请先绑定饭卡卡号以查看余额和消费记录',
+                '请先登录教务处账号以查看饭卡余额和消费记录',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
                 ),
-              ),
-              const SizedBox(height: 16),
-              AnimatedButton(
-                onTap: () {
-                  // 显示设置对话框让用户输入卡号
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _showSettingDialog(Get.context!);
-                  });
-                },
-                child: CupertinoButton(
-                  color: CupertinoColors.systemBlue,
-                  borderRadius: BorderRadius.circular(8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  onPressed: null,
-                  // 由AnimatedButton处理
-                  child: const Text(
-                    '绑定饭卡卡号',
-                    style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -271,10 +242,6 @@ class PaymentPage extends StatelessWidget {
   }
 
   Widget _buildSettingsSection() {
-    if (controller.num.value.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -303,30 +270,5 @@ class PaymentPage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _showSettingDialog(BuildContext context) async {
-    final result = await PlatformDialog.showInputDialog(
-      context,
-      title: '设置饭卡卡号',
-      hintText: '请输入饭卡卡号',
-    );
-
-    if (result != null) {
-      if (result.isEmpty) {
-        if (context.mounted) {
-          PlatformDialog.showConfirmDialog(
-            context,
-            title: '提示',
-            content: '请输入饭卡卡号',
-            confirmText: '确定',
-            cancelText: '',
-          );
-        }
-        return;
-      }
-
-      await controller.setPayment(result);
-    }
   }
 }

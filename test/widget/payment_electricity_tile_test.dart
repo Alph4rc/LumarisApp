@@ -126,7 +126,7 @@ void main() {
 
       await tester.pumpWidget(_wrap(const PaymentTile()));
       expect(find.text('饭卡余额'), findsOneWidget);
-      expect(find.text('点击绑定'), findsOneWidget);
+      expect(find.text('点击查看'), findsOneWidget);
     });
 
     testWidgets('shows error message when no value but has error',
@@ -134,10 +134,10 @@ void main() {
       final store = Get.put<PaymentStore>(_TestPaymentStore());
       store.isLoading.value = false;
       store.totalRecharge.value = 0;
-      store.errorMessage.value = '请先绑定饭卡';
+      store.errorMessage.value = '请先登录教务处账号';
 
       await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('请先绑定饭卡'), findsOneWidget);
+      expect(find.text('请先登录教务处账号'), findsOneWidget);
       expect(find.text('点击绑定'), findsNothing);
     });
   });
