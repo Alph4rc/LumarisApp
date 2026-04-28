@@ -139,8 +139,10 @@ class PaymentPage extends StatelessWidget {
   }
 
   Widget _buildRecentTransactionsSection() {
-    final recentRecords =
-        controller.records.where((r) => r.turnoverType.contains('支付')).toList();
+    final recentRecords = controller.records
+        .where((r) =>
+            r.turnoverType.contains('支付') || r.turnoverType.contains('消费'))
+        .toList();
 
     return Container(
       padding: const EdgeInsets.all(20),
