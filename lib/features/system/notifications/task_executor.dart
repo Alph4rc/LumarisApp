@@ -201,33 +201,33 @@ class TaskExecutor {
 
       final now = DateTime.now();
 
+      // 每天只执行一次课程提醒排期，避免重复调用导致通知累积
+      final lastRemindStr = prefs.getString(PrefsKeys.LAST_REMIND_DATE);
+      if (lastRemindStr != null) {
+        final lastRemind = DateTime.tryParse(lastRemindStr);
+        if (lastRemind != null &&
+            lastRemind.year == now.year &&
+            lastRemind.month == now.month &&
+            lastRemind.day == now.day) {
+          AppLogger.debug('今日已执行课程提醒排期，跳过');
+          return;
+        }
+      }
+
       // 预加载数据
       await _preloadData();
 
-      final upcomingCourses = _getTodayAndTomorrowCoursesFromCache();
-      var scheduledCount = 0;
+      final (_, todayCourses) =
+          _getTodayOrTomorrowCourseFromCache(isTomorrow: false);
 
-      final todayCourses = upcomingCourses['today']!;
-      if (todayCourses.isNotEmpty) {
-        await NotificationService.remindList(
-          todayCourses,
-          targetDate: now,
-        );
-        scheduledCount += todayCourses.length;
-      }
-
-      final tomorrowCourses = upcomingCourses['tomorrow']!;
-      if (tomorrowCourses.isNotEmpty) {
-        await NotificationService.remindList(
-          tomorrowCourses,
-          targetDate: now.add(const Duration(days: 1)),
-        );
-        scheduledCount += tomorrowCourses.length;
-      }
+      await NotificationService.remindList(
+        todayCourses,
+        targetDate: now,
+      );
 
       await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
       AppLogger.debug(
-        '课程提醒排期完成: $scheduledCount 条, 时间=${now.toIso8601String()}',
+        '课程提醒排期完成: ${todayCourses.length} 条, 时间=${now.toIso8601String()}',
       );
     } catch (e) {
       AppLogger.debug('课程提醒检查失败: $e');
