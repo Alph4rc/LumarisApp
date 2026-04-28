@@ -11,13 +11,7 @@ class AuthorPage extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Apple-style background color
-    final backgroundColor = isDark
-        ? const Color(0xFF000000)
-        : const Color(0xFFF2F2F7);
-
     return Scaffold(
-      backgroundColor: backgroundColor,
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -29,7 +23,6 @@ class AuthorPage extends StatelessWidget {
             centerTitle: false,
             elevation: 0,
             scrolledUnderElevation: 0,
-            backgroundColor: backgroundColor,
             surfaceTintColor: Colors.transparent,
           ),
           SliverToBoxAdapter(
