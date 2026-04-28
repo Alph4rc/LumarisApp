@@ -121,9 +121,9 @@ class _ProfilePageState extends State<ProfilePage> {
         ProfileButtonItem(icon: Icons.toc, title: '培养方案', route: '/Program'),
       ProfileButtonItem(
           icon: Icons.monetization_on_outlined, title: '饭卡', route: '/Payment'),
-      if (!kIsWeb)
-        ProfileButtonItem(
-            icon: Icons.wifi_outlined, title: '校园网', route: '/Net'),
+      // if (!kIsWeb)
+      //   ProfileButtonItem(
+      //       icon: Icons.wifi_outlined, title: '校园网', route: '/Net'),
       if (!userStore.isLogin)
         ProfileButtonItem(
             icon: Icons.login,
