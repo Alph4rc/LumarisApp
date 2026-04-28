@@ -1,7 +1,7 @@
 # iOS Club App
 
 ## Project Overview
-This is a cross-platform Flutter application developed for the iOS Club at Xi'an University of Architecture and Technology. It provides members with course management, scheduling, grades, campus bus info, electricity tracking, and more.
+This is a cross-platform Flutter application for students at Xi'an University of Architecture and Technology. It provides course management, scheduling, grades, campus bus info, electricity tracking, and more.
 
 ## Core Technologies & Architecture
 - **Framework:** Flutter (SDK >=3.5.3 <4.0.0)
@@ -11,7 +11,7 @@ This is a cross-platform Flutter application developed for the iOS Club at Xi'an
 
 ## Directory Structure
 - `lib/core/`: Platform-agnostic core functionality (models, services, utils).
-- `lib/features/`: Feature modules (club, education, system) containing their respective services.
+- `lib/features/`: Feature modules (education, system) containing their respective services.
 - `lib/platform/`: Platform-specific implementations (Android background services, iOS widgets, macOS UI).
 - `lib/routes/`: GetX navigation and routing configuration.
 - `lib/state/`: GetX state stores (`SettingsStore`, `UserStore`, `CourseStore`, etc.).

@@ -19,7 +19,8 @@ class CourseApi {
         throw NetworkException('课程返回格式错误: ${response.runtimeType}', -1);
       }
       // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      final Map<String, dynamic> typedResponse =
+          Map<String, dynamic>.from(response);
       return CourseResultResponse.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);

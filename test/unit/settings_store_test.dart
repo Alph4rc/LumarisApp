@@ -32,7 +32,6 @@ void main() {
       expect(store.isRemind, isFalse);
       expect(store.remindTime, 15);
       expect(store.isShowTomorrow, isFalse);
-      expect(store.isUpdateToClub, isFalse);
       expect(store.pageIndex, 0);
       expect(store.enableHapticFeedback, isFalse);
       expect(store.updateIgnored, isFalse);
@@ -50,7 +49,6 @@ void main() {
       await prefs.setBool(PrefsKeys.IS_REMIND, true);
       await prefs.setInt(PrefsKeys.NOTIFICATION_TIME, 30);
       await prefs.setBool(PrefsKeys.IS_SHOW_TOMORROW, true);
-      await prefs.setBool(PrefsKeys.IS_UPDATE_CLUB, true);
       await prefs.setInt(PrefsKeys.PAGE_DATA, 2);
       await prefs.setBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK, true);
       await prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
@@ -67,7 +65,6 @@ void main() {
       expect(store.isRemind, isTrue);
       expect(store.remindTime, 30);
       expect(store.isShowTomorrow, isTrue);
-      expect(store.isUpdateToClub, isTrue);
       expect(store.pageIndex, 2);
       expect(store.enableHapticFeedback, isTrue);
       expect(store.updateIgnored, isTrue);
@@ -86,7 +83,6 @@ void main() {
       await store.setIsRemind(true);
       await store.setRemindTime(45);
       await store.setIsShowTomorrow(true);
-      await store.setIsUpdateToClub(true);
       await store.setPageIndex(1);
       await store.setEnableHapticFeedback(true);
       await store.setUpdateIgnored(true);
@@ -100,7 +96,6 @@ void main() {
       expect(store.isRemind, isTrue);
       expect(store.remindTime, 45);
       expect(store.isShowTomorrow, isTrue);
-      expect(store.isUpdateToClub, isTrue);
       expect(store.pageIndex, 1);
       expect(store.enableHapticFeedback, isTrue);
       expect(store.updateIgnored, isTrue);
@@ -113,7 +108,6 @@ void main() {
       expect(prefs.getBool(PrefsKeys.IS_REMIND), isTrue);
       expect(prefs.getInt(PrefsKeys.NOTIFICATION_TIME), 45);
       expect(prefs.getBool(PrefsKeys.IS_SHOW_TOMORROW), isTrue);
-      expect(prefs.getBool(PrefsKeys.IS_UPDATE_CLUB), isTrue);
       expect(prefs.getInt(PrefsKeys.PAGE_DATA), 1);
       expect(prefs.getBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK), isTrue);
       expect(prefs.getBool(PrefsKeys.UPDATE_IGNORED), isTrue);

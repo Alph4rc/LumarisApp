@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/core/services/todo_service.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 
 class TodoListSetting extends StatefulWidget {
   const TodoListSetting({super.key});
@@ -12,8 +9,6 @@ class TodoListSetting extends StatefulWidget {
 }
 
 class _TodoListSettingState extends State<TodoListSetting> {
-  final SettingsStore settingsStore = SettingsStore.to;
-
   @override
   void initState() {
     super.initState();
@@ -42,7 +37,7 @@ class _TodoListSettingState extends State<TodoListSetting> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '该服务已暂停', // '将待办事务保存至社团官网',
+                    '该服务已暂停',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark
@@ -53,15 +48,10 @@ class _TodoListSettingState extends State<TodoListSetting> {
                 ],
               ),
             ),
-            Obx(() => CupertinoSwitch(
-                  value: settingsStore.isUpdateToClub,
-                  onChanged: (bool value) async {
-                    await settingsStore.setIsUpdateToClub(value);
-                    if (value) {
-                      await TodoService.nowToUpdate();
-                    }
-                  },
-                ))
+            const CupertinoSwitch(
+              value: false,
+              onChanged: null,
+            )
           ],
         ));
   }

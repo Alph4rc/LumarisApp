@@ -15,7 +15,7 @@ class WidgetService {
       return;
     }
 
-    if (!PlatformUtils.isIOS && !PlatformUtils.isAndroid){
+    if (!PlatformUtils.isIOS && !PlatformUtils.isAndroid) {
       _isInitialized = true;
       return;
     }
@@ -69,8 +69,8 @@ class WidgetService {
 
     await HomeWidget.saveWidgetData<String>(
         'flutter.tomorrow.courses', jsonEncode(courses['today'] ?? []));
-    await HomeWidget.saveWidgetData<String>(
-        'flutter.tomorrow.tomorrowCourses', jsonEncode(courses['tomorrow'] ?? []));
+    await HomeWidget.saveWidgetData<String>('flutter.tomorrow.tomorrowCourses',
+        jsonEncode(courses['tomorrow'] ?? []));
     await HomeWidget.saveWidgetData<String>(
         'flutter.tomorrow.date', _formatMonthDayWeekday(now));
     await HomeWidget.saveWidgetData<String>(

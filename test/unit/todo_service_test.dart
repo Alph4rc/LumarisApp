@@ -173,57 +173,5 @@ void main() {
       await TodoService.clearLocalData();
       expect(box.containsKey('u3'), isFalse);
     });
-
-    test('getClubTodoList should return empty when member data missing',
-        () async {
-      final list = await TodoService.getClubTodoList();
-      expect(list, isEmpty);
-    });
-
-    test('nowToUpdate should return directly when member data missing',
-        () async {
-      await TodoService.nowToUpdate();
-      expect(true, isTrue);
-    });
-  });
-
-  group('TodoService fromJsonClub', () {
-    test('should_parse_bool_status_and_optional_fields', () {
-      final item = TodoService.fromJsonClub({
-        'id': 123,
-        'title': 'club-task',
-        'endTime': '2026-04-01',
-        'status': true,
-        'description': 'desc',
-        'key': 'k',
-      });
-
-      expect(item.id, '123');
-      expect(item.title, 'club-task');
-      expect(item.deadline, '2026-04-01');
-      expect(item.isCompleted, isTrue);
-      expect(item.description, 'desc');
-      expect(item.key, 'k');
-    });
-
-    test('should_parse_int_status_and_defaults', () {
-      final item = TodoService.fromJsonClub({
-        'status': 1,
-      });
-
-      expect(item.title, '');
-      expect(item.deadline, '');
-      expect(item.isCompleted, isTrue);
-    });
-
-    test('should_treat_falsey_status_values_as_incomplete', () {
-      final boolStatus = TodoService.fromJsonClub({'status': false});
-      final intStatus = TodoService.fromJsonClub({'status': 0});
-      final missingStatus = TodoService.fromJsonClub({});
-
-      expect(boolStatus.isCompleted, isFalse);
-      expect(intStatus.isCompleted, isFalse);
-      expect(missingStatus.isCompleted, isFalse);
-    });
   });
 }

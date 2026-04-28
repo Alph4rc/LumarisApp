@@ -19,8 +19,6 @@ void main() async {
     'lib/features/system/widget_service.dart',
     'lib/state/schedule_store.dart',
     'lib/ui/components/modal_components.dart',
-    'lib/ui/pages/memberPages/member_data_page.dart',
-    'lib/ui/pages/memberPages/staff_data_page.dart',
   ];
 
   // 需要移除的导入映射
@@ -63,12 +61,6 @@ void main() async {
       "import 'package:flutter/foundation.dart';"
     ],
     'lib/ui/components/modal_components.dart': [
-      "import 'package:ios_club_app/core/utils/app_logger.dart';"
-    ],
-    'lib/ui/pages/memberPages/member_data_page.dart': [
-      "import 'package:ios_club_app/core/utils/app_logger.dart';"
-    ],
-    'lib/ui/pages/memberPages/staff_data_page.dart': [
       "import 'package:ios_club_app/core/utils/app_logger.dart';"
     ],
   };

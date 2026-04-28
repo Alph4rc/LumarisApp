@@ -30,10 +30,12 @@ void main() {
       expect(EduTimeService.getWeekIndexByStartTime(now, startTime), 2);
     });
 
-    test('should correctly transition from Saturday to Sunday (start of new week)', () {
+    test(
+        'should correctly transition from Saturday to Sunday (start of new week)',
+        () {
       final saturday = DateTime(2024, 3, 9);
       final sunday = DateTime(2024, 3, 10);
-      
+
       expect(EduTimeService.getWeekIndexByStartTime(saturday, startTime), 1);
       expect(EduTimeService.getWeekIndexByStartTime(sunday, startTime), 2);
     });
@@ -41,7 +43,7 @@ void main() {
     test('should keep same week from Sunday to Monday', () {
       final sunday = DateTime(2024, 3, 10);
       final monday = DateTime(2024, 3, 11);
-      
+
       expect(EduTimeService.getWeekIndexByStartTime(sunday, startTime), 2);
       expect(EduTimeService.getWeekIndexByStartTime(monday, startTime), 2);
     });

@@ -113,13 +113,7 @@ Sidebar macosUISidebar({
                 },
               ),
               subtitle: Text(
-                userStore.isLogin && userStore.isLoginMember
-                    ? '已登录两个账号'
-                    : userStore.isLogin
-                        ? '教务系统'
-                        : userStore.isLoginMember
-                            ? 'iMember'
-                            : '点击登录',
+                userStore.isLogin ? '教务系统' : '点击登录',
                 style: TextStyle(
                   fontSize: 11,
                   color: CupertinoColors.secondaryLabel.resolveFrom(context),
@@ -148,13 +142,5 @@ Future<String> _getUsername() async {
       name = iosName;
     }
   }
-
-  if (userStore.isLoginMember) {
-    final iosName = await secureStorage.read(key: PrefsKeys.CLUB_NAME);
-    if (iosName != null) {
-      name = iosName;
-    }
-  }
-
   return name;
 }

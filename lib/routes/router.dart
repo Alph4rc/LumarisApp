@@ -15,19 +15,12 @@ import 'package:ios_club_app/ui/pages/program_page.dart';
 import 'package:ios_club_app/ui/pages/setting_page.dart';
 import 'package:ios_club_app/ui/pages/home_page.dart';
 import 'package:ios_club_app/ui/pages/link_page.dart';
-import 'package:ios_club_app/ui/pages/member_page.dart';
 import 'package:ios_club_app/ui/pages/profile_page.dart';
 import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/schedule_setting_page.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 import 'package:ios_club_app/ui/pages/school_bus_page.dart';
 import 'package:ios_club_app/ui/pages/score_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/admin_portal_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/article_management_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/category_management_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/data_dashboard_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/logs_monitoring_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/client_app_management_page.dart';
 
 /// 应用路由配置类
 ///
@@ -43,8 +36,7 @@ class AppRouter {
         /// 首页
         GetPage(
           name: '/',
-          page: () =>
-              const HomePage(),
+          page: () => const HomePage(),
         ),
 
         /// 课表页面
@@ -56,8 +48,7 @@ class AppRouter {
         /// 成绩页面
         GetPage(
           name: '/Score',
-          page: () =>
-              const ScorePage(),
+          page: () => const ScorePage(),
         ),
 
         /// 个人中心页面
@@ -69,15 +60,13 @@ class AppRouter {
         /// 登录页面
         GetPage(
           name: '/Login',
-          page: () =>
-              const LoginPage(),
+          page: () => const LoginPage(),
         ),
 
         /// 链接页面
         GetPage(
           name: '/Link',
-          page: () =>
-              const LinkPage(),
+          page: () => const LinkPage(),
         ),
 
         /// 设置页面
@@ -104,12 +93,6 @@ class AppRouter {
           page: () => const SchoolBusPage(),
         ),
 
-        /// 成员页面
-        GetPage(
-          name: '/iMember',
-          page: () => const MemberPage(),
-        ),
-
         /// 培养方案页面
         GetPage(
           name: '/Program',
@@ -125,22 +108,17 @@ class AppRouter {
         /// 饭卡页面
         GetPage(
           name: '/Payment',
-          page: () =>
-              PaymentPage(),
+          page: () => PaymentPage(),
         ),
 
         /// 网络页面
         GetPage(
           name: '/Net',
-          page: () =>
-              const NetPage(),
+          page: () => const NetPage(),
         ),
 
         /// 帮助页面
-        GetPage(
-            name: '/Helper',
-            page: () =>
-                HelperPage()),
+        GetPage(name: '/Helper', page: () => HelperPage()),
 
         /// 彩蛋页面
         GetPage(
@@ -176,42 +154,6 @@ class AppRouter {
         GetPage(
           name: '/Author',
           page: () => const AuthorPage(),
-        ),
-
-        /// 社团管理主入口
-        GetPage(
-          name: '/AdminPortal',
-          page: () => const AdminPortalPage(),
-        ),
-
-        /// 文章管理页面
-        GetPage(
-          name: '/ArticleManagement',
-          page: () => const ArticleManagementPage(),
-        ),
-
-        /// 分类管理页面
-        GetPage(
-          name: '/CategoryManagement',
-          page: () => const CategoryManagementPage(),
-        ),
-
-        /// 数据统计仪表板
-        GetPage(
-          name: '/DataDashboard',
-          page: () => const DataDashboardPage(),
-        ),
-
-        /// 日志监控页面
-        GetPage(
-          name: '/LogsMonitoring',
-          page: () => const LogsMonitoringPage(),
-        ),
-
-        /// 客户端应用管理
-        GetPage(
-          name: '/ClientAppManagement',
-          page: () => const ClientAppManagementPage(),
         ),
       ];
 }

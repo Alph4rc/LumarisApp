@@ -47,7 +47,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final secureStorage = SecureStorageService.instance;
     final username = await secureStorage.read(key: PrefsKeys.USERNAME) ??
         prefs.getString(PrefsKeys.USERNAME);
-    final iosName = await secureStorage.read(key: PrefsKeys.CLUB_NAME);
 
     // 重置 _username
     _username = '';
@@ -55,17 +54,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (username != null && username.isNotEmpty) {
       _username = username;
     }
-    if (userStore.isLoginMember && iosName != null) {
-      if (username == iosName) {
-        _username = iosName;
-      } else if (username != null) {
-        _username = '$username & $iosName';
-      } else {
-        _username = iosName;
-      }
-    }
 
-    if (!userStore.isLogin && !userStore.isLoginMember) {
+    if (!userStore.isLogin) {
       // 没有登录信息，进入游客模式
       // await _enterGuestMode(); // 其实这里不需要做什么，只是确认状态
     }
@@ -171,13 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           maxLines: 1,
                         ),
                         Text(
-                          userStore.isLogin && userStore.isLoginMember
-                              ? '教务系统账号 & iMember账号'
-                              : userStore.isLogin
-                                  ? '教务系统账号'
-                                  : userStore.isLoginMember
-                                      ? 'iMember账号'
-                                      : '游客',
+                          userStore.isLogin ? '教务系统账号' : '游客',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],

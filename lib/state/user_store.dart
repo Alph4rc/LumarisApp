@@ -16,11 +16,8 @@ class UserStore extends GetxController {
 
   final _isLogin = false.obs;
   final _userData = Rxn<UserData>();
-  final _isLoginMember = false.obs;
 
   bool get isLogin => _isLogin.value;
-
-  bool get isLoginMember => _isLoginMember.value;
 
   UserData? get userData => _userData.value;
 
@@ -34,7 +31,6 @@ class UserStore extends GetxController {
   Future<void> _loadUserData() async {
     final prefs = PrefsService.instance;
     final String? userDataString = prefs.getString(PrefsKeys.USER_DATA);
-    final String? iosName = prefs.getString(PrefsKeys.MEMBER_DATA);
 
     if (userDataString != null) {
       try {
@@ -53,18 +49,12 @@ class UserStore extends GetxController {
         await _clearUserData();
       }
     }
-
-    _isLoginMember.value = iosName != null && iosName.isNotEmpty;
   }
 
   /// 设置用户数据
   Future<void> setUserData(UserData userData) async {
     _userData.value = userData;
     _isLogin.value = true;
-  }
-
-  Future<void> setLoginMember() async {
-    _isLoginMember.value = true;
   }
 
   /// 清除用户数据
@@ -102,19 +92,5 @@ class UserStore extends GetxController {
   /// 登出
   Future<void> logout() async {
     await _clearUserData();
-  }
-
-  /// 退出iMember登录
-  Future<void> logoutMember() async {
-    _isLoginMember.value = false;
-
-    final prefs = PrefsService.instance;
-    final secureStorage = SecureStorageService.instance;
-
-    await prefs.remove(PrefsKeys.MEMBER_DATA);
-
-    await secureStorage.delete(key: PrefsKeys.MEMBER_JWT);
-    await secureStorage.delete(key: PrefsKeys.CLUB_NAME);
-    await secureStorage.delete(key: PrefsKeys.CLUB_ID);
   }
 }

@@ -17,7 +17,7 @@ class _PlatformCheck {
 class PlatformUtils {
   static bool get isWeb => kIsWeb;
 
-static bool get isMacOS {
+  static bool get isMacOS {
     return _PlatformCheck._safeCheck(() {
       // 动态导入以避免在 web 环境中出错
       if (kIsWeb) return false;

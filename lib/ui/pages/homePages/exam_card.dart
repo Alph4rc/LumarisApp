@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/exam_result.dart';
-import 'package:ios_club_app/core/services/exam_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
+import 'package:ios_club_app/features/education/services/exam_service.dart';
 
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -29,7 +29,7 @@ class _ExamCardState extends State<ExamCard> {
     setState(() {
       isLoading = true;
     });
-    ExamService.getExam().then((result) => setExam(result));
+    ExamService.getExamResult().then((result) => setExam(result));
   }
 
   void setExam(ExamResult result) {
@@ -60,7 +60,7 @@ class _ExamCardState extends State<ExamCard> {
       isLoading = true;
       errorMessage = null;
     });
-    final result = await ExamService.getExam(isRefresh: true);
+    final result = await ExamService.getExamResult(isRefresh: true);
     setExam(result);
   }
 

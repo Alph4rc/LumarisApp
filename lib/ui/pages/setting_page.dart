@@ -21,9 +21,7 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/settingPages/show_tomorrow_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 
-import 'package:ios_club_app/ui/pages/settingPages/todo_list_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/haptic_feedback_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 
@@ -101,8 +99,6 @@ class SettingPage extends StatelessWidget {
                   return _buildSettingsGroup([
                     _buildClearCacheTile(context, isDark),
                     if (userStore.isLogin) _buildLogoutTile(context, isDark),
-                    if (userStore.isLoginMember)
-                      _buildLogoutMemberTile(context, isDark),
                     Obx(() {
                       SettingsStore settingsStore = SettingsStore.to;
                       return Container(
@@ -167,8 +163,7 @@ class SettingPage extends StatelessWidget {
                               CupertinoSwitch(
                                 value: settingsStore.hasAcceptedAgreement,
                                 onChanged: (value) {
-                                  settingsStore
-                                      .setHasAcceptedAgreement(value);
+                                  settingsStore.setHasAcceptedAgreement(value);
                                 },
                               ),
                             ],
@@ -540,58 +535,6 @@ class SettingPage extends StatelessWidget {
                   children: [
                     const Text(
                       '退出教务系统',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogoutMemberTile(BuildContext context, bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () async {
-          final result = await PlatformDialog.showConfirmDialog(
-            context,
-            title: "确定退出登录吗？",
-            content: "退出后需要重新登录才能访问数据",
-            confirmText: '退出登录',
-            cancelText: '取消',
-          );
-
-          if (result == true) {
-            final userStore = Get.find<UserStore>();
-            await userStore.logoutMember();
-            if (context.mounted) {
-              showClubSnackBar(context, const Text('已退出iMember账号'));
-            }
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Row(
-            children: [
-              Icon(
-                Icons.logout_outlined,
-                size: 20,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.5)
-                    : CupertinoColors.tertiaryLabel,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '退出iMember',
                       style: TextStyle(fontSize: 16),
                     ),
                   ],

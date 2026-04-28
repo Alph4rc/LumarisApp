@@ -236,8 +236,8 @@ void main() {
 
       final toggled = config.toggleVisibility('电费');
       final tile = toggled.configurations.firstWhere((t) => t.id == '电费');
-      final visibleOrders = toggled.getVisibleTiles().map((t) => t.order).toList()
-        ..sort();
+      final visibleOrders =
+          toggled.getVisibleTiles().map((t) => t.order).toList()..sort();
 
       expect(tile.isVisible, true);
       expect(toggled.getVisibleTiles().length, 2);

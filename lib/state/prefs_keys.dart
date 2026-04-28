@@ -44,18 +44,11 @@ class PrefsKeys {
   static const String LAST_REMIND_DATE = 'last_remind_date';
   static const String IS_SHOW_TOMORROW = 'is_show_tomorrow';
 
-  /// 社团相关
-  static const String MEMBER_DATA = 'member_data';
-  static const String MEMBER_JWT = 'member_jwt';
-  static const String CLUB_NAME = 'club_name';
-  static const String CLUB_ID = 'club_id';
-
   /// 待办事项相关
   /// @deprecated 已迁移到 Hive (TodoService)，保留此 Key 仅用于迁移逻辑，禁止新代码写入
   @Deprecated(
       'Migrated to Hive via TodoService. Do not write new data to this key.')
   static const String TODO_DATA = 'todo_data';
-  static const String IS_UPDATE_CLUB = 'is_update_club';
 
   /// 电费相关
   static const String ELECTRICITY_URL = 'electricity_url';

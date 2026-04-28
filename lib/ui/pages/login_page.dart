@@ -279,21 +279,21 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                      TextButton(
-                        onPressed: () async {
-                          const url =
-                              'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
-                          if (await canLaunchUrl(Uri.parse(url))) {
-                            await launchUrl(
-                              Uri.parse(url),
-                              mode: LaunchMode.externalApplication,
-                            );
-                          }
-                        },
-                        child: const Text('忘记密码?'),
-                      )
-                    ],
-                  ),
+                    TextButton(
+                      onPressed: () async {
+                        const url =
+                            'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(
+                            Uri.parse(url),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      },
+                      child: const Text('忘记密码?'),
+                    )
+                  ],
+                ),
 
                 const SizedBox(height: 32),
 

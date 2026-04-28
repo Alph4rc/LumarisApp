@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-iOS Club App is a cross-platform Flutter application for iOS Club members at Xi'an University of Architecture and Technology. It provides course management, scheduling, member management, exam information, grades, campus bus schedules, and more.
+iOS Club App is a cross-platform Flutter application for students at Xi'an University of Architecture and Technology. It provides course management, scheduling, exam information, grades, campus bus schedules, and more.
 
 ## Common Commands
 
@@ -66,7 +66,6 @@ lib/
 │   ├── services/         # Core services (network, time, storage)
 │   └── utils/            # Utilities (image_load, performance_monitor, request_cache, platform_utils)
 ├── features/             # Feature modules organized by domain
-│   ├── club/             # Club-related features (members, projects, departments)
 │   ├── education/        # Education features (courses, grades, login)
 │   └── system/           # System features (notifications, updates, widgets)
 ├── platform/             # Platform-specific implementations

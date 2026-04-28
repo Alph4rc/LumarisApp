@@ -163,7 +163,8 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     );
   }
 
-  Widget _buildScheduleItem(CourseModel course, ScheduleItem item, bool isTablet) {
+  Widget _buildScheduleItem(
+      CourseModel course, ScheduleItem item, bool isTablet) {
     return Material(
       borderRadius: BorderRadius.circular(20),
       color: Colors.transparent,

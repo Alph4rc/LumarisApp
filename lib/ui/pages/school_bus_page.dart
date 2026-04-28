@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/ui/controllers/bus_controller.dart';
-import 'package:ios_club_app/features/education/models/bus_model.dart' show BusItem;
+import 'package:ios_club_app/features/education/models/bus_model.dart'
+    show BusItem;
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';

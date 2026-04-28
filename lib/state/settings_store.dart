@@ -15,9 +15,6 @@ class SettingsStore extends GetxController {
   // 明日课程显示设置
   final _isShowTomorrow = false.obs;
 
-  // 待办事项同步设置
-  final _isUpdateToClub = false.obs;
-
   // 主页设置
   final _pageIndex = 0.obs;
 
@@ -52,8 +49,6 @@ class SettingsStore extends GetxController {
   int get remindTime => _remindTime.value;
 
   bool get isShowTomorrow => _isShowTomorrow.value;
-
-  bool get isUpdateToClub => _isUpdateToClub.value;
 
   int get pageIndex => _pageIndex.value;
 
@@ -96,7 +91,6 @@ class SettingsStore extends GetxController {
     _isRemind.value = prefs.getBool(PrefsKeys.IS_REMIND) ?? false;
     _remindTime.value = prefs.getInt(PrefsKeys.NOTIFICATION_TIME) ?? 15;
     _isShowTomorrow.value = prefs.getBool(PrefsKeys.IS_SHOW_TOMORROW) ?? false;
-    _isUpdateToClub.value = prefs.getBool(PrefsKeys.IS_UPDATE_CLUB) ?? false;
     _pageIndex.value = prefs.getInt(PrefsKeys.PAGE_DATA) ?? 0;
     _enableHapticFeedback.value =
         prefs.getBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK) ?? false;
@@ -136,13 +130,6 @@ class SettingsStore extends GetxController {
     _isShowTomorrow.value = value;
     final prefs = PrefsService.instance;
     await prefs.setBool(PrefsKeys.IS_SHOW_TOMORROW, value);
-  }
-
-  /// 设置是否同步待办事项到社团
-  Future<void> setIsUpdateToClub(bool value) async {
-    _isUpdateToClub.value = value;
-    final prefs = PrefsService.instance;
-    await prefs.setBool(PrefsKeys.IS_UPDATE_CLUB, value);
   }
 
   /// 设置主页索引

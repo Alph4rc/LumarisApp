@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/services/club_service.dart';
+import 'package:ios_club_app/core/services/link_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,7 +17,7 @@ class LinkPage extends StatelessWidget {
         title: '建大导航',
       ),
       body: FutureBuilder(
-        future: ClubService.getLinks(),
+        future: LinkService.getLinks(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {

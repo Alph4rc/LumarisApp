@@ -151,8 +151,7 @@ void main() {
       await pumpFrames(tester);
     });
 
-    testWidgets('should_allow_hiding_last_tile',
-        (WidgetTester tester) async {
+    testWidgets('should_allow_hiding_last_tile', (WidgetTester tester) async {
       final controller = Get.put(TileEditController());
 
       // Hide all but one tile

@@ -29,15 +29,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   }
 
   Future<List<TodoItem>> getTodoList() async {
-    // final prefs = await SharedPreferences.getInstance();
-
-    // final isUpdateToClub = prefs.getBool('is_update_club') ?? false;
     List<TodoItem> list = await TodoService.getLocalTodoList();
-
-    // if (isUpdateToClub) {
-    //   list.addAll(await TodoService.getClubTodoList());
-    // }
-
     return list;
   }
 

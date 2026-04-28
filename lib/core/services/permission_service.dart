@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ios_club_app/ui/components/permission_dialog.dart';
 
-export 'package:permission_handler/permission_handler.dart' show Permission, PermissionStatus;
+export 'package:permission_handler/permission_handler.dart'
+    show Permission, PermissionStatus;
 
 class PermissionService {
   /// 请求单个权限，支持回调处理不同结果。

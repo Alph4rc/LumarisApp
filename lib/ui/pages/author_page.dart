@@ -140,7 +140,8 @@ class AuthorPage extends StatelessWidget {
           return Column(
             children: [
               ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: Container(
                   width: 36,
                   height: 36,
@@ -263,7 +264,8 @@ class AuthorPage extends StatelessWidget {
           return Column(
             children: [
               ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 leading: Icon(
                   item['icon'] as IconData,
                   color: item['color'] as Color,

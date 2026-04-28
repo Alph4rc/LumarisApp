@@ -26,25 +26,6 @@ class AuthService {
       await prefs.remove(PrefsKeys.PASSWORD);
     }
 
-    final clubName = prefs.getString(PrefsKeys.CLUB_NAME);
-    final clubId = prefs.getString(PrefsKeys.CLUB_ID);
-    final memberJwt = prefs.getString(PrefsKeys.MEMBER_JWT);
-
-    if (clubName != null && clubName.isNotEmpty) {
-      await secureStorage.write(key: PrefsKeys.CLUB_NAME, value: clubName);
-      await prefs.remove(PrefsKeys.CLUB_NAME);
-    }
-
-    if (clubId != null && clubId.isNotEmpty) {
-      await secureStorage.write(key: PrefsKeys.CLUB_ID, value: clubId);
-      await prefs.remove(PrefsKeys.CLUB_ID);
-    }
-
-    if (memberJwt != null && memberJwt.isNotEmpty) {
-      await secureStorage.write(key: PrefsKeys.MEMBER_JWT, value: memberJwt);
-      await prefs.remove(PrefsKeys.MEMBER_JWT);
-    }
-
     final paymentNum = prefs.getString(PrefsKeys.PAYMENT_NUM);
     if (paymentNum != null && paymentNum.isNotEmpty) {
       await secureStorage.write(key: PrefsKeys.PAYMENT_NUM, value: paymentNum);

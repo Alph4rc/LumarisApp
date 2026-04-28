@@ -21,7 +21,8 @@ class ScoreApi {
         throw NetworkException('学期返回格式错误: ${response.runtimeType}', -1);
       }
       // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      final Map<String, dynamic> typedResponse =
+          Map<String, dynamic>.from(response);
       return SemesterResult.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);
@@ -68,7 +69,8 @@ class ScoreApi {
         throw NetworkException('当前学期返回格式错误: ${response.runtimeType}', -1);
       }
       // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse = Map<String, dynamic>.from(response);
+      final Map<String, dynamic> typedResponse =
+          Map<String, dynamic>.from(response);
       return SemesterModel.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);

@@ -224,7 +224,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 _buildInstructionItem(
                   icon: CupertinoIcons.person_circle,
                   title: '登录与账户',
-                  description: '首次使用需登录教务系统账户，社团成员可使用 iMember 账户',
+                  description: '首次使用需登录教务系统账户',
                   color: const Color(0xFF007AFF),
                   isTablet: isTablet,
                 ),
