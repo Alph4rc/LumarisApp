@@ -153,25 +153,33 @@ class ScoreService {
     final mergedScores = Map<String, ScoreList>.from(cachedScores);
     var fetchedAny = false;
 
-    for (final semester in semesters) {
-      try {
-        final list = await ScoreApi.getScore(
-          cookieData.studentId,
-          semester.semester,
-          forceRefresh: forceRefresh,
-        );
-        mergedScores[semester.semester] = ScoreList(
-          semester: semester,
-          list: list,
-        );
-        fetchedAny = true;
-      } catch (e, stackTrace) {
-        AppLogger.error(
-          '获取学期 ${semester.semester} 成绩失败',
-          error: e,
-          stackTrace: stackTrace,
-        );
-      }
+    final results = await Future.wait(
+      semesters.map((semester) async {
+        try {
+          final list = await ScoreApi.getScore(
+            cookieData.studentId,
+            semester.semester,
+            forceRefresh: forceRefresh,
+          );
+          return MapEntry(semester, list);
+        } catch (e, stackTrace) {
+          AppLogger.error(
+            '获取学期 ${semester.semester} 成绩失败',
+            error: e,
+            stackTrace: stackTrace,
+          );
+          return null;
+        }
+      }),
+    );
+
+    for (final result in results) {
+      if (result == null) continue;
+      mergedScores[result.key.semester] = ScoreList(
+        semester: result.key,
+        list: result.value,
+      );
+      fetchedAny = true;
     }
 
     final mergedScoresList = sortScores(mergedScores.values.toList());
