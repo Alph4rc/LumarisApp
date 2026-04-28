@@ -68,6 +68,8 @@ UPDATE_CHANNEL=gitee
    flutter build apk --obfuscate --split-debug-info=xx --no-tree-shake-icons --target-platform android-arm64 --split-per-abi
    ```
    
+可以加入 `--dart-define=UPDATE_CHANNEL=appstore` 来表明使用应用商店版本
+   
 3. Android (aab):
    ```bash
    flutter build appbundle --obfuscate --split-debug-info=xx --no-tree-shake-icons --target-platform android-arm64

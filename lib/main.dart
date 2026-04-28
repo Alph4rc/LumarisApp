@@ -9,7 +9,6 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/state/init.dart';
-import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -106,8 +105,6 @@ void main() async {
     await _configureMacosWindowUtils();
   }
 
-  // 初始化更新管理器
-  await CheckUpdateManager.init();
 
   // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
   // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度

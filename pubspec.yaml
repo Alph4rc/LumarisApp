@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  flutter_dotenv: ^6.0.0
   shared_preferences: ^2.5.3
   http: ^1.6.0
   intl: ^0.20.2
@@ -80,7 +79,6 @@ flutter:
     - assets/男生.webp
     - assets/iconfont/iconfont.json
     - assets/iconfont/iconfont.ttf
-    - .env
     - LICENSE
 
   fonts:
