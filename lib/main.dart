@@ -112,7 +112,7 @@ void main() async {
   // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
   // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度
   // 延迟执行，确保所有 Store 和 Service 完全就绪
-  if (PlatformUtils.isIOS && Platform.isAndroid) {
+  if (PlatformUtils.isMobile) {
     Future.delayed(const Duration(seconds: 2), () async {
       await TaskExecutor.checkAndSendCourseReminder();
       await TaskExecutor.updateWidget();

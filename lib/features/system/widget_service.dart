@@ -3,6 +3,7 @@ import 'package:home_widget/home_widget.dart';
 
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 
 class WidgetService {
@@ -11,6 +12,11 @@ class WidgetService {
 
   static Future<void> initialize() async {
     if (_isInitialized) {
+      return;
+    }
+
+    if (!PlatformUtils.isIOS && !PlatformUtils.isAndroid){
+      _isInitialized = true;
       return;
     }
 
