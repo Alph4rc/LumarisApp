@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/net_service.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 class NetPage extends StatelessWidget {
@@ -371,7 +371,10 @@ class _LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: CupertinoActivityIndicator(),
+      child: LoadingStateView(
+        title: '正在读取校园网数据',
+        subtitle: '正在同步流量、在线时长和账号信息',
+      ),
     );
   }
 }

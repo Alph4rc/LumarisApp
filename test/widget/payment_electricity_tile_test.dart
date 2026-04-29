@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
 
@@ -49,7 +49,8 @@ void main() {
       store.hasData.value = false;
 
       await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+      expect(find.byType(LoadingStateView), findsOneWidget);
+      expect(find.text('正在读取电费'), findsOneWidget);
     });
 
     testWidgets('shows low balance style when amount is small', (tester) async {
@@ -93,7 +94,8 @@ void main() {
       store.isLoading.value = true;
 
       await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+      expect(find.byType(LoadingStateView), findsOneWidget);
+      expect(find.text('正在读取饭卡'), findsOneWidget);
     });
 
     testWidgets('shows low balance state when recharge value is low',

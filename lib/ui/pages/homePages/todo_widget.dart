@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,7 @@ import 'package:ios_club_app/features/system/notifications/notification_service.
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 
 class TodoWidget extends StatefulWidget {
   const TodoWidget({super.key});
@@ -98,7 +98,15 @@ class _TodoWidgetState extends State<TodoWidget> {
             future: _todosFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CupertinoActivityIndicator());
+                return const ClubCard(
+                  child: LoadingStateView(
+                    title: '正在读取待办事务',
+                    subtitle: '正在加载本地待办列表与提醒状态',
+                    compact: true,
+                    showCard: false,
+                    padding: EdgeInsets.all(16),
+                  ),
+                );
               } else if (snapshot.hasError) {
                 return const ClubCard(
                   child: Padding(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -18,7 +17,7 @@ Widget _wrap(
 }
 
 void main() {
-  testWidgets('should_render_title_subtitle_and_icon', (tester) async {
+  testWidgets('should_render_title_subtitle_and_full_layout', (tester) async {
     await tester.pumpWidget(
       _wrap(
         const LoadingStateView(
@@ -30,7 +29,7 @@ void main() {
 
     expect(find.text('正在同步教务数据'), findsOneWidget);
     expect(find.text('网络较慢时可能需要几秒'), findsOneWidget);
-    expect(find.byIcon(CupertinoIcons.cloud_download), findsOneWidget);
+    expect(find.byKey(const ValueKey('loading_full')), findsOneWidget);
   });
 
   testWidgets('should_build_in_light_and_dark_themes', (tester) async {
@@ -73,6 +72,7 @@ void main() {
 
     expect(find.text('正在刷新用电趋势'), findsOneWidget);
     expect(find.text('正在读取最新电费记录'), findsOneWidget);
-    expect(find.byIcon(CupertinoIcons.bolt_fill), findsOneWidget);
+    expect(find.byKey(const ValueKey('loading_compact')), findsOneWidget);
+    expect(find.byType(ClipRRect), findsOneWidget);
   });
 }

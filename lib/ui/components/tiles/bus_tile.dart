@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../club_card.dart';
 
 class BusTile extends StatelessWidget {
@@ -23,7 +24,12 @@ class BusTile extends StatelessWidget {
             child: Obx(() {
               if (busStore.isLoading.value) {
                 return const Center(
-                  child: CupertinoActivityIndicator(),
+                  child: LoadingStateView(
+                    title: '正在获取校车',
+                    subtitle: '',
+                    compact: true,
+                    padding: EdgeInsets.zero,
+                  ),
                 );
               }
 

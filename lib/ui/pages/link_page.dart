@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/services/link_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/models/link_model.dart';
@@ -68,20 +68,10 @@ class LinkPage extends StatelessWidget {
               );
             }
           } else {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CupertinoActivityIndicator(),
-                  const SizedBox(height: 16),
-                  Text(
-                    "加载中...",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+            return const Center(
+              child: LoadingStateView(
+                title: '正在加载导航链接',
+                subtitle: '正在整理常用站点与分类入口',
               ),
             );
           }

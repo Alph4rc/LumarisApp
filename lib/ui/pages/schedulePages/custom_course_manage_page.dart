@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -202,7 +202,10 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
         ),
         body: isLoading
             ? const Center(
-                child: CupertinoActivityIndicator(),
+                child: LoadingStateView(
+                  title: '正在读取自定义课程',
+                  subtitle: '正在整理本地保存的课程配置',
+                ),
               )
             : customCourses.isEmpty
                 ? Center(

@@ -11,6 +11,7 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/info_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
@@ -88,7 +89,10 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: CupertinoActivityIndicator(),
+          child: LoadingStateView(
+            title: '正在读取账号信息',
+            subtitle: '正在同步本地登录状态和个人资料入口，请稍等一下',
+          ),
         ),
       );
     }
@@ -214,10 +218,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CupertinoActivityIndicator(),
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: LoadingStateView(
+                        title: '正在同步学业信息',
+                        subtitle: '正在读取学分与个人信息卡片',
+                        compact: true,
+                        showCard: true,
                       ),
                     );
                   }

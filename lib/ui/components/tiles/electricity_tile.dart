@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../club_card.dart';
 import '../../../state/electricity_store.dart';
 
@@ -24,7 +25,12 @@ class ElectricityTile extends StatelessWidget {
               // Loading state
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CupertinoActivityIndicator(),
+                  child: LoadingStateView(
+                    title: '正在读取电费',
+                    subtitle: '',
+                    compact: true,
+                    padding: EdgeInsets.zero,
+                  ),
                 );
               }
 
