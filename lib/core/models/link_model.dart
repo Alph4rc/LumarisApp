@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'link_model.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class LinkModel {
   const LinkModel({
     required this.key,
@@ -33,30 +38,13 @@ class LinkModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'key': key,
-      'name': name,
-      'icon': icon,
-      'url': url,
-      'description': description,
-      'index': index,
-    };
-  }
+  Map<String, dynamic> toJson() => _$LinkModelToJson(this);
 
-  factory LinkModel.fromJson(Map<String, dynamic> map) {
-    return LinkModel(
-      key: map['key'] as String,
-      name: map['name'] as String,
-      icon: map['icon'] != null ? map['icon'] as String : null,
-      url: map['url'] as String,
-      description:
-          map['description'] != null ? map['description'] as String : null,
-      index: map['index'] as int,
-    );
-  }
+  factory LinkModel.fromJson(Map<String, dynamic> map) =>
+      _$LinkModelFromJson(map);
 }
 
+@JsonSerializable(explicitToJson: true)
 class CategoryModel {
   const CategoryModel({
     required this.key,
@@ -92,30 +80,8 @@ class CategoryModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'key': key,
-      'name': name,
-      'description': description,
-      'icon': icon,
-      'index': index,
-      'links': links.map((x) => x.toJson()).toList(),
-    };
-  }
+  Map<String, dynamic> toJson() => _$CategoryModelToJson(this);
 
-  factory CategoryModel.fromJson(Map<String, dynamic> map) {
-    return CategoryModel(
-      key: map['key'] as String,
-      name: map['name'] as String,
-      description:
-          map['description'] != null ? map['description'] as String : null,
-      icon: map['icon'] as String,
-      index: map['index'] as int,
-      links: List<LinkModel>.from(
-        (map['links'] as List<dynamic>).map<LinkModel>(
-          (x) => LinkModel.fromJson(x as Map<String, dynamic>),
-        ),
-      ),
-    );
-  }
+  factory CategoryModel.fromJson(Map<String, dynamic> map) =>
+      _$CategoryModelFromJson(map);
 }

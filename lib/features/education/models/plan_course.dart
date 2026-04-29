@@ -1,11 +1,24 @@
 import 'dart:convert';
 
+import 'package:json_annotation/json_annotation.dart';
+
+import 'schema_parsers.dart';
+
+part 'plan_course.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class PlanCourse {
+  @JsonKey(readValue: _readName, fromJson: parseSchemaString)
   String name;
+  @JsonKey(readValue: _readLessonType, fromJson: parseSchemaString)
   String lessonType;
+  @JsonKey(readValue: _readExamMode, fromJson: parseSchemaString)
   String examMode;
+  @JsonKey(readValue: _readCourseTypeName, fromJson: parseSchemaString)
   String courseTypeName;
+  @JsonKey(readValue: _readCredits, fromJson: parseSchemaDouble)
   double credits;
+  @JsonKey(readValue: _readTermStr, fromJson: parseSchemaString)
   String termStr;
 
   PlanCourse({
@@ -17,30 +30,10 @@ class PlanCourse {
     this.termStr = "",
   });
 
-  // 将对象转换为Map以便JSON编码
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'lessonType': lessonType,
-        'examMode': examMode,
-        'courseTypeName': courseTypeName,
-        'credits': credits,
-        'termStr': termStr,
-      };
+  Map<String, dynamic> toJson() => _$PlanCourseToJson(this);
 
-  // 从Map创建PlanCourse对象
-  factory PlanCourse.fromJson(Map<String, dynamic> json) {
-    return PlanCourse(
-      name: (json['name'] ?? json['Name']) as String? ?? "",
-      lessonType: (json['lessonType'] ?? json['LessonType']) as String? ?? "",
-      examMode: (json['examMode'] ?? json['ExamMode']) as String? ?? "",
-      courseTypeName:
-          (json['courseTypeName'] ?? json['CourseTypeName']) as String? ?? "",
-      credits: (json['credits'] ?? json['Credits']) == null
-          ? 0.0
-          : double.parse((json['credits'] ?? json['Credits']).toString()),
-      termStr: (json['termStr'] ?? json['TermStr']) as String? ?? "",
-    );
-  }
+  factory PlanCourse.fromJson(Map<String, dynamic> json) =>
+      _$PlanCourseFromJson(json);
 
   // 将对象序列化为JSON字符串
   String toJsonString() => json.encode(toJson());
@@ -49,6 +42,20 @@ class PlanCourse {
   factory PlanCourse.fromJsonString(String jsonString) =>
       PlanCourse.fromJson(json.decode(jsonString) as Map<String, dynamic>);
 }
+
+Object? _readName(Map json, String key) => json[key] ?? json['Name'];
+
+Object? _readLessonType(Map json, String key) =>
+    json[key] ?? json['LessonType'];
+
+Object? _readExamMode(Map json, String key) => json[key] ?? json['ExamMode'];
+
+Object? _readCourseTypeName(Map json, String key) =>
+    json[key] ?? json['CourseTypeName'];
+
+Object? _readCredits(Map json, String key) => json[key] ?? json['Credits'];
+
+Object? _readTermStr(Map json, String key) => json[key] ?? json['TermStr'];
 
 class PlanCourseList {
   List<PlanCourse> courses;

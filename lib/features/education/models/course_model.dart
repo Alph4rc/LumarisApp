@@ -1,4 +1,6 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
+
 import 'schema_parsers.dart';
 
 part 'course_model.g.dart';
@@ -7,53 +9,66 @@ part 'course_model.g.dart';
 ///
 /// 用于表示课程的详细信息，包括课程名称、上课时间、地点、教师等。
 /// 是应用中核心的数据结构之一，用于课程表展示、查询和管理。
+@JsonSerializable(explicitToJson: true)
 @HiveType(typeId: 0)
 class CourseModel {
   /// 课程周次索引列表，例如：[1, 2, 3, 5, 6] 表示第1-3周和第5-6周上课
+  @JsonKey(fromJson: parseSchemaIntList)
   @HiveField(0)
   List<int> weekIndexes = [];
 
   /// 授课教师列表
+  @JsonKey(fromJson: parseSchemaStringList)
   @HiveField(1)
   List<String> teachers = [];
 
   /// 上课地点
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(2)
   String room = '';
 
   /// 课程名称
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(3)
   String courseName = '';
 
   /// 课程代码
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(4)
   String courseCode = '';
 
   /// 星期几上课（0-6，0表示周一，6表示周日）
+  @JsonKey(fromJson: parseSchemaInt)
   @HiveField(5)
   int weekday = 0;
 
   /// 开始上课的节次（例如：1表示第1节课）
+  @JsonKey(fromJson: parseSchemaInt)
   @HiveField(6)
   int startUnit = 0;
 
   /// 结束上课的节次（例如：2表示第2节课结束）
+  @JsonKey(fromJson: parseSchemaInt)
   @HiveField(7)
   int endUnit = 0;
 
   /// 课程学分
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(8)
   String credits = '';
 
   /// 课程ID
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(9)
   String lessonId = '';
 
   /// 上课校区
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(10)
   String campus = '';
 
   /// 是否为自定义课程
+  @JsonKey(fromJson: parseSchemaBool)
   @HiveField(11)
   bool isCustom = false;
 
@@ -102,50 +117,13 @@ class CourseModel {
   ///
   /// @param json JSON格式的课程数据
   /// @return 课程实例
-  factory CourseModel.fromJson(Map<String, dynamic> json) {
-    return CourseModel(
-      weekIndexes: json['weekIndexes'] != null
-          ? (json['weekIndexes'] as List<dynamic>)
-              .map((item) => parseSchemaInt(item))
-              .toList()
-          : [],
-      teachers: json['teachers'] != null
-          ? (json['teachers'] as List<dynamic>)
-              .map((item) => item as String)
-              .toList()
-          : [],
-      room: json['room'] ?? '',
-      courseName: json['courseName'] ?? '',
-      courseCode: json['courseCode'] ?? '',
-      weekday: parseSchemaInt(json['weekday']),
-      startUnit: parseSchemaInt(json['startUnit']),
-      endUnit: parseSchemaInt(json['endUnit']),
-      credits: json['credits']?.toString() ?? '',
-      lessonId: json['lessonId'] ?? '',
-      campus: json['campus'] ?? '',
-      isCustom: json['isCustom'] ?? false,
-    );
-  }
+  factory CourseModel.fromJson(Map<String, dynamic> json) =>
+      _$CourseModelFromJson(json);
 
   /// 将课程实例转换为JSON数据
   ///
   /// @return JSON格式的课程数据
-  Map<String, dynamic> toJson() {
-    return {
-      'weekIndexes': weekIndexes,
-      'teachers': teachers,
-      'room': room,
-      'courseName': courseName,
-      'courseCode': courseCode,
-      'weekday': weekday,
-      'startUnit': startUnit,
-      'endUnit': endUnit,
-      'credits': credits,
-      'lessonId': lessonId,
-      'campus': campus,
-      'isCustom': isCustom,
-    };
-  }
+  Map<String, dynamic> toJson() => _$CourseModelToJson(this);
 
   /// 格式化周次范围
   ///

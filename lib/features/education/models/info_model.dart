@@ -1,6 +1,16 @@
+import 'package:json_annotation/json_annotation.dart';
+
+import 'schema_parsers.dart';
+
+part 'info_model.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class TotalData {
+  @JsonKey(fromJson: parseSchemaString)
   final String name;
+  @JsonKey(fromJson: parseSchemaDouble)
   final double actual;
+  @JsonKey(fromJson: parseSchemaDouble)
   final double full;
 
   TotalData({
@@ -9,25 +19,19 @@ class TotalData {
     required this.full,
   });
 
-  factory TotalData.fromJson(Map<String, dynamic> json) {
-    return TotalData(
-      name: json['name'] as String,
-      actual: double.parse((json['actual'] ?? 0).toString()),
-      full: double.parse((json['full'] ?? 0).toString()),
-    );
-  }
+  factory TotalData.fromJson(Map<String, dynamic> json) =>
+      _$TotalDataFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'actual': actual,
-        'full': full,
-      };
+  Map<String, dynamic> toJson() => _$TotalDataToJson(this);
 }
 
 // 主数据模型类
+@JsonSerializable(explicitToJson: true)
 class InfoModel {
+  @JsonKey(fromJson: parseSchemaString)
   final String type;
   final TotalData total;
+  @JsonKey(fromJson: _totalDataListFromJson)
   final List<TotalData> other;
 
   InfoModel({
@@ -36,22 +40,14 @@ class InfoModel {
     required this.other,
   });
 
-  // 从JSON Map构建实例的工厂构造函数
-  factory InfoModel.fromJson(Map<String, dynamic> json) {
-    return InfoModel(
-      type: json['type'] as String,
-      total: TotalData.fromJson(json['total'] as Map<String, dynamic>),
-      other: List<TotalData>.from(
-        (json['other'] as List<dynamic>)
-            .map((item) => TotalData.fromJson(item as Map<String, dynamic>)),
-      ),
-    );
-  }
+  factory InfoModel.fromJson(Map<String, dynamic> json) =>
+      _$InfoModelFromJson(json);
 
-  // 转换为JSON格式的Map
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        'total': total.toJson(),
-        'other': other.map((item) => item.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() => _$InfoModelToJson(this);
+}
+
+List<TotalData> _totalDataListFromJson(dynamic value) {
+  return (value as List<dynamic>)
+      .map((item) => TotalData.fromJson(item as Map<String, dynamic>))
+      .toList();
 }

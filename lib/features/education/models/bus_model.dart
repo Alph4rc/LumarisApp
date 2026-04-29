@@ -1,5 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
+
+import 'schema_parsers.dart';
+
+part 'bus_model.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class BusModel {
+  @JsonKey(fromJson: _busItemsFromJson)
   List<BusItem> records;
+  @JsonKey(fromJson: parseSchemaInt)
   final int total;
 
   BusModel({
@@ -7,31 +16,27 @@ class BusModel {
     required this.total,
   });
 
-  // 从JSON构造方法
-  factory BusModel.fromJson(Map<String, dynamic> json) {
-    final rawRecords = json['records'] as List<dynamic>? ?? <dynamic>[];
-    return BusModel(
-      records: rawRecords
-          .map((item) => BusItem.fromJson(item as Map<String, dynamic>))
-          .toList(),
-      total: int.parse((json['total'] ?? 0).toString()),
-    );
-  }
+  factory BusModel.fromJson(Map<String, dynamic> json) =>
+      _$BusModelFromJson(json);
 
-  // 转换为JSON方法
-  Map<String, dynamic> toJson() => {
-        'records': records.map((item) => item.toJson()).toList(),
-        'total': total,
-      };
+  Map<String, dynamic> toJson() => _$BusModelToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class BusItem {
+  @JsonKey(fromJson: parseSchemaString)
   final String lineName;
+  @JsonKey(fromJson: parseSchemaString)
   final String description;
+  @JsonKey(fromJson: parseSchemaString)
   final String departureStation;
+  @JsonKey(fromJson: parseSchemaString)
   final String arrivalStation;
+  @JsonKey(fromJson: parseSchemaString)
   String runTime;
+  @JsonKey(fromJson: parseSchemaString)
   String arrivalStationTime;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   String totalTime = '';
 
   BusItem({
@@ -75,25 +80,17 @@ class BusItem {
     }
   }
 
-  // 从JSON构造方法
-  factory BusItem.fromJson(Map<String, dynamic> json) {
-    return BusItem(
-      lineName: json['lineName']?.toString() ?? '',
-      description: json['description']?.toString() ?? '',
-      departureStation: json['departureStation']?.toString() ?? '',
-      arrivalStation: json['arrivalStation']?.toString() ?? '',
-      runTime: json['runTime']?.toString() ?? '',
-      arrivalStationTime: json['arrivalStationTime']?.toString() ?? '',
-    );
-  }
+  factory BusItem.fromJson(Map<String, dynamic> json) =>
+      _$BusItemFromJson(json);
 
-  // 转换为JSON方法
-  Map<String, dynamic> toJson() => {
-        'lineName': lineName,
-        'description': description,
-        'departureStation': departureStation,
-        'arrivalStation': arrivalStation,
-        'runTime': runTime,
-        'arrivalStationTime': arrivalStationTime,
-      };
+  Map<String, dynamic> toJson() => _$BusItemToJson(this);
+}
+
+List<BusItem> _busItemsFromJson(dynamic value) {
+  if (value is List) {
+    return value
+        .map((item) => BusItem.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+  return <BusItem>[];
 }

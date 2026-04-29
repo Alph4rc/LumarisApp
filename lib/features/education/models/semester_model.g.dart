@@ -42,3 +42,19 @@ class SemesterModelAdapter extends TypeAdapter<SemesterModel> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+SemesterModel _$SemesterModelFromJson(Map<String, dynamic> json) =>
+    SemesterModel(
+      semester: parseSchemaString(json['value']),
+      name: parseSchemaString(json['text']),
+    );
+
+Map<String, dynamic> _$SemesterModelToJson(SemesterModel instance) =>
+    <String, dynamic>{
+      'value': instance.semester,
+      'text': instance.name,
+    };

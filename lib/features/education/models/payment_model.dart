@@ -1,7 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'payment_model.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class PaymentModel {
   final String turnoverType;
   final String datetimeStr;
   final String resume;
+  @JsonKey(name: 'tranamt', fromJson: _amountFromJson)
   final double amount;
 
   const PaymentModel({
@@ -12,28 +18,11 @@ class PaymentModel {
   });
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) {
-    final tranamt = json['tranamt'];
-    if (tranamt is! num && tranamt is! String) {
-      throw ArgumentError.value(
-          tranamt, 'tranamt', 'Expected number or string');
-    }
-
-    return PaymentModel(
-      turnoverType: json['turnoverType'] as String,
-      datetimeStr: json['datetimeStr'] as String,
-      resume: json['resume'] as String,
-      amount: double.parse(tranamt.toString()),
-    );
+    _amountFromJson(json['tranamt']);
+    return _$PaymentModelFromJson(json);
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'turnoverType': turnoverType,
-      'datetimeStr': datetimeStr,
-      'resume': resume,
-      'tranamt': amount,
-    };
-  }
+  Map<String, dynamic> toJson() => _$PaymentModelToJson(this);
 
   @override
   String toString() {
@@ -41,31 +30,37 @@ class PaymentModel {
   }
 }
 
+@JsonSerializable(explicitToJson: true)
 class PaymentData {
+  @JsonKey(name: 'records', fromJson: _paymentsFromJson)
   final List<PaymentModel> payments;
+  @JsonKey(fromJson: _totalFromJson)
   final double total;
 
   const PaymentData(this.payments, this.total);
 
-  factory PaymentData.fromJson(Map<String, dynamic> json) {
-    final rawRecords = json['records'] as List<dynamic>? ?? <dynamic>[];
-    final rawTotal = json['total'];
-    if (rawTotal is! num && rawTotal is! String) {
-      throw ArgumentError.value(rawTotal, 'total', 'Expected number or string');
-    }
+  factory PaymentData.fromJson(Map<String, dynamic> json) =>
+      _$PaymentDataFromJson(json);
 
-    return PaymentData(
-      rawRecords
-          .map((e) => PaymentModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      double.parse(rawTotal.toString()),
-    );
-  }
+  Map<String, dynamic> toJson() => _$PaymentDataToJson(this);
+}
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'records': payments.map((payment) => payment.toJson()).toList(),
-      'total': total,
-    };
+double _amountFromJson(dynamic tranamt) {
+  if (tranamt is! num && tranamt is! String) {
+    throw ArgumentError.value(tranamt, 'tranamt', 'Expected number or string');
   }
+  return double.parse(tranamt.toString());
+}
+
+double _totalFromJson(dynamic total) {
+  if (total is! num && total is! String) {
+    throw ArgumentError.value(total, 'total', 'Expected number or string');
+  }
+  return double.parse(total.toString());
+}
+
+List<PaymentModel> _paymentsFromJson(dynamic value) {
+  return (value as List<dynamic>)
+      .map((item) => PaymentModel.fromJson(item as Map<String, dynamic>))
+      .toList();
 }

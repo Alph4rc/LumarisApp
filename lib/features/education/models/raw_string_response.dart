@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'raw_string_response.g.dart';
+
+@JsonSerializable(createFactory: false)
 class RawStringResponse {
   final String value;
 
@@ -10,7 +15,5 @@ class RawStringResponse {
     throw ArgumentError.value(data, 'data', 'Expected string response');
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'value': value};
-  }
+  Map<String, dynamic> toJson() => _$RawStringResponseToJson(this);
 }

@@ -1,24 +1,36 @@
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/features/education/models/semester_model.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+import 'schema_parsers.dart';
 
 part 'score_model.g.dart';
 
+@JsonSerializable(explicitToJson: true)
 @HiveType(typeId: 1)
 class ScoreModel {
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(0)
   String name;
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(1)
   String lessonCode;
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(2)
   String lessonName;
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(3)
   String grade;
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(4)
   String gpa;
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(5)
   String gradeDetail;
+  @JsonKey(fromJson: parseSchemaString)
   @HiveField(6)
   String credit;
+  @JsonKey(fromJson: parseSchemaBool)
   @HiveField(7)
   bool isMinor;
 
@@ -34,33 +46,13 @@ class ScoreModel {
   });
 
   // 如果需要从 JSON 创建对象
-  factory ScoreModel.fromJson(Map<String, dynamic> json) {
-    return ScoreModel(
-      name: json['name']?.toString() ?? '',
-      lessonCode: json['lessonCode']?.toString() ?? '',
-      lessonName: json['lessonName']?.toString() ?? '',
-      grade: json['grade']?.toString() ?? '',
-      gpa: json['gpa']?.toString() ?? '',
-      gradeDetail: (json['gradeDetail'] ?? '').toString(),
-      credit: (json['credit'] ?? '').toString(),
-      isMinor: json['isMinor'] ?? false,
-    );
-  }
+  factory ScoreModel.fromJson(Map<String, dynamic> json) =>
+      _$ScoreModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'lessonCode': lessonCode,
-      'lessonName': lessonName,
-      'grade': grade,
-      'gpa': gpa,
-      'gradeDetail': gradeDetail,
-      'credit': credit,
-      'isMinor': isMinor,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ScoreModelToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 @HiveType(typeId: 2)
 class ScoreList {
   @HiveField(0)
@@ -68,29 +60,10 @@ class ScoreList {
   @HiveField(1)
   SemesterModel semester;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'list': list.map((x) => x.toJson()).toList(),
-      'semester': semester.toJson(),
-    };
-  }
+  Map<String, dynamic> toJson() => _$ScoreListToJson(this);
 
-  ScoreList.fromJson(Map<String, dynamic> json)
-      : list = (json['list'] as List? ?? []).map((x) {
-          try {
-            return ScoreModel.fromJson(x as Map<String, dynamic>);
-          } catch (_) {
-            return ScoreModel();
-          }
-        }).toList(),
-        semester = (() {
-          try {
-            return SemesterModel.fromJson(
-                json['semester'] as Map<String, dynamic>);
-          } catch (_) {
-            return SemesterModel(semester: '', name: '');
-          }
-        })();
+  factory ScoreList.fromJson(Map<String, dynamic> json) =>
+      _$ScoreListFromJson(json);
 
   ScoreList({required this.semester, required this.list});
 

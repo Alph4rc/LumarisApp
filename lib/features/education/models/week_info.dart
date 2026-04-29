@@ -1,5 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
+
+import 'schema_parsers.dart';
+
+part 'week_info.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class WeekInfo {
+  @JsonKey(fromJson: parseSchemaInt)
   final int week;
+  @JsonKey(fromJson: parseSchemaInt)
   final int maxWeek;
 
   WeekInfo({
@@ -7,17 +16,8 @@ class WeekInfo {
     required this.maxWeek,
   });
 
-  factory WeekInfo.fromJson(Map<String, dynamic> json) {
-    return WeekInfo(
-      week: json['week'] as int? ?? 0,
-      maxWeek: json['maxWeek'] as int? ?? 0,
-    );
-  }
+  factory WeekInfo.fromJson(Map<String, dynamic> json) =>
+      _$WeekInfoFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'week': week,
-      'maxWeek': maxWeek,
-    };
-  }
+  Map<String, dynamic> toJson() => _$WeekInfoToJson(this);
 }

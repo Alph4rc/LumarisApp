@@ -72,3 +72,38 @@ class CourseModelAdapter extends TypeAdapter<CourseModel> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+CourseModel _$CourseModelFromJson(Map<String, dynamic> json) => CourseModel(
+      weekIndexes: parseSchemaIntList(json['weekIndexes']),
+      teachers: parseSchemaStringList(json['teachers']),
+      room: parseSchemaString(json['room']),
+      courseName: parseSchemaString(json['courseName']),
+      courseCode: parseSchemaString(json['courseCode']),
+      weekday: parseSchemaInt(json['weekday']),
+      startUnit: parseSchemaInt(json['startUnit']),
+      endUnit: parseSchemaInt(json['endUnit']),
+      credits: parseSchemaString(json['credits']),
+      lessonId: parseSchemaString(json['lessonId']),
+      campus: parseSchemaString(json['campus']),
+      isCustom: parseSchemaBool(json['isCustom']),
+    );
+
+Map<String, dynamic> _$CourseModelToJson(CourseModel instance) =>
+    <String, dynamic>{
+      'weekIndexes': instance.weekIndexes,
+      'teachers': instance.teachers,
+      'room': instance.room,
+      'courseName': instance.courseName,
+      'courseCode': instance.courseCode,
+      'weekday': instance.weekday,
+      'startUnit': instance.startUnit,
+      'endUnit': instance.endUnit,
+      'credits': instance.credits,
+      'lessonId': instance.lessonId,
+      'campus': instance.campus,
+      'isCustom': instance.isCustom,
+    };

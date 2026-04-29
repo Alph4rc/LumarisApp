@@ -1,9 +1,15 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'edu_api_models.dart';
 
+part 'time_info.g.dart';
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class TimeInfo {
   final String? startTime;
   final String? endTime;
   final String? semester;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Map<String, String>? extra;
 
   TimeInfo({
@@ -14,6 +20,7 @@ class TimeInfo {
   });
 
   factory TimeInfo.fromJson(Map<String, dynamic> json) {
+    final generated = _$TimeInfoFromJson(json);
     final timeModel = TimeModel.fromJson(json);
     final extra = <String, String>{};
     for (final entry in json.entries) {
@@ -29,19 +36,15 @@ class TimeInfo {
     }
 
     return TimeInfo(
-      startTime: timeModel.startTime,
-      endTime: timeModel.endTime,
-      semester: json['semester'] as String?,
+      startTime: timeModel.startTime ?? generated.startTime,
+      endTime: timeModel.endTime ?? generated.endTime,
+      semester: generated.semester,
       extra: extra.isEmpty ? null : extra,
     );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> json = {
-      if (startTime != null) 'startTime': startTime,
-      if (endTime != null) 'endTime': endTime,
-      if (semester != null) 'semester': semester,
-    };
+    final Map<String, dynamic> json = _$TimeInfoToJson(this);
 
     if (extra != null) {
       json.addAll(extra!);

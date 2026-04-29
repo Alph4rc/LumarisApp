@@ -1,9 +1,17 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'course_model.dart';
 import 'exam_model.dart';
 import 'semester_model.dart';
+import 'schema_parsers.dart';
 
+part 'edu_api_models.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class CourseErrorResponse {
+  @JsonKey(fromJson: parseSchemaBool)
   final bool success;
+  @JsonKey(fromJson: parseSchemaString)
   final String message;
 
   const CourseErrorResponse({
@@ -11,24 +19,19 @@ class CourseErrorResponse {
     required this.message,
   });
 
-  factory CourseErrorResponse.fromJson(Map<String, dynamic> json) {
-    return CourseErrorResponse(
-      success: json['success'] as bool? ?? false,
-      message: json['message'] as String? ?? '',
-    );
-  }
+  factory CourseErrorResponse.fromJson(Map<String, dynamic> json) =>
+      _$CourseErrorResponseFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'success': success,
-      'message': message,
-    };
-  }
+  Map<String, dynamic> toJson() => _$CourseErrorResponseToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class CourseResultResponse {
+  @JsonKey(fromJson: parseSchemaBool)
   final bool success;
+  @JsonKey(fromJson: _courseListFromJson)
   final List<CourseModel> data;
+  @JsonKey(includeIfNull: false)
   final String? expirationTime;
 
   const CourseResultResponse({
@@ -37,42 +40,30 @@ class CourseResultResponse {
     this.expirationTime,
   });
 
-  factory CourseResultResponse.fromJson(Map<String, dynamic> json) {
-    final rawData = json['data'] as List<dynamic>? ?? <dynamic>[];
-    return CourseResultResponse(
-      success: json['success'] as bool? ?? false,
-      data: rawData
-          .map((e) => CourseModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      expirationTime: json['expirationTime'] as String?,
-    );
-  }
+  factory CourseResultResponse.fromJson(Map<String, dynamic> json) =>
+      _$CourseResultResponseFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'success': success,
-      'data': data.map((course) => course.toJson()).toList(),
-      if (expirationTime != null) 'expirationTime': expirationTime,
-    };
-  }
+  Map<String, dynamic> toJson() => _$CourseResultResponseToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class ErrorResponse {
+  @JsonKey(fromJson: parseSchemaString)
   final String error;
 
   const ErrorResponse({required this.error});
 
-  factory ErrorResponse.fromJson(Map<String, dynamic> json) {
-    return ErrorResponse(error: json['error'] as String? ?? '');
-  }
+  factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
+      _$ErrorResponseFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'error': error};
-  }
+  Map<String, dynamic> toJson() => _$ErrorResponseToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class ErrorWithMessageResponse {
+  @JsonKey(fromJson: parseSchemaString)
   final String message;
+  @JsonKey(fromJson: parseSchemaString)
   final String error;
 
   const ErrorWithMessageResponse({
@@ -80,23 +71,17 @@ class ErrorWithMessageResponse {
     required this.error,
   });
 
-  factory ErrorWithMessageResponse.fromJson(Map<String, dynamic> json) {
-    return ErrorWithMessageResponse(
-      message: json['message'] as String? ?? '',
-      error: json['error'] as String? ?? '',
-    );
-  }
+  factory ErrorWithMessageResponse.fromJson(Map<String, dynamic> json) =>
+      _$ErrorWithMessageResponseFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'message': message,
-      'error': error,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ErrorWithMessageResponseToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class ExamResponse {
+  @JsonKey(fromJson: _examListFromJson)
   final List<ExamItem> exams;
+  @JsonKey(fromJson: parseSchemaBool)
   final bool canClick;
   final String? error;
 
@@ -106,47 +91,26 @@ class ExamResponse {
     this.error,
   });
 
-  factory ExamResponse.fromJson(Map<String, dynamic> json) {
-    final rawExams = json['exams'] as List<dynamic>? ?? <dynamic>[];
-    return ExamResponse(
-      exams: rawExams
-          .map((e) => ExamItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      canClick: json['canClick'] as bool? ?? false,
-      error: json['error'] as String?,
-    );
-  }
+  factory ExamResponse.fromJson(Map<String, dynamic> json) =>
+      _$ExamResponseFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'exams': exams.map((exam) => exam.toJson()).toList(),
-      'canClick': canClick,
-      'error': error,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ExamResponseToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class SemesterResult {
+  @JsonKey(fromJson: _semesterListFromJson)
   final List<SemesterModel> data;
 
   const SemesterResult({required this.data});
 
-  factory SemesterResult.fromJson(Map<String, dynamic> json) {
-    final rawData = json['data'] as List<dynamic>? ?? <dynamic>[];
-    return SemesterResult(
-      data: rawData
-          .map((e) => SemesterModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+  factory SemesterResult.fromJson(Map<String, dynamic> json) =>
+      _$SemesterResultFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'data': data.map((semester) => semester.toJson()).toList(),
-    };
-  }
+  Map<String, dynamic> toJson() => _$SemesterResultToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class TimeModel {
   final String? startTime;
   final String? endTime;
@@ -156,17 +120,35 @@ class TimeModel {
     this.endTime,
   });
 
-  factory TimeModel.fromJson(Map<String, dynamic> json) {
-    return TimeModel(
-      startTime: json['startTime'] as String?,
-      endTime: json['endTime'] as String?,
-    );
-  }
+  factory TimeModel.fromJson(Map<String, dynamic> json) =>
+      _$TimeModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      if (startTime != null) 'startTime': startTime,
-      if (endTime != null) 'endTime': endTime,
-    };
+  Map<String, dynamic> toJson() => _$TimeModelToJson(this);
+}
+
+List<CourseModel> _courseListFromJson(dynamic value) {
+  if (value is List) {
+    return value
+        .map((item) => CourseModel.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
+  return <CourseModel>[];
+}
+
+List<ExamItem> _examListFromJson(dynamic value) {
+  if (value is List) {
+    return value
+        .map((item) => ExamItem.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+  return <ExamItem>[];
+}
+
+List<SemesterModel> _semesterListFromJson(dynamic value) {
+  if (value is List) {
+    return value
+        .map((item) => SemesterModel.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+  return <SemesterModel>[];
 }

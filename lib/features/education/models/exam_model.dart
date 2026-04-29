@@ -1,10 +1,21 @@
+import 'package:json_annotation/json_annotation.dart';
+
+import 'schema_parsers.dart';
+
+part 'exam_model.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class ExamItem {
+  @JsonKey(fromJson: parseSchemaString)
   final String name;
 
+  @JsonKey(name: 'time', fromJson: parseSchemaString)
   final String examTime;
 
+  @JsonKey(name: 'location', fromJson: parseSchemaString)
   final String room;
 
+  @JsonKey(name: 'seat', fromJson: parseSchemaString)
   final String seatNo;
 
   ExamItem({
@@ -14,21 +25,8 @@ class ExamItem {
     this.seatNo = '',
   });
 
-  factory ExamItem.fromJson(Map<String, dynamic> json) {
-    return ExamItem(
-      name: json['name']?.toString() ?? '',
-      examTime: json['time']?.toString() ?? '',
-      room: json['location']?.toString() ?? '',
-      seatNo: json['seat']?.toString() ?? '',
-    );
-  }
+  factory ExamItem.fromJson(Map<String, dynamic> json) =>
+      _$ExamItemFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'name': name,
-      'time': examTime,
-      'location': room,
-      'seat': seatNo,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ExamItemToJson(this);
 }

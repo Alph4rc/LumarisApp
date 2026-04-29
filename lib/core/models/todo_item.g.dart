@@ -54,3 +54,27 @@ class TodoItemAdapter extends TypeAdapter<TodoItem> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+TodoItem _$TodoItemFromJson(Map<String, dynamic> json) => TodoItem(
+      title: _stringFromJson(json['title']),
+      deadline: _stringFromJson(json['deadline']),
+      isCompleted: json['isCompleted'] == null
+          ? false
+          : _boolFromJson(json['isCompleted']),
+      id: _idFromJson(json['id']),
+    )
+      ..description = _nullableStringFromJson(json['description'])
+      ..key = _nullableStringFromJson(json['key']);
+
+Map<String, dynamic> _$TodoItemToJson(TodoItem instance) => <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'deadline': instance.deadline,
+      'isCompleted': instance.isCompleted,
+      'description': instance.description,
+      'key': instance.key,
+    };
