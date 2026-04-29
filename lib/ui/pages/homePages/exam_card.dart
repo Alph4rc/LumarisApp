@@ -171,57 +171,13 @@ class _ExamCardState extends State<ExamCard> {
 
   Widget examCard() {
     if (isLoading) {
-      return AnimatedCard(
-        child: ShimmerLoading(
-          isLoading: true,
-          skeleton: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const SkeletonBox(width: 4, height: 40),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SkeletonLine(width: 120, height: 14),
-                          const SizedBox(height: 6),
-                          SkeletonLine(width: 80, height: 10),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const SkeletonBox(width: 4, height: 40),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SkeletonLine(width: 100, height: 14),
-                          const SizedBox(height: 6),
-                          SkeletonLine(width: 90, height: 10),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          child: const ClubCard(
-            child: LoadingStateView(
-              title: '正在加载考试信息',
-              subtitle: '正在同步近期考试安排、考场和座位信息',
-              compact: true,
-              padding: EdgeInsets.all(20),
-            ),
+      return const AnimatedCard(
+        child: ClubCard(
+          child: LoadingStateView(
+            title: '正在加载考试信息',
+            subtitle: '正在同步近期考试安排、考场和座位信息',
+            compact: true,
+            padding: EdgeInsets.all(20),
           ),
         ),
       );
