@@ -2,19 +2,34 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' as getx;
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/retry_policy.dart';
 import '../../../core/config/api_config.dart';
-import '../../../core/services/auth_state_notifier.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
+typedef RelogFailedCallback = void Function(String reason);
+
+class AuthStateCallbacks {
+  const AuthStateCallbacks({
+    this.onRelogging,
+    this.onRelogSuccess,
+    this.onRelogFailed,
+  });
+
+  static const noop = AuthStateCallbacks();
+
+  final void Function()? onRelogging;
+  final void Function()? onRelogSuccess;
+  final RelogFailedCallback? onRelogFailed;
+}
+
 class EduHttpClient {
   final Dio _dio;
+  final AuthStateCallbacks _authStateCallbacks;
   String _baseUrl;
 
   /// 全局登录锁，确保同一时间只有一个登录请求
@@ -30,8 +45,12 @@ class EduHttpClient {
   static Future<Map<String, dynamic>> Function(String, String)?
       _loginHandlerForTest;
 
-  EduHttpClient({Dio? dio, String? baseUrl})
-      : _dio = dio ?? Dio(),
+  EduHttpClient({
+    Dio? dio,
+    String? baseUrl,
+    AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
+  })  : _dio = dio ?? Dio(),
+        _authStateCallbacks = authStateCallbacks,
         _baseUrl = baseUrl ?? ApiConfig.getDefaultSchool().eduApiBaseUrl {
     _setupDio();
   }
@@ -248,9 +267,7 @@ class EduHttpClient {
   /// 通知UI层开始重登录
   void _notifyRelogging() {
     try {
-      if (getx.Get.isRegistered<AuthStateNotifier>()) {
-        AuthStateNotifier.to.startRelogging();
-      }
+      _authStateCallbacks.onRelogging?.call();
     } catch (e) {
       // 忽略通知失败
       AppLogger.debug('通知重登录状态失败: $e');
@@ -260,9 +277,7 @@ class EduHttpClient {
   /// 通知UI层重登录成功
   void _notifyRelogSuccess() {
     try {
-      if (getx.Get.isRegistered<AuthStateNotifier>()) {
-        AuthStateNotifier.to.relogSuccess();
-      }
+      _authStateCallbacks.onRelogSuccess?.call();
     } catch (e) {
       AppLogger.debug('通知重登录成功失败: $e');
     }
@@ -271,9 +286,7 @@ class EduHttpClient {
   /// 通知UI层重登录失败
   void _notifyRelogFailed(String reason) {
     try {
-      if (getx.Get.isRegistered<AuthStateNotifier>()) {
-        AuthStateNotifier.to.relogFailed(reason);
-      }
+      _authStateCallbacks.onRelogFailed?.call(reason);
     } catch (e) {
       AppLogger.debug('通知重登录失败失败: $e');
     }

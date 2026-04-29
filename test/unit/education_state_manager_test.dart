@@ -51,12 +51,13 @@ void main() {
     });
 
     tearDown(() {
+      EduHttpClientManager.resetForTest();
       Get.reset();
     });
 
     test('should initialize with default school url when settings is missing',
         () {
-      Get.put(EduHttpClientManager());
+      EduHttpClientManager.initialize();
       expect(
         EduHttpClientManager.instance.baseUrl,
         ApiConfig.getDefaultSchool().eduApiBaseUrl,
@@ -69,7 +70,9 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 10));
       expect(settings.schoolId, ApiConfig.defaultSchoolId);
 
-      final manager = Get.put(EduHttpClientManager());
+      final manager = EduHttpClientManager.initialize(
+        school: settings.currentSchool,
+      );
       final custom = SchoolConfig(
         id: 'xauat',
         name: '自定义',
@@ -79,7 +82,7 @@ void main() {
       manager.updateSchoolConfig(custom);
       expect(EduHttpClientManager.instance.baseUrl, custom.eduApiBaseUrl);
 
-      manager.reinitialize();
+      manager.reinitialize(school: settings.currentSchool);
       expect(
         EduHttpClientManager.instance.baseUrl,
         ApiConfig.getDefaultSchool().eduApiBaseUrl,

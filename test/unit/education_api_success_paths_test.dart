@@ -33,8 +33,9 @@ void main() {
   setUp(() async {
     await PrefsService.instance.clear();
     Get.reset();
+    EduHttpClientManager.resetForTest();
     LoginService.setLoginOverrideForTest(null);
-    final manager = Get.put(EduHttpClientManager());
+    final manager = EduHttpClientManager.initialize();
     manager.updateSchoolConfig(
       const SchoolConfig(
         id: 'test',
@@ -47,6 +48,7 @@ void main() {
   tearDown(() {
     LoginService.setLoginOverrideForTest(null);
     LoginService.resetClientForTest();
+    EduHttpClientManager.resetForTest();
     Get.reset();
   });
 

@@ -223,7 +223,7 @@ class SettingsStore extends GetxController {
 
     // 更新 HTTP 客户端的基础 URL
     try {
-      EduHttpClientManager.to.updateSchoolConfig(school);
+      EduHttpClientManager.current.updateSchoolConfig(school);
     } catch (e) {
       // 如果管理器还未初始化，忽略错误
       // 下次初始化时会自动使用新的学校配置

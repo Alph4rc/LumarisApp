@@ -107,6 +107,8 @@ void main() {
     secureStore.clear();
     await PrefsService.instance.clear();
     Get.reset();
+    EduHttpClientManager.resetForTest();
+    EducationRefreshService.resetForTest();
     LoginService.setLoginOverrideForTest(null);
 
     for (final boxName in <String>[
@@ -146,7 +148,7 @@ void main() {
       return null;
     });
 
-    final manager = Get.put(EduHttpClientManager());
+    final manager = EduHttpClientManager.initialize();
     manager.updateSchoolConfig(
       const SchoolConfig(
         id: 'offline',
@@ -160,6 +162,8 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
     LoginService.setLoginOverrideForTest(null);
+    EduHttpClientManager.resetForTest();
+    EducationRefreshService.resetForTest();
     Get.reset();
   });
 

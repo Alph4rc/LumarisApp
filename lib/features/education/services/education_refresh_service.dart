@@ -1,6 +1,4 @@
-import 'package:get/get.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/state/course_store.dart';
 
 import 'auth_service.dart';
 import 'course_service.dart';
@@ -10,7 +8,19 @@ import 'exam_service.dart';
 import 'info_service.dart';
 import 'score_service.dart';
 
+typedef CourseRefreshCallback = Future<void> Function();
+
 class EducationRefreshService {
+  static CourseRefreshCallback? _courseRefreshCallback;
+
+  static void setCourseRefreshCallback(CourseRefreshCallback? callback) {
+    _courseRefreshCallback = callback;
+  }
+
+  static void resetForTest() {
+    _courseRefreshCallback = null;
+  }
+
   static Future<bool> loginAndRefresh(String username, String password) async {
     await EducationCacheService.clearEduCache();
     final loginResult = await AuthService.loginFromData(username, password);
@@ -49,8 +59,10 @@ class EducationRefreshService {
 
       await CourseService.getCourse(userData: cookieData, isRefresh: true);
 
-      final courseStore = Get.put(CourseStore());
-      courseStore.loadCourses();
+      final callback = _courseRefreshCallback;
+      if (callback != null) {
+        await callback();
+      }
       return true;
     } catch (e, stackTrace) {
       AppLogger.error('刷新数据失败', error: e, stackTrace: stackTrace);

@@ -44,7 +44,8 @@ void main() {
 
       Get.testMode = true;
       Get.reset();
-      final manager = Get.put(EduHttpClientManager());
+      EduHttpClientManager.resetForTest();
+      final manager = EduHttpClientManager.initialize();
       manager.updateSchoolConfig(
         const SchoolConfig(
           id: 'offline',
@@ -56,6 +57,7 @@ void main() {
 
     tearDownAll(() async {
       // Do not close Hive here to avoid interfering with pending cache tasks.
+      EduHttpClientManager.resetForTest();
       Get.reset();
     });
 

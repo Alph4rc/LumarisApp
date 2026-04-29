@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
@@ -169,29 +168,32 @@ void main() {
 
     test('should trigger relog failed state on 401 and throw auth exception',
         () async {
-      final client = EduHttpClient(baseUrl: 'http://api.test');
-
-      client.dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.reject(
-              DioException(
-                requestOptions: options,
-                response: Response<dynamic>(
-                  requestOptions: options,
-                  statusCode: 401,
-                ),
-                type: DioExceptionType.badResponse,
-              ),
-            );
-          },
+      var reloggingCalled = 0;
+      String? failedReason;
+      final client = EduHttpClient(
+        baseUrl: 'http://api.test',
+        authStateCallbacks: AuthStateCallbacks(
+          onRelogging: () => reloggingCalled++,
+          onRelogFailed: (reason) => failedReason = reason,
         ),
       );
 
-      expect(
+      client.dio.httpClientAdapter = _QueueAdapter([
+        (_) => ResponseBody.fromString(
+              '{"error":"unauthorized"}',
+              401,
+              headers: <String, List<String>>{
+                Headers.contentTypeHeader: <String>['application/json']
+              },
+            ),
+      ]);
+
+      await expectLater(
         () => client.get('/need-auth'),
         throwsA(isA<AuthenticationException>()),
       );
+      expect(reloggingCalled, 1);
+      expect(failedReason, '账号或密码错误');
 
       client.dispose();
     });

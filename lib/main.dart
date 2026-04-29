@@ -16,12 +16,17 @@ import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
+import 'package:ios_club_app/core/services/auth_state_notifier.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'main_app.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/features/education/services/auth_service.dart';
+import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 
 void main() async {
@@ -49,6 +54,15 @@ void main() async {
 
   // 初始化Stores
   initStores();
+  EduHttpClientManager.initialize(
+    school: SettingsStore.to.currentSchool,
+    authStateCallbacks: AuthStateCallbacks(
+      onRelogging: AuthStateNotifier.to.startRelogging,
+      onRelogSuccess: AuthStateNotifier.to.relogSuccess,
+      onRelogFailed: AuthStateNotifier.to.relogFailed,
+    ),
+  );
+  EducationRefreshService.setCourseRefreshCallback(CourseStore.to.loadCourses);
 
   // 平台特定初始化 - 使用统一的平台判断
   if (!PlatformUtils.isMacOS) {
@@ -104,7 +118,6 @@ void main() async {
   if (PlatformUtils.isMacOS) {
     await _configureMacosWindowUtils();
   }
-
 
   // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
   // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度
