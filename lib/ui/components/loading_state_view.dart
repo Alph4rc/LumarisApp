@@ -139,9 +139,7 @@ class _GlassContainer extends StatelessWidget {
     // 现代毛玻璃效果：大幅增加模糊半径（VisionOS 风格），优化边框和背景
     return ClipRRect(
       borderRadius: BorderRadius.circular(compact ? 100 : 28),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), // 深度模糊
-        child: Container(
+      child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: compact ? 20 : 36,
             vertical: compact ? 12 : 36,
@@ -160,7 +158,6 @@ class _GlassContainer extends StatelessWidget {
           ),
           child: child,
         ),
-      ),
     );
   }
 }

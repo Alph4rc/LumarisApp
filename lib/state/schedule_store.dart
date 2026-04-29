@@ -229,17 +229,17 @@ class ScheduleStore extends GetxController {
   }
 
   /// 获取今天或明天的课程
-  List<CourseModel> getTodayCourses() {
+  ({List<CourseModel> courses, bool isTomorrow}) getTodayCoursesResult() {
     final now = DateTime.now();
     final weekDay = now.weekday;
-    var a = false;
+    var isTomorrow = false;
 
     // 使用 currentWeek 替代 weekNow，确保响应式更新
     final weekIndex = currentWeek;
 
     // 处理今天的课程，使用DataService.getCourse中相同的逻辑
     if (weekIndex < 0 || weekIndex >= allCourses.length) {
-      return [];
+      return (courses: <CourseModel>[], isTomorrow: false);
     }
 
     var filteredCourses = allCourses[weekIndex]
@@ -273,21 +273,18 @@ class ScheduleStore extends GetxController {
 
       // 检查targetWeek是否超出范围
       if (targetWeek >= allCourses.length) {
-        return [];
+        return (courses: <CourseModel>[], isTomorrow: false);
       }
 
       final courses = allCourses[targetWeek];
-      a = true;
+      isTomorrow = true;
       filteredCourses = courses
           .where((course) => course.weekday == tomorrowWeekDay)
           .toList()
         ..sort((a, b) => a.startUnit.compareTo(b.startUnit));
     }
 
-    // 使用 Future.microtask 延迟更新 _showTomorrow 的值，避免在构建过程中触发重建
-    Future.microtask(() => _showTomorrow.value = a);
-
-    return filteredCourses;
+    return (courses: filteredCourses, isTomorrow: isTomorrow);
   }
 
   void clean() {

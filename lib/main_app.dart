@@ -249,7 +249,11 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
       if (!settingsStore.hasAcceptedAgreement) {
         return const AgreementPage();
       }
+      return _buildMainApp(context);
+    });
+  }
 
+  Widget _buildMainApp(BuildContext context) {
       final screenWidth = MediaQuery.of(context).size.width;
       final screenHeight = MediaQuery.of(context).size.height;
 
@@ -370,6 +374,5 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
               )
             : null,
       );
-    });
   }
 }
