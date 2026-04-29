@@ -57,82 +57,69 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
-    return Obx(() {
-      final result = scheduleStore.getTodayCoursesResult();
-      final todayCourses = result.courses;
-
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${result.isTomorrow ? '明' : '今'}日课表',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Obx(() => Text(
+                  '${scheduleStore.showTomorrow ? '明' : '今'}日课表',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (alertContext) => StatefulBuilder(
-                                builder: (context, setStateDialog) =>
-                                    AlertDialog(
-                                        title: const Text('设置'),
-                                        content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ClubListTile(
-                                                  title:
-                                                      const Text('显示明天的课表'),
-                                                  trailing: Obx(() =>
-                                                      CupertinoSwitch(
-                                                          value: scheduleStore
-                                                              .isShowTomorrow,
-                                                          onChanged:
-                                                              (value) async {
-                                                            await scheduleStore
-                                                                .toggleShowTomorrow();
-                                                            _initializeData();
-                                                          }))),
-                                              if (PlatformUtils.isIOS ||
-                                                  PlatformUtils.isAndroid)
-                                                ClubListTile(
-                                                  title: const Text('课程通知'),
-                                                  trailing: Obx(
-                                                      () => CupertinoSwitch(
-                                                            value: SettingsStore
-                                                                .to.isRemind,
-                                                            onChanged:
-                                                                (bool value) async {
-                                                              await SettingsStore
-                                                                  .to
-                                                                  .setIsRemind(
-                                                                      value);
-                                                              if (value &&
-                                                                  context
-                                                                      .mounted) {
-                                                                await NotificationService
-                                                                    .set(
-                                                                        context);
-                                                              }
-                                                            },
-                                                          )),
-                                                )
-                                            ]))));
-                      })
-                ]),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-            child: AnimatedCard(
-              child: ClubCard(
-                child: todayCourses.isEmpty
+                )),
+            IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (alertContext) => StatefulBuilder(
+                          // 使用 StatefulBuilder 包装 AlertDialog
+                          builder: (context, setStateDialog) => AlertDialog(
+                              title: const Text('设置'),
+                              content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ClubListTile(
+                                        title: const Text('显示明天的课表'),
+                                        trailing: Obx(() => CupertinoSwitch(
+                                            value: scheduleStore.isShowTomorrow,
+                                            onChanged: (value) async {
+                                              await scheduleStore
+                                                  .toggleShowTomorrow();
+                                              _initializeData(); // 重新加载数据
+                                            }))),
+                                    if (PlatformUtils.isIOS ||
+                                        PlatformUtils.isAndroid)
+                                      ClubListTile(
+                                        title: const Text('课程通知'),
+                                        trailing: Obx(() => CupertinoSwitch(
+                                              value: SettingsStore.to.isRemind,
+                                              onChanged: (bool value) async {
+                                                await SettingsStore.to
+                                                    .setIsRemind(value);
+                                                if (value && context.mounted) {
+                                                  await NotificationService.set(
+                                                      context);
+                                                }
+                                              },
+                                            )),
+                                      )
+                                  ]))));
+                })
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          child: AnimatedCard(
+            child: ClubCard(
+              child: Obx(() {
+                // 使用 Obx 监听 ScheduleStore 中的变化
+                final todayCourses = scheduleStore.getTodayCourses();
+
+                return todayCourses.isEmpty
                     ? const Padding(
                         padding: EdgeInsets.all(16.0),
                         child: EmptyWidget(
@@ -140,8 +127,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                             icon: Icons.school,
                             subtitle: '好好休息会儿吧，学一天累死个人'))
                     : Column(
-                        children:
-                            todayCourses.asMap().entries.map((entry) {
+                        children: todayCourses.asMap().entries.map((entry) {
                           final index = entry.key;
                           final course = entry.value;
                           final weekdayName = [
@@ -166,17 +152,16 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                           );
                           return AnimatedListItem(
                             index: index,
-                            child:
-                                _buildScheduleItem(course, item, isTablet),
+                            child: _buildScheduleItem(course, item, isTablet),
                           );
                         }).toList(),
-                      ),
-              ),
+                      );
+              }),
             ),
           ),
-        ],
-      );
-    });
+        ),
+      ],
+    );
   }
 
   Widget _buildScheduleItem(

@@ -44,6 +44,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final list = <Widget>[
+      const ScheduleWidget(),
+      const TilesWidget(),
+      // 考试列表
+      const ExamCard(),
+      // 待办事项
+      const TodoWidget()
+    ];
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
@@ -54,15 +63,8 @@ class _HomePageState extends State<HomePage> {
           }
         }
       },
-      child: Scaffold(
-          body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: const ScheduleWidget()),
-          SliverToBoxAdapter(child: const TilesWidget()),
-          SliverToBoxAdapter(child: const ExamCard()),
-          SliverToBoxAdapter(child: const TodoWidget()),
-        ],
-      )),
+      child:
+          Scaffold(body: SingleChildScrollView(child: Column(children: list))),
     );
   }
 }

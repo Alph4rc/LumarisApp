@@ -474,23 +474,10 @@ class _ScorePageState extends State<ScorePage>
         });
       },
       itemCount: _scoreList.length,
-      itemBuilder: (context, index) {
-        final score = _scoreList[index];
-        return CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              sliver: SliverList.builder(
-                itemCount: score.list.length,
-                itemBuilder: (context, index) => AnimatedListItem(
-                  index: index,
-                  child: _buildScoreItem(score.list[index]),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+      itemBuilder: (context, index) => SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: _buildSemesterCard(_scoreList[index]),
+      ),
     );
   }
 
@@ -503,55 +490,36 @@ class _ScorePageState extends State<ScorePage>
             _currentIndex = index;
           });
         },
-        itemBuilder: (context, index) {
-          final score = _yearList[index];
-          const yearStringList = [
-            '一',
-            '二',
-            '三',
-            '四',
-            '五',
-            '六',
-            '七',
-            '八',
-            '九',
-            '十'
-          ];
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: ClubCard(
-                  margin: const EdgeInsets.all(16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Column(
-                      children: [
-                        Text('大${yearStringList[index]}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            )),
-                        _buildStatsPadding(scoreList: score),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                sliver: SliverList.builder(
-                  itemCount: score.list.length,
-                  itemBuilder: (context, idx) => AnimatedListItem(
-                    index: idx,
-                    child: _buildScoreItem(score.list[idx]),
-                  ),
-                ),
-              ),
-            ],
-          );
-        });
+        itemBuilder: (context, index) => SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: _buildYearCard(_yearList[index], index),
+            ));
   }
 
+  Widget _buildYearCard(ScoreList score, int index) {
+    const yearStringList = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    return ClubCard(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Column(children: [
+              Text('大${yearStringList[index]}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  )),
+              _buildStatsPadding(scoreList: score),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: score.list.length,
+                itemBuilder: (context, index) => AnimatedListItem(
+                  index: index,
+                  child: _buildScoreItem(score.list[index]),
+                ),
+              )
+            ])));
+  }
 
   Widget _buildEmptyState() {
     return Padding(
@@ -573,6 +541,38 @@ class _ScorePageState extends State<ScorePage>
     );
   }
 
+  Widget _buildSemesterCard(ScoreList score) {
+    final semesterNames = score.semester.name.split('-');
+    return AnimatedCard(
+      child: ClubCard(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Column(
+            children: [
+              Text(
+                '${semesterNames[0]}至${semesterNames[1]}年 第${semesterNames[2]}学期',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: score.list.length,
+                itemBuilder: (context, index) => AnimatedListItem(
+                  index: index,
+                  child: _buildScoreItem(score.list[index]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildScoreItem(ScoreModel item) {
     final isTablet = MediaQuery.of(context).size.width > 600;

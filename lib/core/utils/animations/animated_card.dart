@@ -11,7 +11,7 @@ import 'package:ios_club_app/core/utils/animations/app_animations.dart';
 ///   child: YourCardContent(),
 /// )
 /// ```
-class AnimatedCard extends StatefulWidget {
+class AnimatedCard extends StatelessWidget {
   final Widget child;
   final Duration? delay;
   final Duration? duration;
@@ -26,58 +26,28 @@ class AnimatedCard extends StatefulWidget {
   });
 
   @override
-  State<AnimatedCard> createState() => _AnimatedCardState();
-}
-
-class _AnimatedCardState extends State<AnimatedCard>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final CurvedAnimation _curved;
-
-  @override
-  void initState() {
-    super.initState();
-    final animDuration = widget.duration ?? AppAnimations.medium;
-    final animCurve = widget.curve ?? AppAnimations.easeOut;
-
-    _controller = AnimationController(duration: animDuration, vsync: this);
-    _curved = CurvedAnimation(parent: _controller, curve: animCurve);
-
-    final animDelay = widget.delay ?? Duration.zero;
-    if (animDelay == Duration.zero) {
-      _controller.forward();
-    } else {
-      Future.delayed(animDelay, () {
-        if (mounted) _controller.forward();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _curved.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _curved,
-      child: AnimatedBuilder(
-        animation: _curved,
-        builder: (context, child) {
-          final value = _curved.value;
-          return Transform.translate(
-            offset: Offset(0, AppAnimations.cardSlideOffset * (1 - value)),
-            child: Transform.scale(
-              scale: AppAnimations.cardInitialScale + (0.1 * value),
+    final animDuration = duration ?? AppAnimations.medium;
+    final animDelay = delay ?? Duration.zero;
+    final animCurve = curve ?? AppAnimations.easeOut;
+
+    return TweenAnimationBuilder<double>(
+      duration: animDuration + animDelay,
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      curve: animCurve,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, AppAnimations.cardSlideOffset * (1 - value)),
+          child: Transform.scale(
+            scale: AppAnimations.cardInitialScale + (0.1 * value),
+            child: Opacity(
+              opacity: value,
               child: child,
             ),
-          );
-        },
-        child: widget.child,
-      ),
+          ),
+        );
+      },
+      child: child,
     );
   }
 }
