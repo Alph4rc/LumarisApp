@@ -450,7 +450,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Future<void> _pickCustomBackgroundImage() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.image,
         withData: false,
       );
