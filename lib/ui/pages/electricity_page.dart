@@ -28,10 +28,18 @@ class ElectricityPage extends StatefulWidget {
 class _ElectricityPageState extends State<ElectricityPage> {
   final ElectricityStore controller = Get.put(ElectricityStore());
   final TextEditingController _urlController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,14 +57,19 @@ class _ElectricityPageState extends State<ElectricityPage> {
       );
     }
     return Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: ClubAppBar(
           title: '电费管理',
+          scrollController: _scrollController,
         ),
         body: SingleChildScrollView(
+          controller: _scrollController,
           padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(
+                  height: MediaQuery.of(context).padding.top + kToolbarHeight),
               // 当前电费卡片
               _buildCurrentElectricityCard(),
 
@@ -457,11 +470,5 @@ class _ElectricityPageState extends State<ElectricityPage> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _urlController.dispose();
-    super.dispose();
   }
 }

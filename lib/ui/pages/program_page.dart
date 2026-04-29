@@ -6,23 +6,39 @@ import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/controllers/program_controller.dart';
 
-class ProgramPage extends StatelessWidget {
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/controllers/program_controller.dart';
+import 'package:ios_club_app/ui/components/club_app_bar.dart';
+
+class ProgramPage extends StatefulWidget {
   const ProgramPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(ProgramController());
+  State<ProgramPage> createState() => _ProgramPageState();
+}
 
+class _ProgramPageState extends State<ProgramPage> {
+  final ScrollController _scrollController = ScrollController();
+  final ProgramController controller = Get.put(ProgramController());
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '培养方案',
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
+      extendBodyBehindAppBar: true,
+      appBar: ClubAppBar(
+        title: '培养方案',
+        scrollController: _scrollController,
         actions: [
           Obx(
             () => IconButton(
@@ -89,9 +105,10 @@ class ProgramPage extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: controller.refreshPrograms,
             child: ListView(
+              controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
+                SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + kTextTabBarHeight + MediaQuery.sizeOf(context).height * 0.2),
                 Column(
                   children: [
                     Icon(CupertinoIcons.exclamationmark_circle,
@@ -115,9 +132,10 @@ class ProgramPage extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: controller.refreshPrograms,
             child: ListView(
+              controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
+                SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + kTextTabBarHeight + MediaQuery.sizeOf(context).height * 0.2),
                 Column(
                   children: [
                     Icon(CupertinoIcons.exclamationmark_circle,
@@ -147,7 +165,8 @@ class ProgramPage extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: controller.refreshPrograms,
               child: ListView.builder(
-                padding: const EdgeInsets.only(top: 16.0),
+                controller: _scrollController,
+                padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + kToolbarHeight + kTextTabBarHeight + 16.0),
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: program.courses.length,
                 itemBuilder: (context, index) {
