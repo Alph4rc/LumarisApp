@@ -10,11 +10,9 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.centerTitle = true,
     this.titleWidget,
     this.bottom,
-    this.hero,
   });
 
   final String? title;
-  final Widget? hero;
   final List<Widget>? actions;
   final Color? backgroundColor;
   final double elevation;
@@ -29,29 +27,13 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: titleWidget ??
-          (hero != null
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    hero!,
-                    const SizedBox(width: 8),
-                    Text(
-                      title ?? '',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    )
-                  ],
-                )
-              : Text(
-                  title ?? '',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
-                )),
+          Text(
+            title ?? '',
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
       actions: actions,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),

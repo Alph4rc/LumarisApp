@@ -54,13 +54,10 @@ class ElectricityTile extends StatelessWidget {
                             color: primaryColor.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
-                          child: Hero(
-                            tag: '电费',
-                            child: Icon(
-                              CupertinoIcons.bolt_fill,
-                              color: primaryColor,
-                              size: 24,
-                            ),
+                          child: Icon(
+                            CupertinoIcons.bolt_fill,
+                            color: primaryColor,
+                            size: 24,
                           ),
                         ),
                         const Spacer(),

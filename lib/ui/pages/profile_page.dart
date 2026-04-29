@@ -279,12 +279,14 @@ class ProfileButtonItem {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Hero(
-                    tag: title,
-                    child: Icon(icon,
-                        size: 32,
-                        color: CourseColorManager.generateSoftColor(title,
-                            isDark: true))),
+                Icon(
+                  icon,
+                  size: 32,
+                  color: CourseColorManager.generateSoftColor(
+                    title,
+                    isDark: true,
+                  ),
+                ),
                 Text(
                   title,
                   style: const TextStyle(

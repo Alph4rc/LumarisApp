@@ -55,13 +55,10 @@ class PaymentTile extends StatelessWidget {
                             color: primaryColor.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
-                          child: Hero(
-                            tag: '饭卡',
-                            child: Icon(
-                              Icons.monetization_on_rounded,
-                              color: primaryColor,
-                              size: 24,
-                            ),
+                          child: Icon(
+                            Icons.monetization_on_rounded,
+                            color: primaryColor,
+                            size: 24,
                           ),
                         ),
                         const Spacer(),

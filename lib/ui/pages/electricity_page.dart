@@ -99,13 +99,11 @@ class _ElectricityPageState extends State<ElectricityPage> {
                       color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
                       borderRadius: ClubRadii.control,
                     ),
-                    child: Hero(
-                        tag: '电费',
-                        child: Icon(
-                          CupertinoIcons.bolt_fill,
-                          color: CupertinoColors.systemBlue,
-                          size: 24,
-                        )),
+                    child: Icon(
+                      CupertinoIcons.bolt_fill,
+                      color: CupertinoColors.systemBlue,
+                      size: 24,
+                    ),
                   ),
                   SizedBox(width: 12),
                   Text(

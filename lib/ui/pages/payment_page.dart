@@ -99,7 +99,7 @@ class PaymentPage extends StatelessWidget {
                 color: color.withValues(alpha: 0.2),
                 borderRadius: ClubRadii.control,
               ),
-              child: Hero(tag: '饭卡', child: Icon(icon, color: color, size: 24)),
+              child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
