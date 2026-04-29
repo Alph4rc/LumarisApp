@@ -1272,6 +1272,7 @@ abstract class _ElectricityState implements ElectricityState {
 /// @nodoc
 mixin _$PaymentState {
   bool get isLoading => throw _privateConstructorUsedError;
+  bool get hasData => throw _privateConstructorUsedError;
   String get errorMessage => throw _privateConstructorUsedError;
   List<PaymentModel> get records => throw _privateConstructorUsedError;
   double get totalRecharge => throw _privateConstructorUsedError;
@@ -1290,6 +1291,7 @@ abstract class $PaymentStateCopyWith<$Res> {
   @useResult
   $Res call(
       {bool isLoading,
+      bool hasData,
       String errorMessage,
       List<PaymentModel> records,
       double totalRecharge,
@@ -1310,6 +1312,7 @@ class _$PaymentStateCopyWithImpl<$Res, $Val extends PaymentState>
   @override
   $Res call({
     Object? isLoading = null,
+    Object? hasData = null,
     Object? errorMessage = null,
     Object? records = null,
     Object? totalRecharge = null,
@@ -1319,6 +1322,10 @@ class _$PaymentStateCopyWithImpl<$Res, $Val extends PaymentState>
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasData: null == hasData
+          ? _value.hasData
+          : hasData // ignore: cast_nullable_to_non_nullable
               as bool,
       errorMessage: null == errorMessage
           ? _value.errorMessage
@@ -1350,6 +1357,7 @@ abstract class _$$PaymentStateImplCopyWith<$Res>
   @useResult
   $Res call(
       {bool isLoading,
+      bool hasData,
       String errorMessage,
       List<PaymentModel> records,
       double totalRecharge,
@@ -1368,6 +1376,7 @@ class __$$PaymentStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? isLoading = null,
+    Object? hasData = null,
     Object? errorMessage = null,
     Object? records = null,
     Object? totalRecharge = null,
@@ -1377,6 +1386,10 @@ class __$$PaymentStateImplCopyWithImpl<$Res>
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasData: null == hasData
+          ? _value.hasData
+          : hasData // ignore: cast_nullable_to_non_nullable
               as bool,
       errorMessage: null == errorMessage
           ? _value.errorMessage
@@ -1403,6 +1416,7 @@ class __$$PaymentStateImplCopyWithImpl<$Res>
 class _$PaymentStateImpl implements _PaymentState {
   const _$PaymentStateImpl(
       {this.isLoading = true,
+      this.hasData = false,
       this.errorMessage = '',
       final List<PaymentModel> records = const <PaymentModel>[],
       this.totalRecharge = 0.0,
@@ -1412,6 +1426,9 @@ class _$PaymentStateImpl implements _PaymentState {
   @override
   @JsonKey()
   final bool isLoading;
+  @override
+  @JsonKey()
+  final bool hasData;
   @override
   @JsonKey()
   final String errorMessage;
@@ -1433,7 +1450,7 @@ class _$PaymentStateImpl implements _PaymentState {
 
   @override
   String toString() {
-    return 'PaymentState(isLoading: $isLoading, errorMessage: $errorMessage, records: $records, totalRecharge: $totalRecharge, isShowTile: $isShowTile)';
+    return 'PaymentState(isLoading: $isLoading, hasData: $hasData, errorMessage: $errorMessage, records: $records, totalRecharge: $totalRecharge, isShowTile: $isShowTile)';
   }
 
   @override
@@ -1443,6 +1460,7 @@ class _$PaymentStateImpl implements _PaymentState {
             other is _$PaymentStateImpl &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
+            (identical(other.hasData, hasData) || other.hasData == hasData) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
             const DeepCollectionEquality().equals(other._records, _records) &&
@@ -1453,7 +1471,7 @@ class _$PaymentStateImpl implements _PaymentState {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isLoading, errorMessage,
+  int get hashCode => Object.hash(runtimeType, isLoading, hasData, errorMessage,
       const DeepCollectionEquality().hash(_records), totalRecharge, isShowTile);
 
   @JsonKey(ignore: true)
@@ -1466,6 +1484,7 @@ class _$PaymentStateImpl implements _PaymentState {
 abstract class _PaymentState implements PaymentState {
   const factory _PaymentState(
       {final bool isLoading,
+      final bool hasData,
       final String errorMessage,
       final List<PaymentModel> records,
       final double totalRecharge,
@@ -1473,6 +1492,8 @@ abstract class _PaymentState implements PaymentState {
 
   @override
   bool get isLoading;
+  @override
+  bool get hasData;
   @override
   String get errorMessage;
   @override

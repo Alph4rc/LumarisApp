@@ -67,12 +67,7 @@ class PaymentStore extends Notifier<PaymentState> {
     try {
       state = state.copyWith(isLoading: true, errorMessage: '');
 
-      final isLogin = ref.read(studentIsLoginReaderProvider)();
-      String? studentId = '';
-
-      if (isLogin) {
-        studentId = await ref.read(paymentStudentIdReaderProvider)();
-      }
+      final studentId = await ref.read(paymentStudentIdReaderProvider)();
 
       if (studentId == null || studentId.isEmpty) {
         state = state.copyWith(errorMessage: '请先登录教务处账号');
@@ -87,7 +82,10 @@ class PaymentStore extends Notifier<PaymentState> {
         records: recordsResult.payments,
         totalRecharge: recordsResult.total,
         isShowTile: isVisible,
+        hasData: true,
       );
+    } catch (e) {
+      state = state.copyWith(errorMessage: '加载失败，点击重试');
     } finally {
       state = state.copyWith(isLoading: false);
     }

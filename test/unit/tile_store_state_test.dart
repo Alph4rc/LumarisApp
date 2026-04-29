@@ -56,7 +56,6 @@ void main() {
   group('PaymentStore', () {
     test('should_set_login_error_when_student_id_is_empty', () async {
       final container = _container([
-        studentIsLoginReaderProvider.overrideWithValue(() => true),
         paymentStudentIdReaderProvider.overrideWithValue(() async => ''),
       ]);
       final store = container.read(paymentStoreProvider.notifier);
@@ -71,7 +70,7 @@ void main() {
 
     test('should_set_login_error_when_student_id_is_null', () async {
       final container = _container([
-        studentIsLoginReaderProvider.overrideWithValue(() => false),
+        paymentStudentIdReaderProvider.overrideWithValue(() async => null),
       ]);
       final store = container.read(paymentStoreProvider.notifier);
 
@@ -118,6 +117,27 @@ void main() {
       expect(state.records, hasLength(1));
       expect(state.totalRecharge, 1000);
       expect(state.isShowTile, isTrue);
+      expect(state.hasData, isTrue);
+    });
+
+    test('should_set_error_message_when_fetch_throws', () async {
+      final container = _container([
+        studentIsLoginReaderProvider.overrideWithValue(() => true),
+        paymentStudentIdReaderProvider
+            .overrideWithValue(() async => 'student-1'),
+        paymentDataFetcherProvider.overrideWithValue((_) async {
+          throw Exception('network error');
+        }),
+        tileVisibilityReaderProvider.overrideWithValue((_) async => true),
+      ]);
+      final store = container.read(paymentStoreProvider.notifier);
+
+      await store.loadData();
+
+      final state = container.read(paymentStoreProvider);
+      expect(state.isLoading, isFalse);
+      expect(state.errorMessage, '加载失败，点击重试');
+      expect(state.hasData, isFalse);
     });
 
     test('should_toggle_tile_and_reload_tile_edit_controller', () async {

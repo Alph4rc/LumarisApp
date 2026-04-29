@@ -36,7 +36,7 @@ class PaymentTile extends ConsumerWidget {
               }
 
               // Has Data state
-              if (!payment.isLoading && payment.totalRecharge != 0) {
+              if (!payment.isLoading && payment.hasData) {
                 final amount = payment.totalRecharge;
                 final isLow = amount <= 10;
                 final primaryColor = isLow

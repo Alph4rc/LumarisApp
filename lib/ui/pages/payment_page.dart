@@ -77,6 +77,7 @@ class PaymentPage extends ConsumerWidget {
         payment.totalRecharge,
         Icons.monetization_on_outlined,
         Colors.green,
+        hasData: payment.hasData,
       ),
     );
   }
@@ -85,8 +86,9 @@ class PaymentPage extends ConsumerWidget {
     String title,
     double amount,
     IconData icon,
-    Color color,
-  ) {
+    Color color, {
+    bool hasData = false,
+  }) {
     return AnimatedCard(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -118,17 +120,17 @@ class PaymentPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  amount == 0
-                      ? const Text(
-                          '暂无数据',
-                          style: TextStyle(
+                  hasData
+                      ? Text(
+                          '¥${amount.toStringAsFixed(2)}',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         )
-                      : Text(
-                          '¥${amount.toStringAsFixed(2)}',
-                          style: const TextStyle(
+                      : const Text(
+                          '暂无数据',
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),

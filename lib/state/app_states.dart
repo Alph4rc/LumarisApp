@@ -83,6 +83,7 @@ class ElectricityState with _$ElectricityState {
 class PaymentState with _$PaymentState {
   const factory PaymentState({
     @Default(true) bool isLoading,
+    @Default(false) bool hasData,
     @Default('') String errorMessage,
     @Default(<PaymentModel>[]) List<PaymentModel> records,
     @Default(0.0) double totalRecharge,
