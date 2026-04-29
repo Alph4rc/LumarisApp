@@ -85,10 +85,14 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      // App 回到前台时，刷新小组件并重新安排课程通知
-      // 这对 iOS 尤其重要，因为后台 Timer 不会运行
-      TaskExecutor.updateWidget();
-      TaskExecutor.checkAndSendCourseReminder();
+      // App 回到前台时，延迟刷新小组件并重新安排课程通知
+      // 避免在恢复动画期间进行重度操作导致卡顿
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          TaskExecutor.updateWidget();
+          TaskExecutor.checkAndSendCourseReminder();
+        }
+      });
     }
   }
 

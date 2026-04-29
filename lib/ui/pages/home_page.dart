@@ -44,15 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final list = <Widget>[
-      const ScheduleWidget(),
-      const TilesWidget(),
-      // 考试列表
-      const ExamCard(),
-      // 待办事项
-      const TodoWidget()
-    ];
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
@@ -63,8 +54,19 @@ class _HomePageState extends State<HomePage> {
           }
         }
       },
-      child:
-          Scaffold(body: SingleChildScrollView(child: Column(children: list))),
+      child: Scaffold(
+        body: ListView(
+          // 使用 ListView 替代 SingleChildScrollView + Column 以获得更好的滚动性能
+          children: const [
+            ScheduleWidget(),
+            TilesWidget(),
+            // 考试列表
+            ExamCard(),
+            // 待办事项
+            TodoWidget(),
+          ],
+        ),
+      ),
     );
   }
 }

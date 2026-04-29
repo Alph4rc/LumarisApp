@@ -32,7 +32,8 @@
       "Bash(curl -s -L \"http://iexue100.com/h5/privacy.html?id=70&name=privacy\")",
       "Bash(curl -s -L \"http://iexue100.com/login/api/get_protocol?product_id=70&name=privacy\")",
       "Bash(curl *)",
-      "Bash(dart analyze *)"
+      "Bash(dart analyze *)",
+      "mcp__sequential-thinking__sequentialthinking"
     ]
   }
 }

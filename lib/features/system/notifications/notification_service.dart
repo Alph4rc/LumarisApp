@@ -87,6 +87,12 @@ class NotificationService {
     isInit = true;
   }
 
+  /// 取消所有已排期的通知
+  Future<void> cancelAllNotifications() async {
+    await notifications.cancelAll();
+    AppLogger.debug('所有通知已取消');
+  }
+
   Future<void> scheduleCourseReminder(
       {required int id,
       required String title,
@@ -119,6 +125,13 @@ class NotificationService {
     AppLogger.debug('Scheduling notification at $tzDateTime with id=$id');
 
     try {
+      // 增加安全检查：如果待处理通知接近 500 个，停止安排
+      final pendingCount = (await notifications.pendingNotificationRequests()).length;
+      if (pendingCount >= 450) {
+        AppLogger.debug('Warning: Approaching 500 alarm limit ($pendingCount). Skipping schedule.');
+        return;
+      }
+
       await notifications.zonedSchedule(
         id: id,
         title: title,
@@ -292,6 +305,7 @@ class NotificationService {
   static Future<void> remindList(
     List<CourseModel> a, {
     DateTime? targetDate,
+    Set<int>? existingIds,
   }) async {
     if (!NotificationService.instance.isInit) {
       await NotificationService.instance.initialize();
@@ -299,10 +313,15 @@ class NotificationService {
 
     final effectiveDate = targetDate ?? DateTime.now();
 
-    // 获取所有待处理的通知，用于去重
-    final pendingRequests = await NotificationService.instance.notifications
-        .pendingNotificationRequests();
-    final existingIds = pendingRequests.map((r) => r.id).toSet();
+    // 如果未提供 existingIds，则获取所有待处理的通知，用于去重
+    final Set<int> idsToCompare;
+    if (existingIds == null) {
+      final pendingRequests = await NotificationService.instance.notifications
+          .pendingNotificationRequests();
+      idsToCompare = pendingRequests.map((r) => r.id).toSet();
+    } else {
+      idsToCompare = existingIds;
+    }
 
     for (var course in a) {
       final target = CourseReminderHelper.buildTarget(
@@ -312,7 +331,7 @@ class NotificationService {
       if (target == null) continue;
 
       // 如果通知已存在，跳过，避免重复调度引发通知闪烁或系统限制
-      if (existingIds.contains(target.notificationId)) {
+      if (idsToCompare.contains(target.notificationId)) {
         continue;
       }
 

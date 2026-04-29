@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 
 import '../core/config/api_config.dart';
@@ -70,6 +71,15 @@ class SettingsStore extends Notifier<SettingsState> {
   Future<void> setIsRemind(bool value) async {
     state = state.copyWith(isRemind: value);
     await PrefsService.instance.setBool(PrefsKeys.IS_REMIND, value);
+    
+    // 如果关闭提醒，尝试清除所有已排期的通知以释放系统资源
+    if (!value) {
+      try {
+        await NotificationService.instance.cancelAllNotifications();
+      } catch (e) {
+        // 忽略错误
+      }
+    }
   }
 
   Future<void> setRemindTime(int value) async {

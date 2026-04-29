@@ -30,27 +30,19 @@ import 'package:window_manager/window_manager.dart';
 import 'main_app.dart';
 
 void main() async {
-  // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 日志系统已就绪（AppLogger 是静态类，无需初始化）
   AppLogger.info('iOS Club App 启动中...');
 
-  // 初始化 Hive 数据库
-  await HiveManager.init();
-
-  // 初始化 SharedPreferences（最先初始化，其他服务可能依赖它）
-  await PrefsService.init();
+  // Hive 和 SharedPreferences 互相独立，并行初始化
+  await Future.wait([
+    HiveManager.init(),
+    PrefsService.init(),
+  ]);
 
   if (PlatformUtils.isIOS) {
     await WidgetService.initialize();
   }
-
-  // 尝试迁移旧的凭证数据到安全存储
-  await AuthService.migrateCredentials();
-
-  // 初始化请求缓存
-  await RequestCache().initialize();
 
   final providerContainer = ProviderContainer();
   final settingsStore = providerContainer.read(settingsStoreProvider.notifier);
@@ -68,25 +60,20 @@ void main() async {
   );
   EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
-  // 平台特定初始化 - 使用统一的平台判断
   if (!PlatformUtils.isMacOS) {
     requestPermissions();
   }
 
   if (PlatformUtils.isDesktop) {
-    // 初始化 window_manager
     await windowManager.ensureInitialized();
 
-    // 根据平台配置不同的窗口选项
     if (PlatformUtils.isMacOS) {
-      // macOS 专用窗口配置
       WindowOptions windowOptions = const WindowOptions(
         minimumSize: Size(800, 600),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.hidden,
-        // 隐藏标题栏以使用原生macOS样式
         title: 'iOS Club App',
       );
 
@@ -95,7 +82,6 @@ void main() async {
         await windowManager.focus();
       });
     } else {
-      // 其他桌面平台的窗口配置
       WindowOptions windowOptions = const WindowOptions(
         minimumSize: Size(800, 600),
         center: true,
@@ -109,11 +95,6 @@ void main() async {
         await windowManager.focus();
       });
     }
-  } else if (PlatformUtils.isAndroid) {
-    // 只在Android平台调用FlutterDisplayMode
-    await FlutterDisplayMode.setHighRefreshRate();
-    await BackgroundService.initializeService();
-    await BackgroundService.startService();
   } else if (PlatformUtils.isIOS) {
     await IOSBackgroundService.initializeService();
     await IOSBackgroundService.startService();
@@ -123,17 +104,35 @@ void main() async {
     await _configureMacosWindowUtils();
   }
 
-  // 在所有初始化完成后，预先安排今日课程通知和刷新小组件
-  // 注意：不依赖后台执行，flutter_local_notifications.zonedSchedule 是 OS 级别调度
-  // 延迟执行，确保所有 Store 和 Service 完全就绪
+  // 先渲染 UI，再执行非关键初始化
+  initApp(providerContainer);
+
+  // 延后到首帧渲染之后：凭证迁移、请求缓存、后台服务等
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _deferredInit();
+  });
+}
+
+/// 延后执行的非关键初始化，避免阻塞首帧渲染
+Future<void> _deferredInit() async {
+  // 凭证迁移（SecureStorage 在安卓上可能较慢）和请求缓存并行执行
+  await Future.wait([
+    AuthService.migrateCredentials(),
+    RequestCache().initialize(),
+  ]);
+
+  if (PlatformUtils.isAndroid) {
+    await FlutterDisplayMode.setHighRefreshRate();
+    await BackgroundService.initializeService();
+    await BackgroundService.startService();
+  }
+
   if (PlatformUtils.isMobile) {
     Future.delayed(const Duration(seconds: 2), () async {
       await TaskExecutor.checkAndSendCourseReminder();
       await TaskExecutor.updateWidget();
     });
   }
-
-  initApp(providerContainer);
 }
 
 /// 配置macOS窗口样式

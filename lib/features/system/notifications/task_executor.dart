@@ -39,13 +39,6 @@ class TaskExecutor {
     return DateTime.now().difference(_cacheTimestamp!) < _cacheValidDuration;
   }
 
-  /// 清除缓存
-  static void _clearCache() {
-    _cachedCourses = null;
-    _cachedTime = null;
-    _cacheTimestamp = null;
-  }
-
   /// 预加载数据到缓存
   static Future<void> _preloadData() async {
     if (_isCacheValid()) {
@@ -213,9 +206,20 @@ class TaskExecutor {
 
       final startTime = DateTime.parse(_cachedTime!.startTime!);
 
-      // 为接下来的 14 天排期
-      // 由于 NotificationService.remindList 内部已实现去重，此处可以多次调用
-      for (int i = 0; i < 14; i++) {
+      // 获取所有已排期的通知，优化去重逻辑
+      final pendingRequests = await NotificationService.instance.notifications
+          .pendingNotificationRequests();
+      
+      // 如果已经接近上限，先清空所有通知（这是一个应急保险）
+      if (pendingRequests.length > 400) {
+        AppLogger.debug('检测到闹钟接近上限 (${pendingRequests.length}), 正在清空并重排...');
+        await NotificationService.instance.cancelAllNotifications();
+      }
+
+      final existingIds = pendingRequests.map((r) => r.id).toSet();
+
+      // 为接下来的 3 天排期 (减少天数以避免 500 闹钟限制)
+      for (int i = 0; i < 3; i++) {
         final targetDate = now.add(Duration(days: i));
         final targetWeek =
             EduTimeService.getWeekIndexByStartTime(targetDate, startTime);
@@ -243,13 +247,14 @@ class TaskExecutor {
           await NotificationService.remindList(
             dailyCourses,
             targetDate: targetDate,
+            existingIds: existingIds,
           );
         }
       }
 
       await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
       AppLogger.debug(
-        '课程提醒排期完成(14天跨度), 时间=${now.toIso8601String()}',
+        '课程提醒排期完成(3天跨度), 时间=${now.toIso8601String()}',
       );
     } catch (e) {
       AppLogger.debug('课程提醒检查失败: $e');
