@@ -6,6 +6,7 @@ import 'package:ios_club_app/ui/controllers/bus_controller.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -198,7 +199,7 @@ class SchoolBusPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 20),
-              Obx(() => ListTile(
+              Obx(() => ClubListTile(
                     title: const Text('是否显示校车磁贴'),
                     trailing: CupertinoSwitch(
                       value: busController.isShowBus.value,
@@ -209,7 +210,7 @@ class SchoolBusPage extends StatelessWidget {
                   )),
               if (!kIsWeb) const SizedBox(height: 10),
               if (!kIsWeb)
-                Obx(() => ListTile(
+                Obx(() => ClubListTile(
                       title: const Text('是否使用新API'),
                       subtitle: const Text('新的API接口只能在校园网内使用'),
                       trailing: CupertinoSwitch(

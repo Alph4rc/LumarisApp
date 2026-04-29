@@ -11,6 +11,7 @@ import 'package:ios_club_app/core/models/electric_data.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
@@ -335,7 +336,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
             Obx(() => controller.hasData.value
                 ? Column(
                     children: [
-                      ListTile(
+                      ClubListTile(
                         leading: Icon(Icons.home),
                         title: Text('添加到首页'),
                         subtitle: Text('在首页显示电费磁贴'),
@@ -346,7 +347,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                               },
                             )),
                       ),
-                      ListTile(
+                      ClubListTile(
                         leading: Icon(Icons.monetization_on_outlined),
                         title: Text('电费充值'),
                         subtitle: Text('跳转至微信进行电费充值'),

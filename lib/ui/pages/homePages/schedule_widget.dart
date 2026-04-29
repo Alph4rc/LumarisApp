@@ -13,6 +13,7 @@ import 'package:ios_club_app/core/models/course_color_manager.dart';
 
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 
@@ -80,7 +81,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    ListTile(
+                                    ClubListTile(
                                         title: const Text('显示明天的课表'),
                                         trailing: Obx(() => CupertinoSwitch(
                                             value: scheduleStore.isShowTomorrow,
@@ -91,7 +92,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                                             }))),
                                     if (PlatformUtils.isIOS ||
                                         PlatformUtils.isAndroid)
-                                      ListTile(
+                                      ClubListTile(
                                         title: const Text('课程通知'),
                                         trailing: Obx(() => CupertinoSwitch(
                                               value: SettingsStore.to.isRemind,

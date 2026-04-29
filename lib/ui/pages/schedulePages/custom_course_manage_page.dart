@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -324,7 +325,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              ListTile(
+                                              ClubListTile(
                                                 leading: Icon(
                                                   Icons.edit_outlined,
                                                   color: isDarkMode
@@ -337,7 +338,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                                                   _showEditCourseDialog(course);
                                                 },
                                               ),
-                                              ListTile(
+                                              ClubListTile(
                                                 leading: Icon(
                                                   Icons.delete_outline,
                                                   color: Colors.red[600],

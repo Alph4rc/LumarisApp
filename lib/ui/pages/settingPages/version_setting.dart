@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/services/git_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -69,99 +70,60 @@ class _VersionSettingState extends State<VersionSetting> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                child: Row(
-                  children: [
-                    isNeedUpdate
-                        ? Badge(
-                            backgroundColor: Colors.red,
-                            child: Icon(
-                              Icons.update,
-                              size: 20,
-                            ),
-                          )
-                        : Icon(Icons.verified, size: 20, color: Colors.green),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '版本',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(version,
-                              style:
-                                  TextStyle(fontSize: 13, color: Colors.grey))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                _handleTap(); // 处理点击事件
+        ClubListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          leading: isNeedUpdate
+              ? Badge(
+                  backgroundColor: Colors.red,
+                  child: Icon(
+                    Icons.update,
+                    size: 20,
+                  ),
+                )
+              : Icon(Icons.verified, size: 20, color: Colors.green),
+          title: const Text('版本'),
+          subtitle: Text(version),
+          subtitleTextStyle: TextStyle(fontSize: 13, color: Colors.grey),
+          onTap: () async {
+            _handleTap(); // 处理点击事件
 
-                if (isNeedUpdate) {
-                  final result = await PlatformDialog.showConfirmDialog(
-                    context,
-                    title: '是否更新最新版本: $newVersion',
-                    content: '发现新版本可用，是否立即更新？',
-                    confirmText: '是的',
-                    cancelText: '不要',
-                  );
+            if (isNeedUpdate) {
+              final result = await PlatformDialog.showConfirmDialog(
+                context,
+                title: '是否更新最新版本: $newVersion',
+                content: '发现新版本可用，是否立即更新？',
+                confirmText: '是的',
+                cancelText: '不要',
+              );
 
-                  if (result == true) {
-                    final a = await GiteeService.getReleases();
-                    if (context.mounted) {
-                      UpdateManager.showUpdateWithProgress(context, a.name);
-                    }
-                  }
+              if (result == true) {
+                final a = await GiteeService.getReleases();
+                if (context.mounted) {
+                  UpdateManager.showUpdateWithProgress(context, a.name);
                 }
-              }),
+              }
+            }
+          },
         ),
         if (CheckUpdateManager.shouldCheckForUpdates())
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.update,
-                  size: 20,
-                  color: Colors.amber,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '更新日志',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '忽略版本更新',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-                Obx(() => CupertinoSwitch(
-                      value: settingsStore.updateIgnored,
-                      onChanged: (bool value) async {
-                        await settingsStore.setUpdateIgnored(value);
-                      },
-                    ))
-              ],
+          ClubListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            leading: Icon(
+              Icons.update,
+              size: 20,
+              color: Colors.amber,
             ),
+            title: const Text('更新日志'),
+            subtitle: const Text('忽略版本更新'),
+            subtitleTextStyle: TextStyle(fontSize: 12, color: Colors.grey),
+            trailing: Obx(() => CupertinoSwitch(
+                  value: settingsStore.updateIgnored,
+                  onChanged: (bool value) async {
+                    await settingsStore.setUpdateIgnored(value);
+                  },
+                )),
           ),
       ],
     );

@@ -9,6 +9,7 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
@@ -149,7 +150,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     return ClubCard(
       child: Column(
         children: [
-          ListTile(
+          ClubListTile(
             leading: Icon(
               Icons.calendar_today_outlined,
               color: isDark ? Colors.blue[300] : Colors.blue[600],

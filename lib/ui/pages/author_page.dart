@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthorPage extends StatelessWidget {
@@ -139,7 +140,7 @@ class AuthorPage extends StatelessWidget {
 
           return Column(
             children: [
-              ListTile(
+              ClubListTile(
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: Container(
@@ -263,7 +264,7 @@ class AuthorPage extends StatelessWidget {
 
           return Column(
             children: [
-              ListTile(
+              ClubListTile(
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 leading: Icon(

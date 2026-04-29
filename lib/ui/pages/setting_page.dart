@@ -15,6 +15,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
@@ -101,72 +102,46 @@ class SettingPage extends StatelessWidget {
                     if (userStore.isLogin) _buildLogoutTile(context, isDark),
                     Obx(() {
                       SettingsStore settingsStore = SettingsStore.to;
-                      return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.grid,
-                                size: 20,
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.5)
-                                    : CupertinoColors.tertiaryLabel,
-                              ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Text(
-                                  '显示课表网格线',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                              CupertinoSwitch(
-                                value: settingsStore.showCourseGrid,
-                                onChanged: (value) {
-                                  settingsStore.setShowCourseGrid(value);
-                                },
-                              ),
-                            ],
-                          ));
+                      return ClubListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        leading: Icon(
+                          CupertinoIcons.grid,
+                          size: 20,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : CupertinoColors.tertiaryLabel,
+                        ),
+                        title: const Text('显示课表网格线'),
+                        trailing: CupertinoSwitch(
+                          value: settingsStore.showCourseGrid,
+                          onChanged: (value) {
+                            settingsStore.setShowCourseGrid(value);
+                          },
+                        ),
+                      );
                     }),
                     if (kDebugMode)
                       Obx(() {
                         SettingsStore settingsStore = SettingsStore.to;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
+                        return ClubListTile(
+                          contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12),
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.checkmark_shield,
-                                size: 20,
-                                color: isDark
-                                    ? Colors.orange.withValues(alpha: 0.7)
-                                    : CupertinoColors.systemOrange,
-                              ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '协议授权状态 [Debug]',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                    Text(
-                                      '关闭后下次启动将重新显示授权页',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              CupertinoSwitch(
-                                value: settingsStore.hasAcceptedAgreement,
-                                onChanged: (value) {
-                                  settingsStore.setHasAcceptedAgreement(value);
-                                },
-                              ),
-                            ],
+                          leading: Icon(
+                            CupertinoIcons.checkmark_shield,
+                            size: 20,
+                            color: isDark
+                                ? Colors.orange.withValues(alpha: 0.7)
+                                : CupertinoColors.systemOrange,
+                          ),
+                          title: const Text('协议授权状态 [Debug]'),
+                          subtitle: const Text('关闭后下次启动将重新显示授权页'),
+                          subtitleTextStyle: const TextStyle(fontSize: 12),
+                          trailing: CupertinoSwitch(
+                            value: settingsStore.hasAcceptedAgreement,
+                            onChanged: (value) {
+                              settingsStore.setHasAcceptedAgreement(value);
+                            },
                           ),
                         );
                       }),
@@ -259,47 +234,24 @@ class SettingPage extends StatelessWidget {
   }
 
   Widget _buildRefreshTile(BuildContext context, bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () async {
-          showClubSnackBar(context, const Text('正在刷新数据...'));
-          final re = await EducationRefreshService.refresh();
-          if (re) {
-            await _syncHomeWidget();
-          }
-          if (context.mounted) {
-            showClubSnackBar(context, Text('刷新数据${re ? '成功' : '失败'}'));
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Row(
-            children: [
-              Icon(
-                CupertinoIcons.refresh,
-                size: 20,
-                color: CupertinoColors.systemBlue,
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  '刷新数据',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 18,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : CupertinoColors.tertiaryLabel,
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.refresh,
+        size: 20,
+        color: CupertinoColors.systemBlue,
       ),
+      title: const Text('刷新数据'),
+      showChevron: true,
+      onTap: () async {
+        showClubSnackBar(context, const Text('正在刷新数据...'));
+        final re = await EducationRefreshService.refresh();
+        if (re) {
+          await _syncHomeWidget();
+        }
+        if (context.mounted) {
+          showClubSnackBar(context, Text('刷新数据${re ? '成功' : '失败'}'));
+        }
+      },
     );
   }
 
@@ -315,274 +267,106 @@ class SettingPage extends StatelessWidget {
   }
 
   Widget _buildTeamTile(bool isDark) {
-    return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            Get.toNamed('/Author');
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(
-                  CupertinoIcons.person_2_fill,
-                  size: 20,
-                  color: CupertinoColors.systemOrange,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '制作团队',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'iOS Club App 开发组',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.5)
-                              : CupertinoColors.secondaryLabel,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ));
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.person_2_fill,
+        size: 20,
+        color: CupertinoColors.systemOrange,
+      ),
+      title: const Text('制作团队'),
+      subtitle: const Text('iOS Club App 开发组'),
+      onTap: () {
+        Get.toNamed('/Author');
+      },
+    );
   }
 
   Widget _buildLicenseTile(bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          Get.toNamed('/License');
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                CupertinoIcons.doc_text_fill,
-                size: 20,
-                color: CupertinoColors.systemGreen,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '开源协议',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'MIT License',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.5)
-                            : CupertinoColors.secondaryLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.doc_text_fill,
+        size: 20,
+        color: CupertinoColors.systemGreen,
       ),
+      title: const Text('开源协议'),
+      subtitle: const Text('MIT License'),
+      onTap: () {
+        Get.toNamed('/License');
+      },
     );
   }
 
   Widget _buildPrivacyPolicyTile(bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          Get.toNamed('/PrivacyPolicy');
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                CupertinoIcons.shield_fill,
-                size: 20,
-                color: CupertinoColors.systemBlue,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '隐私协议',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '了解我们如何保护你的隐私',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.5)
-                            : CupertinoColors.secondaryLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.shield_fill,
+        size: 20,
+        color: CupertinoColors.systemBlue,
       ),
+      title: const Text('隐私协议'),
+      subtitle: const Text('了解我们如何保护你的隐私'),
+      onTap: () {
+        Get.toNamed('/PrivacyPolicy');
+      },
     );
   }
 
   Widget _buildUserAgreementTile(bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          Get.toNamed('/UserAgreement');
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                CupertinoIcons.doc_text_fill,
-                size: 20,
-                color: CupertinoColors.systemPurple,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '用户协议',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '使用本应用即表示你同意本协议',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.5)
-                            : CupertinoColors.secondaryLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.doc_text_fill,
+        size: 20,
+        color: CupertinoColors.systemPurple,
       ),
+      title: const Text('用户协议'),
+      subtitle: const Text('使用本应用即表示你同意本协议'),
+      onTap: () {
+        Get.toNamed('/UserAgreement');
+      },
     );
   }
 
   Widget _buildLogoutTile(BuildContext context, bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () async {
-          final result = await PlatformDialog.showConfirmDialog(
-            context,
-            title: "确定退出登录吗？",
-            content: "退出后需要重新登录才能访问教务系统数据",
-            confirmText: '退出登录',
-            cancelText: '取消',
-          );
-
-          if (result == true) {
-            final userStore = Get.find<UserStore>();
-            await userStore.logout();
-            Get.toNamed("Profile");
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Row(
-            children: [
-              Icon(
-                Icons.logout_outlined,
-                size: 20,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.5)
-                    : CupertinoColors.tertiaryLabel,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '退出教务系统',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        Icons.logout_outlined,
+        size: 20,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.5)
+            : CupertinoColors.tertiaryLabel,
       ),
+      title: const Text('退出教务系统'),
+      onTap: () async {
+        final result = await PlatformDialog.showConfirmDialog(
+          context,
+          title: "确定退出登录吗？",
+          content: "退出后需要重新登录才能访问教务系统数据",
+          confirmText: '退出登录',
+          cancelText: '取消',
+        );
+
+        if (result == true) {
+          final userStore = Get.find<UserStore>();
+          await userStore.logout();
+          Get.toNamed("Profile");
+        }
+      },
     );
   }
 
   Widget _buildWidgetTile(BuildContext context, bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          // 直接打开安卓小组件设置
-          _openWidgetSettings(context);
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Row(
-            children: [
-              Icon(
-                Icons.widgets,
-                size: 20,
-                color: CupertinoColors.systemBlue,
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  '添加到桌面',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 18,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : CupertinoColors.tertiaryLabel,
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        Icons.widgets,
+        size: 20,
+        color: CupertinoColors.systemBlue,
       ),
+      title: const Text('添加到桌面'),
+      showChevron: true,
+      onTap: () {
+        // 直接打开安卓小组件设置
+        _openWidgetSettings(context);
+      },
     );
   }
 
@@ -606,60 +390,37 @@ class SettingPage extends StatelessWidget {
   }
 
   Widget _buildClearCacheTile(BuildContext context, bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () async {
-          final result = await PlatformDialog.showConfirmDialog(
-            context,
-            title: '确定清除缓存吗？',
-            content: '这将删除所有缓存的数据，下次打开应用需要重新加载数据',
-            confirmText: '清除缓存',
-            cancelText: '取消',
-          );
-
-          if (result == true) {
-            if (context.mounted) {
-              showClubSnackBar(context, const Text('正在清除缓存...'));
-            }
-            // 使用 EduService.clearEduCache() 进行全面清理
-            await EducationCacheService.clearEduCache();
-            // 同时也清理 RequestCache 以防万一 (EduService 内部已经调用了，这里可以保留或移除，保留无害)
-            await RequestCache.instance.clear();
-
-            if (context.mounted) {
-              showClubSnackBar(context, const Text('缓存清除成功'));
-            }
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Row(
-            children: [
-              Icon(
-                CupertinoIcons.trash_fill,
-                size: 20,
-                color: CupertinoColors.systemRed,
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  '清除缓存',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 18,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : CupertinoColors.tertiaryLabel,
-              ),
-            ],
-          ),
-        ),
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.trash_fill,
+        size: 20,
+        color: CupertinoColors.systemRed,
       ),
+      title: const Text('清除缓存'),
+      showChevron: true,
+      onTap: () async {
+        final result = await PlatformDialog.showConfirmDialog(
+          context,
+          title: '确定清除缓存吗？',
+          content: '这将删除所有缓存的数据，下次打开应用需要重新加载数据',
+          confirmText: '清除缓存',
+          cancelText: '取消',
+        );
+
+        if (result == true) {
+          if (context.mounted) {
+            showClubSnackBar(context, const Text('正在清除缓存...'));
+          }
+          // 使用 EduService.clearEduCache() 进行全面清理
+          await EducationCacheService.clearEduCache();
+          // 同时也清理 RequestCache 以防万一 (EduService 内部已经调用了，这里可以保留或移除，保留无害)
+          await RequestCache.instance.clear();
+
+          if (context.mounted) {
+            showClubSnackBar(context, const Text('缓存清除成功'));
+          }
+        }
+      },
     );
   }
 

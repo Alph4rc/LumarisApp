@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/services/todo_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 class TodoWidget extends StatefulWidget {
@@ -152,7 +153,7 @@ class _TodoWidgetState extends State<TodoWidget> {
 
                               return AnimatedListItem(
                                 index: index,
-                                child: ListTile(
+                                child: ClubListTile(
                                   leading: Checkbox(
                                     value: todo.isCompleted,
                                     onChanged: (value) async {

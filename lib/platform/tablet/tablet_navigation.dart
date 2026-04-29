@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 
 /// 平板设备导航组件
 ///
@@ -228,13 +229,7 @@ class TabletDrawerNavigation extends StatelessWidget {
                       horizontal: 12,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colorScheme.primary.withValues(alpha: 0.12)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
+                    child: ClubListTile(
                       leading: Icon(
                         isSelected ? item.selectedIcon : item.icon,
                         color: isSelected
@@ -251,14 +246,12 @@ class TabletDrawerNavigation extends StatelessWidget {
                               : (isDark ? Colors.grey[300] : Colors.grey[800]),
                         ),
                       ),
-                      selected: isSelected,
                       onTap: () {
                         onItemSelected(index);
                         Navigator.pop(context); // 关闭抽屉
                       },
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      selected: isSelected,
+                      borderRadius: BorderRadius.circular(12),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,

@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
@@ -442,7 +443,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
               ),
             ),
             const SizedBox(height: 16),
-            ...courses.map((course) => ListTile(
+            ...courses.map((course) => ClubListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Container(
                     width: 8,
@@ -485,7 +486,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListTile(
+          ClubListTile(
             leading: const Icon(Icons.edit),
             title: const Text('编辑课程'),
             onTap: () {
@@ -493,7 +494,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
               _editCustomCourse(course);
             },
           ),
-          ListTile(
+          ClubListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
             title: const Text('删除课程', style: TextStyle(color: Colors.red)),
             onTap: () {

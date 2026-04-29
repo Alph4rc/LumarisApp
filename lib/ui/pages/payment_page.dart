@@ -5,6 +5,7 @@ import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 
 import 'package:ios_club_app/state/payment_store.dart';
@@ -189,7 +190,7 @@ class PaymentPage extends StatelessWidget {
     final date = record.datetimeStr;
     final description = record.resume;
 
-    return ListTile(
+    return ClubListTile(
       title: Text(
         description.trim(),
         style: const TextStyle(
@@ -262,7 +263,7 @@ class PaymentPage extends StatelessWidget {
           ClubCard(
             child: Column(
               children: [
-                ListTile(
+                ClubListTile(
                   leading: Icon(Icons.home),
                   title: Text('添加到首页'),
                   subtitle: Text('在首页显示饭卡磁贴'),
