@@ -12,6 +12,7 @@ import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/features/system/notifications/course_reminder_helper.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
@@ -240,9 +241,22 @@ class NotificationService {
   }
 
   static Future<void> set(BuildContext context) async {
+    // 请求精确闹钟权限
     await PermissionService.request(
       Permission.scheduleExactAlarm,
-      onGranted: remind,
+      onGranted: () async {
+        // 在 Android 上进一步请求忽略电池优化权限，以确保后台任务存活
+        if (PlatformUtils.isAndroid) {
+          await PermissionService.request(
+            Permission.ignoreBatteryOptimizations,
+            context: context,
+            dialogTitle: '允许后台运行',
+            dialogContent: '为了确保课程提醒能准时响铃，请允许应用在后台运行（忽略电池优化）。',
+            settingsText: '去设置',
+          );
+        }
+        await remind();
+      },
       context: context,
       dialogTitle: '请允许使用闹钟',
       dialogContent: '您需要允许使用闹钟才能使用通知功能',
@@ -285,12 +299,22 @@ class NotificationService {
 
     final effectiveDate = targetDate ?? DateTime.now();
 
+    // 获取所有待处理的通知，用于去重
+    final pendingRequests =
+        await NotificationService.instance.notifications.pendingNotificationRequests();
+    final existingIds = pendingRequests.map((r) => r.id).toSet();
+
     for (var course in a) {
       final target = CourseReminderHelper.buildTarget(
         course: course,
         courseDate: effectiveDate,
       );
       if (target == null) continue;
+
+      // 如果通知已存在，跳过，避免重复调度引发通知闪烁或系统限制
+      if (existingIds.contains(target.notificationId)) {
+        continue;
+      }
 
       await NotificationService.instance.scheduleCourseReminder(
         id: target.notificationId,

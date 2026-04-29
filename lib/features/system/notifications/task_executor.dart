@@ -70,8 +70,7 @@ class TaskExecutor {
       AppLogger.debug('后台任务数据预加载完成');
     } catch (e) {
       AppLogger.debug('预加载数据失败: $e');
-      _clearCache();
-      rethrow;
+      // 不再清空缓存，以便在离线或弱网环境下仍能使用旧缓存更新小组件
     }
   }
 
@@ -201,33 +200,56 @@ class TaskExecutor {
 
       final now = DateTime.now();
 
-      // 每天只执行一次课程提醒排期，避免重复调用导致通知累积
-      final lastRemindStr = prefs.getString(PrefsKeys.LAST_REMIND_DATE);
-      if (lastRemindStr != null) {
-        final lastRemind = DateTime.tryParse(lastRemindStr);
-        if (lastRemind != null &&
-            lastRemind.year == now.year &&
-            lastRemind.month == now.month &&
-            lastRemind.day == now.day) {
-          AppLogger.debug('今日已执行课程提醒排期，跳过');
-          return;
-        }
-      }
-
       // 预加载数据
       await _preloadData();
 
-      final (_, todayCourses) =
-          _getTodayOrTomorrowCourseFromCache(isTomorrow: false);
+      // 获取所有课程和时间信息
+      if (_cachedCourses == null ||
+          _cachedTime == null ||
+          _cachedTime!.startTime == null) {
+        AppLogger.debug('没有课程或时间信息，跳过排期');
+        return;
+      }
 
-      await NotificationService.remindList(
-        todayCourses,
-        targetDate: now,
-      );
+      final startTime = DateTime.parse(_cachedTime!.startTime!);
+
+      // 为接下来的 14 天排期
+      // 由于 NotificationService.remindList 内部已实现去重，此处可以多次调用
+      for (int i = 0; i < 14; i++) {
+        final targetDate = now.add(Duration(days: i));
+        final targetWeek =
+            EduTimeService.getWeekIndexByStartTime(targetDate, startTime);
+        final targetWeekday = targetDate.weekday;
+
+        var dailyCourses = _cachedCourses!.where((course) {
+          return course.weekIndexes.contains(targetWeek) &&
+              course.weekday == targetWeekday;
+        }).toList();
+
+        // 如果是今天，过滤掉已经结束的课程
+        if (i == 0) {
+          dailyCourses = dailyCourses.where((course) {
+            final courseTime = TimeService.getStartAndEnd(course);
+            final l = courseTime.end.split(':');
+            var end = DateTime(now.year, now.month, now.day, int.parse(l[0]),
+                int.parse(l[1]), 0);
+            return now.isBefore(end);
+          }).toList();
+        }
+
+        dailyCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+
+        if (dailyCourses.isNotEmpty) {
+          await NotificationService.remindList(
+            dailyCourses,
+            targetDate: targetDate,
+          );
+        }
+      }
 
       await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
       AppLogger.debug(
-        '课程提醒排期完成: ${todayCourses.length} 条, 时间=${now.toIso8601String()}',
+        '课程提醒排期完成(14天跨度), 时间=${now.toIso8601String()}',
       );
     } catch (e) {
       AppLogger.debug('课程提醒检查失败: $e');
