@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// Apple 风格侧边栏 (参考 iCloud / App Store 设计)
 ///
@@ -110,7 +111,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(8), // Apple 风格圆角
+              borderRadius: ClubRadii.control, // Apple 风格圆角
               boxShadow: [
                 BoxShadow(
                   color: colorScheme.primary.withValues(alpha: 0.3),
@@ -180,7 +181,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                   : isHovered
                       ? hoverBgColor
                       : Colors.transparent,
-              borderRadius: BorderRadius.circular(10), // Apple 风格大圆角
+              borderRadius: ClubRadii.navigation, // Apple 风格大圆角
             ),
             child: Row(
               children: [
@@ -227,7 +228,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                           : (isDark
                               ? const Color(0xFF3A3A3C)
                               : const Color(0xFFE5E5EA)),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: ClubRadii.navigation,
                     ),
                     child: Text(
                       item.badge!,

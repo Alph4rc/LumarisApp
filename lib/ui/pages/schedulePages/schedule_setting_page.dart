@@ -10,6 +10,7 @@ import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
@@ -185,7 +186,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey[800] : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: ClubRadii.control,
                   ),
                   child: Row(
                     children: [
@@ -239,9 +240,9 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         children: [
           Material(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: ClubRadii.card,
               child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: ClubRadii.card,
                   onTap: () => Get.toNamed('/CustomCourseManage'),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -275,7 +276,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
           Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: ClubRadii.card,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -353,10 +354,10 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   Widget _buildBackgroundOption(String title, String value, bool isDark) {
     final isSelected = settingsStore.scheduleBackground == value;
     return Material(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: ClubRadii.card,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
         onTap: () {
           setState(() {
             settingsStore.setScheduleBackground(value);
@@ -365,7 +366,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: ClubRadii.navigation,
           ),
           child: Row(
             children: [
@@ -518,7 +519,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: ClubRadii.xsBorder,
                 ),
                 child: Row(
                   children: [
@@ -574,9 +575,9 @@ class CourseIgnoreItem extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
         child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: ClubRadii.card,
             onTap: () => onChanged(ignore, !ignore.isCompleted),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

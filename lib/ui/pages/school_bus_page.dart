@@ -8,6 +8,7 @@ import 'package:ios_club_app/features/education/models/bus_model.dart'
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
@@ -95,9 +96,9 @@ class SchoolBusPage extends StatelessWidget {
                 padding: EdgeInsets.only(
                     top: 12, left: 12, right: 12, bottom: bottom),
                 child: Material(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: ClubRadii.card,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: ClubRadii.card,
                     child: ClubCard(
                       child: Padding(
                         padding: EdgeInsets.all(16.0),

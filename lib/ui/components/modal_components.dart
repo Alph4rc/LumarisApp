@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// Modal 内部布局组件库
 ///
@@ -135,7 +136,7 @@ class ModalInfoRow extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: ClubRadii.control,
           ),
           child: Icon(
             icon,

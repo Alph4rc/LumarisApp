@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// 课程详情弹窗组件
 ///
@@ -30,9 +31,7 @@ class CourseDetailSheet extends StatelessWidget {
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[900] : Colors.white,
-        borderRadius: isDesktop
-            ? BorderRadius.circular(20)
-            : const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -179,7 +178,7 @@ class CourseDetailSheet extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: ClubRadii.control,
           ),
           child: Icon(
             icon,
@@ -240,7 +239,7 @@ class CourseDetailSheet extends StatelessWidget {
         context: context,
         builder: (context) => Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: ClubRadii.card,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),

@@ -7,6 +7,7 @@ import 'package:ios_club_app/features/education/services/exam_service.dart';
 
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
@@ -270,7 +271,7 @@ class _ExamCardState extends State<ExamCard> {
                     index: index,
                     child: Material(
                       color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: ClubRadii.card,
                       child: InkWell(
                         onTap: () {
                           if (isTablet) {
@@ -286,7 +287,7 @@ class _ExamCardState extends State<ExamCard> {
                             );
                           }
                         },
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: ClubRadii.card,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: Row(
@@ -297,7 +298,7 @@ class _ExamCardState extends State<ExamCard> {
                                 height: isTablet ? 42 : 52,
                                 decoration: BoxDecoration(
                                   color: exam.color,
-                                  borderRadius: BorderRadius.circular(3),
+                                  borderRadius: ClubRadii.xsBorder,
                                 ),
                               ),
                               const SizedBox(width: 16),

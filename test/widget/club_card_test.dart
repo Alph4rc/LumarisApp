@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 void main() {
   group('ClubCard', () {
@@ -62,7 +63,7 @@ void main() {
       expect(containerFinder, findsOneWidget);
     });
 
-    testWidgets('should have rounded corners', (WidgetTester tester) async {
+    testWidgets('should use default card radius', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -73,13 +74,31 @@ void main() {
         ),
       );
 
-      final containerFinder = find.byWidgetPredicate((Widget widget) {
-        return widget is Container &&
-            widget.decoration is BoxDecoration &&
-            (widget.decoration as BoxDecoration).borderRadius != null;
-      });
+      final container = tester.widget<Container>(find.byType(Container));
+      final decoration = container.decoration as BoxDecoration;
 
-      expect(containerFinder, findsOneWidget);
+      expect(decoration.borderRadius, ClubRadii.card);
+    });
+
+    testWidgets('should apply custom border radius',
+        (WidgetTester tester) async {
+      const borderRadius = ClubRadii.navigation;
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ClubCard(
+              borderRadius: borderRadius,
+              child: Text('测试'),
+            ),
+          ),
+        ),
+      );
+
+      final container = tester.widget<Container>(find.byType(Container));
+      final decoration = container.decoration as BoxDecoration;
+
+      expect(decoration.borderRadius, borderRadius);
     });
   });
 }

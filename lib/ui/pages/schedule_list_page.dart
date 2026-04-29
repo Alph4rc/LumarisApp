@@ -17,6 +17,7 @@ import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
@@ -172,7 +173,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
 
       return InkWell(
         onTap: () => _jumpToPage(scheduleStore.currentWeek),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: ClubRadii.control,
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
@@ -267,7 +268,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ClubRadii.navigation,
       ),
       child: CupertinoSlidingSegmentedControl<CourseCardStyle>(
         groupValue: _cardStyle,
@@ -428,7 +429,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[900] : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: ClubRadii.sheetTop,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -451,7 +452,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                     decoration: BoxDecoration(
                       color: CourseColorManager.generateSoftColor(
                           course.courseName),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: ClubRadii.xsBorder,
                     ),
                   ),
                   title: Text(

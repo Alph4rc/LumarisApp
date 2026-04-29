@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 /// Controls for entering and exiting tile edit mode
@@ -100,7 +101,7 @@ class EditModeIndicator extends StatelessWidget {
                   width: 2,
                 )
               : null,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: ClubRadii.control,
         ),
         child: child,
       );

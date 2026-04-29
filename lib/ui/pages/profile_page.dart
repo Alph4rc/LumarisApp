@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/info_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
@@ -262,10 +263,10 @@ class ProfileButtonItem {
 
   Widget build() {
     return Material(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: ClubRadii.panel,
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: ClubRadii.panel,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// 统一的错误显示组件
 ///
@@ -46,7 +47,7 @@ class ErrorBanner extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ClubRadii.navigation,
       ),
       child: Row(
         children: [

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 class AgreementPage extends StatelessWidget {
   const AgreementPage({super.key});
@@ -165,7 +166,7 @@ class AgreementPage extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(isWide ? 22 : 20),
+        borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
         boxShadow: [
           BoxShadow(
             color:
@@ -176,7 +177,7 @@ class AgreementPage extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(isWide ? 22 : 20),
+        borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
         child: const Image(
           image: AssetImage('assets/icon.webp'),
           fit: BoxFit.cover,
@@ -237,9 +238,9 @@ class AgreementPage extends StatelessWidget {
   }) {
     return Material(
       color: isDark ? Colors.grey[850] : CupertinoColors.systemGrey6,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: ClubRadii.panel,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: ClubRadii.panel,
         onTap: onTap,
         child: Padding(
           padding: EdgeInsets.all(isWide ? 20 : 18),
@@ -250,7 +251,7 @@ class AgreementPage extends StatelessWidget {
                 height: isWide ? 46 : 42,
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(isWide ? 12 : 11),
+                  borderRadius: ClubRadii.navigation,
                 ),
                 child: Icon(icon, size: isWide ? 24 : 22, color: iconColor),
               ),

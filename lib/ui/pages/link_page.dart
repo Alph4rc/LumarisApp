@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/services/link_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/models/link_model.dart';
@@ -124,7 +125,7 @@ class ScoreBuilder extends StatelessWidget {
                     height: 20,
                     decoration: BoxDecoration(
                       color: const Color(0xFF6366F1),
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: ClubRadii.indicatorBorder,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -179,7 +180,7 @@ class _LinkItem extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ClubRadii.navigation,
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -202,7 +203,7 @@ class _LinkItem extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: ClubRadii.control,
                     ),
                   );
                 },

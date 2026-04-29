@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// 课程卡片组件
 ///
@@ -35,11 +36,11 @@ class CourseCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: ClubRadii.control,
         color: courseColor,
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: ClubRadii.control,
         onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(

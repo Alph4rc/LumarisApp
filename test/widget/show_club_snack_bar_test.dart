@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 void main() {
@@ -67,9 +68,11 @@ void main() {
 
       // 验证 SnackBar 的行为和形状
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      final shape = snackBar.shape as RoundedRectangleBorder;
+
       expect(snackBar.behavior, SnackBarBehavior.floating);
       expect(snackBar.duration, const Duration(seconds: 2));
-      expect(snackBar.shape, isA<RoundedRectangleBorder>());
+      expect(shape.borderRadius, ClubRadii.control);
     });
   });
 }

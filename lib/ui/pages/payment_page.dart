@@ -6,6 +6,7 @@ import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 
 import 'package:ios_club_app/state/payment_store.dart';
@@ -88,7 +89,7 @@ class PaymentPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: ClubRadii.card,
         ),
         child: Row(
           children: [
@@ -96,7 +97,7 @@ class PaymentPage extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: ClubRadii.control,
               ),
               child: Hero(tag: '饭卡', child: Icon(icon, color: color, size: 24)),
             ),

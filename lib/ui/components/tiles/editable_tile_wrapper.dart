@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
 class EditableTileWrapper extends StatefulWidget {
@@ -75,14 +76,14 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: ClubRadii.tile,
               ),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   // Original tile content
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: ClubRadii.tile,
                     child: widget.child,
                   ),
 

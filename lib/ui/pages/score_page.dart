@@ -12,6 +12,7 @@ import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -577,10 +578,10 @@ class _ScorePageState extends State<ScorePage>
     final isTablet = MediaQuery.of(context).size.width > 600;
 
     return Material(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: ClubRadii.navigation,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ClubRadii.navigation,
         onTap: () => _showScoreDetails(item),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -591,7 +592,7 @@ class _ScorePageState extends State<ScorePage>
                 height: 40,
                 decoration: BoxDecoration(
                   color: CourseColorManager.generateSoftColor(item.name),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: ClubRadii.indicatorBorder,
                 ),
               ),
               const SizedBox(width: 16),

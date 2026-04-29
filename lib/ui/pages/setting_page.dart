@@ -17,6 +17,7 @@ import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 import 'package:ios_club_app/ui/pages/settingPages/show_tomorrow_setting.dart';
@@ -163,7 +164,7 @@ class SettingPage extends StatelessWidget {
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: ClubRadii.tile,
             boxShadow: [
               BoxShadow(
                 color: isDark
@@ -175,7 +176,7 @@ class SettingPage extends StatelessWidget {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: ClubRadii.tile,
             child: const Image(
               image: AssetImage('assets/icon.webp'),
               fit: BoxFit.cover,

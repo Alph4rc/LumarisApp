@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/controllers/program_controller.dart';
 
@@ -209,7 +210,7 @@ class ProgramPage extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: courseColor.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6.0),
+                                borderRadius: ClubRadii.control,
                               ),
                               child: Text(
                                 "${course.credits} 学分",

@@ -14,6 +14,7 @@ import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 
@@ -166,10 +167,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
   Widget _buildScheduleItem(
       CourseModel course, ScheduleItem item, bool isTablet) {
     return Material(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: ClubRadii.card,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
         onTap: () {
           CourseDetailSheet.show(context, course);
         },
@@ -183,7 +184,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                 height: 52,
                 decoration: BoxDecoration(
                   color: CourseColorManager.generateSoftColor(item.title),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: ClubRadii.xsBorder,
                 ),
               ),
               const SizedBox(width: 20),

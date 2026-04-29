@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -81,7 +82,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: ClubRadii.navigation,
                   ),
                 ),
               );
@@ -115,7 +116,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: ClubRadii.navigation,
                   ),
                 ),
               );
@@ -212,7 +213,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: primaryColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: ClubRadii.card,
                           ),
                           child: Icon(
                             Icons.event_available,
@@ -250,7 +251,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: cardColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: ClubRadii.navigation,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.05),
@@ -262,7 +263,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: ClubRadii.navigation,
                             onTap: () => _showEditCourseDialog(course),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -317,9 +318,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                                         context: context,
                                         backgroundColor: cardColor,
                                         shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20),
-                                          ),
+                                          borderRadius: ClubRadii.sheetTop,
                                         ),
                                         builder: (context) => SafeArea(
                                           child: Column(
@@ -371,7 +370,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: ClubRadii.control,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -524,7 +523,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
         ),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: ClubRadii.panel,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.2),
@@ -619,7 +618,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: ClubRadii.navigation,
                         border: Border.all(
                           color: isDarkMode
                               ? Colors.grey[600]!
@@ -671,7 +670,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                   color: isDarkMode
                                       ? Colors.grey[700]!
                                       : Colors.grey[100]!,
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: ClubRadii.navigation,
                                   border: Border.all(
                                     color: isDarkMode
                                         ? Colors.grey[600]!
@@ -725,7 +724,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                   color: isDarkMode
                                       ? Colors.grey[700]!
                                       : Colors.grey[100]!,
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: ClubRadii.navigation,
                                   border: Border.all(
                                     color: isDarkMode
                                         ? Colors.grey[600]!
@@ -796,7 +795,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                   : isDarkMode
                                       ? Colors.grey[700]
                                       : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: ClubRadii.card,
                               border: Border.all(
                                 color: isSelected
                                     ? primaryColor
@@ -864,7 +863,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                         vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: ClubRadii.control,
                       ),
                       elevation: 0,
                     ),
@@ -930,15 +929,15 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
             filled: true,
             fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.primary,
                 width: 2,

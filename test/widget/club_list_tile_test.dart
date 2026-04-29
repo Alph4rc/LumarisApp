@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 void main() {
   group('ClubListTile', () {
@@ -87,8 +88,26 @@ void main() {
 
       expect(
         inkWell.borderRadius,
-        const BorderRadius.all(Radius.circular(20)),
+        ClubRadii.card,
       );
+    });
+
+    testWidgets('should apply custom round radius',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ClubListTile(
+              borderRadius: ClubRadii.navigation,
+              title: Text('自定义圆角'),
+            ),
+          ),
+        ),
+      );
+
+      final inkWell = tester.widget<InkWell>(find.byType(InkWell));
+
+      expect(inkWell.borderRadius, ClubRadii.navigation);
     });
 
     testWidgets('should show chevron when requested',

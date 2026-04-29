@@ -12,6 +12,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
@@ -90,7 +91,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: ClubRadii.control,
                     ),
                     child: Hero(
                         tag: '电费',
@@ -310,7 +311,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                             end: Alignment.topCenter,
                           ),
                           width: 16,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: ClubRadii.xsBorder,
                         ),
                       ],
                     ),

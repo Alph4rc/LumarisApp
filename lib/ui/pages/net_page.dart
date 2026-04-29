@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/net_service.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 class NetPage extends StatelessWidget {
@@ -128,8 +129,7 @@ class _DataContent extends StatelessWidget {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: cardColor,
-                            borderRadius:
-                                BorderRadius.circular(20), // Apple 风格圆角
+                            borderRadius: ClubRadii.card, // Apple 风格圆角
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.05),
@@ -174,7 +174,7 @@ class _DataContent extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color:
                                       theme.primaryColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: ClubRadii.card,
                                 ),
                                 child: Text(
                                   "在线时长: ${timeFormat(data['sum_seconds'])}",
@@ -208,7 +208,7 @@ class _DataContent extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: cardColor,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: ClubRadii.panel,
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.05),
@@ -299,8 +299,8 @@ class _DetailRow extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.vertical(
-          top: isFirst ? const Radius.circular(16) : Radius.zero,
-          bottom: isLast ? const Radius.circular(16) : Radius.zero,
+          top: isFirst ? ClubRadii.panelRadius : Radius.zero,
+          bottom: isLast ? ClubRadii.panelRadius : Radius.zero,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -310,7 +310,7 @@ class _DetailRow extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: iconColor,
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: ClubRadii.control,
                 ),
                 child: Icon(
                   icon,

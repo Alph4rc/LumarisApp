@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 class ClubListTile extends StatelessWidget {
   const ClubListTile({
@@ -11,7 +12,7 @@ class ClubListTile extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.contentPadding,
-    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.borderRadius = ClubRadii.card,
     this.enabled = true,
     this.selected = false,
     this.showChevron = false,

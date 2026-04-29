@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
     {bool isScrollControlled = true, double maxHeight = 0}) {
@@ -18,7 +19,7 @@ Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
       return Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: ClubRadii.sheetTop,
         ),
         child: Column(
           children: [
@@ -30,7 +31,7 @@ Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.3)
                     : Colors.grey[300],
-                borderRadius: BorderRadius.circular(2.5),
+                borderRadius: ClubRadii.pill,
               ),
             ),
             const SizedBox(height: 8),

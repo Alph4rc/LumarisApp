@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class HelperPage extends StatefulWidget {
@@ -340,7 +341,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                       height: 36,
                       decoration: BoxDecoration(
                         color: const Color(0xFF34C759).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: ClubRadii.control,
                       ),
                       child: const Icon(
                         CupertinoIcons.device_phone_portrait,
@@ -413,7 +414,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                       height: 36,
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF9500).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: ClubRadii.control,
                       ),
                       child: const Icon(
                         CupertinoIcons.heart,
@@ -484,7 +485,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             height: 36,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
             ),
             child: Icon(
               icon,
@@ -541,7 +542,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             height: 36,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
             ),
             child: Icon(
               icon,
@@ -594,7 +595,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
           height: 32,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: ClubRadii.control,
           ),
           child: Icon(
             icon,

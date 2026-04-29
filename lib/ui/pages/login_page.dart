@@ -11,6 +11,7 @@ import 'package:ios_club_app/features/education/services/education_cache_service
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -203,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                 // Logo
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: ClubRadii.tile,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.1),
@@ -213,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: ClubRadii.tile,
                     child: LazyLoadImage.assets(
                       'assets/icon.webp',
                       width: 100,
@@ -249,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                 Container(
                   decoration: BoxDecoration(
                     color: groupBackgroundColor,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: ClubRadii.navigation,
                   ),
                   child: Column(
                     children: [

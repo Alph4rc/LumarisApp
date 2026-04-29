@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import '../club_card.dart';
 
 class BusTile extends StatelessWidget {
@@ -16,7 +17,7 @@ class BusTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => Get.toNamed('/SchoolBus'),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: ClubRadii.tile,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Obx(() {
@@ -54,7 +55,7 @@ class BusTile extends StatelessWidget {
                               horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: primaryColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: ClubRadii.navigation,
                           ),
                           child: Text(
                             '$busData班次',

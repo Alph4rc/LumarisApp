@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthorPage extends StatelessWidget {
@@ -65,7 +66,7 @@ class AuthorPage extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: ClubRadii.tile,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
@@ -75,7 +76,7 @@ class AuthorPage extends StatelessWidget {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: ClubRadii.tile,
             child: Image.asset(
               'assets/iOS_Club_Logo.webp',
               fit: BoxFit.cover,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/timeline_column.dart';
 
@@ -224,11 +225,11 @@ class ScheduleGrid extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: ClubRadii.control,
           color: courseColor,
         ),
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: ClubRadii.control,
           onTap: onConflictCourseTap != null
               ? () => onConflictCourseTap!(courses)
               : (onCourseTap != null

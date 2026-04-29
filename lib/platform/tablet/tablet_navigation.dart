@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// 平板设备导航组件
 ///
@@ -70,7 +71,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: ClubRadii.navigation,
                     ),
                     child: const Icon(
                       Icons.dashboard_rounded,
@@ -132,7 +133,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
               ),
               indicatorColor: colorScheme.primary.withValues(alpha: 0.15),
               indicatorShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: ClubRadii.navigation,
               ),
               minWidth: 72,
               minExtendedWidth: 220,
@@ -251,7 +252,7 @@ class TabletDrawerNavigation extends StatelessWidget {
                         Navigator.pop(context); // 关闭抽屉
                       },
                       selected: isSelected,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: ClubRadii.navigation,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
