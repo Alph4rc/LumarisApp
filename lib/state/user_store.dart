@@ -9,7 +9,7 @@ import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
-import 'package:ios_club_app/ui/controllers/program_controller.dart';
+import 'package:ios_club_app/state/program_page_notifier.dart';
 
 final userStoreProvider = NotifierProvider<UserStore, UserState>(UserStore.new);
 

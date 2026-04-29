@@ -4,9 +4,9 @@ import 'package:ios_club_app/features/education/services/program_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 
 final programControllerProvider =
-    NotifierProvider<ProgramController, ProgramState>(ProgramController.new);
+    NotifierProvider<ProgramPageNotifier, ProgramState>(ProgramPageNotifier.new);
 
-class ProgramController extends Notifier<ProgramState> {
+class ProgramPageNotifier extends Notifier<ProgramState> {
   final List<String> semesterNames = const [
     '大一上',
     '大一下',

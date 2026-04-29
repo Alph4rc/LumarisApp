@@ -12,7 +12,7 @@ import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
-import 'package:ios_club_app/ui/controllers/bus_controller.dart';
+import 'package:ios_club_app/state/bus_page_notifier.dart';
 
 class SchoolBusPage extends ConsumerStatefulWidget {
   const SchoolBusPage({super.key});
@@ -232,7 +232,7 @@ class _SchoolBusPageState extends ConsumerState<SchoolBusPage>
   Future<void> _showSettingsModalBottomSheet(
     BuildContext context,
     BusPageState busState,
-    BusController busController,
+    BusPageNotifier busController,
   ) async {
     await showClubModalBottomSheet(
       context,

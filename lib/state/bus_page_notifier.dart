@@ -8,9 +8,9 @@ import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 final busControllerProvider =
-    NotifierProvider<BusController, BusPageState>(BusController.new);
+    NotifierProvider<BusPageNotifier, BusPageState>(BusPageNotifier.new);
 
-class BusController extends Notifier<BusPageState> {
+class BusPageNotifier extends Notifier<BusPageState> {
   final Map<String, String> availableDates = {};
 
   @override
