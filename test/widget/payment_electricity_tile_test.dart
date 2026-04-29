@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
+import 'package:ios_club_app/ui/pages/electricity_page.dart';
+import 'package:ios_club_app/ui/pages/payment_page.dart';
+import 'package:ios_club_app/ui/pages/school_bus_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _TestElectricityStore extends ElectricityStore {
   @override
@@ -17,24 +25,34 @@ class _TestPaymentStore extends PaymentStore {
   void onInit() {}
 }
 
+class _TestBusTileStore extends BusTileStore {
+  @override
+  void onInit() {}
+}
+
 Widget _wrap(Widget child) {
-  return GetMaterialApp(
-    home: Scaffold(
-      body: SizedBox(width: 300, height: 200, child: child),
+  return MaterialApp.router(
+    routerConfig: AppRouter.router,
+    builder: (context, routerChild) => Stack(
+      children: [
+        Offstage(child: routerChild ?? const SizedBox.shrink()),
+        Scaffold(
+          body: SizedBox(width: 300, height: 200, child: child),
+        ),
+      ],
     ),
-    getPages: <GetPage<dynamic>>[
-      GetPage<dynamic>(name: '/Electricity', page: () => const SizedBox()),
-      GetPage<dynamic>(name: '/Payment', page: () => const SizedBox()),
-    ],
   );
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PrefsService.init();
     Get.testMode = true;
     Get.reset();
+    AppRouter.go(AppRoutes.agreement);
   });
 
   tearDown(() {
@@ -84,6 +102,19 @@ void main() {
       await tester.pumpWidget(_wrap(const ElectricityTile()));
       expect(find.text('电费查询'), findsOneWidget);
       expect(find.text('点击订阅'), findsOneWidget);
+    });
+
+    testWidgets('navigates to electricity page when tapped', (tester) async {
+      final store = Get.put<ElectricityStore>(_TestElectricityStore());
+      store.isLoading.value = false;
+      store.hasData.value = true;
+      store.electricity.value = 18.5;
+
+      await tester.pumpWidget(_wrap(const ElectricityTile()));
+      await tester.tap(find.text('¥18.50'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ElectricityPage, skipOffstage: false), findsOneWidget);
     });
   });
 
@@ -142,6 +173,32 @@ void main() {
       await tester.pumpWidget(_wrap(const PaymentTile()));
       expect(find.text('请先登录教务处账号'), findsOneWidget);
       expect(find.text('点击绑定'), findsNothing);
+    });
+
+    testWidgets('navigates to payment page when tapped', (tester) async {
+      final store = Get.put<PaymentStore>(_TestPaymentStore());
+      store.isLoading.value = false;
+      store.totalRecharge.value = 30.0;
+
+      await tester.pumpWidget(_wrap(const PaymentTile()));
+      await tester.tap(find.text('¥30.00'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PaymentPage, skipOffstage: false), findsOneWidget);
+    });
+  });
+
+  group('BusTile', () {
+    testWidgets('navigates to school bus page when tapped', (tester) async {
+      final store = Get.put<BusTileStore>(_TestBusTileStore());
+      store.isLoading.value = false;
+      store.busCount.value = 3;
+
+      await tester.pumpWidget(_wrap(const BusTile()));
+      await tester.tap(find.text('今日校车'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SchoolBusPage, skipOffstage: false), findsOneWidget);
     });
   });
 }

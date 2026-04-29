@@ -69,7 +69,7 @@ void main() {
   });
 
   Widget createTestWidget() {
-    return GetMaterialApp(
+    return MaterialApp(
       home: Scaffold(
         body: SingleChildScrollView(
           child: TilesWidget(),

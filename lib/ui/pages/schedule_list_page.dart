@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/utils/image_helper.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
@@ -257,7 +258,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         // 设置
         IconButton(
           icon: const Icon(Icons.settings_outlined),
-          onPressed: () => Get.toNamed('/ScheduleSetting'),
+          onPressed: () => AppRouter.push(AppRoutes.scheduleSetting),
           tooltip: '课表设置',
         ),
       ],

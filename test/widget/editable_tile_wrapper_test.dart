@@ -34,7 +34,7 @@ void main() {
   });
 
   Widget createTestWidget(Widget child) {
-    return GetMaterialApp(
+    return MaterialApp(
       home: Scaffold(
         body: child,
       ),

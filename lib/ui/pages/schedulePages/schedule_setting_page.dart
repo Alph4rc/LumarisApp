@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -243,7 +243,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
               borderRadius: ClubRadii.card,
               child: InkWell(
                   borderRadius: ClubRadii.card,
-                  onTap: () => Get.toNamed('/CustomCourseManage'),
+                  onTap: () => AppRouter.push(AppRoutes.customCourseManage),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 16),

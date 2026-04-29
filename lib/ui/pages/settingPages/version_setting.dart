@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/git_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -58,7 +59,7 @@ class _VersionSettingState extends State<VersionSetting> {
 
     if (tapCount >= 5) {
       // 显示彩蛋页面
-      Get.toNamed('/Egg');
+      AppRouter.push(AppRoutes.egg);
 
       // 重置计数器
       tapCount = 0;

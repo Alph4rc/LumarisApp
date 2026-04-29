@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../../../state/payment_store.dart';
@@ -18,7 +19,7 @@ class PaymentTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: ClubRadii.tile,
-          onTap: () => Get.toNamed('/Payment'),
+          onTap: () => AppRouter.push(AppRoutes.payment),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Obx(() {

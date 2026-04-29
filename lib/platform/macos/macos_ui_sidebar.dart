@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -74,7 +75,7 @@ Sidebar macosUISidebar({
             padding: const EdgeInsets.only(top: 8),
             child: MacosListTile(
               onClick: () {
-                Get.toNamed('/Profile');
+                AppRouter.go(AppRoutes.profile);
               },
               leading: Container(
                 width: 24,

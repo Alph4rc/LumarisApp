@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -17,7 +18,7 @@ class BusTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => Get.toNamed('/SchoolBus'),
+          onTap: () => AppRouter.push(AppRoutes.schoolBus),
           borderRadius: ClubRadii.tile,
           child: Padding(
             padding: const EdgeInsets.all(16.0),

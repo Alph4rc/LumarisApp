@@ -1,12 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _SpyTileEditController extends TileEditController {
   int reloadCount = 0;
@@ -42,7 +45,9 @@ BusModel _busModel(int count) {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PrefsService.init();
     Get.testMode = true;
     Get.reset();
     PaymentStore.resetTestOverrides();
@@ -107,6 +112,7 @@ void main() {
           return true;
         },
       );
+      await PrefsService.instance.setString(PrefsKeys.USERNAME, 'student-1');
       final store = PaymentStore();
 
       await store.loadData();

@@ -69,7 +69,7 @@ void main() {
   });
 
   Widget createHost() {
-    return const GetMaterialApp(
+    return const MaterialApp(
       home: Scaffold(
         body: SingleChildScrollView(
           child: TilesWidget(),

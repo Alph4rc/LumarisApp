@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -20,7 +19,6 @@ import 'platform/windows/windows_sidebar.dart';
 import 'platform/tablet/tablet_navigation.dart';
 import 'core/services/git_service.dart';
 import 'features/system/update/check_update_manager.dart';
-import 'under_maintenance_screen.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -34,12 +32,18 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   bool _showBottomNav = true;
   final SettingsStore settingsStore = SettingsStore.to;
 
-  static const _bottomNavRoutes = {'/', '/Schedule', '/Score', '/Profile'};
+  static const _bottomNavRoutes = {
+    AppRoutes.home,
+    AppRoutes.schedule,
+    AppRoutes.score,
+    AppRoutes.profile,
+  };
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    AppRouter.router.routerDelegate.addListener(_syncNavigationState);
 
     if (PlatformUtils.isAndroid) {
       CheckUpdateManager.checkForUpdates().then((result) async {
@@ -49,21 +53,31 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
       });
     }
 
-    // 延迟执行导航，确保GetMaterialApp已经初始化
+    // 延迟执行导航，确保路由器已经初始化
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
       final prefs = PrefsService.instance;
+      final initialIndex = prefs.getInt(PrefsKeys.PAGE_DATA) ?? 0;
+      final initialRoute = _routeMap[initialIndex] ?? AppRoutes.home;
+
+      if (initialIndex != 0) {
+        _navigateToMainRoute(initialIndex);
+        return;
+      }
+
       setState(() {
-        _currentIndex = prefs.getInt(PrefsKeys.PAGE_DATA) ?? 0;
-        // 只有在不是默认首页时才导航
-        if (_currentIndex != 0) {
-          Get.toNamed(_routeMap[_currentIndex] ?? '/');
-        }
+        _currentIndex = initialIndex;
+        _showBottomNav = _bottomNavRoutes.contains(initialRoute);
       });
     });
   }
 
   @override
   void dispose() {
+    AppRouter.router.routerDelegate.removeListener(_syncNavigationState);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -181,23 +195,53 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   ];
 
   static const Map<int, String> _routeMap = {
-    0: '/',
-    1: '/Schedule',
-    2: '/Score',
-    3: '/Profile',
-    4: '/Electricity',
-    5: '/SchoolBus',
-    6: '/Payment',
+    0: AppRoutes.home,
+    1: AppRoutes.schedule,
+    2: AppRoutes.score,
+    3: AppRoutes.profile,
+    4: AppRoutes.electricity,
+    5: AppRoutes.schoolBus,
+    6: AppRoutes.payment,
   };
 
-  Widget _app(bool isTablet) => GetMaterialApp(
+  void _syncNavigationState() {
+    final route = AppRouter.currentLocation;
+    final index = _routeMap.entries
+        .firstWhere(
+          (entry) => entry.value == route,
+          orElse: () => const MapEntry(0, AppRoutes.home),
+        )
+        .key;
+    final showBottomNav = _bottomNavRoutes.contains(route);
+
+    if (_currentIndex == index && _showBottomNav == showBottomNav) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _currentIndex = index;
+        _showBottomNav = showBottomNav;
+      });
+    });
+  }
+
+  void _navigateToMainRoute(int index) {
+    final route = _routeMap[index] ?? AppRoutes.home;
+    setState(() {
+      _currentIndex = index;
+      _showBottomNav = _bottomNavRoutes.contains(route);
+    });
+    AppRouter.go(route);
+  }
+
+  Widget _app() => MaterialApp.router(
         title: 'iOS Club App',
         debugShowCheckedModeBanner: false,
-        defaultTransition: (kIsWeb)
-            ? Transition.fadeIn
-            : isTablet
-                ? Transition.fadeIn
-                : Transition.native,
         theme: ThemeData(
           fontFamily: SettingsStore.to.fontFamily.isEmpty
               ? PlatformUtils.getWindowsFontFamily()
@@ -214,33 +258,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
             elevation: 0,
           ),
         ),
-        getPages: AppRouter.getPages,
-        onUnknownRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (context) => UnderMaintenanceScreen(),
-          );
-        },
-        // 添加路由监听，确保索引与路由同步
-        routingCallback: (routing) {
-          if (routing?.current != null) {
-            final route = routing!.current;
-            final index = _routeMap.entries
-                .firstWhere((entry) => entry.value == route,
-                    orElse: () => const MapEntry(0, '/'))
-                .key;
-            final showBottomNav = _bottomNavRoutes.contains(route);
-            if (_currentIndex != index || _showBottomNav != showBottomNav) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  setState(() {
-                    _currentIndex = index;
-                    _showBottomNav = showBottomNav;
-                  });
-                }
-              });
-            }
-          }
-        },
+        routerConfig: AppRouter.router,
       );
 
   @override
@@ -274,10 +292,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
             items: _destinations,
             selectedIndex: _currentIndex,
             onItemSelected: (int index) {
-              setState(() {
-                _currentIndex = index;
-              });
-              Get.toNamed(_routeMap[index] ?? '/');
+              _navigateToMainRoute(index);
             },
           ),
           titleBar: TitleBar(
@@ -286,7 +301,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
               color: MacosTheme.of(context).canvasColor,
             ),
           ),
-          child: _app(true),
+          child: _app(),
         );
       }
 
@@ -300,14 +315,11 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
                   items: _destinations,
                   selectedIndex: _currentIndex,
                   onItemSelected: (int index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                    Get.toNamed(_routeMap[index] ?? '/');
+                    _navigateToMainRoute(index);
                   },
                 ),
                 Expanded(
-                  child: _app(true),
+                  child: _app(),
                 ),
               ],
             ),
@@ -321,12 +333,9 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           items: _destinations,
           selectedIndex: _currentIndex,
           onItemSelected: (int index) {
-            setState(() {
-              _currentIndex = index;
-            });
-            Get.toNamed(_routeMap[index] ?? '/');
+            _navigateToMainRoute(index);
           },
-          child: _app(true),
+          child: _app(),
         );
       }
 
@@ -336,18 +345,15 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           items: _destinations,
           selectedIndex: _currentIndex,
           onItemSelected: (int index) {
-            setState(() {
-              _currentIndex = index;
-            });
-            Get.toNamed(_routeMap[index] ?? '/');
+            _navigateToMainRoute(index);
           },
-          child: _app(true),
+          child: _app(),
         );
       }
 
       // 手机 - 使用底部导航栏（仅在四个主页面显示）
       return Scaffold(
-        body: SafeArea(child: _app(false)),
+        body: SafeArea(child: _app()),
         bottomNavigationBar: _showBottomNav
             ? BottomNavigation(
                 destinations: _destinations.sublist(0, 4).map((destination) {
@@ -359,10 +365,7 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
                 }).toList(),
                 selectedIndex: _currentIndex,
                 onDestinationSelected: (int index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                  Get.toNamed(_routeMap[index] ?? '/');
+                  _navigateToMainRoute(index);
                 },
                 backgroundColor: Theme.of(context)
                     .scaffoldBackgroundColor

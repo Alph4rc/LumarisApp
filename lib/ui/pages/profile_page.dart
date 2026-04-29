@@ -9,6 +9,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/info_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -70,8 +71,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _enterLoginMode({bool isOnlyLoginMember = false}) async {
-    final result = await Get.toNamed('/Login',
-        arguments: {'isOnlyLoginMember': isOnlyLoginMember});
+    final result = await AppRouter.push<bool>(
+      AppRoutes.login,
+      extra: {'isOnlyLoginMember': isOnlyLoginMember},
+    );
     // 如果登录成功返回 true
     if (result == true) {
       await _checkLoginStatus();
@@ -105,20 +108,30 @@ class _ProfilePageState extends State<ProfilePage> {
   List<ProfileButtonItem> get profileButtonItems {
     return [
       ProfileButtonItem(
-          icon: CupertinoIcons.link_circle, title: '建大导航', route: '/Link'),
-      ProfileButtonItem(icon: Icons.settings, title: '设置/关于', route: '/About'),
+          icon: CupertinoIcons.link_circle,
+          title: '建大导航',
+          route: AppRoutes.link),
       ProfileButtonItem(
-          title: '校车', icon: Icons.directions_bus_rounded, route: '/SchoolBus'),
+          icon: Icons.settings, title: '设置/关于', route: AppRoutes.about),
+      ProfileButtonItem(
+          title: '校车',
+          icon: Icons.directions_bus_rounded,
+          route: AppRoutes.schoolBus),
       if (!kIsWeb)
         ProfileButtonItem(
-            icon: CupertinoIcons.bolt_fill, title: '电费', route: '/Electricity'),
+            icon: CupertinoIcons.bolt_fill,
+            title: '电费',
+            route: AppRoutes.electricity),
       if (userStore.isLogin)
-        ProfileButtonItem(icon: Icons.toc, title: '培养方案', route: '/Program'),
+        ProfileButtonItem(
+            icon: Icons.toc, title: '培养方案', route: AppRoutes.program),
       ProfileButtonItem(
-          icon: Icons.monetization_on_outlined, title: '饭卡', route: '/Payment'),
+          icon: Icons.monetization_on_outlined,
+          title: '饭卡',
+          route: AppRoutes.payment),
       // if (!kIsWeb)
       //   ProfileButtonItem(
-      //       icon: Icons.wifi_outlined, title: '校园网', route: '/Net'),
+      //       icon: Icons.wifi_outlined, title: '校园网', route: AppRoutes.net),
       if (!userStore.isLogin)
         ProfileButtonItem(
             icon: Icons.login,
@@ -127,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
       ProfileButtonItem(
-          icon: Icons.help_outline, title: '帮助', route: '/Helper'),
+          icon: Icons.help_outline, title: '帮助', route: AppRoutes.helper),
     ];
   }
 
@@ -301,7 +314,7 @@ class ProfileButtonItem {
             if (route.isEmpty) {
               onPressed?.call();
             } else {
-              Get.toNamed(route);
+              AppRouter.push(route);
             }
           },
         ));

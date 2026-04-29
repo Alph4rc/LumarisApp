@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/pages/agreement_page.dart';
+import 'package:ios_club_app/ui/pages/home_page.dart';
+import 'package:ios_club_app/ui/pages/link_page.dart';
+import 'package:ios_club_app/ui/pages/login_page.dart';
+import 'package:ios_club_app/ui/pages/profile_page.dart';
+import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
+import 'package:ios_club_app/ui/pages/score_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PrefsService.init();
+    Get.testMode = true;
+    Get.put(UserStore());
+    AppRouter.go(AppRoutes.agreement);
+  });
+
+  tearDown(() {
+    Get.reset();
+  });
+
+  Widget buildMatchedRoute(BuildContext context, String location) {
+    final match = AppRouter.router.configuration.findMatch(Uri.parse(location));
+    expect(match.isError, isFalse);
+
+    final state = match.last.buildState(
+      AppRouter.router.configuration,
+      match,
+    );
+    return match.last.route.builder!(context, state);
+  }
+
+  testWidgets('matches and builds the core route table', (tester) async {
+    await tester.pumpWidget(const Directionality(
+      textDirection: TextDirection.ltr,
+      child: SizedBox(),
+    ));
+    final context = tester.element(find.byType(SizedBox));
+
+    expect(buildMatchedRoute(context, AppRoutes.home), isA<HomePage>());
+    expect(
+      buildMatchedRoute(context, AppRoutes.schedule),
+      isA<ScheduleListPage>(),
+    );
+    expect(buildMatchedRoute(context, AppRoutes.score), isA<ScorePage>());
+    expect(buildMatchedRoute(context, AppRoutes.profile), isA<ProfilePage>());
+    expect(buildMatchedRoute(context, AppRoutes.login), isA<LoginPage>());
+    expect(buildMatchedRoute(context, AppRoutes.link), isA<LinkPage>());
+  });
+
+  testWidgets('login route can return true when popped', (tester) async {
+    await tester.pumpWidget(MaterialApp.router(routerConfig: AppRouter.router));
+    await tester.pumpAndSettle();
+
+    final resultFuture = AppRouter.push<bool>(AppRoutes.login);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LoginPage), findsOneWidget);
+
+    AppRouter.pop(true);
+    await tester.pumpAndSettle();
+
+    await expectLater(resultFuture, completion(isTrue));
+  });
+
+  testWidgets('go switches the active route without GetX routing',
+      (tester) async {
+    AppRouter.go(AppRoutes.login);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: AppRouter.router));
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginPage), findsOneWidget);
+
+    AppRouter.go(AppRoutes.agreement);
+    await tester.pumpAndSettle();
+
+    expect(AppRouter.currentLocation, AppRoutes.agreement);
+    expect(find.byType(AgreementPage), findsOneWidget);
+  });
+}

@@ -3,12 +3,12 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // 登录成功，返回上一页并传递成功标志
       if (mounted) {
-        Get.back(result: true);
+        AppRouter.pop(true);
       }
 
       AppLogger.debug('[LoginPage] 登录成功');
@@ -184,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Get.back(),
+          onPressed: () => AppRouter.pop(),
           icon: Icon(
             Icons.arrow_back_ios_new, // 更现代的返回图标
             color: Theme.of(context).textTheme.bodyLarge?.color,

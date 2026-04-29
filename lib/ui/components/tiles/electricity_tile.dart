@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../club_card.dart';
@@ -17,7 +18,7 @@ class ElectricityTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => Get.toNamed('/Electricity'),
+          onTap: () => AppRouter.push(AppRoutes.electricity),
           borderRadius: ClubRadii.tile,
           child: Padding(
             padding: const EdgeInsets.all(16.0),

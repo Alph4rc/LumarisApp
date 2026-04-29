@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/pages/settingPages/version_setting.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
@@ -277,7 +278,7 @@ class SettingPage extends StatelessWidget {
       title: const Text('制作团队'),
       subtitle: const Text('iOS Club App 开发组'),
       onTap: () {
-        Get.toNamed('/Author');
+        AppRouter.push(AppRoutes.author);
       },
     );
   }
@@ -292,7 +293,7 @@ class SettingPage extends StatelessWidget {
       title: const Text('开源协议'),
       subtitle: const Text('MIT License'),
       onTap: () {
-        Get.toNamed('/License');
+        AppRouter.push(AppRoutes.license);
       },
     );
   }
@@ -307,7 +308,7 @@ class SettingPage extends StatelessWidget {
       title: const Text('隐私协议'),
       subtitle: const Text('了解我们如何保护你的隐私'),
       onTap: () {
-        Get.toNamed('/PrivacyPolicy');
+        AppRouter.push(AppRoutes.privacyPolicy);
       },
     );
   }
@@ -322,7 +323,7 @@ class SettingPage extends StatelessWidget {
       title: const Text('用户协议'),
       subtitle: const Text('使用本应用即表示你同意本协议'),
       onTap: () {
-        Get.toNamed('/UserAgreement');
+        AppRouter.push(AppRoutes.userAgreement);
       },
     );
   }
@@ -349,7 +350,7 @@ class SettingPage extends StatelessWidget {
         if (result == true) {
           final userStore = Get.find<UserStore>();
           await userStore.logout();
-          Get.toNamed("Profile");
+          AppRouter.go(AppRoutes.profile);
         }
       },
     );

@@ -8,6 +8,7 @@ import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/features/education/models/edu_fetch_models.dart';
 import 'package:ios_club_app/features/education/services/score_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -205,7 +206,7 @@ class _ScorePageState extends State<ScorePage>
               ElevatedButton(
                 onPressed: () {
                   // 导航到个人页面进行登录
-                  Get.toNamed('/Profile');
+                  AppRouter.go(AppRoutes.profile);
                 },
                 child: Text('前往登录'),
               ),
