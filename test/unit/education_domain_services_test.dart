@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart' hide Response;
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
@@ -94,7 +93,6 @@ void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await PrefsService.init();
-    Get.testMode = true;
 
     tempDir = await Directory.systemTemp.createTemp(
       'education_domain_services_test_',
@@ -106,7 +104,6 @@ void main() {
   setUp(() async {
     secureStore.clear();
     await PrefsService.instance.clear();
-    Get.reset();
     EduHttpClientManager.resetForTest();
     EducationRefreshService.resetForTest();
     LoginService.setLoginOverrideForTest(null);
@@ -164,7 +161,6 @@ void main() {
     LoginService.setLoginOverrideForTest(null);
     EduHttpClientManager.resetForTest();
     EducationRefreshService.resetForTest();
-    Get.reset();
   });
 
   tearDownAll(() async {

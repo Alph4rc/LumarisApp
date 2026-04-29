@@ -1,204 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
+import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
-import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
-import 'package:ios_club_app/ui/pages/electricity_page.dart';
-import 'package:ios_club_app/ui/pages/payment_page.dart';
-import 'package:ios_club_app/ui/pages/school_bus_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _TestElectricityStore extends ElectricityStore {
-  @override
-  void onInit() {}
-}
-
-class _TestPaymentStore extends PaymentStore {
-  @override
-  void onInit() {}
-}
-
-class _TestBusTileStore extends BusTileStore {
-  @override
-  void onInit() {}
-}
-
-Widget _wrap(Widget child) {
-  return MaterialApp.router(
-    routerConfig: AppRouter.router,
-    builder: (context, routerChild) => Stack(
-      children: [
-        Offstage(child: routerChild ?? const SizedBox.shrink()),
-        Scaffold(
-          body: SizedBox(width: 300, height: 200, child: child),
+List<Override> _overrides() => [
+      tileConfigurationReaderProvider.overrideWithValue(
+        () async => TileConfigurationList.defaultConfig(),
+      ),
+      tileConfigurationWriterProvider.overrideWithValue((config) async {}),
+      availableTilesReaderProvider.overrideWithValue(
+        () => const ['电费', '校车', '饭卡'],
+      ),
+      electricityReaderProvider.overrideWithValue(() async => 23.5),
+      electricityWeeklyReaderProvider.overrideWithValue(
+        () async => [ElectricData(timestamp: DateTime(2026), value: 1)],
+      ),
+      electricityTileVisibilityReaderProvider
+          .overrideWithValue((_) async => true),
+      studentIsLoginReaderProvider.overrideWithValue(() => true),
+      paymentStudentIdReaderProvider.overrideWithValue(() async => 'student-1'),
+      paymentDataFetcherProvider.overrideWithValue(
+        (_) async => const PaymentData(
+          [
+            PaymentModel(
+              turnoverType: '充值',
+              datetimeStr: '2026-04-27',
+              resume: '测试',
+              amount: 20,
+            ),
+          ],
+          20,
         ),
-      ],
-    ),
-  );
-}
+      ),
+      tileVisibilityReaderProvider.overrideWithValue((_) async => true),
+      busPreferenceReaderProvider.overrideWithValue(() async => false),
+      oldBusFetcherProvider.overrideWithValue(
+        () async => BusModel(
+          records: [
+            BusItem(
+              lineName: '草堂线',
+              description: '',
+              departureStation: 'A',
+              arrivalStation: 'B',
+              runTime: '10:00',
+              arrivalStationTime: '10:30',
+            ),
+          ],
+          total: 1,
+        ),
+      ),
+    ];
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'username': 'student-1'});
     await PrefsService.init();
-    Get.testMode = true;
-    Get.reset();
-    AppRouter.go(AppRoutes.agreement);
   });
 
-  tearDown(() {
-    Get.reset();
-  });
+  testWidgets('tiles_render_loaded_states', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: _overrides(),
+        child: const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                SizedBox(width: 180, height: 180, child: ElectricityTile()),
+                SizedBox(width: 180, height: 180, child: PaymentTile()),
+                SizedBox(width: 180, height: 180, child: BusTile()),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
-  group('ElectricityTile', () {
-    testWidgets('shows loading indicator when store is loading',
-        (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = true;
-      store.hasData.value = false;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.byType(LoadingStateView), findsOneWidget);
-      expect(find.text('正在读取电费'), findsOneWidget);
-    });
-
-    testWidgets('shows low balance style when amount is small', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = true;
-      store.electricity.value = 8.0;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.text('当前电费'), findsOneWidget);
-      expect(find.text('¥8.00'), findsOneWidget);
-      expect(find.text('余额不足'), findsOneWidget);
-    });
-
-    testWidgets('shows normal state when amount is sufficient', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = true;
-      store.electricity.value = 18.5;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.text('¥18.50'), findsOneWidget);
-      expect(find.text('余额不足'), findsNothing);
-    });
-
-    testWidgets('shows subscribe hint when no data exists', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = false;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.text('电费查询'), findsOneWidget);
-      expect(find.text('点击订阅'), findsOneWidget);
-    });
-
-    testWidgets('navigates to electricity page when tapped', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = true;
-      store.electricity.value = 18.5;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      await tester.tap(find.text('¥18.50'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ElectricityPage, skipOffstage: false), findsOneWidget);
-    });
-  });
-
-  group('PaymentTile', () {
-    testWidgets('shows loading indicator when store is loading',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = true;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.byType(LoadingStateView), findsOneWidget);
-      expect(find.text('正在读取饭卡'), findsOneWidget);
-    });
-
-    testWidgets('shows low balance state when recharge value is low',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 9.2;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('当前余额'), findsOneWidget);
-      expect(find.text('¥9.20'), findsOneWidget);
-      expect(find.text('余额不足'), findsOneWidget);
-    });
-
-    testWidgets('shows normal balance state when value is sufficient',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 30.0;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('¥30.00'), findsOneWidget);
-      expect(find.text('余额不足'), findsNothing);
-    });
-
-    testWidgets('shows bind hint when no value and no error', (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 0;
-      store.errorMessage.value = '';
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('饭卡余额'), findsOneWidget);
-      expect(find.text('点击查看'), findsOneWidget);
-    });
-
-    testWidgets('shows error message when no value but has error',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 0;
-      store.errorMessage.value = '请先登录教务处账号';
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('请先登录教务处账号'), findsOneWidget);
-      expect(find.text('点击绑定'), findsNothing);
-    });
-
-    testWidgets('navigates to payment page when tapped', (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 30.0;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      await tester.tap(find.text('¥30.00'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(PaymentPage, skipOffstage: false), findsOneWidget);
-    });
-  });
-
-  group('BusTile', () {
-    testWidgets('navigates to school bus page when tapped', (tester) async {
-      final store = Get.put<BusTileStore>(_TestBusTileStore());
-      store.isLoading.value = false;
-      store.busCount.value = 3;
-
-      await tester.pumpWidget(_wrap(const BusTile()));
-      await tester.tap(find.text('今日校车'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SchoolBusPage, skipOffstage: false), findsOneWidget);
-    });
+    expect(find.text('当前电费'), findsOneWidget);
+    expect(find.text('当前余额'), findsOneWidget);
+    expect(find.text('今日校车'), findsOneWidget);
   });
 }

@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../club_card.dart';
 
-class BusTile extends StatelessWidget {
+class BusTile extends ConsumerWidget {
   const BusTile({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final busStore = Get.find<BusTileStore>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final busStore = ref.watch(busTileStoreProvider);
 
     return ClubCard(
       child: Material(
@@ -22,8 +22,8 @@ class BusTile extends StatelessWidget {
           borderRadius: ClubRadii.tile,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Obx(() {
-              if (busStore.isLoading.value) {
+            child: Builder(builder: (context) {
+              if (busStore.isLoading) {
                 return const Center(
                   child: LoadingStateView(
                     title: '正在获取校车',
@@ -34,7 +34,7 @@ class BusTile extends StatelessWidget {
                 );
               }
 
-              final busData = busStore.busCount.value;
+              final busData = busStore.busCount;
               final primaryColor = CupertinoColors.activeGreen;
 
               return Column(

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -22,17 +23,18 @@ import 'package:ios_club_app/core/utils/image_brightness.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
-class ScheduleSettingPage extends StatefulWidget {
+class ScheduleSettingPage extends ConsumerStatefulWidget {
   const ScheduleSettingPage({super.key});
 
   @override
-  State<ScheduleSettingPage> createState() => _ScheduleSettingPageState();
+  ConsumerState<ScheduleSettingPage> createState() =>
+      _ScheduleSettingPageState();
 }
 
-class _ScheduleSettingPageState extends State<ScheduleSettingPage>
+class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     with AutomaticKeepAliveClientMixin {
-  final CourseStore courseStore = CourseStore.to;
-  final SettingsStore settingsStore = SettingsStore.to;
+  late CourseStore courseStore;
+  late SettingsStore settingsStore;
   List<String> totalList = [];
   List<String> ignoreList = [];
   late List<CourseIgnore> _ignores = [];
@@ -44,6 +46,8 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   @override
   void initState() {
     super.initState();
+    courseStore = ref.read(courseStoreProvider.notifier);
+    settingsStore = ref.read(settingsStoreProvider.notifier);
     _initData();
   }
 

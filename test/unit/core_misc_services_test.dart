@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/services/auth_state_notifier.dart';
@@ -128,8 +127,6 @@ void main() {
       await PrefsService.init();
       tempDir = await Directory.systemTemp.createTemp('login_service_test_');
       Hive.init(tempDir.path);
-      Get.testMode = true;
-      Get.reset();
     });
 
     tearDownAll(() async {
@@ -137,7 +134,6 @@ void main() {
       if (await tempDir.exists()) {
         await tempDir.delete(recursive: true);
       }
-      Get.reset();
     });
 
     test('should throw NetworkException when login request fails', () async {

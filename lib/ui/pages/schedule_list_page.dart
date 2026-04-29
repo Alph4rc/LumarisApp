@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/image_helper.dart';
@@ -29,17 +29,15 @@ import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.da
 /// 课表列表页面
 ///
 /// 简约的苹果风格设计，展示完整的课程表
-class ScheduleListPage extends StatefulWidget {
+class ScheduleListPage extends ConsumerStatefulWidget {
   const ScheduleListPage({super.key});
 
   @override
-  State<ScheduleListPage> createState() => _ScheduleListPageState();
+  ConsumerState<ScheduleListPage> createState() => _ScheduleListPageState();
 }
 
-class _ScheduleListPageState extends State<ScheduleListPage> {
+class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   late PageController _pageController;
-  final ScheduleStore scheduleStore = ScheduleStore.to;
-  final SettingsStore settingsStore = SettingsStore.to;
 
   CourseCardStyle _cardStyle = CourseCardStyle.normal;
   bool _showStyleSelector = false;
@@ -47,7 +45,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: scheduleStore.currentPage);
+    _pageController = PageController(
+      initialPage: ref.read(scheduleStoreProvider).currentPage,
+    );
     _loadPreferences();
   }
 
@@ -73,25 +73,27 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   }
 
   void _jumpToPage(int page) {
+    final scheduleStore = ref.read(scheduleStoreProvider.notifier);
     scheduleStore.jumpToPage(page);
-    _pageController.jumpToPage(scheduleStore.currentPage);
+    _pageController.jumpToPage(ref.read(scheduleStoreProvider).currentPage);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = PlatformUtils.isDesktop;
     final systemIsDark = Theme.of(context).brightness == Brightness.dark;
+    final settings = ref.watch(settingsStoreProvider);
+    final scheduleState = ref.watch(scheduleStoreProvider);
 
     return Scaffold(
-      body: Obx(() {
-        final hasCustomBackground =
-            settingsStore.scheduleBackground == 'custom' &&
-                settingsStore.customBackgroundImage.isNotEmpty;
+      body: Builder(builder: (context) {
+        final hasCustomBackground = settings.scheduleBackground == 'custom' &&
+            settings.customBackgroundImage.isNotEmpty;
 
         // 有自定义背景时，根据背景亮暗决定字体颜色（异步计算后自动更新）
         // 未计算完成前回退到系统主题
         final isDark = hasCustomBackground
-            ? (settingsStore.customBackgroundIsDark ?? systemIsDark)
+            ? (settings.customBackgroundIsDark ?? systemIsDark)
             : systemIsDark;
 
         final content = Column(
@@ -100,8 +102,8 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             _buildTopBar(context, isDesktop, isDark),
             // 课表内容
             Expanded(
-              child: Obx(() {
-                if (scheduleStore.isLoading) {
+              child: Builder(builder: (context) {
+                if (scheduleState.isLoading) {
                   return const Center(
                     child: LoadingStateView(
                       title: '正在加载课表',
@@ -113,9 +115,11 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                 return PageView.builder(
                   controller: _pageController,
                   onPageChanged: (index) {
-                    scheduleStore.setCurrentPage(index);
+                    ref
+                        .read(scheduleStoreProvider.notifier)
+                        .setCurrentPage(index);
                   },
-                  itemCount: scheduleStore.allCourses.length,
+                  itemCount: scheduleState.allCourses.length,
                   itemBuilder: (context, index) {
                     return _buildSchedulePage(context, index);
                   },
@@ -129,7 +133,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             ? Stack(
                 fit: StackFit.expand,
                 children: [
-                  _buildBackgroundImage(settingsStore.customBackgroundImage),
+                  _buildBackgroundImage(settings.customBackgroundImage),
                   content,
                 ],
               )
@@ -167,13 +171,14 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   }
 
   Widget _buildWeekInfo(BuildContext context, bool isDark) {
-    return Obx(() {
-      final weekText = scheduleStore.currentWeek <= 0
-          ? '距离开学还有${-scheduleStore.currentWeek + 1}周'
-          : '当前为第${scheduleStore.currentWeek}周';
+    final scheduleState = ref.watch(scheduleStoreProvider);
+    return Builder(builder: (context) {
+      final weekText = scheduleState.currentWeek <= 0
+          ? '距离开学还有${-scheduleState.currentWeek + 1}周'
+          : '当前为第${scheduleState.currentWeek}周';
 
       return InkWell(
-        onTap: () => _jumpToPage(scheduleStore.currentWeek),
+        onTap: () => _jumpToPage(scheduleState.currentWeek),
         borderRadius: ClubRadii.control,
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -181,9 +186,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                scheduleStore.currentPage <= 0
+                scheduleState.currentPage <= 0
                     ? '全部课表'
-                    : '第 ${scheduleStore.currentPage} 周',
+                    : '第 ${scheduleState.currentPage} 周',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -207,24 +212,25 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   }
 
   Widget _buildDesktopWeekNav(BuildContext context) {
+    final scheduleState = ref.watch(scheduleStoreProvider);
     return Row(
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed: () => _jumpToPage((scheduleStore.currentPage - 1).ceil()),
+          onPressed: () => _jumpToPage((scheduleState.currentPage - 1).ceil()),
           tooltip: '上一周',
         ),
         const SizedBox(width: 8),
-        Obx(() => Text(
-              scheduleStore.currentPage <= 0
-                  ? '全部课表'
-                  : '第 ${scheduleStore.currentPage} 周'
-                      '${scheduleStore.currentPage == scheduleStore.currentWeek ? " (本周)" : ""}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            )),
+        Text(
+          scheduleState.currentPage <= 0
+              ? '全部课表'
+              : '第 ${scheduleState.currentPage} 周'
+                  '${scheduleState.currentPage == scheduleState.currentWeek ? " (本周)" : ""}',
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(width: 8),
         IconButton(
           icon: const Icon(Icons.chevron_right),
@@ -286,7 +292,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
               height = 60;
             }
 
-            await scheduleStore.setCourseHeight(height);
+            await ref
+                .read(scheduleStoreProvider.notifier)
+                .setCourseHeight(height);
           }
         },
         children: const {
@@ -308,7 +316,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   }
 
   Widget _buildSchedulePage(BuildContext context, int weekIndex) {
-    final courses = scheduleStore.allCourses[weekIndex];
+    final scheduleState = ref.watch(scheduleStoreProvider);
+    final settings = ref.watch(settingsStoreProvider);
+    final courses = scheduleState.allCourses[weekIndex];
     final now = DateTime.now();
     int weekday = now.weekday;
     if (weekday == 7) weekday = 0;
@@ -316,9 +326,9 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     final weekStartDate = weekIndex == 0
         ? DateTime(now.year, 1, 1)
         : now.subtract(Duration(
-            days: weekday + (scheduleStore.currentWeek - weekIndex) * 7));
+            days: weekday + (scheduleState.currentWeek - weekIndex) * 7));
 
-    return Obx(() {
+    return Builder(builder: (context) {
       final scheduleContent = Column(
         children: [
           // 星期标题栏
@@ -326,19 +336,19 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
             weekStartDate: weekStartDate,
             currentWeek: weekIndex == 0 ? null : weekIndex,
             showDate: weekIndex > 0,
-            showGrid: settingsStore.showCourseGrid,
+            showGrid: settings.showCourseGrid,
           ),
           // 课表网格
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox(
-                height: scheduleStore.height * 12,
+                height: scheduleState.height * 12,
                 child: ScheduleGrid(
                   courses: courses,
-                  cellHeight: scheduleStore.height,
-                  isYanTa: scheduleStore.isYanTa,
+                  cellHeight: scheduleState.height,
+                  isYanTa: scheduleState.isYanTa,
                   cardStyle: _cardStyle,
-                  showGrid: settingsStore.showCourseGrid,
+                  showGrid: settings.showCourseGrid,
                   onCourseTap: (course) => _showCourseDetail(course),
                   onCourseLongPress: (course) {
                     if (course.isCustom) {
@@ -388,7 +398,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
   Future<void> _handleRefresh() async {
     showClubSnackBar(context, const Text('正在更新课表...'));
     try {
-      await scheduleStore.refreshCourses();
+      await ref.read(scheduleStoreProvider.notifier).refreshCourses();
       if (mounted) {
         showClubSnackBar(context, const Text('更新完成'));
       }
@@ -559,7 +569,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
           final updatedJsonString =
               jsonEncode(customCourses.map((c) => c.toJson()).toList());
           await prefs.setString('custom_courses', updatedJsonString);
-          await scheduleStore.refreshCourses();
+          await ref.read(scheduleStoreProvider.notifier).refreshCourses();
 
           if (mounted) {
             showClubSnackBar(context, const Text('课程删除成功'));
@@ -594,7 +604,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         final updatedJsonString =
             jsonEncode(customCourses.map((c) => c.toJson()).toList());
         await prefs.setString('custom_courses', updatedJsonString);
-        await scheduleStore.refreshCourses();
+        await ref.read(scheduleStoreProvider.notifier).refreshCourses();
       } catch (e) {
         // 处理错误
       }

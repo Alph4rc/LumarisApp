@@ -30,7 +30,7 @@ void main() {
 
       expect(store.loading, isFalse);
       expect(store.hasError, isTrue);
-      expect(store.errorMessage.value, '业务失败');
+      expect(store.errorMessage, '业务失败');
     });
 
     test('should_set_generic_error_when_operation_throws', () async {
@@ -43,7 +43,7 @@ void main() {
       );
 
       expect(store.loading, isFalse);
-      expect(store.errorMessage.value, '操作失败，请重试');
+      expect(store.errorMessage, '操作失败，请重试');
     });
 
     test('should_return_value_from_successful_result', () async {
@@ -69,12 +69,12 @@ void main() {
 
       expect(value, isNull);
       expect(store.loading, isFalse);
-      expect(store.errorMessage.value, '参数错误');
+      expect(store.errorMessage, '参数错误');
     });
 
     test('should_handle_result_without_loading', () async {
       final store = _TestStore();
-      store.isLoading.value = true;
+      store.state = store.state.copyWith(isLoading: true);
       var captured = 0;
 
       await store.handleResultWithoutLoading(

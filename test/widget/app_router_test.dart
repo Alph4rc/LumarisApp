@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:ios_club_app/ui/pages/home_page.dart';
 import 'package:ios_club_app/ui/pages/link_page.dart';
@@ -19,13 +18,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
-    Get.testMode = true;
-    Get.put(UserStore());
     AppRouter.go(AppRoutes.agreement);
-  });
-
-  tearDown(() {
-    Get.reset();
   });
 
   Widget buildMatchedRoute(BuildContext context, String location) {
@@ -58,7 +51,11 @@ void main() {
   });
 
   testWidgets('login route can return true when popped', (tester) async {
-    await tester.pumpWidget(MaterialApp.router(routerConfig: AppRouter.router));
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp.router(routerConfig: AppRouter.router),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final resultFuture = AppRouter.push<bool>(AppRoutes.login);
@@ -75,7 +72,11 @@ void main() {
   testWidgets('go switches the active route without GetX routing',
       (tester) async {
     AppRouter.go(AppRoutes.login);
-    await tester.pumpWidget(MaterialApp.router(routerConfig: AppRouter.router));
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp.router(routerConfig: AppRouter.router),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.byType(LoginPage), findsOneWidget);
 

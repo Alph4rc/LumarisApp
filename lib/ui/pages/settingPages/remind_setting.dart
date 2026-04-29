@@ -1,28 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:numberpicker/numberpicker.dart';
 
-class RemindSetting extends StatefulWidget {
+class RemindSetting extends ConsumerWidget {
   const RemindSetting({super.key});
 
   @override
-  State<StatefulWidget> createState() => _RemindSettingState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsStoreProvider);
+    final settingsStore = ref.read(settingsStoreProvider.notifier);
 
-class _RemindSettingState extends State<RemindSetting> {
-  final SettingsStore settingsStore = SettingsStore.to;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       children: [
         ClubListTile(
@@ -35,35 +26,33 @@ class _RemindSettingState extends State<RemindSetting> {
           ),
           title: const Text('课程通知'),
           subtitle: const Text('上课前进行提醒'),
-          trailing: Obx(() => CupertinoSwitch(
-                value: settingsStore.isRemind,
-                onChanged: (bool value) async {
-                  await settingsStore.setIsRemind(value);
-                  if (value && context.mounted) {
-                    await NotificationService.set(context);
-                  }
+          trailing: CupertinoSwitch(
+            value: settings.isRemind,
+            onChanged: (bool value) async {
+              await settingsStore.setIsRemind(value);
+              if (value && context.mounted) {
+                await NotificationService.set(context);
+              }
+            },
+          ),
+        ),
+        settings.isRemind
+            ? ClubListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                leading: const SizedBox(width: 24),
+                title: const Text('提前几分钟提醒'),
+                trailing: Text('${settings.remindTime}分钟'),
+                onTap: () {
+                  _show(context, ref);
                 },
-              )),
-        ),
-        Obx(
-          () => settingsStore.isRemind
-              ? ClubListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  leading: const SizedBox(width: 24),
-                  title: const Text('提前几分钟提醒'),
-                  trailing: Text('${settingsStore.remindTime}分钟'),
-                  onTap: () {
-                    _show(context);
-                  },
-                )
-              : const SizedBox.shrink(),
-        ),
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }
 
-  Future<void> _show(BuildContext context) async {
+  Future<void> _show(BuildContext context, WidgetRef ref) async {
     final a = MediaQuery.of(context).size.width;
 
     await showModalBottomSheet<void>(
@@ -75,6 +64,8 @@ class _RemindSettingState extends State<RemindSetting> {
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       builder: (BuildContext context) {
+        final settings = ref.watch(settingsStoreProvider);
+        final settingsStore = ref.read(settingsStoreProvider.notifier);
         return StatefulBuilder(
           builder: (context, setStateBottomSheet) {
             return Padding(
@@ -84,15 +75,15 @@ class _RemindSettingState extends State<RemindSetting> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Obx(() => NumberPicker(
-                        value: settingsStore.remindTime,
-                        minValue: 10,
-                        maxValue: 120,
-                        step: 1,
-                        onChanged: (value) async {
-                          await settingsStore.setRemindTime(value);
-                        },
-                      ))
+                  NumberPicker(
+                    value: settings.remindTime,
+                    minValue: 10,
+                    maxValue: 120,
+                    step: 1,
+                    onChanged: (value) async {
+                      await settingsStore.setRemindTime(value);
+                    },
+                  )
                 ],
               ),
             );

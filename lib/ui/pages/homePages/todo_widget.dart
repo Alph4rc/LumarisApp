@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
@@ -13,15 +13,14 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 
-class TodoWidget extends StatefulWidget {
+class TodoWidget extends ConsumerStatefulWidget {
   const TodoWidget({super.key});
 
   @override
-  State<StatefulWidget> createState() => _TodoWidgetState();
+  ConsumerState<TodoWidget> createState() => _TodoWidgetState();
 }
 
-class _TodoWidgetState extends State<TodoWidget> {
-  final SettingsStore settingsStore = Get.find();
+class _TodoWidgetState extends ConsumerState<TodoWidget> {
   late Future<List<TodoItem>> _todosFuture;
 
   @override
@@ -36,13 +35,13 @@ class _TodoWidgetState extends State<TodoWidget> {
   }
 
   Future<void> scheduleTodoNotification(TodoItem todo) async {
-    await NotificationService.instance
-        .scheduleTodoNotification(todo, settingsStore.todoRemindEnabled);
+    await NotificationService.instance.scheduleTodoNotification(
+        todo, ref.read(settingsStoreProvider).todoRemindEnabled);
   }
 
   Future<void> updateTodoNotification(TodoItem todo) async {
-    await NotificationService.instance
-        .updateTodoNotification(todo, settingsStore.todoRemindEnabled);
+    await NotificationService.instance.updateTodoNotification(
+        todo, ref.read(settingsStoreProvider).todoRemindEnabled);
   }
 
   Future<void> _refreshTodos() {

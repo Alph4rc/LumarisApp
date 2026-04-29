@@ -1,139 +1,123 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:ios_club_app/features/education/models/bus_model.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/core/services/new_bus_api.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
+import 'package:ios_club_app/features/education/services/bus_service.dart';
+import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
-class BusController extends GetxController
-    with GetSingleTickerProviderStateMixin {
-  // Observable variables
-  var selectedDate = ''.obs;
-  var busData = <BusItem>[].obs;
-  var todayBusData = <BusItem>[].obs;
-  var isLoading = false.obs;
-  var errorMessage = ''.obs;
-  var isCaoTang = true.obs;
-  var isShowBus = false.obs;
-  var useNewApi = false.obs;
-  var tiles = <String>[].obs;
+final busControllerProvider =
+    NotifierProvider<BusController, BusPageState>(BusController.new);
 
-  late TabController tabController;
+class BusController extends Notifier<BusPageState> {
   final Map<String, String> availableDates = {};
 
   @override
-  void onInit() {
-    super.onInit();
+  BusPageState build() {
     _generateWeeklyDates();
-    tabController = TabController(length: 7, vsync: this);
-    tabController.addListener(_handleTabSelection);
-    selectedDate.value =
+    final selectedDate =
         availableDates.isNotEmpty ? availableDates.keys.first : '';
-    if (selectedDate.isNotEmpty) _fetchBusData(isInit: true);
-    _loadTiles();
+    Future<void>.microtask(() async {
+      state = state.copyWith(selectedDate: selectedDate);
+      if (selectedDate.isNotEmpty) {
+        await _fetchBusData(isInit: true);
+      }
+      await _loadTiles();
+    });
+    return BusPageState(selectedDate: selectedDate);
   }
 
   void _generateWeeklyDates() {
+    availableDates.clear();
     final now = DateTime.now();
-    for (int i = 0; i < 7; i++) {
+    for (var i = 0; i < 7; i++) {
       final date = now.add(Duration(days: i));
       availableDates[DateFormat('yyyy-MM-dd').format(date)] =
           DateFormat('M月d日').format(date);
     }
   }
 
-  void _handleTabSelection() async {
-    if (tabController.indexIsChanging) {
-      selectedDate.value = availableDates.keys.elementAt(tabController.index);
-      await _fetchBusData();
+  Future<void> selectDateByIndex(int index) async {
+    if (index < 0 || index >= availableDates.length) {
+      return;
     }
+    state = state.copyWith(selectedDate: availableDates.keys.elementAt(index));
+    await _fetchBusData();
   }
 
   Future<void> _loadTiles() async {
-    final prefs = PrefsService.instance;
-    tiles.assignAll(prefs.getStringList(PrefsKeys.TILES) ?? []);
-    isShowBus.value = tiles.contains('校车');
+    final tiles = PrefsService.instance.getStringList(PrefsKeys.TILES) ?? [];
+    state = state.copyWith(
+      tiles: tiles,
+      isShowBus: tiles.contains('校车'),
+    );
   }
 
   Future<void> _fetchBusData({bool isInit = false}) async {
-    isLoading.value = true;
-    errorMessage.value = '';
+    state = state.copyWith(isLoading: true, errorMessage: '');
 
     try {
+      var useNewApi = state.useNewApi;
       if (isInit) {
-        final prefs = PrefsService.instance;
-        useNewApi.value = prefs.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
+        useNewApi =
+            PrefsService.instance.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
+        state = state.copyWith(useNewApi: useNewApi);
       }
 
-      BusModel data = BusModel(records: [], total: 0);
-      if (useNewApi.value) {
-        data = await getBusFromNewData(time: selectedDate.value, loc: 'ALL');
+      final BusModel data;
+      if (useNewApi) {
+        data = await getBusFromNewData(time: state.selectedDate, loc: 'ALL');
       } else {
-        data = await BusService.getBus(dayDate: selectedDate.value);
+        data = await BusService.getBus(dayDate: state.selectedDate);
       }
 
-      todayBusData.assignAll(data.records);
-      if (isCaoTang.value) {
-        busData.assignAll(todayBusData
-            .where((bus) => bus.lineName.startsWith('草堂'))
-            .toList());
-      } else {
-        busData.assignAll(todayBusData
-            .where((bus) => bus.lineName.startsWith('雁塔'))
-            .toList());
-      }
+      final todayBusData = data.records;
+      final busData = state.isCaoTang
+          ? todayBusData.where((bus) => bus.lineName.startsWith('草堂')).toList()
+          : todayBusData.where((bus) => bus.lineName.startsWith('雁塔')).toList();
+
+      state = state.copyWith(todayBusData: todayBusData, busData: busData);
     } catch (e) {
-      errorMessage.value = '获取校车数据时出错: $e';
-      busData.clear();
+      state = state.copyWith(errorMessage: '获取校车数据时出错: $e', busData: const []);
     } finally {
-      isLoading.value = false;
+      state = state.copyWith(isLoading: false);
     }
   }
 
   void toggleCampus() {
-    isCaoTang.toggle();
-    if (isCaoTang.value) {
-      busData.assignAll(
-          todayBusData.where((bus) => bus.lineName.startsWith("草堂")).toList());
-    } else {
-      busData.assignAll(
-          todayBusData.where((bus) => bus.lineName.startsWith("雁塔")).toList());
-    }
+    final isCaoTang = !state.isCaoTang;
+    final busData = isCaoTang
+        ? state.todayBusData
+            .where((bus) => bus.lineName.startsWith('草堂'))
+            .toList()
+        : state.todayBusData
+            .where((bus) => bus.lineName.startsWith('雁塔'))
+            .toList();
+    state = state.copyWith(isCaoTang: isCaoTang, busData: busData);
   }
 
-  void refreshData() {
-    _fetchBusData();
+  Future<void> refreshData() async {
+    await _fetchBusData();
   }
 
-  void toggleShowBus(bool value) async {
-    isShowBus.value = value;
-    if (isShowBus.value) {
-      if (!tiles.contains("校车")) {
-        tiles.add("校车");
+  Future<void> toggleShowBus(bool value) async {
+    final tiles = [...state.tiles];
+    if (value) {
+      if (!tiles.contains('校车')) {
+        tiles.add('校车');
       }
     } else {
-      tiles.remove("校车");
+      tiles.remove('校车');
     }
 
-    final prefs = PrefsService.instance;
-    await prefs.setStringList(PrefsKeys.TILES, tiles);
+    state = state.copyWith(isShowBus: value, tiles: tiles);
+    await PrefsService.instance.setStringList(PrefsKeys.TILES, tiles);
   }
 
-  void toggleUseNewApi(bool value) async {
-    useNewApi.value = value;
-
-    final prefs = PrefsService.instance;
-    await prefs.setBool(PrefsKeys.USE_NEW_BUS_API, useNewApi.value);
-
-    // 切换API后重新获取数据
-    _fetchBusData();
-  }
-
-  @override
-  void onClose() {
-    tabController.dispose();
-    super.onClose();
+  Future<void> toggleUseNewApi(bool value) async {
+    state = state.copyWith(useNewApi: value);
+    await PrefsService.instance.setBool(PrefsKeys.USE_NEW_BUS_API, value);
+    await _fetchBusData();
   }
 }

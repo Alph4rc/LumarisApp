@@ -1,5 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -9,39 +9,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<void> _flushAsyncTasks() async {
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  }
-
   group('SettingsStore', () {
+    late ProviderContainer container;
+
     setUp(() async {
-      Get.testMode = true;
-      Get.reset();
       SharedPreferences.setMockInitialValues(<String, Object>{});
       await PrefsService.init();
+      container = ProviderContainer();
+      addTearDown(container.dispose);
     });
 
-    tearDown(() {
-      Get.reset();
-    });
+    SettingsStore store() => container.read(settingsStoreProvider.notifier);
 
     test('should load default values when prefs is empty', () async {
-      final store = Get.put(SettingsStore());
-      await _flushAsyncTasks();
+      final settingsStore = store();
 
-      expect(store.isRemind, isFalse);
-      expect(store.remindTime, 15);
-      expect(store.isShowTomorrow, isFalse);
-      expect(store.pageIndex, 0);
-      expect(store.enableHapticFeedback, isFalse);
-      expect(store.updateIgnored, isFalse);
-      expect(store.fontFamily, '');
-      expect(store.showCourseGrid, isFalse);
-      expect(store.todoRemindEnabled, isFalse);
-      expect(store.scheduleBackground, '');
-      expect(store.customBackgroundImage, '');
-      expect(store.schoolId, ApiConfig.defaultSchoolId);
-      expect(store.currentSchool.id, ApiConfig.defaultSchoolId);
+      expect(settingsStore.isRemind, isFalse);
+      expect(settingsStore.remindTime, 15);
+      expect(settingsStore.isShowTomorrow, isFalse);
+      expect(settingsStore.pageIndex, 0);
+      expect(settingsStore.enableHapticFeedback, isFalse);
+      expect(settingsStore.updateIgnored, isFalse);
+      expect(settingsStore.fontFamily, '');
+      expect(settingsStore.showCourseGrid, isFalse);
+      expect(settingsStore.todoRemindEnabled, isFalse);
+      expect(settingsStore.scheduleBackground, '');
+      expect(settingsStore.customBackgroundImage, '');
+      expect(settingsStore.schoolId, ApiConfig.defaultSchoolId);
+      expect(settingsStore.currentSchool.id, ApiConfig.defaultSchoolId);
     });
 
     test('should load existing values from prefs', () async {
@@ -59,51 +54,52 @@ void main() {
       await prefs.setString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE, '/tmp/bg.jpg');
       await prefs.setString(PrefsKeys.SCHOOL_ID, 'xauat');
 
-      final store = Get.put(SettingsStore());
-      await _flushAsyncTasks();
+      container.dispose();
+      container = ProviderContainer();
+      addTearDown(container.dispose);
+      final settingsStore = store();
 
-      expect(store.isRemind, isTrue);
-      expect(store.remindTime, 30);
-      expect(store.isShowTomorrow, isTrue);
-      expect(store.pageIndex, 2);
-      expect(store.enableHapticFeedback, isTrue);
-      expect(store.updateIgnored, isTrue);
-      expect(store.fontFamily, 'PingFang SC');
-      expect(store.showCourseGrid, isTrue);
-      expect(store.todoRemindEnabled, isTrue);
-      expect(store.scheduleBackground, 'paper');
-      expect(store.customBackgroundImage, '/tmp/bg.jpg');
-      expect(store.schoolId, 'xauat');
+      expect(settingsStore.isRemind, isTrue);
+      expect(settingsStore.remindTime, 30);
+      expect(settingsStore.isShowTomorrow, isTrue);
+      expect(settingsStore.pageIndex, 2);
+      expect(settingsStore.enableHapticFeedback, isTrue);
+      expect(settingsStore.updateIgnored, isTrue);
+      expect(settingsStore.fontFamily, 'PingFang SC');
+      expect(settingsStore.showCourseGrid, isTrue);
+      expect(settingsStore.todoRemindEnabled, isTrue);
+      expect(settingsStore.scheduleBackground, 'paper');
+      expect(settingsStore.customBackgroundImage, '/tmp/bg.jpg');
+      expect(settingsStore.schoolId, 'xauat');
     });
 
     test('should update and persist common settings', () async {
-      final store = Get.put(SettingsStore());
-      await _flushAsyncTasks();
+      final settingsStore = store();
 
-      await store.setIsRemind(true);
-      await store.setRemindTime(45);
-      await store.setIsShowTomorrow(true);
-      await store.setPageIndex(1);
-      await store.setEnableHapticFeedback(true);
-      await store.setUpdateIgnored(true);
-      await store.setFontFamily('Source Han Sans');
-      await store.setShowCourseGrid(true);
-      await store.setTodoRemindEnabled(true);
-      await store.setScheduleBackground('wave');
-      await store.setCustomBackgroundImage('/tmp/custom.png');
+      await settingsStore.setIsRemind(true);
+      await settingsStore.setRemindTime(45);
+      await settingsStore.setIsShowTomorrow(true);
+      await settingsStore.setPageIndex(1);
+      await settingsStore.setEnableHapticFeedback(true);
+      await settingsStore.setUpdateIgnored(true);
+      await settingsStore.setFontFamily('Source Han Sans');
+      await settingsStore.setShowCourseGrid(true);
+      await settingsStore.setTodoRemindEnabled(true);
+      await settingsStore.setScheduleBackground('wave');
+      await settingsStore.setCustomBackgroundImage('/tmp/custom.png');
 
       final prefs = PrefsService.instance;
-      expect(store.isRemind, isTrue);
-      expect(store.remindTime, 45);
-      expect(store.isShowTomorrow, isTrue);
-      expect(store.pageIndex, 1);
-      expect(store.enableHapticFeedback, isTrue);
-      expect(store.updateIgnored, isTrue);
-      expect(store.fontFamily, 'Source Han Sans');
-      expect(store.showCourseGrid, isTrue);
-      expect(store.todoRemindEnabled, isTrue);
-      expect(store.scheduleBackground, 'wave');
-      expect(store.customBackgroundImage, '/tmp/custom.png');
+      expect(settingsStore.isRemind, isTrue);
+      expect(settingsStore.remindTime, 45);
+      expect(settingsStore.isShowTomorrow, isTrue);
+      expect(settingsStore.pageIndex, 1);
+      expect(settingsStore.enableHapticFeedback, isTrue);
+      expect(settingsStore.updateIgnored, isTrue);
+      expect(settingsStore.fontFamily, 'Source Han Sans');
+      expect(settingsStore.showCourseGrid, isTrue);
+      expect(settingsStore.todoRemindEnabled, isTrue);
+      expect(settingsStore.scheduleBackground, 'wave');
+      expect(settingsStore.customBackgroundImage, '/tmp/custom.png');
 
       expect(prefs.getBool(PrefsKeys.IS_REMIND), isTrue);
       expect(prefs.getInt(PrefsKeys.NOTIFICATION_TIME), 45);
@@ -122,24 +118,25 @@ void main() {
     });
 
     test('should throw when setting invalid school id', () async {
-      final store = Get.put(SettingsStore());
-      await _flushAsyncTasks();
+      final settingsStore = store();
 
       await expectLater(
-        store.setSchoolId('invalid-school'),
+        settingsStore.setSchoolId('invalid-school'),
         throwsA(isA<ArgumentError>()),
       );
     });
 
     test('should fallback currentSchool to default when school id is unknown',
         () async {
-      final prefs = PrefsService.instance;
-      await prefs.setString(PrefsKeys.SCHOOL_ID, 'unknown-school');
-      final store = Get.put(SettingsStore());
-      await _flushAsyncTasks();
+      await PrefsService.instance
+          .setString(PrefsKeys.SCHOOL_ID, 'unknown-school');
+      container.dispose();
+      container = ProviderContainer();
+      addTearDown(container.dispose);
+      final settingsStore = store();
 
-      expect(store.schoolId, 'unknown-school');
-      expect(store.currentSchool.id, ApiConfig.defaultSchoolId);
+      expect(settingsStore.schoolId, 'unknown-school');
+      expect(settingsStore.currentSchool.id, ApiConfig.defaultSchoolId);
     });
   });
 }

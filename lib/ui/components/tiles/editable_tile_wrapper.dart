@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
-class EditableTileWrapper extends StatefulWidget {
+class EditableTileWrapper extends ConsumerStatefulWidget {
   final Widget child;
   final String tileId;
   final int index;
@@ -17,13 +19,15 @@ class EditableTileWrapper extends StatefulWidget {
   });
 
   @override
-  State<EditableTileWrapper> createState() => _EditableTileWrapperState();
+  ConsumerState<EditableTileWrapper> createState() =>
+      _EditableTileWrapperState();
 }
 
-class _EditableTileWrapperState extends State<EditableTileWrapper>
+class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
     with TickerProviderStateMixin {
   late AnimationController _jiggleController;
   late Animation<double> _jiggleAnimation;
+  Timer? _jiggleDelayTimer;
 
   @override
   void initState() {
@@ -43,77 +47,86 @@ class _EditableTileWrapperState extends State<EditableTileWrapper>
 
   @override
   void dispose() {
+    _jiggleDelayTimer?.cancel();
     _jiggleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<TileEditController>();
+    final tileEditState = ref.watch(tileEditControllerProvider);
+    final controller = ref.read(tileEditControllerProvider.notifier);
+    final isEditMode = tileEditState.isEditMode;
 
-    return Obx(() {
-      final isEditMode = controller.isEditMode.value;
-
-      if (isEditMode) {
-        if (!_jiggleController.isAnimating) {
-          // Create a slightly random offset so they don't all jiggle exactly identical
-          Future.delayed(Duration(milliseconds: widget.index * 50), () {
-            if (mounted && controller.isEditMode.value) {
-              _jiggleController.repeat();
-            }
-          });
+    if (isEditMode) {
+      if (!_jiggleController.isAnimating &&
+          !(_jiggleDelayTimer?.isActive ?? false)) {
+        // Create a slightly random offset so they don't all jiggle exactly identical
+        final delay = Duration(milliseconds: widget.index * 50);
+        void startJiggle() {
+          if (mounted && ref.read(tileEditControllerProvider).isEditMode) {
+            _jiggleController.repeat();
+          }
         }
-      } else {
-        _jiggleController.stop();
-        _jiggleController.reset();
+
+        if (delay == Duration.zero) {
+          startJiggle();
+        } else {
+          _jiggleDelayTimer = Timer(delay, startJiggle);
+        }
       }
+    } else {
+      _jiggleDelayTimer?.cancel();
+      _jiggleDelayTimer = null;
+      _jiggleController.stop();
+      _jiggleController.reset();
+    }
 
-      Widget content = AnimatedBuilder(
-        animation: _jiggleAnimation,
-        builder: (context, child) {
-          return Transform.rotate(
-            angle: isEditMode ? _jiggleAnimation.value : 0.0,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                borderRadius: ClubRadii.tile,
-              ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  // Original tile content
-                  ClipRRect(
-                    borderRadius: ClubRadii.tile,
-                    child: widget.child,
-                  ),
+    Widget content = AnimatedBuilder(
+      animation: _jiggleAnimation,
+      builder: (context, child) {
+        return Transform.rotate(
+          angle: isEditMode ? _jiggleAnimation.value : 0.0,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              borderRadius: ClubRadii.tile,
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Original tile content
+                ClipRRect(
+                  borderRadius: ClubRadii.tile,
+                  child: widget.child,
+                ),
 
-                  // Make the whole card act as a drag handle in edit mode
-                  if (isEditMode)
-                    Positioned.fill(
-                      child: ReorderableDragStartListener(
-                        index: widget.index,
-                        child: Container(
-                          color: Colors.transparent,
-                        ),
+                // Make the whole card act as a drag handle in edit mode
+                if (isEditMode)
+                  Positioned.fill(
+                    child: ReorderableDragStartListener(
+                      index: widget.index,
+                      child: Container(
+                        color: Colors.transparent,
                       ),
                     ),
+                  ),
 
-                  // iOS style minus button on top left
-                  if (isEditMode)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: _buildHideButton(controller),
-                    ),
-                ],
-              ),
+                // iOS style minus button on top left
+                if (isEditMode)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: _buildHideButton(controller),
+                  ),
+              ],
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
 
-      return content;
-    });
+    return content;
   }
 
   Widget _buildHideButton(TileEditController controller) {

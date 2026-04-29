@@ -1,5 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
+import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,116 +8,136 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  late ProviderContainer container;
+
   setUp(() async {
-    // Clear shared preferences and initialize
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
-
-    // Initialize GetX
-    Get.testMode = true;
+    container = ProviderContainer(overrides: [
+      tileConfigurationReaderProvider.overrideWithValue(
+        () async => TileConfigurationList.defaultConfig(),
+      ),
+      tileConfigurationWriterProvider.overrideWithValue((config) async {}),
+      availableTilesReaderProvider.overrideWithValue(
+        () => const ['电费', '校车', '饭卡'],
+      ),
+    ]);
+    addTearDown(container.dispose);
   });
 
-  tearDown(() {
-    Get.reset();
-  });
+  Future<void> waitForLoad() async {
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+  }
+
+  TileEditController controller() =>
+      container.read(tileEditControllerProvider.notifier);
 
   group('TileEditController', () {
     test('should_initialize_with_default_configuration', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
+      final state = container.read(tileEditControllerProvider);
 
-      expect(controller.isEditMode.value, false);
-      expect(controller.config.value.configurations.length, 3);
-      expect(controller.isLoading.value, false);
+      expect(state.isEditMode, false);
+      expect(state.config.configurations.length, 3);
+      expect(state.isLoading, false);
+      expect(store.visibleTiles, hasLength(3));
     });
 
     test('should_toggle_edit_mode_on_and_off', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      expect(controller.isEditMode.value, false);
+      expect(container.read(tileEditControllerProvider).isEditMode, false);
 
-      await controller.toggleEditMode();
-      expect(controller.isEditMode.value, true);
+      await store.toggleEditMode();
+      expect(container.read(tileEditControllerProvider).isEditMode, true);
 
-      await controller.toggleEditMode();
-      expect(controller.isEditMode.value, false);
+      await store.toggleEditMode();
+      expect(container.read(tileEditControllerProvider).isEditMode, false);
     });
 
     test('should_reorder_tiles_correctly', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      final initialOrder = controller.visibleTiles.map((t) => t.id).toList();
+      final initialOrder = store.visibleTiles.map((t) => t.id).toList();
       expect(initialOrder[0], '电费');
 
-      await controller.reorderTile('电费', 0, 2);
+      await store.reorderTile('电费', 0, 2);
 
-      final newOrder = controller.visibleTiles.map((t) => t.id).toList();
+      final newOrder = store.visibleTiles.map((t) => t.id).toList();
       expect(newOrder[0], '校车');
       expect(newOrder[2], '电费');
     });
 
     test('should_toggle_tile_visibility', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      expect(controller.visibleTiles.length, 3);
-      expect(controller.isTileVisible('电费'), true);
+      expect(store.visibleTiles.length, 3);
+      expect(store.isTileVisible('电费'), true);
 
-      await controller.toggleVisibility('电费');
+      await store.toggleVisibility('电费');
 
-      expect(controller.visibleTiles.length, 2);
-      expect(controller.isTileVisible('电费'), false);
+      expect(store.visibleTiles.length, 2);
+      expect(store.isTileVisible('电费'), false);
     });
 
     test('should_force_exit_edit_mode_and_save', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      await controller.toggleEditMode();
-      expect(controller.isEditMode.value, true);
+      await store.toggleEditMode();
+      expect(container.read(tileEditControllerProvider).isEditMode, true);
 
-      await controller.forceExitEditMode();
-      expect(controller.isEditMode.value, false);
+      await store.forceExitEditMode();
+      expect(container.read(tileEditControllerProvider).isEditMode, false);
     });
 
     test('should_reload_configuration_from_storage', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      final initialCount = controller.config.value.configurations.length;
+      final initialCount = container
+          .read(tileEditControllerProvider)
+          .config
+          .configurations
+          .length;
 
-      await controller.reload();
+      await store.reload();
 
-      expect(controller.config.value.configurations.length, initialCount);
+      expect(
+        container.read(tileEditControllerProvider).config.configurations.length,
+        initialCount,
+      );
     });
 
     test('should_get_visible_tiles_list', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      final visible = controller.visibleTiles;
+      final visible = store.visibleTiles;
 
       expect(visible.length, 3);
       expect(visible.every((t) => t.isVisible), true);
     });
 
     test('should_get_all_tiles_list', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      final all = controller.allTiles;
+      final all = store.allTiles;
 
       expect(all.length, 3);
     });
 
     test('should_check_if_tile_is_visible', () async {
-      final controller = TileEditController();
-      await Future.delayed(const Duration(milliseconds: 100));
+      final store = controller();
+      await waitForLoad();
 
-      expect(controller.isTileVisible('电费'), true);
-      expect(controller.isTileVisible('不存在'), false);
+      expect(store.isTileVisible('电费'), true);
+      expect(store.isTileVisible('不存在'), false);
     });
   });
 }

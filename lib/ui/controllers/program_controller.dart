@@ -1,64 +1,46 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'package:ios_club_app/features/education/services/program_service.dart';
+import 'package:ios_club_app/state/app_states.dart';
 
-class ProgramController extends GetxController {
-  TabController? _tabController;
-  late PageController pageController;
-  bool _isTabListenerAdded = false;
+final programControllerProvider =
+    NotifierProvider<ProgramController, ProgramState>(ProgramController.new);
 
-  List<String> semesterNames = [
-    "大一上",
-    "大一下",
-    "大二上",
-    "大二下",
-    "大三上",
-    "大三下",
-    "大四上",
-    "大四下",
-    "大五上",
-    "大五下",
-    "特殊分组"
+class ProgramController extends Notifier<ProgramState> {
+  final List<String> semesterNames = const [
+    '大一上',
+    '大一下',
+    '大二上',
+    '大二下',
+    '大三上',
+    '大三下',
+    '大四上',
+    '大四下',
+    '大五上',
+    '大五下',
+    '特殊分组',
   ];
 
-  // Observable variables
-  var programs = <PlanCourseList>[].obs;
-  var isLoading = true.obs;
-  var isError = false.obs;
-  var errorMessage = ''.obs;
-
   @override
-  void onInit() {
-    super.onInit();
-    pageController = PageController();
-    loadPrograms();
+  ProgramState build() {
+    Future<void>.microtask(loadPrograms);
+    return const ProgramState();
   }
+
+  List<PlanCourseList> get programs => List.unmodifiable(state.programs);
+  bool get isLoading => state.isLoading;
+  bool get isError => state.isError;
+  String get errorMessage => state.errorMessage;
 
   Future<void> loadPrograms() async {
     try {
-      isLoading(true);
-      isError(false);
+      state = state.copyWith(isLoading: true, isError: false);
       final result = await ProgramService.getPrograms();
-      programs.assignAll(result);
-
-      // Initialize TabController after data is loaded
-      if (_tabController == null || _tabController!.length != programs.length) {
-        if (_isTabListenerAdded && _tabController != null) {
-          _tabController!.removeListener(onTabChanged);
-          _isTabListenerAdded = false;
-        }
-        _tabController?.dispose();
-        // 使用 RootBundle 的 TickerProvider
-        _tabController = TabController(
-            length: programs.length, vsync: const _FakeTickerProvider());
-      }
+      state = state.copyWith(programs: result);
     } catch (e) {
-      isError(true);
-      errorMessage(e.toString());
+      state = state.copyWith(isError: true, errorMessage: e.toString());
     } finally {
-      isLoading(false);
+      state = state.copyWith(isLoading: false);
     }
   }
 
@@ -66,53 +48,7 @@ class ProgramController extends GetxController {
     await loadPrograms();
   }
 
-  TabController? get tabController => _tabController;
-
-  /// 添加 TabController 监听器（仅添加一次）
-  void addTabListenerIfNeeded() {
-    if (_tabController != null && !_isTabListenerAdded) {
-      _tabController!.addListener(onTabChanged);
-      _isTabListenerAdded = true;
-    }
-  }
-
-  void onPageChanged(int index) {
-    if (_tabController != null && _tabController!.index != index) {
-      _tabController!.animateTo(index);
-    }
-  }
-
-  void onTabChanged() {
-    if (_tabController != null && !_tabController!.indexIsChanging) {
-      pageController.animateToPage(
-        _tabController!.index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.ease,
-      );
-    }
-  }
-
-  @override
-  void onClose() {
-    if (_isTabListenerAdded && _tabController != null) {
-      _tabController!.removeListener(onTabChanged);
-    }
-    _tabController?.dispose();
-    pageController.dispose();
-    super.onClose();
-  }
-
   void clean() {
-    programs.clear();
-  }
-}
-
-// 创建一个简单的 TickerProvider 实现
-class _FakeTickerProvider implements TickerProvider {
-  const _FakeTickerProvider();
-
-  @override
-  Ticker createTicker(TickerCallback onTick) {
-    return Ticker(onTick);
+    state = state.copyWith(programs: const []);
   }
 }

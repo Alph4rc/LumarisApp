@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'dart:math';
 
@@ -16,17 +17,15 @@ import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
-import 'package:get/get.dart';
 
-class ElectricityPage extends StatefulWidget {
+class ElectricityPage extends ConsumerStatefulWidget {
   const ElectricityPage({super.key});
 
   @override
-  State<ElectricityPage> createState() => _ElectricityPageState();
+  ConsumerState<ElectricityPage> createState() => _ElectricityPageState();
 }
 
-class _ElectricityPageState extends State<ElectricityPage> {
-  final ElectricityStore controller = Get.put(ElectricityStore());
+class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   final TextEditingController _urlController = TextEditingController();
 
   @override
@@ -42,6 +41,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
 
   @override
   Widget build(BuildContext context) {
+    final electricityState = ref.watch(electricityStoreProvider);
     if (kIsWeb) {
       return Scaffold(
         appBar: ClubAppBar(
@@ -69,12 +69,9 @@ class _ElectricityPageState extends State<ElectricityPage> {
               SizedBox(height: 20),
 
               // 电费图表卡片
-              Obx(() =>
-                  controller.hasData.value ? _buildChartCard() : Container()),
+              electricityState.hasData ? _buildChartCard() : Container(),
 
-              Obx(() => controller.hasData.value
-                  ? SizedBox(height: 20)
-                  : Container()),
+              electricityState.hasData ? SizedBox(height: 20) : Container(),
 
               // 设置选项
               _buildSettingsSection(),
@@ -84,6 +81,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
   }
 
   Widget _buildCurrentElectricityCard() {
+    final electricityState = ref.watch(electricityStoreProvider);
     return AnimatedCard(
       child: ClubCard(
         child: Padding(
@@ -114,25 +112,25 @@ class _ElectricityPageState extends State<ElectricityPage> {
                     ),
                   ),
                   Spacer(),
-                  Obx(() => CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: _handleElectricityAction,
-                        child: Icon(
-                          controller.hasData.value
-                              ? CupertinoIcons.refresh
-                              : CupertinoIcons.add,
-                          color: CupertinoColors.systemBlue,
-                        ),
-                      )),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _handleElectricityAction,
+                    child: Icon(
+                      electricityState.hasData
+                          ? CupertinoIcons.refresh
+                          : CupertinoIcons.add,
+                      color: CupertinoColors.systemBlue,
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 16),
-              Obx(() => controller.hasData.value
+              electricityState.hasData
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '¥${controller.electricity.value.toStringAsFixed(2)}',
+                          '¥${electricityState.electricity.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w700,
@@ -140,10 +138,10 @@ class _ElectricityPageState extends State<ElectricityPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          controller.electricity.value <= 10 ? '余额不足' : '余额充足',
+                          electricityState.electricity <= 10 ? '余额不足' : '余额充足',
                           style: TextStyle(
                             fontSize: 14,
-                            color: controller.electricity.value <= 10
+                            color: electricityState.electricity <= 10
                                 ? CupertinoColors.systemRed
                                 : CupertinoColors.systemGreen,
                             fontWeight: FontWeight.w500,
@@ -169,7 +167,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                           ),
                         ),
                       ],
-                    )),
+                    ),
             ],
           ),
         ),
@@ -178,6 +176,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
   }
 
   Widget _buildChartCard() {
+    final electricityState = ref.watch(electricityStoreProvider);
     return AnimatedCard(
       delay: const Duration(milliseconds: 150),
       child: ClubCard(
@@ -207,8 +206,8 @@ class _ElectricityPageState extends State<ElectricityPage> {
               SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                child: Obx(() {
-                  if (controller.isLoading.value) {
+                child: Builder(builder: (context) {
+                  if (electricityState.isLoading) {
                     return const Center(
                       child: LoadingStateView(
                         title: '正在刷新用电趋势',
@@ -219,7 +218,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                       ),
                     );
                   }
-                  return _buildChart(controller.weeklyData);
+                  return _buildChart(electricityState.weeklyData);
                 }),
               ),
             ],
@@ -333,24 +332,26 @@ class _ElectricityPageState extends State<ElectricityPage> {
   }
 
   Widget _buildSettingsSection() {
+    final electricityState = ref.watch(electricityStoreProvider);
+    final controller = ref.read(electricityStoreProvider.notifier);
     return AnimatedCard(
       delay: const Duration(milliseconds: 300),
       child: ClubCard(
         child: Column(
           children: [
-            Obx(() => controller.hasData.value
+            electricityState.hasData
                 ? Column(
                     children: [
                       ClubListTile(
                         leading: Icon(Icons.home),
                         title: Text('添加到首页'),
                         subtitle: Text('在首页显示电费磁贴'),
-                        trailing: Obx(() => CupertinoSwitch(
-                              value: controller.tiles.contains('电费'),
-                              onChanged: (value) async {
-                                await controller.toggleTile('电费', value);
-                              },
-                            )),
+                        trailing: CupertinoSwitch(
+                          value: electricityState.tiles.contains('电费'),
+                          onChanged: (value) async {
+                            await controller.toggleTile('电费', value);
+                          },
+                        ),
                       ),
                       ClubListTile(
                         leading: Icon(Icons.monetization_on_outlined),
@@ -366,7 +367,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
                       )
                     ],
                   )
-                : Container()),
+                : Container(),
           ],
         ),
       ),
@@ -374,7 +375,7 @@ class _ElectricityPageState extends State<ElectricityPage> {
   }
 
   void _handleElectricityAction() {
-    if (controller.hasData.value) {
+    if (ref.read(electricityStoreProvider).hasData) {
       _showRefreshDialog();
     } else {
       _showInputDialog();
@@ -402,7 +403,9 @@ class _ElectricityPageState extends State<ElectricityPage> {
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              await controller.refreshElectricityData();
+              await ref
+                  .read(electricityStoreProvider.notifier)
+                  .refreshElectricityData();
             },
             child: Text('刷新数据'),
           ),
@@ -451,8 +454,8 @@ class _ElectricityPageState extends State<ElectricityPage> {
               );
               if (value != null) {
                 _urlController.clear();
-                controller.electricity.value = value;
-                controller.hasData.value = true;
+                final controller = ref.read(electricityStoreProvider.notifier);
+                await controller.setElectricityValue(value);
                 await controller.loadElectricityData(); // 重新加载所有数据
               }
             },

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
@@ -13,14 +14,16 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 /// 自定义课程管理页面
 ///
 /// 提供自定义课程的增删改查功能
-class CustomCourseManagePage extends StatefulWidget {
+class CustomCourseManagePage extends ConsumerStatefulWidget {
   const CustomCourseManagePage({super.key});
 
   @override
-  State<CustomCourseManagePage> createState() => _CustomCourseManagePageState();
+  ConsumerState<CustomCourseManagePage> createState() =>
+      _CustomCourseManagePageState();
 }
 
-class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
+class _CustomCourseManagePageState
+    extends ConsumerState<CustomCourseManagePage> {
   late List<CourseModel> customCourses;
   bool isLoading = true;
 
@@ -160,7 +163,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
 
   Future<void> _refreshCourseStore() async {
     // 刷新CourseStore以包含最新的自定义课程
-    await CourseStore.to.loadCourses();
+    await ref.read(courseStoreProvider.notifier).loadCourses();
   }
 
   @override

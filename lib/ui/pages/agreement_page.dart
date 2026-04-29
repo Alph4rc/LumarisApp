@@ -2,15 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 
-class AgreementPage extends StatelessWidget {
+class AgreementPage extends ConsumerWidget {
   const AgreementPage({super.key});
 
-  Future<void> _onAgree(BuildContext context) async {
-    await SettingsStore.to.setHasAcceptedAgreement(true);
+  Future<void> _onAgree(BuildContext context, WidgetRef ref) async {
+    await ref
+        .read(settingsStoreProvider.notifier)
+        .setHasAcceptedAgreement(true);
   }
 
   void _onDisagree() {
@@ -34,7 +37,7 @@ class AgreementPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -146,7 +149,7 @@ class AgreementPage extends StatelessWidget {
                       Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
-                        child: _buildButtons(context, isDark, isWide),
+                        child: _buildButtons(context, ref, isDark, isWide),
                       ),
                       SizedBox(height: isDesktop ? 40 : 24),
                     ],
@@ -186,7 +189,12 @@ class AgreementPage extends StatelessWidget {
     );
   }
 
-  Widget _buildButtons(BuildContext context, bool isDark, bool isWide) {
+  Widget _buildButtons(
+    BuildContext context,
+    WidgetRef ref,
+    bool isDark,
+    bool isWide,
+  ) {
     final buttonHeight = isWide ? 52.0 : 50.0;
     final fontSize = isWide ? 18.0 : 17.0;
 
@@ -196,7 +204,7 @@ class AgreementPage extends StatelessWidget {
           width: double.infinity,
           height: buttonHeight,
           child: CupertinoButton.filled(
-            onPressed: () => _onAgree(context),
+            onPressed: () => _onAgree(context, ref),
             child: Text(
               '同意并继续',
               style: TextStyle(

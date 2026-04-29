@@ -2,7 +2,7 @@ import 'dart:async' show TimeoutException, unawaited;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
@@ -20,16 +20,15 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
-class ScorePage extends StatefulWidget {
+class ScorePage extends ConsumerStatefulWidget {
   const ScorePage({super.key});
 
   @override
-  State<ScorePage> createState() => _ScorePageState();
+  ConsumerState<ScorePage> createState() => _ScorePageState();
 }
 
-class _ScorePageState extends State<ScorePage>
+class _ScorePageState extends ConsumerState<ScorePage>
     with SingleTickerProviderStateMixin {
-  final UserStore userStore = Get.find();
   final List<ScoreList> _scoreList = [];
   bool _isLoading = true;
   bool _isFool = false;
@@ -175,7 +174,7 @@ class _ScorePageState extends State<ScorePage>
   @override
   Widget build(BuildContext context) {
     // 检查是否为游客模式
-    if (!userStore.isLogin) {
+    if (!ref.watch(userStoreProvider).isLogin) {
       return Scaffold(
         body: Center(
           child: Column(

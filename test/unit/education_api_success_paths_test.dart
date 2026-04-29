@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart' hide Response;
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
@@ -23,7 +22,6 @@ void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await PrefsService.init();
-    Get.testMode = true;
     tempDir = await Directory.systemTemp.createTemp(
       'education_api_success_paths_test_',
     );
@@ -32,7 +30,6 @@ void main() {
 
   setUp(() async {
     await PrefsService.instance.clear();
-    Get.reset();
     EduHttpClientManager.resetForTest();
     LoginService.setLoginOverrideForTest(null);
     final manager = EduHttpClientManager.initialize();
@@ -49,7 +46,6 @@ void main() {
     LoginService.setLoginOverrideForTest(null);
     LoginService.resetClientForTest();
     EduHttpClientManager.resetForTest();
-    Get.reset();
   });
 
   tearDownAll(() async {

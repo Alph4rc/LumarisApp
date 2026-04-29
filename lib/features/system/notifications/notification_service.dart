@@ -300,8 +300,8 @@ class NotificationService {
     final effectiveDate = targetDate ?? DateTime.now();
 
     // 获取所有待处理的通知，用于去重
-    final pendingRequests =
-        await NotificationService.instance.notifications.pendingNotificationRequests();
+    final pendingRequests = await NotificationService.instance.notifications
+        .pendingNotificationRequests();
     final existingIds = pendingRequests.map((r) => r.id).toSet();
 
     for (var course in a) {

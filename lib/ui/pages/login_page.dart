@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -19,16 +20,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final UserStore userStore = UserStore.to;
-
+class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -155,7 +154,9 @@ class _LoginPageState extends State<LoginPage> {
     final userDataString = prefs.getString(PrefsKeys.USER_DATA);
     if (userDataString != null) {
       final userData = jsonDecode(userDataString);
-      await userStore.setUserData(UserData.fromJson(userData));
+      await ref
+          .read(userStoreProvider.notifier)
+          .setUserData(UserData.fromJson(userData));
     }
 
     return saveSuccess;

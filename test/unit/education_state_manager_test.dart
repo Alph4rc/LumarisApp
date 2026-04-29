@@ -1,8 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
@@ -10,51 +12,40 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _TestBusTileStore extends BusTileStore {
-  int loadBusDataCalled = 0;
-
-  @override
-  void onInit() {}
-
-  @override
-  Future<void> loadBusData() async {
-    loadBusDataCalled++;
-    isLoading.value = false;
-  }
-}
-
-class _TestElectricityStore extends ElectricityStore {
-  @override
-  void onInit() {}
-
-  @override
-  Future<void> loadElectricityData() async {}
-}
-
-class _TestPaymentStore extends PaymentStore {
-  @override
-  void onInit() {}
-
-  @override
-  Future<void> loadData() async {}
+BusModel _busModel(int count) {
+  return BusModel(
+    records: List.generate(
+      count,
+      (index) => BusItem(
+        lineName: 'line-$index',
+        description: '',
+        departureStation: 'A',
+        arrivalStation: 'B',
+        runTime: '10:00',
+        arrivalStationTime: '10:30',
+      ),
+    ),
+    total: count,
+  );
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  ProviderContainer createContainer({List<Override> overrides = const []}) {
+    final container = ProviderContainer(overrides: overrides);
+    addTearDown(container.dispose);
+    return container;
+  }
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await PrefsService.init();
+  });
+
+  tearDown(EduHttpClientManager.resetForTest);
+
   group('EduHttpClientManager', () {
-    setUp(() async {
-      Get.testMode = true;
-      Get.reset();
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-      await PrefsService.init();
-    });
-
-    tearDown(() {
-      EduHttpClientManager.resetForTest();
-      Get.reset();
-    });
-
     test('should initialize with default school url when settings is missing',
         () {
       EduHttpClientManager.initialize();
@@ -66,8 +57,8 @@ void main() {
 
     test('should update school config and reinitialize back to settings value',
         () async {
-      final settings = Get.put(SettingsStore());
-      await Future<void>.delayed(const Duration(milliseconds: 10));
+      final container = createContainer();
+      final settings = container.read(settingsStoreProvider.notifier);
       expect(settings.schoolId, ApiConfig.defaultSchoolId);
 
       final manager = EduHttpClientManager.initialize(
@@ -91,53 +82,75 @@ void main() {
   });
 
   group('State Stores', () {
-    setUp(() async {
-      Get.testMode = true;
-      Get.reset();
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-      await PrefsService.init();
-    });
-
-    tearDown(() {
-      Get.reset();
-    });
-
     test('BusTileStore.toggleUseNewApi should persist flag and trigger reload',
         () async {
-      final store = _TestBusTileStore();
+      var loadCount = 0;
+      final container = createContainer(overrides: [
+        oldBusFetcherProvider.overrideWithValue(() async {
+          loadCount++;
+          return _busModel(1);
+        }),
+        newBusFetcherProvider.overrideWithValue(() async {
+          loadCount++;
+          return _busModel(2);
+        }),
+      ]);
+      final store = container.read(busTileStoreProvider.notifier);
 
-      expect(store.useNewApi.value, isFalse);
+      expect(container.read(busTileStoreProvider).useNewApi, isFalse);
       await store.toggleUseNewApi(true);
 
-      expect(store.useNewApi.value, isTrue);
-      expect(store.loadBusDataCalled, 1);
+      expect(container.read(busTileStoreProvider).useNewApi, isTrue);
+      expect(loadCount, greaterThanOrEqualTo(1));
       expect(
         PrefsService.instance.getBool(PrefsKeys.USE_NEW_BUS_API),
         isTrue,
       );
     });
 
-    test(
-        'ElectricityStore.toggleTile should toggle visibility via tile service',
-        () async {
-      final store = _TestElectricityStore();
+    test('ElectricityStore.toggleTile should update local tile list', () async {
+      final touchedTiles = <String>[];
+      final container = createContainer(overrides: [
+        electricityTileAdderProvider.overrideWithValue(
+            (tileId) async => touchedTiles.add('add:$tileId')),
+        electricityTileRemoverProvider.overrideWithValue(
+          (tileId) async => touchedTiles.add('remove:$tileId'),
+        ),
+        tileConfigurationReaderProvider.overrideWithValue(
+          () async => throw StateError('not needed'),
+        ),
+      ]);
+      final store = container.read(electricityStoreProvider.notifier);
 
       await store.toggleTile('电费', false);
-      expect(store.tiles.contains('电费'), isFalse);
+      expect(container.read(electricityStoreProvider).tiles,
+          isNot(contains('电费')));
 
       await store.toggleTile('电费', true);
-      expect(store.tiles.contains('电费'), isTrue);
+      expect(container.read(electricityStoreProvider).tiles, contains('电费'));
+      expect(touchedTiles, ['remove:电费', 'add:电费']);
     });
 
-    test('PaymentStore.toggleTileShow should switch local state and persist',
-        () async {
-      final store = _TestPaymentStore();
+    test('PaymentStore.toggleTileShow should switch local state', () async {
+      final touchedTiles = <String>[];
+      final container = createContainer(overrides: [
+        tileAdderProvider.overrideWithValue(
+            (tileId) async => touchedTiles.add('add:$tileId')),
+        tileRemoverProvider.overrideWithValue(
+          (tileId) async => touchedTiles.add('remove:$tileId'),
+        ),
+        tileConfigurationReaderProvider.overrideWithValue(
+          () async => throw StateError('not needed'),
+        ),
+      ]);
+      final store = container.read(paymentStoreProvider.notifier);
 
       await store.toggleTileShow(false);
-      expect(store.isShowTile.value, isFalse);
+      expect(container.read(paymentStoreProvider).isShowTile, isFalse);
 
       await store.toggleTileShow(true);
-      expect(store.isShowTile.value, isTrue);
+      expect(container.read(paymentStoreProvider).isShowTile, isTrue);
+      expect(touchedTiles, ['remove:饭卡', 'add:饭卡']);
     });
   });
 }

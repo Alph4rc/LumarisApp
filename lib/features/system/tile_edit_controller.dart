@@ -1,58 +1,73 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
+import 'package:ios_club_app/state/app_states.dart';
 
-/// Controller for managing tile edit mode state
-class TileEditController extends GetxController {
-  /// Whether edit mode is currently active
-  final RxBool isEditMode = false.obs;
+typedef TileConfigurationReader = Future<TileConfigurationList> Function();
+typedef TileConfigurationWriter = Future<void> Function(
+  TileConfigurationList config,
+);
+typedef AvailableTilesReader = List<String> Function();
 
-  /// Current tile configuration
-  final Rx<TileConfigurationList> config =
-      TileConfigurationList.defaultConfig().obs;
+final tileConfigurationReaderProvider =
+    Provider<TileConfigurationReader>((ref) {
+  return TileService.getTileConfigurations;
+});
 
-  /// Loading state
-  final RxBool isLoading = false.obs;
+final tileConfigurationWriterProvider =
+    Provider<TileConfigurationWriter>((ref) {
+  return TileService.saveTileConfigurations;
+});
 
-  /// Timer for auto-exit after inactivity
+final availableTilesReaderProvider = Provider<AvailableTilesReader>((ref) {
+  return TileService.getAvailableTiles;
+});
+
+final tileEditControllerProvider =
+    NotifierProvider<TileEditController, TileEditState>(
+  TileEditController.new,
+);
+
+class TileEditController extends Notifier<TileEditState> {
   Timer? _inactivityTimer;
-
-  /// Duration of inactivity before auto-exit (30 seconds)
   static const Duration _inactivityDuration = Duration(seconds: 30);
 
-  @override
-  void onInit() {
-    super.onInit();
-    _loadConfiguration();
-  }
+  TileConfigurationReader get _readConfigurations =>
+      ref.read(tileConfigurationReaderProvider);
+  TileConfigurationWriter get _saveConfigurations =>
+      ref.read(tileConfigurationWriterProvider);
+  AvailableTilesReader get _readAvailableTiles =>
+      ref.read(availableTilesReaderProvider);
 
   @override
-  void onClose() {
-    _cancelInactivityTimer();
-    super.onClose();
+  TileEditState build() {
+    ref.onDispose(_cancelInactivityTimer);
+    Future<void>.microtask(_loadConfiguration);
+    return TileEditState(config: TileConfigurationList.defaultConfig());
   }
 
-  /// Load tile configuration from storage
+  bool get isEditMode => state.isEditMode;
+  TileConfigurationList get config => state.config;
+  bool get isLoading => state.isLoading;
+
   Future<void> _loadConfiguration() async {
     try {
-      isLoading.value = true;
-      var loadedConfig = await TileService.getTileConfigurations();
+      state = state.copyWith(isLoading: true);
+      var loadedConfig = await _readConfigurations();
 
-      // Merge with available tiles if any are missing
-      final availableTiles = TileService.getAvailableTiles();
+      final availableTiles = _readAvailableTiles();
       final existingIds = loadedConfig.configurations.map((t) => t.id).toSet();
 
       var hasChanges = false;
-      var newConfigs =
+      final newConfigs =
           List<TileConfiguration>.from(loadedConfig.configurations);
 
       for (final id in availableTiles) {
         if (!existingIds.contains(id)) {
-          // Add missing tile as hidden
           newConfigs.add(TileConfiguration(
             id: id,
             order: newConfigs.length,
@@ -64,132 +79,101 @@ class TileEditController extends GetxController {
 
       if (hasChanges) {
         loadedConfig = loadedConfig.copyWith(configurations: newConfigs);
-        // Save back immediately to ensure consistency
-        await TileService.saveTileConfigurations(loadedConfig);
+        await _saveConfigurations(loadedConfig);
       }
 
-      config.value = loadedConfig;
-    } catch (e) {
-      // Error already logged in TileService
-      config.value = TileConfigurationList.defaultConfig();
+      state = state.copyWith(config: loadedConfig);
+    } catch (_) {
+      state = state.copyWith(config: TileConfigurationList.defaultConfig());
     } finally {
-      isLoading.value = false;
+      state = state.copyWith(isLoading: false);
     }
   }
 
-  /// Toggle edit mode on/off
   Future<void> toggleEditMode() async {
-    if (isEditMode.value) {
-      // Exiting edit mode - save changes
+    if (state.isEditMode) {
       await _saveConfiguration();
-      isEditMode.value = false;
+      state = state.copyWith(isEditMode: false);
       _cancelInactivityTimer();
     } else {
-      // Entering edit mode
-      isEditMode.value = true;
+      state = state.copyWith(isEditMode: true);
 
-      // Provide haptic feedback on mobile platforms
       if (PlatformUtils.isIOS || PlatformUtils.isAndroid) {
         await HapticFeedback.mediumImpact();
       }
 
-      // Start inactivity timer
       _resetInactivityTimer();
     }
   }
 
-  /// Reorder a tile to a new position
   Future<void> reorderTile(String tileId, int oldIndex, int newIndex) async {
     try {
-      // Update local state immediately for responsive UI
-      config.value = config.value.reorderTile(tileId, oldIndex, newIndex);
-
-      // Reset inactivity timer
+      state = state.copyWith(
+        config: state.config.reorderTile(tileId, oldIndex, newIndex),
+      );
       _resetInactivityTimer();
-
-      // Save will happen on edit mode exit
-    } catch (e) {
-      // Revert on error
+    } catch (_) {
       await _loadConfiguration();
       rethrow;
     }
   }
 
-  /// Toggle visibility of a tile
   Future<void> toggleVisibility(String tileId) async {
     try {
-      // Update local state immediately
-      config.value = config.value.toggleVisibility(tileId);
+      state = state.copyWith(config: state.config.toggleVisibility(tileId));
 
-      // Provide haptic feedback
       if (PlatformUtils.isIOS || PlatformUtils.isAndroid) {
         await HapticFeedback.selectionClick();
       }
 
-      // Reset inactivity timer
       _resetInactivityTimer();
-
-      // Save will happen on edit mode exit
-    } catch (e) {
-      // Revert on error
+    } catch (_) {
       await _loadConfiguration();
       rethrow;
     }
   }
 
-  /// Save current configuration to storage
   Future<void> _saveConfiguration() async {
-    try {
-      await TileService.saveTileConfigurations(config.value);
-    } catch (e) {
-      // Error already logged in TileService
-      rethrow;
-    }
+    await _saveConfigurations(state.config);
   }
 
-  /// Reset the inactivity timer
   void _resetInactivityTimer() {
     _cancelInactivityTimer();
 
-    if (isEditMode.value) {
+    if (state.isEditMode) {
       _inactivityTimer = Timer(_inactivityDuration, () {
-        // Auto-exit edit mode after inactivity
-        if (isEditMode.value) {
+        if (state.isEditMode) {
           toggleEditMode();
         }
       });
     }
   }
 
-  /// Cancel the inactivity timer
   void _cancelInactivityTimer() {
     _inactivityTimer?.cancel();
     _inactivityTimer = null;
   }
 
-  /// Force exit edit mode (called when navigating away)
   Future<void> forceExitEditMode() async {
-    if (isEditMode.value) {
+    if (state.isEditMode) {
       await _saveConfiguration();
-      isEditMode.value = false;
+      state = state.copyWith(isEditMode: false);
       _cancelInactivityTimer();
     }
   }
 
-  /// Get list of visible tiles
-  List<TileConfiguration> get visibleTiles => config.value.getVisibleTiles();
+  List<TileConfiguration> get visibleTiles => state.config.getVisibleTiles();
+  List<TileConfiguration> get allTiles => state.config.configurations;
 
-  /// Get list of all tiles (visible and hidden)
-  List<TileConfiguration> get allTiles => config.value.configurations;
-
-  /// Check if a tile is visible
   bool isTileVisible(String tileId) {
-    final tile =
-        config.value.configurations.firstWhereOrNull((t) => t.id == tileId);
-    return tile?.isVisible ?? false;
+    for (final tile in state.config.configurations) {
+      if (tile.id == tileId) {
+        return tile.isVisible;
+      }
+    }
+    return false;
   }
 
-  /// Reload configuration from storage
   Future<void> reload() async {
     await _loadConfiguration();
   }

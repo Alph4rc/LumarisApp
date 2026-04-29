@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -28,14 +28,17 @@ import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 
-class SettingPage extends StatelessWidget {
+class SettingPage extends ConsumerWidget {
   const SettingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final userStore = Get.find<UserStore>();
+    final userState = ref.watch(userStoreProvider);
+    final userStore = ref.read(userStoreProvider.notifier);
+    final settings = ref.watch(settingsStoreProvider);
+    final settingsStore = ref.read(settingsStoreProvider.notifier);
 
     return Scaffold(
       appBar: ClubAppBar(
@@ -98,57 +101,50 @@ class SettingPage extends StatelessWidget {
                 // 其他
                 _buildSectionTitle('其他', isDark),
                 const SizedBox(height: 12),
-                Obx(() {
-                  return _buildSettingsGroup([
-                    _buildClearCacheTile(context, isDark),
-                    if (userStore.isLogin) _buildLogoutTile(context, isDark),
-                    Obx(() {
-                      SettingsStore settingsStore = SettingsStore.to;
-                      return ClubListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        leading: Icon(
-                          CupertinoIcons.grid,
-                          size: 20,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.5)
-                              : CupertinoColors.tertiaryLabel,
-                        ),
-                        title: const Text('显示课表网格线'),
-                        trailing: CupertinoSwitch(
-                          value: settingsStore.showCourseGrid,
-                          onChanged: (value) {
-                            settingsStore.setShowCourseGrid(value);
-                          },
-                        ),
-                      );
-                    }),
-                    if (kDebugMode)
-                      Obx(() {
-                        SettingsStore settingsStore = SettingsStore.to;
-                        return ClubListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          leading: Icon(
-                            CupertinoIcons.checkmark_shield,
-                            size: 20,
-                            color: isDark
-                                ? Colors.orange.withValues(alpha: 0.7)
-                                : CupertinoColors.systemOrange,
-                          ),
-                          title: const Text('协议授权状态 [Debug]'),
-                          subtitle: const Text('关闭后下次启动将重新显示授权页'),
-                          subtitleTextStyle: const TextStyle(fontSize: 12),
-                          trailing: CupertinoSwitch(
-                            value: settingsStore.hasAcceptedAgreement,
-                            onChanged: (value) {
-                              settingsStore.setHasAcceptedAgreement(value);
-                            },
-                          ),
-                        );
-                      }),
-                  ]);
-                }),
+                _buildSettingsGroup([
+                  _buildClearCacheTile(context, isDark),
+                  if (userState.isLogin)
+                    _buildLogoutTile(context, isDark, userStore),
+                  ClubListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    leading: Icon(
+                      CupertinoIcons.grid,
+                      size: 20,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.5)
+                          : CupertinoColors.tertiaryLabel,
+                    ),
+                    title: const Text('显示课表网格线'),
+                    trailing: CupertinoSwitch(
+                      value: settings.showCourseGrid,
+                      onChanged: (value) {
+                        settingsStore.setShowCourseGrid(value);
+                      },
+                    ),
+                  ),
+                  if (kDebugMode)
+                    ClubListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      leading: Icon(
+                        CupertinoIcons.checkmark_shield,
+                        size: 20,
+                        color: isDark
+                            ? Colors.orange.withValues(alpha: 0.7)
+                            : CupertinoColors.systemOrange,
+                      ),
+                      title: const Text('协议授权状态 [Debug]'),
+                      subtitle: const Text('关闭后下次启动将重新显示授权页'),
+                      subtitleTextStyle: const TextStyle(fontSize: 12),
+                      trailing: CupertinoSwitch(
+                        value: settings.hasAcceptedAgreement,
+                        onChanged: (value) {
+                          settingsStore.setHasAcceptedAgreement(value);
+                        },
+                      ),
+                    ),
+                ]),
                 const SizedBox(height: 32),
               ],
             ),
@@ -328,7 +324,11 @@ class SettingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutTile(BuildContext context, bool isDark) {
+  Widget _buildLogoutTile(
+    BuildContext context,
+    bool isDark,
+    UserStore userStore,
+  ) {
     return ClubListTile(
       leading: Icon(
         Icons.logout_outlined,
@@ -348,7 +348,6 @@ class SettingPage extends StatelessWidget {
         );
 
         if (result == true) {
-          final userStore = Get.find<UserStore>();
           await userStore.logout();
           AppRouter.go(AppRoutes.profile);
         }

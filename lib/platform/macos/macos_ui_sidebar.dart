@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:get/get.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
@@ -58,85 +58,82 @@ Sidebar macosUISidebar({
       );
     },
     // 底部用户信息卡片
-    bottom: Builder(
-      builder: (context) {
-        return Obx(() {
-          final UserStore userStore = UserStore.to;
+    bottom: Consumer(
+      builder: (context, ref, child) {
+        final userState = ref.watch(userStoreProvider);
 
-          return Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: CupertinoColors.separator.resolveFrom(context),
-                  width: 0.5,
-                ),
+        return Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: CupertinoColors.separator.resolveFrom(context),
+                width: 0.5,
               ),
             ),
-            padding: const EdgeInsets.only(top: 8),
-            child: MacosListTile(
-              onClick: () {
-                AppRouter.go(AppRoutes.profile);
-              },
-              leading: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: CupertinoColors.systemBlue.resolveFrom(context),
-                  shape: BoxShape.circle,
-                ),
-                child: const MacosIcon(
-                  CupertinoIcons.person_fill,
-                  size: 18,
-                  color: CupertinoColors.white,
-                ),
+          ),
+          padding: const EdgeInsets.only(top: 8),
+          child: MacosListTile(
+            onClick: () {
+              AppRouter.go(AppRoutes.profile);
+            },
+            leading: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: CupertinoColors.systemBlue.resolveFrom(context),
+                shape: BoxShape.circle,
               ),
-              title: FutureBuilder(
-                future: _getUsername(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    return Text(
-                      snapshot.data!,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      maxLines: 1,
-                    );
-                  }
-                  return const Text(
-                    '未登录',
-                    style: TextStyle(
+              child: const MacosIcon(
+                CupertinoIcons.person_fill,
+                size: 18,
+                color: CupertinoColors.white,
+              ),
+            ),
+            title: FutureBuilder(
+              future: _getUsername(userState.isLogin),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Text(
+                    snapshot.data!,
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    maxLines: 1,
                   );
-                },
-              ),
-              subtitle: Text(
-                userStore.isLogin ? '教务系统' : '点击登录',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                maxLines: 1,
-              ),
+                }
+                return const Text(
+                  '未登录',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                );
+              },
             ),
-          );
-        });
+            subtitle: Text(
+              userState.isLogin ? '教务系统' : '点击登录',
+              style: TextStyle(
+                fontSize: 11,
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                overflow: TextOverflow.ellipsis,
+              ),
+              maxLines: 1,
+            ),
+          ),
+        );
       },
     ),
   );
 }
 
-Future<String> _getUsername() async {
-  final UserStore userStore = UserStore.to;
+Future<String> _getUsername(bool isLogin) async {
   final prefs = PrefsService.instance;
   final secureStorage = SecureStorageService.instance;
   var name = '未登录';
 
-  if (userStore.isLogin) {
+  if (isLogin) {
     final iosName = await secureStorage.read(key: PrefsKeys.USERNAME) ??
         prefs.getString(PrefsKeys.USERNAME);
     if (iosName != null) {

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../under_maintenance_screen.dart';
@@ -162,3 +163,7 @@ class AppRouter {
     }
   }
 }
+
+final appRouterProvider = Provider<GoRouter>((ref) {
+  return AppRouter.router;
+});

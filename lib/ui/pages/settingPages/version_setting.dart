@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/git_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -12,15 +12,14 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 
-class VersionSetting extends StatefulWidget {
+class VersionSetting extends ConsumerStatefulWidget {
   const VersionSetting({super.key});
 
   @override
-  State<StatefulWidget> createState() => _VersionSettingState();
+  ConsumerState<VersionSetting> createState() => _VersionSettingState();
 }
 
-class _VersionSettingState extends State<VersionSetting> {
-  final SettingsStore settingsStore = SettingsStore.to;
+class _VersionSettingState extends ConsumerState<VersionSetting> {
   late bool isNeedUpdate = false;
   late String version = '';
   late String newVersion = '';
@@ -69,6 +68,9 @@ class _VersionSettingState extends State<VersionSetting> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = ref.watch(settingsStoreProvider);
+    final settingsStore = ref.read(settingsStoreProvider.notifier);
+
     return Column(
       children: [
         ClubListTile(
@@ -119,12 +121,12 @@ class _VersionSettingState extends State<VersionSetting> {
             title: const Text('更新日志'),
             subtitle: const Text('忽略版本更新'),
             subtitleTextStyle: TextStyle(fontSize: 12, color: Colors.grey),
-            trailing: Obx(() => CupertinoSwitch(
-                  value: settingsStore.updateIgnored,
-                  onChanged: (bool value) async {
-                    await settingsStore.setUpdateIgnored(value);
-                  },
-                )),
+            trailing: CupertinoSwitch(
+              value: settings.updateIgnored,
+              onChanged: (bool value) async {
+                await settingsStore.setUpdateIgnored(value);
+              },
+            ),
           ),
       ],
     );

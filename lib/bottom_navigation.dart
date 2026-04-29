@@ -22,7 +22,6 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    // final settingsStore = Get.find<SettingsStore>();
 
     // 定义颜色
     final bgColor = backgroundColor ?? theme.scaffoldBackgroundColor;

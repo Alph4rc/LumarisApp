@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -12,20 +13,24 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 
-class PaymentPage extends StatelessWidget {
-  final PaymentStore controller = Get.put(PaymentStore());
-
-  PaymentPage({super.key});
+class PaymentPage extends ConsumerWidget {
+  const PaymentPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final payment = ref.watch(paymentStoreProvider);
+    final controller = ref.read(paymentStoreProvider.notifier);
+
     return Scaffold(
-      appBar: _buildAppBar(context),
-      body: Obx(() => _buildContent()),
+      appBar: _buildAppBar(context, controller),
+      body: _buildContent(payment, controller),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    PaymentStore controller,
+  ) {
     return ClubAppBar(
       title: '饭卡余额',
       actions: [
@@ -37,41 +42,39 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(PaymentState payment, PaymentStore controller) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStatisticsSection(),
-          Obx(() {
-            if (controller.isLoading.value) {
+          _buildStatisticsSection(payment),
+          Builder(builder: (context) {
+            if (payment.isLoading) {
               return const LoadingStateView(
                 title: '正在读取饭卡余额',
                 subtitle: '正在同步余额和近期流水，校园网络较慢时可能需要几秒',
                 showCard: true,
               );
             }
-            if (controller.errorMessage.value.isNotEmpty) {
+            if (payment.errorMessage.isNotEmpty) {
               return _buildLoginPrompt();
             }
-            return _buildRecentTransactionsSection();
+            return _buildRecentTransactionsSection(payment);
           }),
-          Obx(
-            () => controller.errorMessage.value.isEmpty
-                ? _buildSettingsSection()
-                : const SizedBox.shrink(),
-          ),
+          payment.errorMessage.isEmpty
+              ? _buildSettingsSection(payment, controller)
+              : const SizedBox.shrink(),
         ],
       ),
     );
   }
 
-  Widget _buildStatisticsSection() {
+  Widget _buildStatisticsSection(PaymentState payment) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: _buildStatCard(
         '余额',
-        controller.totalRecharge.value,
+        payment.totalRecharge,
         Icons.monetization_on_outlined,
         Colors.green,
       ),
@@ -115,7 +118,7 @@ class PaymentPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Obx(() => controller.totalRecharge.value == 0
+                  amount == 0
                       ? const Text(
                           '暂无数据',
                           style: TextStyle(
@@ -129,7 +132,7 @@ class PaymentPage extends StatelessWidget {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
-                        )),
+                        ),
                 ],
               ),
             ),
@@ -139,8 +142,8 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentTransactionsSection() {
-    final recentRecords = controller.records
+  Widget _buildRecentTransactionsSection(PaymentState payment) {
+    final recentRecords = payment.records
         .where((r) =>
             r.turnoverType.contains('支付') || r.turnoverType.contains('消费'))
         .toList();
@@ -250,7 +253,7 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsSection() {
+  Widget _buildSettingsSection(PaymentState payment, PaymentStore controller) {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -269,7 +272,7 @@ class PaymentPage extends StatelessWidget {
                   title: Text('添加到首页'),
                   subtitle: Text('在首页显示饭卡磁贴'),
                   trailing: CupertinoSwitch(
-                    value: controller.isShowTile.value,
+                    value: payment.isShowTile,
                     onChanged: (value) => controller.toggleTileShow(value),
                   ),
                 ),

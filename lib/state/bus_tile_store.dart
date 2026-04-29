@@ -1,61 +1,70 @@
-import 'package:get/get.dart';
-import 'package:ios_club_app/features/education/models/bus_model.dart';
-import 'package:ios_club_app/features/education/services/bus_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/new_bus_api.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
+import 'package:ios_club_app/features/education/services/bus_service.dart';
+import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/state/tile_store_providers.dart';
 
 typedef BusPreferenceReader = Future<bool> Function();
 typedef BusPreferenceWriter = Future<void> Function(bool value);
 typedef BusFetcher = Future<BusModel> Function();
 
-class BusTileStore extends GetxController {
-  static BusPreferenceReader _preferenceReader = () async {
-    final prefs = PrefsService.instance;
-    return prefs.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
+final busPreferenceReaderProvider = Provider<BusPreferenceReader>((ref) {
+  return () async {
+    return PrefsService.instance.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
   };
-  static BusPreferenceWriter _preferenceWriter = (bool value) async {
-    final prefs = PrefsService.instance;
-    await prefs.setBool(PrefsKeys.USE_NEW_BUS_API, value);
+});
+
+final busPreferenceWriterProvider = Provider<BusPreferenceWriter>((ref) {
+  return (bool value) async {
+    await PrefsService.instance.setBool(PrefsKeys.USE_NEW_BUS_API, value);
   };
-  static BusFetcher _newBusFetcher = () => getBusFromNewData(loc: 'ALL');
-  static BusFetcher _oldBusFetcher = BusService.getBus;
+});
 
-  final RxBool isLoading = true.obs;
-  final RxInt busCount = 0.obs;
-  //final Rx<BusModel> busData = BusModel(records: [], total: 0).obs;
-  final RxBool useNewApi = false.obs;
+final newBusFetcherProvider = Provider<BusFetcher>((ref) {
+  return () => getBusFromNewData(loc: 'ALL');
+});
 
+final oldBusFetcherProvider = Provider<BusFetcher>((ref) {
+  return BusService.getBus;
+});
+
+final busTileStoreProvider =
+    NotifierProvider<BusTileStore, BusTileState>(BusTileStore.new);
+
+class BusTileStore extends Notifier<BusTileState> {
   @override
-  void onInit() {
-    super.onInit();
-    loadBusData();
+  BusTileState build() {
+    if (ref.read(tileStoreAutoLoadProvider)) {
+      Future<void>.microtask(loadBusData);
+    }
+    return const BusTileState();
   }
 
+  bool get isLoading => state.isLoading;
+  int get busCount => state.busCount;
+  bool get useNewApi => state.useNewApi;
+
   Future<void> loadPreferences() async {
-    useNewApi.value = await _preferenceReader();
+    state = state.copyWith(
+      useNewApi: await ref.read(busPreferenceReaderProvider)(),
+    );
   }
 
   Future<void> loadBusData() async {
     try {
-      isLoading.value = true;
-
-      // 加载API偏好设置
+      state = state.copyWith(isLoading: true);
       await loadPreferences();
 
-      BusModel data;
-      if (useNewApi.value) {
-        // 使用新API
-        data = await _newBusFetcher();
-      } else {
-        // 使用旧API
-        data = await _oldBusFetcher();
-      }
+      final data = state.useNewApi
+          ? await ref.read(newBusFetcherProvider)()
+          : await ref.read(oldBusFetcherProvider)();
 
-      //busData.value = data;
-      busCount.value = data.records.length;
+      state = state.copyWith(busCount: data.records.length);
     } finally {
-      isLoading.value = false;
+      state = state.copyWith(isLoading: false);
     }
   }
 
@@ -64,33 +73,8 @@ class BusTileStore extends GetxController {
   }
 
   Future<void> toggleUseNewApi(bool value) async {
-    useNewApi.value = value;
-    await _preferenceWriter(useNewApi.value);
-    await loadBusData(); // 切换后重新加载数据
-  }
-
-  static void setTestOverrides({
-    BusPreferenceReader? preferenceReader,
-    BusPreferenceWriter? preferenceWriter,
-    BusFetcher? newBusFetcher,
-    BusFetcher? oldBusFetcher,
-  }) {
-    if (preferenceReader != null) _preferenceReader = preferenceReader;
-    if (preferenceWriter != null) _preferenceWriter = preferenceWriter;
-    if (newBusFetcher != null) _newBusFetcher = newBusFetcher;
-    if (oldBusFetcher != null) _oldBusFetcher = oldBusFetcher;
-  }
-
-  static void resetTestOverrides() {
-    _preferenceReader = () async {
-      final prefs = PrefsService.instance;
-      return prefs.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
-    };
-    _preferenceWriter = (bool value) async {
-      final prefs = PrefsService.instance;
-      await prefs.setBool(PrefsKeys.USE_NEW_BUS_API, value);
-    };
-    _newBusFetcher = () => getBusFromNewData(loc: 'ALL');
-    _oldBusFetcher = BusService.getBus;
+    state = state.copyWith(useNewApi: value);
+    await ref.read(busPreferenceWriterProvider)(value);
+    await loadBusData();
   }
 }

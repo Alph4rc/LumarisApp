@@ -5,29 +5,29 @@ import 'package:display_mode/display_mode.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/platform/android/background_service.dart';
-import 'package:ios_club_app/state/init.dart';
-import 'package:ios_club_app/platform/ios/background_service.dart';
-import 'package:ios_club_app/core/utils/request_cache.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/features/system/widget_service.dart';
-import 'package:ios_club_app/features/system/notifications/task_executor.dart';
-import 'package:macos_ui/macos_ui.dart';
-import 'package:ios_club_app/core/services/permission_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/auth_state_notifier.dart';
+import 'package:ios_club_app/core/services/hive_manager.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
+import 'package:ios_club_app/features/system/widget_service.dart';
+import 'package:ios_club_app/platform/android/background_service.dart';
+import 'package:ios_club_app/platform/ios/background_service.dart';
+import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/settings_store.dart';
+import 'package:macos_ui/macos_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'main_app.dart';
-import 'package:ios_club_app/core/services/hive_manager.dart';
-import 'package:ios_club_app/features/education/services/auth_service.dart';
-import 'package:ios_club_app/state/course_store.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 
 void main() async {
   // 确保在所有平台上都初始化 WidgetsFlutterBinding
@@ -52,17 +52,21 @@ void main() async {
   // 初始化请求缓存
   await RequestCache().initialize();
 
-  // 初始化Stores
-  initStores();
+  final providerContainer = ProviderContainer();
+  final settingsStore = providerContainer.read(settingsStoreProvider.notifier);
+  final authStateNotifier =
+      providerContainer.read(authStateNotifierProvider.notifier);
+  final courseStore = providerContainer.read(courseStoreProvider.notifier);
+
   EduHttpClientManager.initialize(
-    school: SettingsStore.to.currentSchool,
+    school: settingsStore.currentSchool,
     authStateCallbacks: AuthStateCallbacks(
-      onRelogging: AuthStateNotifier.to.startRelogging,
-      onRelogSuccess: AuthStateNotifier.to.relogSuccess,
-      onRelogFailed: AuthStateNotifier.to.relogFailed,
+      onRelogging: authStateNotifier.startRelogging,
+      onRelogSuccess: authStateNotifier.relogSuccess,
+      onRelogFailed: authStateNotifier.relogFailed,
     ),
   );
-  EducationRefreshService.setCourseRefreshCallback(CourseStore.to.loadCourses);
+  EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
   // 平台特定初始化 - 使用统一的平台判断
   if (!PlatformUtils.isMacOS) {
@@ -129,7 +133,7 @@ void main() async {
     });
   }
 
-  initApp();
+  initApp(providerContainer);
 }
 
 /// 配置macOS窗口样式
@@ -138,10 +142,9 @@ Future<void> _configureMacosWindowUtils() async {
   await config.apply();
 }
 
-String? _getFontFamily() {
+String? _getFontFamily(ProviderContainer container) {
   if (PlatformUtils.isDesktop) {
-    // 获取设置存储实例
-    final settingsStore = SettingsStore.to;
+    final settingsStore = container.read(settingsStoreProvider.notifier);
     // 如果设置了自定义字体，则使用自定义字体，否则使用系统默认字体
     return PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
   }
@@ -158,61 +161,67 @@ Widget _getHomePage() {
   return const MainApp();
 }
 
-void initApp() {
+void initApp(ProviderContainer container) {
   if (PlatformUtils.isMacOS) {
-    runApp(MacosApp(
-      title: 'iOS Club App',
-      debugShowCheckedModeBanner: false,
-      theme: MacosThemeData.light().copyWith(
-        primaryColor: CupertinoColors.systemBlue,
-        pushButtonTheme: const PushButtonThemeData(
-          color: CupertinoColors.systemBlue,
-          secondaryColor: CupertinoColors.systemGrey,
+    runApp(UncontrolledProviderScope(
+      container: container,
+      child: MacosApp(
+        title: 'iOS Club App',
+        debugShowCheckedModeBanner: false,
+        theme: MacosThemeData.light().copyWith(
+          primaryColor: CupertinoColors.systemBlue,
+          pushButtonTheme: const PushButtonThemeData(
+            color: CupertinoColors.systemBlue,
+            secondaryColor: CupertinoColors.systemGrey,
+          ),
+          // 帮助按钮主题
+          helpButtonTheme: const HelpButtonThemeData(
+            color: CupertinoColors.systemBlue,
+          ),
         ),
-        // 帮助按钮主题
-        helpButtonTheme: const HelpButtonThemeData(
-          color: CupertinoColors.systemBlue,
+        darkTheme: MacosThemeData.dark().copyWith(
+          primaryColor: CupertinoColors.systemBlue,
+          brightness: Brightness.dark,
+          pushButtonTheme: const PushButtonThemeData(
+            color: CupertinoColors.systemBlue,
+            secondaryColor: CupertinoColors.systemGrey,
+          ),
+          helpButtonTheme: const HelpButtonThemeData(
+            color: CupertinoColors.systemBlue,
+          ),
         ),
+        // 跟随系统设置自动切换亮暗模式
+        themeMode: ThemeMode.system,
+        home: const MainApp(),
       ),
-      darkTheme: MacosThemeData.dark().copyWith(
-        primaryColor: CupertinoColors.systemBlue,
-        brightness: Brightness.dark,
-        pushButtonTheme: const PushButtonThemeData(
-          color: CupertinoColors.systemBlue,
-          secondaryColor: CupertinoColors.systemGrey,
-        ),
-        helpButtonTheme: const HelpButtonThemeData(
-          color: CupertinoColors.systemBlue,
-        ),
-      ),
-      // 跟随系统设置自动切换亮暗模式
-      themeMode: ThemeMode.system,
-      home: const MainApp(),
     ));
     return;
   }
 
-  runApp(MaterialApp(
-    title: 'iOS Club App',
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      fontFamily: _getFontFamily(),
-      appBarTheme: AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-        foregroundColor: Colors.black,
-        elevation: 0,
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: MaterialApp(
+      title: 'iOS Club App',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: _getFontFamily(container),
+        appBarTheme: AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
       ),
-    ),
-    darkTheme: ThemeData(
-      fontFamily: _getFontFamily(),
-      brightness: Brightness.dark,
-      appBarTheme: const AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        foregroundColor: Colors.white,
-        elevation: 0,
+      darkTheme: ThemeData(
+        fontFamily: _getFontFamily(container),
+        brightness: Brightness.dark,
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
       ),
+      home: _getHomePage(),
     ),
-    home: _getHomePage(),
   ));
 }
 

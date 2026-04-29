@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../../../state/payment_store.dart';
 import '../club_card.dart';
 
-class PaymentTile extends StatelessWidget {
+class PaymentTile extends ConsumerWidget {
   const PaymentTile({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<PaymentStore>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final payment = ref.watch(paymentStoreProvider);
 
     return ClubCard(
       child: Material(
@@ -22,9 +22,9 @@ class PaymentTile extends StatelessWidget {
           onTap: () => AppRouter.push(AppRoutes.payment),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Obx(() {
+            child: Builder(builder: (context) {
               // Loading state
-              if (controller.isLoading.value) {
+              if (payment.isLoading) {
                 return const Center(
                   child: LoadingStateView(
                     title: '正在读取饭卡',
@@ -36,9 +36,8 @@ class PaymentTile extends StatelessWidget {
               }
 
               // Has Data state
-              if (!controller.isLoading.value &&
-                  controller.totalRecharge.value != 0) {
-                final amount = controller.totalRecharge.value;
+              if (!payment.isLoading && payment.totalRecharge != 0) {
+                final amount = payment.totalRecharge;
                 final isLow = amount <= 10;
                 final primaryColor = isLow
                     ? CupertinoColors.destructiveRed
@@ -139,14 +138,14 @@ class PaymentTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    controller.errorMessage.value.isNotEmpty
-                        ? controller.errorMessage.value
+                    payment.errorMessage.isNotEmpty
+                        ? payment.errorMessage
                         : '点击查看',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
-                      color: controller.errorMessage.value.isNotEmpty
+                      color: payment.errorMessage.isNotEmpty
                           ? CupertinoColors.destructiveRed
                           : Colors.grey,
                     ),

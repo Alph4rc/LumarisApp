@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
@@ -17,23 +17,19 @@ import 'package:ios_club_app/ui/components/optimized_image.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/study_credit_card.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  final UserStore userStore = UserStore.to;
-  final SettingsStore settingsStore = SettingsStore.to;
-
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _isLoading = true;
   String _username = '';
   int _dataRefreshKey = 0;
@@ -58,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _username = username;
     }
 
-    if (!userStore.isLogin) {
+    if (!ref.read(userStoreProvider).isLogin) {
       // 没有登录信息，进入游客模式
       // await _enterGuestMode(); // 其实这里不需要做什么，只是确认状态
     }
@@ -101,11 +97,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return Scaffold(
-      body: Obx(() => _buildProfileContent()),
+      body: _buildProfileContent(),
     );
   }
 
   List<ProfileButtonItem> get profileButtonItems {
+    final isLogin = ref.watch(userStoreProvider).isLogin;
     return [
       ProfileButtonItem(
           icon: CupertinoIcons.link_circle,
@@ -122,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: CupertinoIcons.bolt_fill,
             title: '电费',
             route: AppRoutes.electricity),
-      if (userStore.isLogin)
+      if (isLogin)
         ProfileButtonItem(
             icon: Icons.toc, title: '培养方案', route: AppRoutes.program),
       ProfileButtonItem(
@@ -132,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // if (!kIsWeb)
       //   ProfileButtonItem(
       //       icon: Icons.wifi_outlined, title: '校园网', route: AppRoutes.net),
-      if (!userStore.isLogin)
+      if (!isLogin)
         ProfileButtonItem(
             icon: Icons.login,
             title: '登录教务系统',
@@ -146,6 +143,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfileContent() {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -179,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           maxLines: 1,
                         ),
                         Text(
-                          userStore.isLogin ? '教务系统账号' : '游客',
+                          isLogin ? '教务系统账号' : '游客',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -217,8 +215,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   )),
             ),
           ),
-          if (userStore.isLogin) const SizedBox(height: 16),
-          if (userStore.isLogin)
+          if (isLogin) const SizedBox(height: 16),
+          if (isLogin)
             FutureBuilder(
                 key: ValueKey('info_data_$_dataRefreshKey'),
                 // 添加超时保护：最多10秒

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
@@ -41,9 +40,6 @@ void main() {
 
       tempDir = await Directory.systemTemp.createTemp('edu_api_error_');
       Hive.init(tempDir.path);
-
-      Get.testMode = true;
-      Get.reset();
       EduHttpClientManager.resetForTest();
       final manager = EduHttpClientManager.initialize();
       manager.updateSchoolConfig(
@@ -58,7 +54,6 @@ void main() {
     tearDownAll(() async {
       // Do not close Hive here to avoid interfering with pending cache tasks.
       EduHttpClientManager.resetForTest();
-      Get.reset();
     });
 
     test('direct wrapper methods should throw NetworkException', () async {

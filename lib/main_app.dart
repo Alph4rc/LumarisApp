@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
@@ -20,17 +20,16 @@ import 'platform/tablet/tablet_navigation.dart';
 import 'core/services/git_service.dart';
 import 'features/system/update/check_update_manager.dart';
 
-class MainApp extends StatefulWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  ConsumerState<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
+class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   int _currentIndex = 0;
   bool _showBottomNav = true;
-  final SettingsStore settingsStore = SettingsStore.to;
 
   static const _bottomNavRoutes = {
     AppRoutes.home,
@@ -239,140 +238,145 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
     AppRouter.go(route);
   }
 
-  Widget _app() => MaterialApp.router(
-        title: 'iOS Club App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          fontFamily: SettingsStore.to.fontFamily.isEmpty
-              ? PlatformUtils.getWindowsFontFamily()
-              : PlatformUtils.getDesktopFontFamily(SettingsStore.to.fontFamily),
+  Widget _app() {
+    final settings = ref.watch(settingsStoreProvider);
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
+      title: 'iOS Club App',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: settings.fontFamily.isEmpty
+            ? PlatformUtils.getWindowsFontFamily()
+            : PlatformUtils.getDesktopFontFamily(settings.fontFamily),
+      ),
+      darkTheme: ThemeData(
+        fontFamily: settings.fontFamily.isEmpty
+            ? PlatformUtils.getWindowsFontFamily()
+            : PlatformUtils.getDesktopFontFamily(settings.fontFamily),
+        brightness: Brightness.dark,
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          foregroundColor: Colors.white,
+          elevation: 0,
         ),
-        darkTheme: ThemeData(
-          fontFamily: SettingsStore.to.fontFamily.isEmpty
-              ? PlatformUtils.getWindowsFontFamily()
-              : PlatformUtils.getDesktopFontFamily(SettingsStore.to.fontFamily),
-          brightness: Brightness.dark,
-          appBarTheme: const AppBarTheme(
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-            foregroundColor: Colors.white,
-            elevation: 0,
-          ),
-        ),
-        routerConfig: AppRouter.router,
-      );
+      ),
+      routerConfig: router,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (!settingsStore.hasAcceptedAgreement) {
-        return const AgreementPage();
-      }
+    final settings = ref.watch(settingsStoreProvider);
 
-      final screenWidth = MediaQuery.of(context).size.width;
-      final screenHeight = MediaQuery.of(context).size.height;
+    if (!settings.hasAcceptedAgreement) {
+      return const AgreementPage();
+    }
 
-      // 判断设备类型
-      final isMacOS = PlatformUtils.isMacOS;
-      final isWindows = PlatformUtils.isWindows;
-      final isLinux = !isMacOS && !isWindows && PlatformUtils.isDesktop;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-      // 平板判断：宽度 > 600 且不是桌面平台
-      final isTablet = screenWidth > 600 && !PlatformUtils.isDesktop;
+    // 判断设备类型
+    final isMacOS = PlatformUtils.isMacOS;
+    final isWindows = PlatformUtils.isWindows;
+    final isLinux = !isMacOS && !isWindows && PlatformUtils.isDesktop;
 
-      // 平板横屏判断（使用 NavigationRail）
-      final isTabletLandscape = isTablet && screenWidth > screenHeight;
+    // 平板判断：宽度 > 600 且不是桌面平台
+    final isTablet = screenWidth > 600 && !PlatformUtils.isDesktop;
 
-      // 平板竖屏判断（使用 Drawer）
-      final isTabletPortrait = isTablet && screenWidth <= screenHeight;
+    // 平板横屏判断（使用 NavigationRail）
+    final isTabletLandscape = isTablet && screenWidth > screenHeight;
 
-      // macOS - 使用原生 macOS UI
-      if (isMacOS) {
-        return MacosWindow(
-          sidebar: macosUISidebar(
-            items: _destinations,
-            selectedIndex: _currentIndex,
-            onItemSelected: (int index) {
-              _navigateToMainRoute(index);
-            },
-          ),
-          titleBar: TitleBar(
-            title: const Text('iOS Club App'),
-            decoration: BoxDecoration(
-              color: MacosTheme.of(context).canvasColor,
-            ),
-          ),
-          child: _app(),
-        );
-      }
+    // 平板竖屏判断（使用 Drawer）
+    final isTabletPortrait = isTablet && screenWidth <= screenHeight;
 
-      // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
-      if (isWindows || isLinux) {
-        return Scaffold(
-          body: SafeArea(
-            child: Row(
-              children: [
-                WindowsSidebar(
-                  items: _destinations,
-                  selectedIndex: _currentIndex,
-                  onItemSelected: (int index) {
-                    _navigateToMainRoute(index);
-                  },
-                ),
-                Expanded(
-                  child: _app(),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-
-      // 平板横屏 - 使用 NavigationRail
-      if (isTabletLandscape) {
-        return TabletNavigation(
+    // macOS - 使用原生 macOS UI
+    if (isMacOS) {
+      return MacosWindow(
+        sidebar: macosUISidebar(
           items: _destinations,
           selectedIndex: _currentIndex,
           onItemSelected: (int index) {
             _navigateToMainRoute(index);
           },
-          child: _app(),
-        );
-      }
+        ),
+        titleBar: TitleBar(
+          title: const Text('iOS Club App'),
+          decoration: BoxDecoration(
+            color: MacosTheme.of(context).canvasColor,
+          ),
+        ),
+        child: _app(),
+      );
+    }
 
-      // 平板竖屏 - 使用 Drawer
-      if (isTabletPortrait) {
-        return TabletDrawerNavigation(
-          items: _destinations,
-          selectedIndex: _currentIndex,
-          onItemSelected: (int index) {
-            _navigateToMainRoute(index);
-          },
-          child: _app(),
-        );
-      }
-
-      // 手机 - 使用底部导航栏（仅在四个主页面显示）
+    // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
+    if (isWindows || isLinux) {
       return Scaffold(
-        body: SafeArea(child: _app()),
-        bottomNavigationBar: _showBottomNav
-            ? BottomNavigation(
-                destinations: _destinations.sublist(0, 4).map((destination) {
-                  return NavigationDestination(
-                    icon: Icon(destination.icon),
-                    selectedIcon: Icon(destination.selectedIcon),
-                    label: destination.label,
-                  );
-                }).toList(),
+        body: SafeArea(
+          child: Row(
+            children: [
+              WindowsSidebar(
+                items: _destinations,
                 selectedIndex: _currentIndex,
-                onDestinationSelected: (int index) {
+                onItemSelected: (int index) {
                   _navigateToMainRoute(index);
                 },
-                backgroundColor: Theme.of(context)
-                    .scaffoldBackgroundColor
-                    .withValues(alpha: 0.95),
-              )
-            : null,
+              ),
+              Expanded(
+                child: _app(),
+              ),
+            ],
+          ),
+        ),
       );
-    });
+    }
+
+    // 平板横屏 - 使用 NavigationRail
+    if (isTabletLandscape) {
+      return TabletNavigation(
+        items: _destinations,
+        selectedIndex: _currentIndex,
+        onItemSelected: (int index) {
+          _navigateToMainRoute(index);
+        },
+        child: _app(),
+      );
+    }
+
+    // 平板竖屏 - 使用 Drawer
+    if (isTabletPortrait) {
+      return TabletDrawerNavigation(
+        items: _destinations,
+        selectedIndex: _currentIndex,
+        onItemSelected: (int index) {
+          _navigateToMainRoute(index);
+        },
+        child: _app(),
+      );
+    }
+
+    // 手机 - 使用底部导航栏（仅在四个主页面显示）
+    return Scaffold(
+      body: SafeArea(child: _app()),
+      bottomNavigationBar: _showBottomNav
+          ? BottomNavigation(
+              destinations: _destinations.sublist(0, 4).map((destination) {
+                return NavigationDestination(
+                  icon: Icon(destination.icon),
+                  selectedIcon: Icon(destination.selectedIcon),
+                  label: destination.label,
+                );
+              }).toList(),
+              selectedIndex: _currentIndex,
+              onDestinationSelected: (int index) {
+                _navigateToMainRoute(index);
+              },
+              backgroundColor: Theme.of(context)
+                  .scaffoldBackgroundColor
+                  .withValues(alpha: 0.95),
+            )
+          : null,
+    );
   }
 }

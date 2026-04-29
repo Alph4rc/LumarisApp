@@ -92,7 +92,7 @@ class ErrorBanner extends StatelessWidget {
 ///
 /// 使用示例：
 /// ```dart
-/// Obx(() {
+/// Consumer(builder: (context, ref, child) {
 ///   if (controllers.isLoading.value) {
 ///     return LoadingWidget();
 ///   }

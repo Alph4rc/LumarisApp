@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../club_card.dart';
 import '../../../state/electricity_store.dart';
 
-class ElectricityTile extends StatelessWidget {
+class ElectricityTile extends ConsumerWidget {
   const ElectricityTile({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final ElectricityStore controller = Get.find<ElectricityStore>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final electricity = ref.watch(electricityStoreProvider);
 
     return ClubCard(
       child: Material(
@@ -22,9 +22,9 @@ class ElectricityTile extends StatelessWidget {
           borderRadius: ClubRadii.tile,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Obx(() {
+            child: Builder(builder: (context) {
               // Loading state
-              if (controller.isLoading.value) {
+              if (electricity.isLoading) {
                 return const Center(
                   child: LoadingStateView(
                     title: '正在读取电费',
@@ -36,8 +36,8 @@ class ElectricityTile extends StatelessWidget {
               }
 
               // Has Data state
-              if (controller.hasData.value) {
-                final amount = controller.electricity.value;
+              if (electricity.hasData) {
+                final amount = electricity.electricity;
                 final isLow = amount <= 10;
                 final primaryColor = isLow
                     ? CupertinoColors.destructiveRed

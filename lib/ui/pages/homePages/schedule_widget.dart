@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
@@ -7,7 +8,6 @@ import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
-import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 
@@ -18,22 +18,19 @@ import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 
-class ScheduleWidget extends StatefulWidget {
+class ScheduleWidget extends ConsumerStatefulWidget {
   const ScheduleWidget({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ScheduleWidgetState();
+  ConsumerState<ScheduleWidget> createState() => _ScheduleWidgetState();
 }
 
-class _ScheduleWidgetState extends State<ScheduleWidget> {
+class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
   late bool isRemind = false;
-  late ScheduleStore scheduleStore;
 
   @override
   void initState() {
     super.initState();
-    // 使用 Get.find 获取已经在其他地方初始化的 ScheduleStore 实例
-    scheduleStore = Get.find<ScheduleStore>();
     _initializeData();
   }
 
@@ -42,8 +39,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
       if (!mounted) return;
 
       setState(() {
-        // 使用SettingsStore中的isRemind值
-        isRemind = SettingsStore.to.isRemind;
+        isRemind = ref.read(settingsStoreProvider).isRemind;
       });
     } catch (e) {
       AppLogger.debug('初始化失败: $e');
@@ -54,6 +50,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final scheduleState = ref.watch(scheduleStoreProvider);
+    final scheduleStore = ref.read(scheduleStoreProvider.notifier);
+    final settings = ref.watch(settingsStoreProvider);
+    final settingsStore = ref.read(settingsStoreProvider.notifier);
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -63,13 +63,13 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           padding: const EdgeInsets.all(16.0),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Obx(() => Text(
-                  '${scheduleStore.showTomorrow ? '明' : '今'}日课表',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
+            Text(
+              '${scheduleState.showTomorrow ? '明' : '今'}日课表',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
@@ -84,28 +84,28 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                                   children: [
                                     ClubListTile(
                                         title: const Text('显示明天的课表'),
-                                        trailing: Obx(() => CupertinoSwitch(
-                                            value: scheduleStore.isShowTomorrow,
+                                        trailing: CupertinoSwitch(
+                                            value: settings.isShowTomorrow,
                                             onChanged: (value) async {
                                               await scheduleStore
                                                   .toggleShowTomorrow();
                                               _initializeData(); // 重新加载数据
-                                            }))),
+                                            })),
                                     if (PlatformUtils.isIOS ||
                                         PlatformUtils.isAndroid)
                                       ClubListTile(
                                         title: const Text('课程通知'),
-                                        trailing: Obx(() => CupertinoSwitch(
-                                              value: SettingsStore.to.isRemind,
-                                              onChanged: (bool value) async {
-                                                await SettingsStore.to
-                                                    .setIsRemind(value);
-                                                if (value && context.mounted) {
-                                                  await NotificationService.set(
-                                                      context);
-                                                }
-                                              },
-                                            )),
+                                        trailing: CupertinoSwitch(
+                                          value: settings.isRemind,
+                                          onChanged: (bool value) async {
+                                            await settingsStore
+                                                .setIsRemind(value);
+                                            if (value && context.mounted) {
+                                              await NotificationService.set(
+                                                  context);
+                                            }
+                                          },
+                                        ),
                                       )
                                   ]))));
                 })
@@ -115,8 +115,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
           child: AnimatedCard(
             child: ClubCard(
-              child: Obx(() {
-                // 使用 Obx 监听 ScheduleStore 中的变化
+              child: Builder(builder: (context) {
                 final todayCourses = scheduleStore.getTodayCourses();
 
                 return todayCourses.isEmpty

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/system/tile_edit_controller.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -7,42 +7,41 @@ import 'package:ios_club_app/ui/components/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 /// Controls for entering and exiting tile edit mode
-class TileEditControls extends StatelessWidget {
+class TileEditControls extends ConsumerWidget {
   const TileEditControls({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<TileEditController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEditMode = ref.watch(
+      tileEditControllerProvider.select((value) => value.isEditMode),
+    );
+    final controller = ref.read(tileEditControllerProvider.notifier);
 
-    return Obx(() {
-      final isEditMode = controller.isEditMode.value;
-
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Title
-            const Text(
-              '快捷功能',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.5,
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Title
+          const Text(
+            '快捷功能',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
             ),
+          ),
 
-            // Edit/Done button
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: isEditMode
-                  ? _buildDoneButton(controller)
-                  : _buildEditButton(controller),
-            ),
-          ],
-        ),
-      );
-    });
+          // Edit/Done button
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: isEditMode
+                ? _buildDoneButton(controller)
+                : _buildEditButton(controller),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Build edit button
@@ -77,7 +76,7 @@ class TileEditControls extends StatelessWidget {
 }
 
 /// Visual indicator for edit mode (optional overlay)
-class EditModeIndicator extends StatelessWidget {
+class EditModeIndicator extends ConsumerWidget {
   final Widget child;
 
   const EditModeIndicator({
@@ -86,26 +85,24 @@ class EditModeIndicator extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<TileEditController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEditMode = ref.watch(
+      tileEditControllerProvider.select((value) => value.isEditMode),
+    );
 
-    return Obx(() {
-      final isEditMode = controller.isEditMode.value;
-
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        decoration: BoxDecoration(
-          border: isEditMode
-              ? Border.all(
-                  color: Colors.blue.withValues(alpha: 0.3),
-                  width: 2,
-                )
-              : null,
-          borderRadius: ClubRadii.control,
-        ),
-        child: child,
-      );
-    });
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        border: isEditMode
+            ? Border.all(
+                color: Colors.blue.withValues(alpha: 0.3),
+                width: 2,
+              )
+            : null,
+        borderRadius: ClubRadii.control,
+      ),
+      child: child,
+    );
   }
 }
 
@@ -124,85 +121,80 @@ class EmptyTilesMessage extends StatelessWidget {
 }
 
 /// Available tiles list for edit mode (shows hidden tiles)
-class AvailableTilesList extends StatelessWidget {
+class AvailableTilesList extends ConsumerWidget {
   const AvailableTilesList({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<TileEditController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tileEditState = ref.watch(tileEditControllerProvider);
+    final controller = ref.read(tileEditControllerProvider.notifier);
+    final allTiles = tileEditState.config.configurations;
+    final hiddenTiles = allTiles.where((t) => !t.isVisible).toList();
 
-    return Obx(() {
-      final allTiles = controller.allTiles;
-      final hiddenTiles = allTiles.where((t) => !t.isVisible).toList();
+    if (hiddenTiles.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-      if (hiddenTiles.isEmpty) {
-        return const SizedBox.shrink();
-      }
-
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 8.0, bottom: 8.0, top: 16.0),
-              child: Text(
-                '更多功能',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8.0, bottom: 8.0, top: 16.0),
+            child: Text(
+              '更多功能',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.5,
               ),
             ),
-            ClubCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: hiddenTiles.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final tileId = entry.value.id;
-                  final isLast = index == hiddenTiles.length - 1;
+          ),
+          ClubCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: hiddenTiles.asMap().entries.map((entry) {
+                final index = entry.key;
+                final tileId = entry.value.id;
+                final isLast = index == hiddenTiles.length - 1;
 
-                  return Column(
-                    children: [
-                      ClubListTile(
-                        leading: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 16,
-                          ),
+                return Column(
+                  children: [
+                    ClubListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
                         ),
-                        title: Text(
-                          tileId,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 16,
                         ),
-                        onTap: () => controller.toggleVisibility(tileId),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
                       ),
-                      if (!isLast)
-                        const Divider(
-                            height: 1,
-                            indent: 48,
-                            endIndent: 16,
-                            thickness: 0.5),
-                    ],
-                  );
-                }).toList(),
-              ),
+                      title: Text(
+                        tileId,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () => controller.toggleVisibility(tileId),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 4.0),
+                    ),
+                    if (!isLast)
+                      const Divider(
+                          height: 1, indent: 48, endIndent: 16, thickness: 0.5),
+                  ],
+                );
+              }).toList(),
             ),
-          ],
-        ),
-      );
-    });
+          ),
+        ],
+      ),
+    );
   }
 }
