@@ -33,7 +33,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     with AutomaticKeepAliveClientMixin {
   final CourseStore courseStore = CourseStore.to;
   final SettingsStore settingsStore = SettingsStore.to;
-  final ScrollController _scrollController = ScrollController();
   List<String> totalList = [];
   List<String> ignoreList = [];
   late List<CourseIgnore> _ignores = [];
@@ -46,12 +45,6 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   void initState() {
     super.initState();
     _initData();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   Future<void> _initData() async {
@@ -112,18 +105,14 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     final cardColor = isDark ? Colors.grey[900] : Colors.white;
 
     return Scaffold(
-        extendBodyBehindAppBar: true,
         appBar: ClubAppBar(
           title: '课表设置',
-          scrollController: _scrollController,
         ),
         body: SingleChildScrollView(
-          controller: _scrollController,
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight),
               if (!isDesktop) ...[
                 _buildSectionTitle('日历订阅'),
                 const SizedBox(height: 12),

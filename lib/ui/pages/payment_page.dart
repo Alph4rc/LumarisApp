@@ -12,27 +12,14 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 
-class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key});
-
-  @override
-  State<PaymentPage> createState() => _PaymentPageState();
-}
-
-class _PaymentPageState extends State<PaymentPage> {
+class PaymentPage extends StatelessWidget {
   final PaymentStore controller = Get.put(PaymentStore());
-  final ScrollController _scrollController = ScrollController();
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+  PaymentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: Obx(() => _buildContent()),
     );
@@ -41,7 +28,6 @@ class _PaymentPageState extends State<PaymentPage> {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return ClubAppBar(
       title: '饭卡余额',
-      scrollController: _scrollController,
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
@@ -53,11 +39,9 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _buildContent() {
     return SingleChildScrollView(
-      controller: _scrollController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight),
           _buildStatisticsSection(),
           Obx(() {
             if (controller.isLoading.value) {

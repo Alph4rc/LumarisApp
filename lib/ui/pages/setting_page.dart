@@ -27,21 +27,8 @@ import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 
-class SettingPage extends StatefulWidget {
+class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
-
-  @override
-  State<SettingPage> createState() => _SettingPageState();
-}
-
-class _SettingPageState extends State<SettingPage> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +37,8 @@ class _SettingPageState extends State<SettingPage> {
     final userStore = Get.find<UserStore>();
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: ClubAppBar(
         title: '设置',
-        scrollController: _scrollController,
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -61,11 +46,10 @@ class _SettingPageState extends State<SettingPage> {
           final horizontalPadding = isTablet ? 32.0 : 16.0;
 
           return SingleChildScrollView(
-            controller: _scrollController,
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               children: [
-                SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 24),
+                const SizedBox(height: 24),
                 // App 图标区域
                 _buildAppHeader(context, isDark),
                 const SizedBox(height: 32),
