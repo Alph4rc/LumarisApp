@@ -6,7 +6,6 @@ import 'package:ios_club_app/core/utils/animations/app_animations.dart';
 class LoadingStateView extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData icon;
   final bool compact;
   final bool showCard;
   final EdgeInsetsGeometry padding;
@@ -15,7 +14,6 @@ class LoadingStateView extends StatelessWidget {
     super.key,
     this.title = '正在同步数据',
     this.subtitle = '网络较慢时可能需要几秒，请稍等一下',
-    this.icon = CupertinoIcons.cloud_download,
     this.compact = false,
     this.showCard = false,
     this.padding = const EdgeInsets.all(24),
@@ -55,7 +53,6 @@ class LoadingStateView extends StatelessWidget {
       key: const ValueKey('loading_full'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 极简风格：移除冗余的图标叠放，使用标准的 iOS 加载指示器
         const CupertinoActivityIndicator(radius: 16),
         const SizedBox(height: 24),
         Text(

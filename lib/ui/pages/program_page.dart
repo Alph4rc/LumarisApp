@@ -80,7 +80,6 @@ class ProgramPage extends StatelessWidget {
             child: LoadingStateView(
               title: '正在加载培养方案',
               subtitle: '正在整理学期课程结构和课程类别，请稍等一下',
-              icon: CupertinoIcons.square_list_fill,
             ),
           );
         }

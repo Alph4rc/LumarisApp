@@ -220,7 +220,6 @@ class _ScorePageState extends State<ScorePage>
           child: LoadingStateView(
             title: _loadingText,
             subtitle: '正在读取缓存并同步教务成绩，网络较慢时可能需要几秒',
-            icon: CupertinoIcons.chart_bar_alt_fill,
           ),
         ),
       );

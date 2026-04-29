@@ -41,12 +41,12 @@ struct Provider: TimelineProvider {
             todayDateString: todayDateString,
             tomorrowDateString: tomorrowDateString,
             todayCourses: [
-                Course(title: "高等数学", time: "第1-2节 08:00-09:30", location: "教学楼A101", teacher: "张教授"),
-                Course(title: "大学英语", time: "第3-4节 10:00-11:30", location: "教学楼B205", teacher: "李老师")
+                Course(title: "高等数学", time: "第1-2节 08:00-09:30", location: "教学楼A101", teacher: "教学楼A101"),
+                Course(title: "大学英语", time: "第3-4节 10:00-11:30", location: "教学楼B205", teacher: "教学楼B205")
             ],
             tomorrowCourses: [
-                Course(title: "计算机科学", time: "第1-2节 08:00-09:30", location: "实验楼C301", teacher: "王博士"),
-                Course(title: "物理学", time: "第3-4节 10:00-11:30", location: "教学楼D405", teacher: "赵教授")
+                Course(title: "计算机科学", time: "第1-2节 08:00-09:30", location: "实验楼C301", teacher: "实验楼C301"),
+                Course(title: "物理学", time: "第3-4节 10:00-11:30", location: "教学楼D405", teacher: "教学楼D405")
             ]
         )
     }
@@ -268,14 +268,6 @@ struct CourseRowView: View {
                     }
                     .lineLimit(1)
 
-                    HStack(spacing: 4) {
-                        Image(systemName: "person")
-                            .font(.caption2)
-                            .foregroundColor(Color.gray.opacity(0.6))
-                        Text(course.teacher)
-                            .font(.caption2)
-                    }
-                    .lineLimit(1)
                 }
             }
 

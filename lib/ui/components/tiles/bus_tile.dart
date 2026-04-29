@@ -22,7 +22,7 @@ class BusTile extends StatelessWidget {
             child: Obx(() {
               if (busStore.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: CupertinoActivityIndicator(),
                 );
               }
 

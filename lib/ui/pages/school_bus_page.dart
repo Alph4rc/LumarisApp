@@ -66,7 +66,6 @@ class SchoolBusPage extends StatelessWidget {
           child: LoadingStateView(
             title: '正在获取校车班次',
             subtitle: '正在按日期整理两校区往返班车信息',
-            icon: CupertinoIcons.bus,
             showCard: true,
           ),
         );

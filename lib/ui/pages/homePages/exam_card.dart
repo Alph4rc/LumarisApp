@@ -218,7 +218,6 @@ class _ExamCardState extends State<ExamCard> {
             child: LoadingStateView(
               title: '正在加载考试信息',
               subtitle: '正在同步近期考试安排、考场和座位信息',
-              icon: CupertinoIcons.calendar,
               compact: true,
               padding: EdgeInsets.all(20),
             ),

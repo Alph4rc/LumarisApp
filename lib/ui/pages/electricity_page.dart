@@ -207,7 +207,6 @@ class _ElectricityPageState extends State<ElectricityPage> {
                       child: LoadingStateView(
                         title: '正在刷新用电趋势',
                         subtitle: '正在读取最新电费记录',
-                        icon: CupertinoIcons.bolt_fill,
                         compact: true,
                         showCard: false,
                         padding: EdgeInsets.zero,

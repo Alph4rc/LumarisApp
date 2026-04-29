@@ -23,7 +23,7 @@ class PaymentTile extends StatelessWidget {
               // Loading state
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: CupertinoActivityIndicator(),
                 );
               }
 

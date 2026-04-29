@@ -172,7 +172,6 @@ class _LoginPageState extends State<LoginPage> {
           child: LoadingStateView(
             title: '正在登录教务系统',
             subtitle: '正在验证账号并同步课程、成绩等基础数据，首次登录可能需要几秒',
-            icon: CupertinoIcons.person_crop_circle,
           ),
         ),
       );

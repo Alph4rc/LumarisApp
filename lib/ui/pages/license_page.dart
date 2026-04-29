@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
@@ -40,7 +41,7 @@ class _LicensePageState extends State<LicensePage> {
     return Scaffold(
       appBar: ClubAppBar(title: '开源许可证'),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CupertinoActivityIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: SelectableText(_licenseText),

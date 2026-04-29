@@ -43,7 +43,6 @@ class CourseListRemoteViewsFactory(
             views.setTextViewText(R.id.course_title, course.title)
             views.setTextViewText(R.id.course_time, course.time)
             views.setTextViewText(R.id.course_location, course.location)
-            views.setTextViewText(R.id.course_teacher, course.teacher)
 
             // 根据课程名称生成颜色并设置给分隔线 (ImageView)
             val color = CourseColorManager.generateSoftColor(course.title)

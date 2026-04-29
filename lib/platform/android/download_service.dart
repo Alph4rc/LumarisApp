@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -171,14 +172,7 @@ class UpdateManager {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 线性进度条
-                  LinearProgressIndicator(
-                    value: downloadProgress.progress,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  const CupertinoActivityIndicator(radius: 14),
                   const SizedBox(height: 16),
                   // 进度信息
                   Row(

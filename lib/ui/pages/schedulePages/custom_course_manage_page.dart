@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -199,7 +200,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
         ),
         body: isLoading
             ? const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CupertinoActivityIndicator(),
               )
             : customCourses.isEmpty
                 ? Center(

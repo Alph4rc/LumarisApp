@@ -103,7 +103,6 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                     child: LoadingStateView(
                       title: '正在加载课表',
                       subtitle: '正在读取课程、偏好设置和背景配置',
-                      icon: CupertinoIcons.calendar_today,
                     ),
                   );
                 }

@@ -24,7 +24,6 @@ void main() {
         const LoadingStateView(
           title: '正在同步教务数据',
           subtitle: '网络较慢时可能需要几秒',
-          icon: CupertinoIcons.cloud_download,
         ),
       ),
     );
@@ -40,7 +39,6 @@ void main() {
         const LoadingStateView(
           title: '正在加载课表',
           subtitle: '正在读取课程和偏好设置',
-          icon: CupertinoIcons.calendar_today,
         ),
       ),
     );
@@ -51,7 +49,6 @@ void main() {
         const LoadingStateView(
           title: '正在加载课表',
           subtitle: '正在读取课程和偏好设置',
-          icon: CupertinoIcons.calendar_today,
         ),
         themeMode: ThemeMode.dark,
       ),
@@ -67,7 +64,6 @@ void main() {
           child: LoadingStateView(
             title: '正在刷新用电趋势',
             subtitle: '正在读取最新电费记录',
-            icon: CupertinoIcons.bolt_fill,
             compact: true,
             showCard: true,
           ),

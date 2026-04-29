@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// 优化的图片加载组件
@@ -98,7 +99,7 @@ class OptimizedImage extends StatelessWidget {
         child: SizedBox(
           width: width != null ? width! * 0.5 : 24,
           height: height != null ? height! * 0.5 : 24,
-          child: const CircularProgressIndicator(strokeWidth: 2),
+          child: const CupertinoActivityIndicator(),
         ),
       ),
     );

@@ -46,7 +46,6 @@ class PaymentPage extends StatelessWidget {
               return const LoadingStateView(
                 title: '正在读取饭卡余额',
                 subtitle: '正在同步余额和近期流水，校园网络较慢时可能需要几秒',
-                icon: CupertinoIcons.creditcard_fill,
                 showCard: true,
               );
             }

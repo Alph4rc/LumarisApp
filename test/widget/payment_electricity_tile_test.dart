@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -48,7 +49,7 @@ void main() {
       store.hasData.value = false;
 
       await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
     });
 
     testWidgets('shows low balance style when amount is small', (tester) async {
@@ -92,7 +93,7 @@ void main() {
       store.isLoading.value = true;
 
       await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
     });
 
     testWidgets('shows low balance state when recharge value is low',

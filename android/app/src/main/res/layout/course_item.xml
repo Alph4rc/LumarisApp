@@ -50,34 +50,15 @@
                 android:text="09:00 - 10:30"
                 android:textColor="@color/course_info_text_light"
                 android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="6dp"
-                android:text="•"
-                android:textColor="@color/course_info_text_light"
-                android:textSize="12sp" />
-
-            <!-- 地点 -->
-            <TextView
-                android:id="@+id/course_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="教学楼 A101"
-                android:textColor="@color/course_info_text_light"
-                android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- 教师 (次要信息) -->
+        <!-- 教室 -->
         <TextView
-            android:id="@+id/course_teacher"
+            android:id="@+id/course_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:text="张教授"
+            android:text="教学楼 A101"
             android:textColor="@color/course_info_text_light"
             android:textSize="11sp"
             android:alpha="0.8" />

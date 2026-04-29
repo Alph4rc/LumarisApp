@@ -331,7 +331,7 @@ class TaskExecutor {
           time:
               '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
           location: course.room,
-          teacher: course.teachers.join(','),
+          teacher: course.room,
         ));
       } catch (e) {
         AppLogger.debug('转换课程 ${course.courseName} 失败: $e');
