@@ -45,7 +45,6 @@ class WorkmanagerService {
     if (_isInitialized) return;
     await Workmanager().initialize(
       callbackDispatcher,
-      isInDebugMode: false,
     );
     _isInitialized = true;
     AppLogger.debug('WorkManager 初始化完成');
