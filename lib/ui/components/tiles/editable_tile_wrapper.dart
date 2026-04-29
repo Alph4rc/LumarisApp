@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
@@ -129,7 +129,7 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
     return content;
   }
 
-  Widget _buildHideButton(TileEditController controller) {
+  Widget _buildHideButton(TileEditNotifier controller) {
     return GestureDetector(
       onTap: () async {
         try {

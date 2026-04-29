@@ -252,16 +252,16 @@ class _SchoolBusPageState extends ConsumerState<SchoolBusPage>
               onChanged: busController.toggleShowBus,
             ),
           ),
-          // if (!kIsWeb) const SizedBox(height: 10),
-          // if (!kIsWeb)
-          //   ClubListTile(
-          //     title: const Text('是否使用新API'),
-          //     subtitle: const Text('新的API接口只能在校园网内使用'),
-          //     trailing: CupertinoSwitch(
-          //       value: busState.useNewApi,
-          //       onChanged: busController.toggleUseNewApi,
-          //     ),
-          //   ),
+          if (!kIsWeb) const SizedBox(height: 10),
+          if (!kIsWeb)
+            ClubListTile(
+              title: const Text('是否使用新API'),
+              subtitle: const Text('新的API接口只能在校园网内使用'),
+              trailing: CupertinoSwitch(
+                value: busState.useNewApi,
+                onChanged: busController.toggleUseNewApi,
+              ),
+            ),
         ],
       ),
     );
