@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
 import 'package:ios_club_app/ui/components/tiles/editable_tile_wrapper.dart';
 
@@ -19,7 +19,7 @@ class TilesWidget extends ConsumerStatefulWidget {
 
 class _TilesWidgetState extends ConsumerState<TilesWidget>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
-  late final TileEditController _tileEditController;
+  late final TileEditNotifier _tileEditController;
 
   @override
   bool get wantKeepAlive => true;
@@ -83,7 +83,7 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
 
   /// Build reorderable grid for full Flutter platforms
   Widget _buildReorderableGrid(
-      List visibleTiles, TileEditController controller) {
+      List visibleTiles, TileEditNotifier controller) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       child: ReorderableGridView.builder(

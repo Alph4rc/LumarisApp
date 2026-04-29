@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/services/auth_state_notifier.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/auth_state_notifier.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/electricity_store.dart';

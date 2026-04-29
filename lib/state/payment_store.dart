@@ -3,7 +3,7 @@ import 'package:ios_club_app/core/services/payment_analyzer.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart' show PrefsKeys;

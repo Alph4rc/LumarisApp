@@ -28,11 +28,11 @@ final availableTilesReaderProvider = Provider<AvailableTilesReader>((ref) {
 });
 
 final tileEditControllerProvider =
-    NotifierProvider<TileEditController, TileEditState>(
-  TileEditController.new,
+    NotifierProvider<TileEditNotifier, TileEditState>(
+  TileEditNotifier.new,
 );
 
-class TileEditController extends Notifier<TileEditState> {
+class TileEditNotifier extends Notifier<TileEditState> {
   Timer? _inactivityTimer;
   static const Duration _inactivityDuration = Duration(seconds: 30);
 

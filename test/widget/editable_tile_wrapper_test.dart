@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/tiles/editable_tile_wrapper.dart';
 import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
@@ -45,7 +45,7 @@ class TileEditControls extends ConsumerWidget {
   }
 
   /// Build edit button
-  Widget _buildEditButton(TileEditController controller) {
+  Widget _buildEditButton(TileEditNotifier controller) {
     return TextButton.icon(
       key: const ValueKey('edit_button'),
       onPressed: () => controller.toggleEditMode(),
@@ -59,7 +59,7 @@ class TileEditControls extends ConsumerWidget {
   }
 
   /// Build done button
-  Widget _buildDoneButton(TileEditController controller) {
+  Widget _buildDoneButton(TileEditNotifier controller) {
     return ElevatedButton.icon(
       key: const ValueKey('done_button'),
       onPressed: () => controller.toggleEditMode(),

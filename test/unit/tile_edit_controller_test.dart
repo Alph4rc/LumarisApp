@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -29,7 +29,7 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 20));
   }
 
-  TileEditController controller() =>
+  TileEditNotifier controller() =>
       container.read(tileEditControllerProvider.notifier);
 
   group('TileEditController', () {
