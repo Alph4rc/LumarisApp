@@ -34,7 +34,8 @@
       "Bash(curl *)",
       "Bash(dart analyze *)",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(dart run *)"
+      "Bash(dart run *)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

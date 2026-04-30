@@ -64,10 +64,10 @@ class RemindSetting extends ConsumerWidget {
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       builder: (BuildContext context) {
-        final settings = ref.watch(settingsStoreProvider);
-        final settingsStore = ref.read(settingsStoreProvider.notifier);
-        return StatefulBuilder(
-          builder: (context, setStateBottomSheet) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final settings = ref.watch(settingsStoreProvider);
+            final settingsStore = ref.read(settingsStoreProvider.notifier);
             return Padding(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,

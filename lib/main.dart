@@ -17,6 +17,7 @@ import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
@@ -128,6 +129,7 @@ Future<void> _deferredInit() async {
   }
 
   if (PlatformUtils.isMobile) {
+    await NotificationService.instance.initialize();
     Future.delayed(const Duration(seconds: 2), () async {
       await TaskExecutor.checkAndSendCourseReminder();
       await TaskExecutor.updateWidget();

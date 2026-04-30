@@ -26,25 +26,9 @@ class ScheduleWidget extends ConsumerStatefulWidget {
 }
 
 class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
-  late bool isRemind = false;
-
   @override
   void initState() {
     super.initState();
-    _initializeData();
-  }
-
-  Future<void> _initializeData() async {
-    try {
-      if (!mounted) return;
-
-      setState(() {
-        isRemind = ref.read(settingsStoreProvider).isRemind;
-      });
-    } catch (e) {
-      AppLogger.debug('初始化失败: $e');
-      // 可添加错误处理逻辑（如显示错误提示）
-    }
   }
 
   @override
@@ -75,9 +59,13 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                 onPressed: () {
                   showDialog(
                       context: context,
-                      builder: (alertContext) => StatefulBuilder(
-                          // 使用 StatefulBuilder 包装 AlertDialog
-                          builder: (context, setStateDialog) => AlertDialog(
+                      builder: (alertContext) => Consumer(
+                          builder: (context, ref, child) {
+                            final settings = ref.watch(settingsStoreProvider);
+                            final scheduleStore = ref.read(scheduleStoreProvider.notifier);
+                            final settingsStore = ref.read(settingsStoreProvider.notifier);
+                            
+                            return AlertDialog(
                               title: const Text('设置'),
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -89,7 +77,6 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                                             onChanged: (value) async {
                                               await scheduleStore
                                                   .toggleShowTomorrow();
-                                              _initializeData(); // 重新加载数据
                                             })),
                                     if (PlatformUtils.isIOS ||
                                         PlatformUtils.isAndroid)
@@ -107,7 +94,8 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                                           },
                                         ),
                                       )
-                                  ]))));
+                                  ]));
+                          }));
                 })
           ]),
         ),

@@ -5,7 +5,7 @@ This is a cross-platform Flutter application for students at Xi'an University of
 
 ## Core Technologies & Architecture
 - **Framework:** Flutter (SDK >=3.5.3 <4.0.0)
-- **State Management:** GetX (`lib/state/`) - Stores are initialized in `lib/state/init.dart` and accessed via `Get.find<T>()` or `T.to`.
+- **State Management:** Riverpod (`lib/state/`) - Stores are implemented as `Notifier` or `AsyncNotifier` and accessed via `ref.watch()` or `ref.read()`.
 - **Networking:** Dio with custom `RequestCache` (`lib/core/services/net_service.dart`).
 - **Storage:** Transitioning from `SharedPreferences` to `Hive` and `flutter_secure_storage` for improved performance and security (see `CACHE_IMPROVEMENT_PLAN.md`).
 
