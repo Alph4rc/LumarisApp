@@ -15,7 +15,6 @@ import 'package:ios_club_app/features/system/notifications/notification_service.
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_radii.dart';
-import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 
 class ScheduleWidget extends ConsumerStatefulWidget {
