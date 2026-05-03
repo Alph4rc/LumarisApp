@@ -11,8 +11,27 @@ import 'package:ios_club_app/features/education/models/link_model.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/icon_font.dart';
 
-class LinkPage extends StatelessWidget {
+class LinkPage extends StatefulWidget {
   const LinkPage({super.key});
+
+  @override
+  State<LinkPage> createState() => _LinkPageState();
+}
+
+class _LinkPageState extends State<LinkPage> {
+  late Future<List<CategoryModel>> _linksFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _linksFuture = LinkApi.getLinks();
+  }
+
+  void _refreshLinks() {
+    setState(() {
+      _linksFuture = LinkApi.getLinks();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +39,16 @@ class LinkPage extends StatelessWidget {
     return Scaffold(
       appBar: ClubAppBar(
         title: '校园导航',
+        actions: [
+          IconButton(
+            onPressed: _refreshLinks,
+            icon: const Icon(Icons.refresh),
+            tooltip: '刷新',
+          ),
+        ],
       ),
       body: FutureBuilder(
-        future: LinkApi.getLinks(),
+        future: _linksFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
