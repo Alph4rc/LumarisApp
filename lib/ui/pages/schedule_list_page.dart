@@ -22,7 +22,6 @@ import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
 // 条件导入 dart:io，仅在非 Web 环境中使用
@@ -87,8 +86,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final settings = ref.watch(settingsStoreProvider);
     final scheduleState = ref.watch(scheduleStoreProvider);
 
-    return ClubScaffold(
-      useSliverAppBar: false,
+    return Scaffold(
       body: Builder(builder: (context) {
         final hasCustomBackground = settings.scheduleBackground == 'custom' &&
             settings.customBackgroundImage.isNotEmpty;

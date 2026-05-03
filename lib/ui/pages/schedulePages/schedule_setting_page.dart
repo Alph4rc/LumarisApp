@@ -8,7 +8,6 @@ import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
-import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -109,8 +108,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     final isDark = theme.brightness == Brightness.dark;
     final cardColor = isDark ? Colors.grey[900] : Colors.white;
 
-    return ClubScaffold(
-        appBar: const ClubAppBar(
+    return Scaffold(
+        appBar: ClubAppBar(
           title: '课表设置',
         ),
         body: SingleChildScrollView(

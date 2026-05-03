@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 
 class EasterEggPage extends StatelessWidget {
@@ -8,9 +7,8 @@ class EasterEggPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClubScaffold(
-      useSliverAppBar: false,
-      appBar: const ClubAppBar(
+    return Scaffold(
+      appBar: ClubAppBar(
         title: '🎉 彩蛋',
       ),
       body: Center(

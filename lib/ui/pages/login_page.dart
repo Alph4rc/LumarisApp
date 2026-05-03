@@ -15,7 +15,6 @@ import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
-import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -170,8 +169,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         isDark ? const Color(0xFF1C1C1E) : Colors.white;
 
     if (_isLoading) {
-      return const ClubScaffold(
-        useSliverAppBar: false,
+      return const Scaffold(
         body: Center(
           child: LoadingStateView(
             title: '正在登录教务系统',
@@ -181,8 +179,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       );
     }
 
-    return ClubScaffold(
-      useSliverAppBar: false,
+    return Scaffold(
       // 简约风格通常使用系统背景色，Material 3 默认背景色已足够适配
       appBar: AppBar(
         backgroundColor: Colors.transparent,

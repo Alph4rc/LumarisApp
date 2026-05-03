@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/core/models/link_model.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/icon_font.dart';
-import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 class LinkPage extends StatelessWidget {
@@ -15,8 +14,7 @@ class LinkPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClubScaffold(
-      useSliverAppBar: false,
+    return Scaffold(
       appBar: const ClubAppBar(
         title: '校园导航',
       ),

@@ -4,8 +4,6 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'package:ios_club_app/ui/components/club_scaffold.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthorPage extends StatelessWidget {
@@ -15,12 +13,25 @@ class AuthorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.clubColors;
 
-    return ClubScaffold(
+    return Scaffold(
       backgroundColor: colors.groupedBackground,
-      appBar: const ClubAppBar(title: '关于作者'),
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+          SliverAppBar.large(
+            title: Text(
+              '关于作者',
+              style: TextStyle(
+                color: colors.label,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: colors.groupedBackground,
+            centerTitle: false,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            surfaceTintColor: Colors.transparent,
+          ),
           SliverToBoxAdapter(
             child: Center(
               child: ConstrainedBox(
