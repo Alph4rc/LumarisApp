@@ -1,119 +1,64 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:html/parser.dart' as parser;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models/electric_data.dart';
 import '../../../core/services/prefs_service.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../state/prefs_keys.dart';
+import 'electricity_api.dart';
+
+typedef ElectricityBalanceReader = Future<double?> Function({String? url});
+typedef ElectricityWeeklyDataReader =
+    Future<List<ElectricData>> Function({String? url});
+typedef ElectricityRechargeUrlReader = Future<String?> Function({String? url});
 
 /// 电费数据服务
 ///
-/// 负责读取本地保存的电费页面链接、抓取余额与明细，
-/// 并统一处理充值页跳转逻辑，便于后续切换到后端接口实现。
+/// 负责封装电费 API 调用，并统一处理本地 URL 缓存与充值页跳转逻辑。
 class ElectricityService {
-  ElectricityService({Dio? dio})
-      : _dio = dio ??
-            Dio(
-              BaseOptions(
-                connectTimeout: const Duration(seconds: 10),
-                receiveTimeout: const Duration(seconds: 10),
-              ),
-            );
+  ElectricityService({
+    ElectricityBalanceReader? balanceReader,
+    ElectricityWeeklyDataReader? weeklyDataReader,
+    ElectricityRechargeUrlReader? rechargeUrlReader,
+  })  : _balanceReader = balanceReader ?? ElectricityApi.getCurrentBalance,
+        _weeklyDataReader = weeklyDataReader ?? ElectricityApi.getWeeklyData,
+        _rechargeUrlReader = rechargeUrlReader ?? ElectricityApi.getRechargeUrl;
 
-  final Dio _dio;
+  final ElectricityBalanceReader _balanceReader;
+  final ElectricityWeeklyDataReader _weeklyDataReader;
+  final ElectricityRechargeUrlReader _rechargeUrlReader;
 
   Future<double?> fetchCurrentBalance({String? url}) async {
     try {
-      final resolvedUrl = _resolveSourceUrl(url);
+      if (url != null) {
+        await PrefsService.instance.setString(
+          PrefsKeys.ELECTRICITY_URL,
+          url,
+        );
+      }
+      final resolvedUrl = await _resolveSourceUrl();
       if (resolvedUrl.isEmpty) {
         return null;
       }
 
-      final response = await _dio.get(resolvedUrl);
-      if (response.statusCode != 200) {
-        throw Exception('HTTP请求失败: ${response.statusCode}');
-      }
-
-      final document = parser.parse(response.data);
-      final textNodes = document.body?.text
-              .split('\n')
-              .map((text) => text.trim())
-              .where((text) => text.isNotEmpty) ??
-          const Iterable<String>.empty();
-
-      for (final text in textNodes) {
-        if (!text.contains('充值余额：¥')) {
-          continue;
-        }
-
-        final balanceText = text.split('充值余额：¥')[1].trim();
-        final balance = double.tryParse(balanceText);
-        if (balance != null) {
-          await PrefsService.instance.setString(
-            PrefsKeys.ELECTRICITY_URL,
-            resolvedUrl,
-          );
-          return balance;
-        }
-      }
-
-      return null;
+      return await _balanceReader(url: resolvedUrl);
     } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('获取电费余额失败: $e');
-      }
+      AppLogger.error('获取电费余额失败: $e');
       return null;
     }
   }
 
   Future<List<ElectricData>> fetchWeeklyData() async {
-    final sourceUrl =
-        PrefsService.instance.getString(PrefsKeys.ELECTRICITY_URL);
-    if (sourceUrl == null || sourceUrl.isEmpty) {
-      return [];
-    }
-
-    final detailUrl = sourceUrl.replaceAll('wxAccount', 'wxElecDtl');
-    final response = await _dio.get(detailUrl);
-    final document = parser.parse(response.data);
-    final tables = document.querySelectorAll('table');
-    final List<ElectricData> data = [];
-
-    for (final table in tables) {
-      final rows = table.querySelectorAll('tr');
-      for (final row in rows) {
-        final cells = row.querySelectorAll('td');
-        if (cells.length != 3) {
-          continue;
-        }
-
-        final timestamp = _parseTimestamp(cells[1].text);
-        final value = double.tryParse(cells[2].text);
-        if (timestamp == null || value == null) {
-          continue;
-        }
-
-        if (data.isEmpty || data.last.timestamp.hour != timestamp.hour) {
-          data.add(ElectricData(timestamp: timestamp, value: value));
-        } else {
-          data.last.value += value;
-        }
-      }
-    }
-
-    data.sort((left, right) => left.timestamp.compareTo(right.timestamp));
-    return data;
+    final resolvedUrl = await _resolveSourceUrl();
+    return await _weeklyDataReader(
+      url: resolvedUrl.isEmpty ? null : resolvedUrl,
+    );
   }
 
   Future<String?> getRechargeUrl() async {
-    final sourceUrl =
-        PrefsService.instance.getString(PrefsKeys.ELECTRICITY_URL);
-    if (sourceUrl == null || sourceUrl.isEmpty) {
-      return null;
-    }
-    return sourceUrl.replaceAll('wxAccount', 'wxCharge');
+    final resolvedUrl = await _resolveSourceUrl();
+    return await _rechargeUrlReader(
+      url: resolvedUrl.isEmpty ? null : resolvedUrl,
+    );
   }
 
   Future<void> openRechargePage() async {
@@ -143,34 +88,15 @@ class ElectricityService {
     throw '无法打开 URL: $rechargeUrl';
   }
 
-  String _resolveSourceUrl(String? url) {
-    if (url != null && url.isNotEmpty) {
+  Future<String> _resolveSourceUrl({String? url}) async {
+    if (url != null) {
+      await PrefsService.instance.setString(
+        PrefsKeys.ELECTRICITY_URL,
+        url,
+      );
+
       return url;
     }
-
     return PrefsService.instance.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
-  }
-
-  DateTime? _parseTimestamp(String rawValue) {
-    final parts = rawValue.trim().split(' ');
-    if (parts.length != 2) {
-      return null;
-    }
-
-    final dayParts = parts[0].split('/');
-    final timeParts = parts[1].split(':');
-    if (dayParts.length != 3 || timeParts.length < 2) {
-      return null;
-    }
-
-    final year = int.tryParse(dayParts[0]);
-    final month = int.tryParse(dayParts[1]);
-    final day = int.tryParse(dayParts[2]);
-    final hour = int.tryParse(timeParts[0]);
-    if (year == null || month == null || day == null || hour == null) {
-      return null;
-    }
-
-    return DateTime(year, month, day, hour);
   }
 }
