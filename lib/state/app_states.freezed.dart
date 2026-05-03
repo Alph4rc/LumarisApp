@@ -1535,7 +1535,6 @@ abstract class _PaymentState implements PaymentState {
 mixin _$BusTileState {
   bool get isLoading => throw _privateConstructorUsedError;
   int get busCount => throw _privateConstructorUsedError;
-  bool get useNewApi => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $BusTileStateCopyWith<BusTileState> get copyWith =>
@@ -1548,7 +1547,7 @@ abstract class $BusTileStateCopyWith<$Res> {
           BusTileState value, $Res Function(BusTileState) then) =
       _$BusTileStateCopyWithImpl<$Res, BusTileState>;
   @useResult
-  $Res call({bool isLoading, int busCount, bool useNewApi});
+  $Res call({bool isLoading, int busCount});
 }
 
 /// @nodoc
@@ -1566,7 +1565,6 @@ class _$BusTileStateCopyWithImpl<$Res, $Val extends BusTileState>
   $Res call({
     Object? isLoading = null,
     Object? busCount = null,
-    Object? useNewApi = null,
   }) {
     return _then(_value.copyWith(
       isLoading: null == isLoading
@@ -1577,10 +1575,6 @@ class _$BusTileStateCopyWithImpl<$Res, $Val extends BusTileState>
           ? _value.busCount
           : busCount // ignore: cast_nullable_to_non_nullable
               as int,
-      useNewApi: null == useNewApi
-          ? _value.useNewApi
-          : useNewApi // ignore: cast_nullable_to_non_nullable
-              as bool,
     ) as $Val);
   }
 }
@@ -1593,7 +1587,7 @@ abstract class _$$BusTileStateImplCopyWith<$Res>
       __$$BusTileStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({bool isLoading, int busCount, bool useNewApi});
+  $Res call({bool isLoading, int busCount});
 }
 
 /// @nodoc
@@ -1609,7 +1603,6 @@ class __$$BusTileStateImplCopyWithImpl<$Res>
   $Res call({
     Object? isLoading = null,
     Object? busCount = null,
-    Object? useNewApi = null,
   }) {
     return _then(_$BusTileStateImpl(
       isLoading: null == isLoading
@@ -1620,10 +1613,6 @@ class __$$BusTileStateImplCopyWithImpl<$Res>
           ? _value.busCount
           : busCount // ignore: cast_nullable_to_non_nullable
               as int,
-      useNewApi: null == useNewApi
-          ? _value.useNewApi
-          : useNewApi // ignore: cast_nullable_to_non_nullable
-              as bool,
     ));
   }
 }
@@ -1631,8 +1620,7 @@ class __$$BusTileStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$BusTileStateImpl implements _BusTileState {
-  const _$BusTileStateImpl(
-      {this.isLoading = true, this.busCount = 0, this.useNewApi = false});
+  const _$BusTileStateImpl({this.isLoading = true, this.busCount = 0});
 
   @override
   @JsonKey()
@@ -1640,13 +1628,10 @@ class _$BusTileStateImpl implements _BusTileState {
   @override
   @JsonKey()
   final int busCount;
-  @override
-  @JsonKey()
-  final bool useNewApi;
 
   @override
   String toString() {
-    return 'BusTileState(isLoading: $isLoading, busCount: $busCount, useNewApi: $useNewApi)';
+    return 'BusTileState(isLoading: $isLoading, busCount: $busCount)';
   }
 
   @override
@@ -1657,13 +1642,11 @@ class _$BusTileStateImpl implements _BusTileState {
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.busCount, busCount) ||
-                other.busCount == busCount) &&
-            (identical(other.useNewApi, useNewApi) ||
-                other.useNewApi == useNewApi));
+                other.busCount == busCount));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isLoading, busCount, useNewApi);
+  int get hashCode => Object.hash(runtimeType, isLoading, busCount);
 
   @JsonKey(ignore: true)
   @override
@@ -1673,17 +1656,13 @@ class _$BusTileStateImpl implements _BusTileState {
 }
 
 abstract class _BusTileState implements BusTileState {
-  const factory _BusTileState(
-      {final bool isLoading,
-      final int busCount,
-      final bool useNewApi}) = _$BusTileStateImpl;
+  const factory _BusTileState({final bool isLoading, final int busCount}) =
+      _$BusTileStateImpl;
 
   @override
   bool get isLoading;
   @override
   int get busCount;
-  @override
-  bool get useNewApi;
   @override
   @JsonKey(ignore: true)
   _$$BusTileStateImplCopyWith<_$BusTileStateImpl> get copyWith =>
@@ -2334,7 +2313,6 @@ mixin _$BusPageState {
   String get errorMessage => throw _privateConstructorUsedError;
   bool get isCaoTang => throw _privateConstructorUsedError;
   bool get isShowBus => throw _privateConstructorUsedError;
-  bool get useNewApi => throw _privateConstructorUsedError;
   List<String> get tiles => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -2356,7 +2334,6 @@ abstract class $BusPageStateCopyWith<$Res> {
       String errorMessage,
       bool isCaoTang,
       bool isShowBus,
-      bool useNewApi,
       List<String> tiles});
 }
 
@@ -2380,7 +2357,6 @@ class _$BusPageStateCopyWithImpl<$Res, $Val extends BusPageState>
     Object? errorMessage = null,
     Object? isCaoTang = null,
     Object? isShowBus = null,
-    Object? useNewApi = null,
     Object? tiles = null,
   }) {
     return _then(_value.copyWith(
@@ -2412,10 +2388,6 @@ class _$BusPageStateCopyWithImpl<$Res, $Val extends BusPageState>
           ? _value.isShowBus
           : isShowBus // ignore: cast_nullable_to_non_nullable
               as bool,
-      useNewApi: null == useNewApi
-          ? _value.useNewApi
-          : useNewApi // ignore: cast_nullable_to_non_nullable
-              as bool,
       tiles: null == tiles
           ? _value.tiles
           : tiles // ignore: cast_nullable_to_non_nullable
@@ -2440,7 +2412,6 @@ abstract class _$$BusPageStateImplCopyWith<$Res>
       String errorMessage,
       bool isCaoTang,
       bool isShowBus,
-      bool useNewApi,
       List<String> tiles});
 }
 
@@ -2462,7 +2433,6 @@ class __$$BusPageStateImplCopyWithImpl<$Res>
     Object? errorMessage = null,
     Object? isCaoTang = null,
     Object? isShowBus = null,
-    Object? useNewApi = null,
     Object? tiles = null,
   }) {
     return _then(_$BusPageStateImpl(
@@ -2494,10 +2464,6 @@ class __$$BusPageStateImplCopyWithImpl<$Res>
           ? _value.isShowBus
           : isShowBus // ignore: cast_nullable_to_non_nullable
               as bool,
-      useNewApi: null == useNewApi
-          ? _value.useNewApi
-          : useNewApi // ignore: cast_nullable_to_non_nullable
-              as bool,
       tiles: null == tiles
           ? _value._tiles
           : tiles // ignore: cast_nullable_to_non_nullable
@@ -2517,7 +2483,6 @@ class _$BusPageStateImpl implements _BusPageState {
       this.errorMessage = '',
       this.isCaoTang = true,
       this.isShowBus = false,
-      this.useNewApi = false,
       final List<String> tiles = const <String>[]})
       : _busData = busData,
         _todayBusData = todayBusData,
@@ -2556,9 +2521,6 @@ class _$BusPageStateImpl implements _BusPageState {
   @override
   @JsonKey()
   final bool isShowBus;
-  @override
-  @JsonKey()
-  final bool useNewApi;
   final List<String> _tiles;
   @override
   @JsonKey()
@@ -2570,7 +2532,7 @@ class _$BusPageStateImpl implements _BusPageState {
 
   @override
   String toString() {
-    return 'BusPageState(selectedDate: $selectedDate, busData: $busData, todayBusData: $todayBusData, isLoading: $isLoading, errorMessage: $errorMessage, isCaoTang: $isCaoTang, isShowBus: $isShowBus, useNewApi: $useNewApi, tiles: $tiles)';
+    return 'BusPageState(selectedDate: $selectedDate, busData: $busData, todayBusData: $todayBusData, isLoading: $isLoading, errorMessage: $errorMessage, isCaoTang: $isCaoTang, isShowBus: $isShowBus, tiles: $tiles)';
   }
 
   @override
@@ -2591,8 +2553,6 @@ class _$BusPageStateImpl implements _BusPageState {
                 other.isCaoTang == isCaoTang) &&
             (identical(other.isShowBus, isShowBus) ||
                 other.isShowBus == isShowBus) &&
-            (identical(other.useNewApi, useNewApi) ||
-                other.useNewApi == useNewApi) &&
             const DeepCollectionEquality().equals(other._tiles, _tiles));
   }
 
@@ -2606,7 +2566,6 @@ class _$BusPageStateImpl implements _BusPageState {
       errorMessage,
       isCaoTang,
       isShowBus,
-      useNewApi,
       const DeepCollectionEquality().hash(_tiles));
 
   @JsonKey(ignore: true)
@@ -2625,7 +2584,6 @@ abstract class _BusPageState implements BusPageState {
       final String errorMessage,
       final bool isCaoTang,
       final bool isShowBus,
-      final bool useNewApi,
       final List<String> tiles}) = _$BusPageStateImpl;
 
   @override
@@ -2642,8 +2600,6 @@ abstract class _BusPageState implements BusPageState {
   bool get isCaoTang;
   @override
   bool get isShowBus;
-  @override
-  bool get useNewApi;
   @override
   List<String> get tiles;
   @override

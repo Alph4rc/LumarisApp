@@ -1,4 +1,4 @@
-import 'package:ios_club_app/core/services/git_service.dart';
+import 'package:ios_club_app/features/education/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 /// 更新管理类
@@ -40,7 +40,7 @@ class CheckUpdateManager {
   /// 根据环境变量决定返回哪种更新服务
   static Future<(bool, ReleaseModel)> checkForUpdates() async {
     if (shouldCheckForUpdates()) {
-      return await GiteeService.isNeedUpdate();
+      return await AppService.isNeedUpdate();
     } else {
       // 返回不需要更新的结果
       return (false, ReleaseModel(name: '0.0.0', body: '0.0.0'));

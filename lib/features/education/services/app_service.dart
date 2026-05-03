@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:open_file/open_file.dart';
@@ -10,24 +9,21 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
-class GiteeService {
-  static final BaseHttpClient _client = BaseHttpClient(
-    baseUrl: 'https://xauatapi.xauat.site',
-    enableCache: false,
-  );
+import 'app_api.dart';
 
+class AppService {
   static Future<ReleaseModel> getReleases() async {
     final prefs = PrefsService.instance;
 
     try {
-      final response = await _client.get('/App');
+      final releases = await AppApi.getAppInfo();
 
-      if (response != null) {
-        final jsonResponse =
-            response is String ? jsonDecode(response) : response;
-        final data =
-            jsonResponse is String ? jsonDecode(jsonResponse) : jsonResponse;
-        final re = ReleaseModel.fromJson(data[0] as Map<String, dynamic>);
+      if (releases.isNotEmpty) {
+        final reInfo = releases.first;
+        final re = ReleaseModel(
+          name: reInfo.name ?? '0.0.0',
+          body: reInfo.body ?? '',
+        );
 
         if (re.body.contains('[强制更新]')) {
           return re;

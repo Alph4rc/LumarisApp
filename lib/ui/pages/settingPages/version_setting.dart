@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/services/git_service.dart';
+import 'package:ios_club_app/features/education/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
@@ -106,7 +106,7 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
               );
 
               if (result == true) {
-                final a = await GiteeService.getReleases();
+                final a = await AppService.getReleases();
                 if (context.mounted) {
                   UpdateManager.showUpdateWithProgress(context, a.name);
                 }

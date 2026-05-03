@@ -1,18 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/core/models/link_model.dart';
-import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
-class LinkService {
-  static final BaseHttpClient _client = BaseHttpClient(
-    baseUrl: 'https://link.xauat.site',
-    enableCache: true,
-  );
+import 'edu_http_client_manager.dart';
+
+class LinkApi {
 
   static Future<List<CategoryModel>> getLinks() async {
     final List<CategoryModel> list = [];
     try {
-      final response = await _client.get('/Category');
+      final response = await await EduHttpClientManager.instance.get('/SchoolNav');
 
       if (response is List) {
         for (final item in response) {

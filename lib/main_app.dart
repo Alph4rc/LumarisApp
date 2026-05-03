@@ -17,7 +17,7 @@ import 'bottom_navigation.dart';
 import 'platform/macos/macos_ui_sidebar.dart';
 import 'platform/windows/windows_sidebar.dart';
 import 'platform/tablet/tablet_navigation.dart';
-import 'core/services/git_service.dart';
+import 'features/education/services/app_service.dart';
 import 'features/system/update/check_update_manager.dart';
 
 class MainApp extends ConsumerStatefulWidget {

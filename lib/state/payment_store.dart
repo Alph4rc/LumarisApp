@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/services/payment_analyzer.dart';
+import 'package:ios_club_app/features/education/services/payment_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
@@ -17,7 +17,7 @@ typedef TileVisibilityReader = Future<bool> Function(String tileId);
 typedef TileMutator = Future<void> Function(String tileId);
 
 final paymentDataFetcherProvider = Provider<PaymentDataFetcher>((ref) {
-  return PaymentAnalyzer.fetchData;
+  return PaymentService.fetchData;
 });
 
 final studentIsLoginReaderProvider = Provider<StudentIsLoginReader>((ref) {

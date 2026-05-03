@@ -4,7 +4,7 @@ import 'package:ios_club_app/features/education/services/payment_api.dart';
 /// 支付数据分析器类
 ///
 /// 负责获取、存储和处理用户的支付数据
-class PaymentAnalyzer {
+class PaymentService {
   /// 根据指定卡号获取支付数据
   ///
   /// [cardId] 卡号

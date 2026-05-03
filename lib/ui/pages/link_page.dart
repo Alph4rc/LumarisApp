@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/services/link_service.dart';
+import 'package:ios_club_app/features/education/services/link_api.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -22,7 +22,7 @@ class LinkPage extends StatelessWidget {
         title: '校园导航',
       ),
       body: FutureBuilder(
-        future: LinkService.getLinks(),
+        future: LinkApi.getLinks(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
