@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/services/link_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,6 +50,11 @@ class LinkPage extends StatelessWidget {
                   ],
                 ),
               );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return EmptyWidget(
+                  title: '暂无导航数据',
+                  subtitle: '请重新进入此页，或检查当前网络',
+                  icon: Icons.link);
             } else {
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 12),
