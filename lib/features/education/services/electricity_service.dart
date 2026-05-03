@@ -1,6 +1,6 @@
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/models/electric_data.dart';
+import '../models/electric_data.dart';
 import '../../../core/services/prefs_service.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../state/prefs_keys.dart';

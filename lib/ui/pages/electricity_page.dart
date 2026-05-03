@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
-import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';

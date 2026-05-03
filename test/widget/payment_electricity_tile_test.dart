@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';

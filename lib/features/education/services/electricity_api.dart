@@ -1,4 +1,4 @@
-import '../../../core/models/electric_data.dart';
+import '../models/electric_data.dart';
 import '../../../core/services/network_exception.dart';
 import 'edu_http_client_manager.dart';
 
