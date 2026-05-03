@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -172,7 +173,7 @@ class _CustomCourseManagePageState
     final cardColor = isDarkMode ? Colors.grey[900] : Colors.white;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
-    return Scaffold(
+    return ClubScaffold(
         appBar: ClubAppBar(
           titleWidget: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

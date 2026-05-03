@@ -15,6 +15,7 @@ import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -41,8 +42,8 @@ class SettingPage extends ConsumerWidget {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
 
-    return Scaffold(
-      appBar: ClubAppBar(
+    return ClubScaffold(
+      appBar: const ClubAppBar(
         title: '设置',
       ),
       body: LayoutBuilder(
@@ -50,7 +51,7 @@ class SettingPage extends ConsumerWidget {
           final isTablet = constraints.maxWidth > 600;
           final horizontalPadding = isTablet ? 32.0 : 16.0;
 
-          return SingleChildScrollView(
+          return Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               children: [

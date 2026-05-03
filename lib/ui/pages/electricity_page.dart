@@ -12,6 +12,7 @@ import 'package:ios_club_app/core/models/electric_data.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 
 import 'package:ios_club_app/ui/components/empty_widget.dart';
@@ -43,7 +44,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget build(BuildContext context) {
     final electricityState = ref.watch(electricityStoreProvider);
     if (kIsWeb) {
-      return const Scaffold(
+      return const ClubScaffold(
         appBar: ClubAppBar(
           title: '电费管理',
         ),
@@ -54,7 +55,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         ),
       );
     }
-    return Scaffold(
+    return ClubScaffold(
         appBar: ClubAppBar(
           title: '电费管理',
           actions: [
@@ -71,9 +72,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
+        body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -89,6 +89,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
               // 设置选项
               if (electricityState.hasData) _buildSettingsSection(),
+              
+              // 底部留白，确保能滑动
+              const SizedBox(height: 60),
             ],
           ),
         ));

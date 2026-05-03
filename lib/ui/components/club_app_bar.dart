@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -5,7 +6,7 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.title,
     this.actions,
-    this.backgroundColor = Colors.transparent,
+    this.backgroundColor,
     this.elevation = 0,
     this.centerTitle = true,
     this.titleWidget,
@@ -25,6 +26,9 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final effectiveBgColor = backgroundColor ?? colors.surface.withValues(alpha: 0.8);
+
     return AppBar(
       title: titleWidget ??
           Text(
@@ -40,10 +44,16 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => Navigator.of(context).pop(),
         tooltip: 'Back',
       ),
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent, // transparent so flexibleSpace handles color
       elevation: elevation,
       centerTitle: centerTitle,
       bottom: bottom,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+          child: Container(color: effectiveBgColor),
+        ),
+      ),
     );
   }
 }

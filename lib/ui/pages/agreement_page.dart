@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 class AgreementPage extends ConsumerWidget {
@@ -41,7 +42,8 @@ class AgreementPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
+    return ClubScaffold(
+      useSliverAppBar: false,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -312,7 +314,8 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
     final textColor = isDark ? Colors.white : Colors.black87;
     final titleColor = isDark ? Colors.white : Colors.black;
 
-    return Scaffold(
+    return ClubScaffold(
+      useSliverAppBar: false,
       appBar: AppBar(
         title: const Text('隐私协议'),
         leading: IconButton(
@@ -417,7 +420,8 @@ class _UserAgreementContentPage extends StatelessWidget {
     final textColor = isDark ? Colors.white : Colors.black87;
     final titleColor = isDark ? Colors.white : Colors.black;
 
-    return Scaffold(
+    return ClubScaffold(
+      useSliverAppBar: false,
       appBar: AppBar(
         title: const Text('用户协议'),
         leading: IconButton(

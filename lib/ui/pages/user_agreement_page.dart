@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 
 class UserAgreementPage extends StatelessWidget {
@@ -11,9 +12,9 @@ class UserAgreementPage extends StatelessWidget {
     final textColor = isDark ? Colors.white : Colors.black87;
     final titleColor = isDark ? Colors.white : Colors.black;
 
-    return Scaffold(
+    return ClubScaffold(
       appBar: const ClubAppBar(title: '用户协议'),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

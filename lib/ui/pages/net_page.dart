@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/net_service.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
+import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
@@ -11,7 +13,27 @@ class NetPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 使用 Material 3 风格的 Scaffold，背景色跟随主题
-    return Scaffold(
+    return ClubScaffold(
+      appBar: ClubAppBar(
+        title: '校园网数据',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              // 简单的刷新逻辑，重建页面
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      const NetPage(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: NetService.get(),
         builder: (context, snapshot) {
@@ -81,38 +103,9 @@ class _DataContent extends StatelessWidget {
     final primaryTextColor = isDark ? Colors.white : Colors.black;
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[600];
 
-    return CustomScrollView(
-      physics:
-          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      slivers: [
-        SliverAppBar.large(
-          title: const Text('校园网数据'),
-          centerTitle: false,
-          backgroundColor: theme.scaffoldBackgroundColor,
-          surfaceTintColor: Colors.transparent,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                // 简单的刷新逻辑，重建页面
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        const NetPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Column(
               children: [
                 // 顶部大卡片 - 流量使用
                 TweenAnimationBuilder<double>(
@@ -255,9 +248,6 @@ class _DataContent extends StatelessWidget {
                 const SizedBox(height: 40),
               ],
             ),
-          ),
-        ),
-      ],
     );
   }
 

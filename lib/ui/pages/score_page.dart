@@ -18,6 +18,7 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ScorePage extends ConsumerStatefulWidget {
@@ -175,7 +176,8 @@ class _ScorePageState extends ConsumerState<ScorePage>
   Widget build(BuildContext context) {
     // 检查是否为游客模式
     if (!ref.watch(userStoreProvider).isLogin) {
-      return Scaffold(
+      return ClubScaffold(
+        useSliverAppBar: false,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -216,7 +218,8 @@ class _ScorePageState extends ConsumerState<ScorePage>
     }
 
     if (_isLoading) {
-      return Scaffold(
+      return ClubScaffold(
+        useSliverAppBar: false,
         body: Center(
           child: LoadingStateView(
             title: _loadingText,
@@ -226,16 +229,19 @@ class _ScorePageState extends ConsumerState<ScorePage>
       );
     }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          _buildAppBar(),
-          _buildStatsCard(),
-          _buildSelector(),
-          Expanded(
-            child: _buildScoreList(),
-          )
-        ],
+    return ClubScaffold(
+      useSliverAppBar: false,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildAppBar(),
+            _buildStatsCard(),
+            _buildSelector(),
+            Expanded(
+              child: _buildScoreList(),
+            )
+          ],
+        ),
       ),
     );
   }

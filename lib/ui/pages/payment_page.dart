@@ -8,6 +8,7 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/payment_store.dart';
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 
 class PaymentPage extends ConsumerWidget {
@@ -19,7 +20,7 @@ class PaymentPage extends ConsumerWidget {
     final controller = ref.read(paymentStoreProvider.notifier);
     final colors = context.clubColors;
 
-    return Scaffold(
+    return ClubScaffold(
       appBar: ClubAppBar(
         title: '饭卡',
         actions: [
@@ -40,9 +41,10 @@ class PaymentPage extends ConsumerWidget {
     PaymentStore controller,
     ClubColors colors,
   ) {
-    return ListView(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      children: [
+      child: Column(
+        children: [
         _buildBalanceCard(payment, colors),
         const SizedBox(height: 24),
         if (payment.isLoading)
@@ -60,8 +62,9 @@ class PaymentPage extends ConsumerWidget {
         ],
         const SizedBox(height: 32),
       ],
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildBalanceCard(PaymentState payment, ClubColors colors) {
     return Container(

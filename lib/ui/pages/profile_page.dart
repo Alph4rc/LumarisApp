@@ -20,6 +20,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/study_credit_card.dart';
 
+import 'package:ios_club_app/ui/components/club_scaffold.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -86,7 +87,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
+      return const ClubScaffold(
+        useSliverAppBar: false,
         body: Center(
           child: LoadingStateView(
             title: '正在读取账号信息',
@@ -96,7 +98,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       );
     }
 
-    return Scaffold(
+    return ClubScaffold(
+      useSliverAppBar: false,
       body: _buildProfileContent(),
     );
   }
