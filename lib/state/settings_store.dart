@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import '../core/config/api_config.dart';
 import '../features/education/services/edu_http_client_manager.dart';
@@ -27,6 +29,7 @@ class SettingsStore extends Notifier<SettingsState> {
   String get fontFamily => state.fontFamily;
   bool get showCourseGrid => state.showCourseGrid;
   bool get todoRemindEnabled => state.todoRemindEnabled;
+  ThemeMode get themeMode => state.themeMode;
   String get scheduleBackground => state.scheduleBackground;
   String get customBackgroundImage => state.customBackgroundImage;
   bool? get customBackgroundIsDark => state.customBackgroundIsDark;
@@ -52,6 +55,9 @@ class SettingsStore extends Notifier<SettingsState> {
       fontFamily: prefs.getString(PrefsKeys.FONT_FAMILY) ?? '',
       showCourseGrid: prefs.getBool(PrefsKeys.SHOW_COURSE_GRID) ?? false,
       todoRemindEnabled: prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED) ?? false,
+      themeMode: ClubThemeModeCodec.fromPreference(
+        prefs.getString(PrefsKeys.THEME_MODE),
+      ),
       scheduleBackground: prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND) ?? '',
       customBackgroundImage:
           prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE) ?? '',
@@ -71,7 +77,7 @@ class SettingsStore extends Notifier<SettingsState> {
   Future<void> setIsRemind(bool value) async {
     state = state.copyWith(isRemind: value);
     await PrefsService.instance.setBool(PrefsKeys.IS_REMIND, value);
-    
+
     // 如果关闭提醒，尝试清除所有已排期的通知以释放系统资源
     if (!value) {
       try {
@@ -121,6 +127,14 @@ class SettingsStore extends Notifier<SettingsState> {
   Future<void> setTodoRemindEnabled(bool value) async {
     state = state.copyWith(todoRemindEnabled: value);
     await PrefsService.instance.setBool(PrefsKeys.TODO_REMIND_ENABLED, value);
+  }
+
+  Future<void> setThemeMode(ThemeMode value) async {
+    state = state.copyWith(themeMode: value);
+    await PrefsService.instance.setString(
+      PrefsKeys.THEME_MODE,
+      ClubThemeModeCodec.toPreference(value),
+    );
   }
 
   Future<void> setScheduleBackground(String value) async {

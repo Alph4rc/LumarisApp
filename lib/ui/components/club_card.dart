@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ClubCard extends StatelessWidget {
   const ClubCard({
@@ -18,15 +19,16 @@ class ClubCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Container(
       padding: padding,
       margin: margin,
       decoration: BoxDecoration(
-        color: isDark ? theme.hoverColor : theme.colorScheme.surface,
+        color: colors.cardBackground,
         borderRadius: borderRadius,
-        boxShadow: isDark
+        border: Border.all(color: colors.separator.withValues(alpha: 0.5)),
+        boxShadow: theme.brightness == Brightness.dark
             ? []
             : [
                 BoxShadow(

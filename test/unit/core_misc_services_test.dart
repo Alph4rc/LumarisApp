@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -85,7 +86,9 @@ void main() {
   group('AuthStateNotifier', () {
     test('should transition states and auto-reset after delay', () {
       fakeAsync((async) {
-        final notifier = AuthStateNotifier();
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+        final notifier = container.read(authStateNotifierProvider.notifier);
 
         notifier.startRelogging();
         expect(notifier.authState, AuthState.relogging);
@@ -110,7 +113,9 @@ void main() {
     });
 
     test('reset should restore normal state immediately', () {
-      final notifier = AuthStateNotifier();
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(authStateNotifierProvider.notifier);
       notifier.startRelogging();
       notifier.reset();
 

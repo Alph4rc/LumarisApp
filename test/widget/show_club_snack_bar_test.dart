@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
+
+import 'theme_test_helpers.dart';
 
 void main() {
   group('showClubSnackBar', () {
@@ -11,31 +14,27 @@ void main() {
       var snackBarShown = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (BuildContext context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showClubSnackBar(
-                      context,
-                      const Text(testText),
-                    );
-                    snackBarShown = true;
-                  },
-                  child: const Text('显示 SnackBar'),
-                );
-              },
-            ),
+        themedTestApp(
+          child: Builder(
+            builder: (BuildContext context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showClubSnackBar(
+                    context,
+                    const Text(testText),
+                  );
+                  snackBarShown = true;
+                },
+                child: const Text('显示 SnackBar'),
+              );
+            },
           ),
         ),
       );
 
-      // 点击按钮触发 SnackBar
       await tester.tap(find.text('显示 SnackBar'));
       await tester.pump();
 
-      // 验证 SnackBar 已显示
       expect(snackBarShown, true);
       expect(find.text(testText), findsOneWidget);
     });
@@ -43,36 +42,61 @@ void main() {
     testWidgets('should show SnackBar with correct styling',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (BuildContext context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showClubSnackBar(
-                      context,
-                      const Text('测试'),
-                    );
-                  },
-                  child: const Text('显示 SnackBar'),
-                );
-              },
-            ),
+        themedTestApp(
+          child: Builder(
+            builder: (BuildContext context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showClubSnackBar(
+                    context,
+                    const Text('测试'),
+                  );
+                },
+                child: const Text('显示 SnackBar'),
+              );
+            },
           ),
         ),
       );
 
-      // 点击按钮触发 SnackBar
       await tester.tap(find.text('显示 SnackBar'));
       await tester.pumpAndSettle();
 
-      // 验证 SnackBar 的行为和形状
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
       final shape = snackBar.shape as RoundedRectangleBorder;
 
       expect(snackBar.behavior, SnackBarBehavior.floating);
       expect(snackBar.duration, const Duration(seconds: 2));
       expect(shape.borderRadius, ClubRadii.control);
+      expect(snackBar.backgroundColor, ClubColors.light.cardBackground);
+    });
+
+    testWidgets('should use dark theme colors when theme mode is dark',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        themedTestApp(
+          themeMode: ThemeMode.dark,
+          child: Builder(
+            builder: (BuildContext context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showClubSnackBar(
+                    context,
+                    const Text('深色测试'),
+                  );
+                },
+                child: const Text('显示 SnackBar'),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('显示 SnackBar'));
+      await tester.pumpAndSettle();
+
+      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      expect(snackBar.backgroundColor, ClubColors.dark.cardBackground);
     });
   });
 }

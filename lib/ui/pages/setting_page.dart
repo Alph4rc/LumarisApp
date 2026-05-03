@@ -13,12 +13,14 @@ import 'package:ios_club_app/features/education/services/education_refresh_servi
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 import 'package:ios_club_app/ui/pages/settingPages/show_tomorrow_setting.dart';
@@ -33,8 +35,7 @@ class SettingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
     final userState = ref.watch(userStoreProvider);
     final userStore = ref.read(userStoreProvider.notifier);
     final settings = ref.watch(settingsStoreProvider);
@@ -55,13 +56,14 @@ class SettingPage extends ConsumerWidget {
               children: [
                 const SizedBox(height: 24),
                 // App 图标区域
-                _buildAppHeader(context, isDark),
+                _buildAppHeader(context),
                 const SizedBox(height: 32),
                 // 基本设置
-                _buildSectionTitle('基本设置', isDark),
+                _buildSectionTitle(context, '基本设置'),
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
-                  _buildRefreshTile(context, isDark),
+                  _buildRefreshTile(context),
+                  _buildThemeModeTile(context, settings, settingsStore),
                   const ShowTomorrowSetting(),
                   if (PlatformUtils.isMobile) const RemindSetting(),
                   //const TodoListSetting(),
@@ -74,46 +76,43 @@ class SettingPage extends ConsumerWidget {
                 ]),
                 const SizedBox(height: 24),
                 // 版本信息
-                _buildSectionTitle('版本', isDark),
+                _buildSectionTitle(context, '版本'),
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
                   const VersionSetting(),
                 ]),
                 const SizedBox(height: 24),
                 // 移动端小组件
-                if (PlatformUtils.isMobile) _buildSectionTitle('小组件', isDark),
+                if (PlatformUtils.isMobile) _buildSectionTitle(context, '小组件'),
                 if (PlatformUtils.isMobile) const SizedBox(height: 12),
                 if (PlatformUtils.isMobile)
                   _buildSettingsGroup([
-                    _buildWidgetTile(context, isDark),
+                    _buildWidgetTile(context),
                   ]),
                 if (PlatformUtils.isMobile) const SizedBox(height: 24),
                 // 关于我们
-                _buildSectionTitle('关于', isDark),
+                _buildSectionTitle(context, '关于'),
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
-                  _buildTeamTile(isDark),
-                  _buildLicenseTile(isDark),
-                  _buildPrivacyPolicyTile(isDark),
-                  _buildUserAgreementTile(isDark),
+                  _buildTeamTile(),
+                  _buildLicenseTile(),
+                  _buildPrivacyPolicyTile(),
+                  _buildUserAgreementTile(),
                 ]),
                 const SizedBox(height: 24),
                 // 其他
-                _buildSectionTitle('其他', isDark),
+                _buildSectionTitle(context, '其他'),
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
-                  _buildClearCacheTile(context, isDark),
-                  if (userState.isLogin)
-                    _buildLogoutTile(context, isDark, userStore),
+                  _buildClearCacheTile(context),
+                  if (userState.isLogin) _buildLogoutTile(context, userStore),
                   ClubListTile(
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     leading: Icon(
                       CupertinoIcons.grid,
                       size: 20,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.5)
-                          : CupertinoColors.tertiaryLabel,
+                      color: colors.tertiaryLabel,
                     ),
                     title: const Text('显示课表网格线'),
                     trailing: CupertinoSwitch(
@@ -130,9 +129,7 @@ class SettingPage extends ConsumerWidget {
                       leading: Icon(
                         CupertinoIcons.checkmark_shield,
                         size: 20,
-                        color: isDark
-                            ? Colors.orange.withValues(alpha: 0.7)
-                            : CupertinoColors.systemOrange,
+                        color: colors.warning,
                       ),
                       title: const Text('协议授权状态 [Debug]'),
                       subtitle: const Text('关闭后下次启动将重新显示授权页'),
@@ -154,7 +151,9 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppHeader(BuildContext context, bool isDark) {
+  Widget _buildAppHeader(BuildContext context) {
+    final colors = context.clubColors;
+
     return Column(
       children: [
         Container(
@@ -164,11 +163,9 @@ class SettingPage extends ConsumerWidget {
             borderRadius: ClubRadii.tile,
             boxShadow: [
               BoxShadow(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                spreadRadius: 2,
+                color: colors.shadowColor,
+                blurRadius: 18,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -186,7 +183,7 @@ class SettingPage extends ConsumerWidget {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : Colors.black,
+            color: colors.label,
           ),
         ),
         const SizedBox(height: 4),
@@ -194,16 +191,16 @@ class SettingPage extends ConsumerWidget {
           '试着把大学囊括其中',
           style: TextStyle(
             fontSize: 14,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.6)
-                : CupertinoColors.secondaryLabel,
+            color: colors.secondaryLabel,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSectionTitle(String title, bool isDark) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final colors = context.clubColors;
+
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
@@ -214,9 +211,7 @@ class SettingPage extends ConsumerWidget {
             fontSize: 14,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.5)
-                : CupertinoColors.secondaryLabel,
+            color: colors.secondaryLabel,
           ),
         ),
       ),
@@ -231,12 +226,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildRefreshTile(BuildContext context, bool isDark) {
+  Widget _buildRefreshTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.refresh,
         size: 20,
-        color: CupertinoColors.systemBlue,
+        color: context.clubColors.primary,
       ),
       title: const Text('刷新数据'),
       showChevron: true,
@@ -253,6 +248,26 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
+  Widget _buildThemeModeTile(
+    BuildContext context,
+    SettingsState settings,
+    SettingsStore settingsStore,
+  ) {
+    final colors = context.clubColors;
+
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.moon_stars,
+        size: 20,
+        color: colors.primary,
+      ),
+      title: const Text('外观'),
+      subtitle: Text(_themeModeLabel(settings.themeMode)),
+      showChevron: true,
+      onTap: () => _showThemeModePicker(context, settingsStore),
+    );
+  }
+
   Future<void> _syncHomeWidget() async {
     if (PlatformUtils.isAndroid) {
       await BackgroundService.updateWidget();
@@ -264,12 +279,12 @@ class SettingPage extends ConsumerWidget {
     }
   }
 
-  Widget _buildTeamTile(bool isDark) {
+  Widget _buildTeamTile() {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.person_2_fill,
         size: 20,
-        color: CupertinoColors.systemOrange,
+        color: ClubColors.light.warning,
       ),
       title: const Text('制作团队'),
       subtitle: const Text('iOS Club App 开发组'),
@@ -279,12 +294,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLicenseTile(bool isDark) {
+  Widget _buildLicenseTile() {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.doc_text_fill,
         size: 20,
-        color: CupertinoColors.systemGreen,
+        color: ClubColors.light.success,
       ),
       title: const Text('开源协议'),
       subtitle: const Text('MIT License'),
@@ -294,12 +309,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildPrivacyPolicyTile(bool isDark) {
+  Widget _buildPrivacyPolicyTile() {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.shield_fill,
         size: 20,
-        color: CupertinoColors.systemBlue,
+        color: ClubColors.light.primary,
       ),
       title: const Text('隐私协议'),
       subtitle: const Text('了解我们如何保护你的隐私'),
@@ -309,12 +324,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserAgreementTile(bool isDark) {
+  Widget _buildUserAgreementTile() {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.doc_text_fill,
         size: 20,
-        color: CupertinoColors.systemPurple,
+        color: const Color(0xFFAF52DE),
       ),
       title: const Text('用户协议'),
       subtitle: const Text('使用本应用即表示你同意本协议'),
@@ -326,16 +341,13 @@ class SettingPage extends ConsumerWidget {
 
   Widget _buildLogoutTile(
     BuildContext context,
-    bool isDark,
     UserStore userStore,
   ) {
     return ClubListTile(
       leading: Icon(
         Icons.logout_outlined,
         size: 20,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.5)
-            : CupertinoColors.tertiaryLabel,
+        color: context.clubColors.tertiaryLabel,
       ),
       title: const Text('退出教务系统'),
       onTap: () async {
@@ -355,12 +367,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildWidgetTile(BuildContext context, bool isDark) {
+  Widget _buildWidgetTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         Icons.widgets,
         size: 20,
-        color: CupertinoColors.systemBlue,
+        color: context.clubColors.primary,
       ),
       title: const Text('添加到桌面'),
       showChevron: true,
@@ -384,18 +396,17 @@ class SettingPage extends ConsumerWidget {
     } catch (e) {
       // 如果无法直接打开设置，则显示说明
       if (context.mounted) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        _showWidgetInstructions(context, isDark);
+        _showWidgetInstructions(context);
       }
     }
   }
 
-  Widget _buildClearCacheTile(BuildContext context, bool isDark) {
+  Widget _buildClearCacheTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.trash_fill,
         size: 20,
-        color: CupertinoColors.systemRed,
+        color: context.clubColors.danger,
       ),
       title: const Text('清除缓存'),
       showChevron: true,
@@ -425,7 +436,9 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  void _showWidgetInstructions(BuildContext context, bool isDark) {
+  void _showWidgetInstructions(BuildContext context) {
+    final colors = context.clubColors;
+
     showClubModalBottomSheet(
       context,
       Column(
@@ -437,7 +450,7 @@ class SettingPage extends ConsumerWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
+              color: colors.label,
             ),
           ),
           const SizedBox(height: 16),
@@ -445,32 +458,30 @@ class SettingPage extends ConsumerWidget {
             '请按照以下步骤操作：',
             style: TextStyle(
               fontSize: 16,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.7)
-                  : Colors.black.withValues(alpha: 0.7),
+              color: colors.secondaryLabel,
             ),
           ),
           const SizedBox(height: 16),
           _buildInstructionStep(
-            isDark,
+            context,
             '1',
             '长按手机桌面空白处',
           ),
           const SizedBox(height: 8),
           _buildInstructionStep(
-            isDark,
+            context,
             '2',
             '点击"小组件"或"Widgets"选项',
           ),
           const SizedBox(height: 8),
           _buildInstructionStep(
-            isDark,
+            context,
             '3',
             '找到"iOS Club App"并选择合适的小组件',
           ),
           const SizedBox(height: 8),
           _buildInstructionStep(
-            isDark,
+            context,
             '4',
             '将小组件拖拽到桌面合适位置',
           ),
@@ -479,9 +490,7 @@ class SettingPage extends ConsumerWidget {
             '提示：小组件可以显示今日课程等信息，方便快速查看',
             style: TextStyle(
               fontSize: 14,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.6)
-                  : Colors.black.withValues(alpha: 0.6),
+              color: colors.secondaryLabel,
             ),
           ),
           const SizedBox(height: 24),
@@ -490,7 +499,13 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildInstructionStep(bool isDark, String step, String description) {
+  Widget _buildInstructionStep(
+    BuildContext context,
+    String step,
+    String description,
+  ) {
+    final colors = context.clubColors;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -498,7 +513,7 @@ class SettingPage extends ConsumerWidget {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: CupertinoColors.systemBlue,
+            color: colors.primary,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -518,11 +533,74 @@ class SettingPage extends ConsumerWidget {
             description,
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? Colors.white : Colors.black,
+              color: colors.label,
             ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _showThemeModePicker(
+    BuildContext context,
+    SettingsStore settingsStore,
+  ) async {
+    final colors = context.clubColors;
+
+    await showCupertinoModalPopup<void>(
+      context: context,
+      builder: (popupContext) {
+        return CupertinoActionSheet(
+          title: const Text('外观'),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                await settingsStore.setThemeMode(ThemeMode.system);
+                if (popupContext.mounted) {
+                  Navigator.of(popupContext).pop();
+                }
+              },
+              child: const Text('跟随系统'),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                await settingsStore.setThemeMode(ThemeMode.light);
+                if (popupContext.mounted) {
+                  Navigator.of(popupContext).pop();
+                }
+              },
+              child: Text(
+                '浅色',
+                style: TextStyle(color: colors.label),
+              ),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () async {
+                await settingsStore.setThemeMode(ThemeMode.dark);
+                if (popupContext.mounted) {
+                  Navigator.of(popupContext).pop();
+                }
+              },
+              child: const Text('深色'),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(popupContext).pop(),
+            child: const Text('取消'),
+          ),
+        );
+      },
+    );
+  }
+
+  String _themeModeLabel(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.system:
+        return '跟随系统';
+      case ThemeMode.light:
+        return '浅色';
+      case ThemeMode.dark:
+        return '深色';
+    }
   }
 }

@@ -39,20 +39,26 @@ void main() {
     // 在测试中手动注册 adapters（模拟 HiveManager.init() 的注册步骤，
     // 但使用 Hive.init() 而非 Hive.initFlutter()，避免依赖 Flutter 平台通道）
 
-    void _registerAdapters() {
-      if (!Hive.isAdapterRegistered(0))
+    void registerAdapters() {
+      if (!Hive.isAdapterRegistered(0)) {
         Hive.registerAdapter(CourseModelAdapter());
-      if (!Hive.isAdapterRegistered(1))
+      }
+      if (!Hive.isAdapterRegistered(1)) {
         Hive.registerAdapter(ScoreModelAdapter());
-      if (!Hive.isAdapterRegistered(2))
+      }
+      if (!Hive.isAdapterRegistered(2)) {
         Hive.registerAdapter(ScoreListAdapter());
-      if (!Hive.isAdapterRegistered(3))
+      }
+      if (!Hive.isAdapterRegistered(3)) {
         Hive.registerAdapter(SemesterModelAdapter());
-      if (!Hive.isAdapterRegistered(4)) Hive.registerAdapter(TodoItemAdapter());
+      }
+      if (!Hive.isAdapterRegistered(4)) {
+        Hive.registerAdapter(TodoItemAdapter());
+      }
     }
 
     test('should_register_all_five_adapters', () {
-      _registerAdapters();
+      registerAdapters();
 
       expect(Hive.isAdapterRegistered(0), isTrue); // CourseModel
       expect(Hive.isAdapterRegistered(1), isTrue); // ScoreModel
@@ -62,16 +68,17 @@ void main() {
     });
 
     test('should_not_throw_when_registering_same_adapter_twice', () {
-      _registerAdapters();
+      registerAdapters();
       // 第二次注册相同 typeId 的 adapter 不应抛出异常
-      expect(() => _registerAdapters(), returnsNormally);
+      expect(() => registerAdapters(), returnsNormally);
     });
   });
 
   group('HiveManager.openBox', () {
     setUp(() {
-      if (!Hive.isAdapterRegistered(0))
+      if (!Hive.isAdapterRegistered(0)) {
         Hive.registerAdapter(CourseModelAdapter());
+      }
     });
 
     test('should_open_a_box_successfully', () async {
@@ -108,8 +115,9 @@ void main() {
     });
 
     test('should_persist_data_written_to_box', () async {
-      if (!Hive.isAdapterRegistered(0))
+      if (!Hive.isAdapterRegistered(0)) {
         Hive.registerAdapter(CourseModelAdapter());
+      }
       final box = await HiveManager.instance
           .openBox<CourseModel>(HiveManager.courseBoxName);
       final course = CourseModel(lessonId: 'T001', courseName: '测试课程');

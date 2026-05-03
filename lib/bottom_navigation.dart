@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({
@@ -22,19 +23,19 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final colors = context.clubColors;
 
     // 定义颜色
-    final bgColor = backgroundColor ?? theme.scaffoldBackgroundColor;
+    final bgColor = backgroundColor ?? colors.cardOverlay;
     final selectedColor = selectedItemColor ?? colorScheme.primary;
-    final unselectedColor = unselectedItemColor ??
-        colorScheme.onSurfaceVariant.withValues(alpha: 0.64);
+    final unselectedColor = unselectedItemColor ?? colors.secondaryLabel;
 
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadowColor,
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

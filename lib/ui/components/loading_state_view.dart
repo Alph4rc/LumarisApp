@@ -1,7 +1,9 @@
 import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class LoadingStateView extends StatelessWidget {
   final String title;
@@ -21,8 +23,7 @@ class LoadingStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     Widget content = AnimatedSwitcher(
       duration: AppAnimations.standard,
@@ -32,7 +33,8 @@ class LoadingStateView extends StatelessWidget {
     if (showCard) {
       content = _GlassContainer(
         compact: compact,
-        isDark: isDark,
+        backgroundColor: colors.cardOverlay,
+        borderColor: colors.separator.withValues(alpha: 0.35),
         child: content,
       );
     }
@@ -126,12 +128,14 @@ class LoadingStateView extends StatelessWidget {
 class _GlassContainer extends StatelessWidget {
   final Widget child;
   final bool compact;
-  final bool isDark;
+  final Color backgroundColor;
+  final Color borderColor;
 
   const _GlassContainer({
     required this.child,
     required this.compact,
-    required this.isDark,
+    required this.backgroundColor,
+    required this.borderColor,
   });
 
   @override
@@ -147,14 +151,10 @@ class _GlassContainer extends StatelessWidget {
             vertical: compact ? 12 : 36,
           ),
           decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08) // 极简半透灰
-                : Colors.white.withValues(alpha: 0.65),
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(compact ? 100 : 28),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.15) // 极细高光描边
-                  : Colors.white.withValues(alpha: 0.8),
+              color: borderColor,
               width: 0.5,
             ),
           ),

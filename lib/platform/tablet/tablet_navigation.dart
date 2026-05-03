@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 平板设备导航组件
 ///
@@ -34,7 +35,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Scaffold(
       body: Row(
@@ -45,9 +46,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
             curve: Curves.easeInOut,
             child: NavigationRail(
               extended: _isExtended,
-              backgroundColor: isDark
-                  ? Colors.grey[900]?.withValues(alpha: 0.95)
-                  : Colors.grey[50]?.withValues(alpha: 0.95),
+              backgroundColor: colors.cardOverlay,
               elevation: 2,
               selectedIndex: widget.selectedIndex,
               onDestinationSelected: widget.onItemSelected,
@@ -116,7 +115,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                 size: 28,
               ),
               unselectedIconTheme: IconThemeData(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: colors.secondaryLabel,
                 size: 24,
               ),
               selectedLabelTextStyle: TextStyle(
@@ -126,7 +125,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                 letterSpacing: 0.2,
               ),
               unselectedLabelTextStyle: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: colors.secondaryLabel,
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 letterSpacing: 0.2,
@@ -168,14 +167,14 @@ class TabletDrawerNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('iOS Club App'),
         centerTitle: false,
         elevation: 0,
-        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+        backgroundColor: colors.cardBackground,
       ),
       drawer: Drawer(
         width: 280,
@@ -235,16 +234,15 @@ class TabletDrawerNavigation extends StatelessWidget {
                         isSelected ? item.selectedIcon : item.icon,
                         color: isSelected
                             ? colorScheme.primary
-                            : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                            : colors.secondaryLabel,
                       ),
                       title: Text(
                         item.label,
                         style: TextStyle(
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w400,
-                          color: isSelected
-                              ? colorScheme.primary
-                              : (isDark ? Colors.grey[300] : Colors.grey[800]),
+                          color:
+                              isSelected ? colorScheme.primary : colors.label,
                         ),
                       ),
                       onTap: () {

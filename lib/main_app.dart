@@ -10,6 +10,7 @@ import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
@@ -245,26 +246,16 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   Widget _app() {
     final settings = ref.watch(settingsStoreProvider);
     final router = ref.watch(appRouterProvider);
+    final fontFamily = settings.fontFamily.isEmpty
+        ? PlatformUtils.getWindowsFontFamily()
+        : PlatformUtils.getDesktopFontFamily(settings.fontFamily);
 
     return MaterialApp.router(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: settings.fontFamily.isEmpty
-            ? PlatformUtils.getWindowsFontFamily()
-            : PlatformUtils.getDesktopFontFamily(settings.fontFamily),
-      ),
-      darkTheme: ThemeData(
-        fontFamily: settings.fontFamily.isEmpty
-            ? PlatformUtils.getWindowsFontFamily()
-            : PlatformUtils.getDesktopFontFamily(settings.fontFamily),
-        brightness: Brightness.dark,
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
+      theme: ClubTheme.lightTheme(fontFamily: fontFamily),
+      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
+      themeMode: settings.themeMode,
       routerConfig: router,
     );
   }

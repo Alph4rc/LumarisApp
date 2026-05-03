@@ -35,8 +35,6 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
     final screenWidth = MediaQuery.of(context).size.width;
     final scheduleState = ref.watch(scheduleStoreProvider);
     final scheduleStore = ref.read(scheduleStoreProvider.notifier);
-    final settings = ref.watch(settingsStoreProvider);
-    final settingsStore = ref.read(settingsStoreProvider.notifier);
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -58,42 +56,44 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                 onPressed: () {
                   showDialog(
                       context: context,
-                      builder: (alertContext) => Consumer(
-                          builder: (context, ref, child) {
+                      builder: (alertContext) =>
+                          Consumer(builder: (context, ref, child) {
                             final settings = ref.watch(settingsStoreProvider);
-                            final scheduleStore = ref.read(scheduleStoreProvider.notifier);
-                            final settingsStore = ref.read(settingsStoreProvider.notifier);
-                            
+                            final scheduleStore =
+                                ref.read(scheduleStoreProvider.notifier);
+                            final settingsStore =
+                                ref.read(settingsStoreProvider.notifier);
+
                             return AlertDialog(
-                              title: const Text('设置'),
-                              content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ClubListTile(
-                                        title: const Text('显示明天的课表'),
-                                        trailing: CupertinoSwitch(
-                                            value: settings.isShowTomorrow,
-                                            onChanged: (value) async {
-                                              await scheduleStore
-                                                  .toggleShowTomorrow();
-                                            })),
-                                    if (PlatformUtils.isIOS ||
-                                        PlatformUtils.isAndroid)
+                                title: const Text('设置'),
+                                content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
                                       ClubListTile(
-                                        title: const Text('课程通知'),
-                                        trailing: CupertinoSwitch(
-                                          value: settings.isRemind,
-                                          onChanged: (bool value) async {
-                                            await settingsStore
-                                                .setIsRemind(value);
-                                            if (value && context.mounted) {
-                                              await NotificationService.set(
-                                                  context);
-                                            }
-                                          },
-                                        ),
-                                      )
-                                  ]));
+                                          title: const Text('显示明天的课表'),
+                                          trailing: CupertinoSwitch(
+                                              value: settings.isShowTomorrow,
+                                              onChanged: (value) async {
+                                                await scheduleStore
+                                                    .toggleShowTomorrow();
+                                              })),
+                                      if (PlatformUtils.isIOS ||
+                                          PlatformUtils.isAndroid)
+                                        ClubListTile(
+                                          title: const Text('课程通知'),
+                                          trailing: CupertinoSwitch(
+                                            value: settings.isRemind,
+                                            onChanged: (bool value) async {
+                                              await settingsStore
+                                                  .setIsRemind(value);
+                                              if (value && context.mounted) {
+                                                await NotificationService.set(
+                                                    context);
+                                              }
+                                            },
+                                          ),
+                                        )
+                                    ]));
                           }));
                 })
           ]),

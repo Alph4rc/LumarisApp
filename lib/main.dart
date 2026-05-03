@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:display_mode/display_mode.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/auth_state_notifier.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
@@ -24,6 +22,7 @@ import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
@@ -163,36 +162,18 @@ Widget _getHomePage() {
 }
 
 void initApp(ProviderContainer container) {
+  final settingsStore = container.read(settingsStoreProvider.notifier);
+  final fontFamily = _getFontFamily(container);
+
   if (PlatformUtils.isMacOS) {
     runApp(UncontrolledProviderScope(
       container: container,
       child: MacosApp(
         title: 'iOS Club App',
         debugShowCheckedModeBanner: false,
-        theme: MacosThemeData.light().copyWith(
-          primaryColor: CupertinoColors.systemBlue,
-          pushButtonTheme: const PushButtonThemeData(
-            color: CupertinoColors.systemBlue,
-            secondaryColor: CupertinoColors.systemGrey,
-          ),
-          // 帮助按钮主题
-          helpButtonTheme: const HelpButtonThemeData(
-            color: CupertinoColors.systemBlue,
-          ),
-        ),
-        darkTheme: MacosThemeData.dark().copyWith(
-          primaryColor: CupertinoColors.systemBlue,
-          brightness: Brightness.dark,
-          pushButtonTheme: const PushButtonThemeData(
-            color: CupertinoColors.systemBlue,
-            secondaryColor: CupertinoColors.systemGrey,
-          ),
-          helpButtonTheme: const HelpButtonThemeData(
-            color: CupertinoColors.systemBlue,
-          ),
-        ),
-        // 跟随系统设置自动切换亮暗模式
-        themeMode: ThemeMode.system,
+        theme: ClubTheme.macosLightTheme(),
+        darkTheme: ClubTheme.macosDarkTheme(),
+        themeMode: settingsStore.themeMode,
         home: const MainApp(),
       ),
     ));
@@ -204,23 +185,9 @@ void initApp(ProviderContainer container) {
     child: MaterialApp(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: _getFontFamily(container),
-        appBarTheme: AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-      ),
-      darkTheme: ThemeData(
-        fontFamily: _getFontFamily(container),
-        brightness: Brightness.dark,
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
+      theme: ClubTheme.lightTheme(fontFamily: fontFamily),
+      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
+      themeMode: settingsStore.themeMode,
       home: _getHomePage(),
     ),
   ));

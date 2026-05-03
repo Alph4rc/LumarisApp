@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Apple 风格侧边栏 (参考 iCloud / App Store 设计)
 ///
@@ -31,24 +32,18 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    // Apple 风格配色
-    final backgroundColor = isDark
-        ? const Color(0xFF1E1E1E) // macOS Dark Sidebar
-        : const Color(0xFFF2F2F7); // macOS Light Sidebar (System Grey 6)
-
-    final dividerColor =
-        isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0xFFE5E5E5);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    final colors = context.clubColors;
 
     return Container(
       width: widget.width,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: colors.groupedBackground,
         border: Border(
           right: BorderSide(
-            color: dividerColor,
+            color: colors.separator,
             width: 1,
           ),
         ),
@@ -133,7 +128,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+              color: context.clubColors.label,
               letterSpacing: -0.5, // 紧凑的字间距
             ),
           ),
@@ -157,8 +152,8 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
 
     // 悬停态颜色
     final hoverBgColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
-        : Colors.black.withValues(alpha: 0.05);
+        ? context.clubColors.selectionFill
+        : colorScheme.primary.withValues(alpha: 0.08);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
@@ -191,9 +186,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                   size: 20,
                   color: isSelected
                       ? selectedTextColor
-                      : (isDark
-                          ? const Color(0xFF636366)
-                          : const Color(0xFF98989D)), // Apple System Grey
+                      : context.clubColors.secondaryLabel,
                 ),
                 const SizedBox(width: 12),
                 // 标签
@@ -206,9 +199,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                           isSelected ? FontWeight.w500 : FontWeight.w400,
                       color: isSelected
                           ? selectedTextColor
-                          : (isDark
-                              ? const Color(0xFFDDDDDD)
-                              : const Color(0xFF1C1C1E)),
+                          : context.clubColors.label,
                       letterSpacing: -0.2,
                     ),
                     maxLines: 1,
@@ -225,9 +216,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Colors.white.withValues(alpha: 0.2)
-                          : (isDark
-                              ? const Color(0xFF3A3A3C)
-                              : const Color(0xFFE5E5EA)),
+                          : context.clubColors.cardOverlay,
                       borderRadius: ClubRadii.navigation,
                     ),
                     child: Text(
@@ -235,7 +224,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                       style: TextStyle(
                         color: isSelected
                             ? Colors.white
-                            : (isDark ? Colors.white : Colors.black87),
+                            : context.clubColors.label,
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),

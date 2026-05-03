@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ClubListTile extends StatelessWidget {
   const ClubListTile({
@@ -39,7 +40,7 @@ class ClubListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
     final effectivePadding = contentPadding ??
         EdgeInsets.symmetric(
           horizontal: 16,
@@ -53,20 +54,14 @@ class ClubListTile extends StatelessWidget {
     ).merge(titleTextStyle);
     final effectiveSubtitleStyle = TextStyle(
       fontSize: 13,
-      color: enabled
-          ? (isDark
-              ? Colors.white.withValues(alpha: 0.5)
-              : CupertinoColors.secondaryLabel)
-          : theme.disabledColor,
+      color: enabled ? colors.secondaryLabel : theme.disabledColor,
     ).merge(subtitleTextStyle);
     final effectiveTrailing = trailing ??
         (showChevron
             ? Icon(
                 CupertinoIcons.chevron_right,
                 size: 18,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : CupertinoColors.tertiaryLabel,
+                color: colors.tertiaryLabel,
               )
             : null);
 
@@ -80,8 +75,7 @@ class ClubListTile extends StatelessWidget {
           padding: effectivePadding,
           decoration: BoxDecoration(
             color: selected
-                ? selectedBackgroundColor ??
-                    theme.colorScheme.primary.withValues(alpha: 0.12)
+                ? selectedBackgroundColor ?? colors.selectionFill
                 : Colors.transparent,
             borderRadius: borderRadius,
           ),

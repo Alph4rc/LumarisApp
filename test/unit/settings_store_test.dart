@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
@@ -33,6 +34,7 @@ void main() {
       expect(settingsStore.fontFamily, '');
       expect(settingsStore.showCourseGrid, isFalse);
       expect(settingsStore.todoRemindEnabled, isFalse);
+      expect(settingsStore.themeMode, ThemeMode.system);
       expect(settingsStore.scheduleBackground, '');
       expect(settingsStore.customBackgroundImage, '');
       expect(settingsStore.schoolId, ApiConfig.defaultSchoolId);
@@ -50,6 +52,7 @@ void main() {
       await prefs.setString(PrefsKeys.FONT_FAMILY, 'PingFang SC');
       await prefs.setBool(PrefsKeys.SHOW_COURSE_GRID, true);
       await prefs.setBool(PrefsKeys.TODO_REMIND_ENABLED, true);
+      await prefs.setString(PrefsKeys.THEME_MODE, 'dark');
       await prefs.setString(PrefsKeys.SCHEDULE_BACKGROUND, 'paper');
       await prefs.setString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE, '/tmp/bg.jpg');
       await prefs.setString(PrefsKeys.SCHOOL_ID, 'xauat');
@@ -68,6 +71,7 @@ void main() {
       expect(settingsStore.fontFamily, 'PingFang SC');
       expect(settingsStore.showCourseGrid, isTrue);
       expect(settingsStore.todoRemindEnabled, isTrue);
+      expect(settingsStore.themeMode, ThemeMode.dark);
       expect(settingsStore.scheduleBackground, 'paper');
       expect(settingsStore.customBackgroundImage, '/tmp/bg.jpg');
       expect(settingsStore.schoolId, 'xauat');
@@ -85,6 +89,7 @@ void main() {
       await settingsStore.setFontFamily('Source Han Sans');
       await settingsStore.setShowCourseGrid(true);
       await settingsStore.setTodoRemindEnabled(true);
+      await settingsStore.setThemeMode(ThemeMode.light);
       await settingsStore.setScheduleBackground('wave');
       await settingsStore.setCustomBackgroundImage('/tmp/custom.png');
 
@@ -98,6 +103,7 @@ void main() {
       expect(settingsStore.fontFamily, 'Source Han Sans');
       expect(settingsStore.showCourseGrid, isTrue);
       expect(settingsStore.todoRemindEnabled, isTrue);
+      expect(settingsStore.themeMode, ThemeMode.light);
       expect(settingsStore.scheduleBackground, 'wave');
       expect(settingsStore.customBackgroundImage, '/tmp/custom.png');
 
@@ -110,6 +116,7 @@ void main() {
       expect(prefs.getString(PrefsKeys.FONT_FAMILY), 'Source Han Sans');
       expect(prefs.getBool(PrefsKeys.SHOW_COURSE_GRID), isTrue);
       expect(prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED), isTrue);
+      expect(prefs.getString(PrefsKeys.THEME_MODE), 'light');
       expect(prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND), 'wave');
       expect(
         prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE),
@@ -137,6 +144,18 @@ void main() {
 
       expect(settingsStore.schoolId, 'unknown-school');
       expect(settingsStore.currentSchool.id, ApiConfig.defaultSchoolId);
+    });
+
+    test('should fallback theme mode to system when prefs value is invalid',
+        () async {
+      await PrefsService.instance.setString(PrefsKeys.THEME_MODE, 'neon');
+      container.dispose();
+      container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final settingsStore = store();
+
+      expect(settingsStore.themeMode, ThemeMode.system);
     });
   });
 }

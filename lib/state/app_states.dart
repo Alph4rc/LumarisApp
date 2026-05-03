@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/models/electric_data.dart';
@@ -29,6 +30,7 @@ class SettingsState with _$SettingsState {
     @Default('') String fontFamily,
     @Default(false) bool showCourseGrid,
     @Default(false) bool todoRemindEnabled,
+    @Default(ThemeMode.system) ThemeMode themeMode,
     @Default('') String scheduleBackground,
     @Default('') String customBackgroundImage,
     bool? customBackgroundIsDark,

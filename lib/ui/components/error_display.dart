@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 统一的错误显示组件
 ///
@@ -35,12 +36,10 @@ class ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDarkMode
-        ? Colors.red.shade900.withValues(alpha: 0.3)
-        : Colors.red.shade50;
-    final textColor = isDarkMode ? Colors.red.shade200 : Colors.red.shade900;
-    final iconColor = isDarkMode ? Colors.red.shade300 : Colors.red.shade700;
+    final colors = context.clubColors;
+    final backgroundColor = colors.danger.withValues(alpha: 0.12);
+    final textColor = colors.danger;
+    final iconColor = colors.danger;
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -119,10 +118,10 @@ class RetryableErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDarkMode ? Colors.red.shade300 : Colors.red.shade700;
-    final textColor = isDarkMode ? Colors.white : Colors.black87;
-    final subtextColor = isDarkMode ? Colors.white70 : Colors.black54;
+    final colors = context.clubColors;
+    final iconColor = colors.danger;
+    final textColor = colors.label;
+    final subtextColor = colors.secondaryLabel;
 
     return Center(
       child: Padding(
