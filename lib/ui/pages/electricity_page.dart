@@ -512,7 +512,6 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               subtitle: const Text('在首页显示电费磁贴'),
               trailing: CupertinoSwitch(
                 value: electricityState.tiles.contains('电费'),
-                activeTrackColor: colorScheme.primary,
                 onChanged: (value) async {
                   await controller.toggleTile('电费', value);
                 },
