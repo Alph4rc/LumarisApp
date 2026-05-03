@@ -176,7 +176,10 @@ class _AppLauncher extends ConsumerWidget {
         theme: ClubTheme.macosLightTheme(),
         darkTheme: ClubTheme.macosDarkTheme(),
         themeMode: settingsStore.themeMode,
-        home: const MainApp(),
+        home: ClubMaterialThemeBridge(
+          fontFamily: fontFamily,
+          child: const MainApp(),
+        ),
       );
     }
 

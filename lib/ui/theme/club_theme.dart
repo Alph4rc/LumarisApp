@@ -357,3 +357,27 @@ class ClubThemeModeCodec {
     }
   }
 }
+
+class ClubMaterialThemeBridge extends StatelessWidget {
+  const ClubMaterialThemeBridge({
+    super.key,
+    required this.child,
+    this.fontFamily,
+  });
+
+  final Widget child;
+  final String? fontFamily;
+
+  @override
+  Widget build(BuildContext context) {
+    final brightness = MacosTheme.brightnessOf(context);
+    final materialTheme = brightness == Brightness.dark
+        ? ClubTheme.darkTheme(fontFamily: fontFamily)
+        : ClubTheme.lightTheme(fontFamily: fontFamily);
+
+    return Theme(
+      data: materialTheme,
+      child: child,
+    );
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:macos_ui/macos_ui.dart';
 
 void main() {
   group('ClubTheme', () {
@@ -40,6 +41,37 @@ void main() {
       );
 
       expect(resolved, ClubColors.dark);
+    });
+
+    testWidgets('should bridge macOS dark theme to Material widgets',
+        (WidgetTester tester) async {
+      late ThemeData resolvedTheme;
+      late ClubColors resolvedColors;
+
+      await tester.pumpWidget(
+        MacosApp(
+          themeMode: ThemeMode.dark,
+          darkTheme: ClubTheme.macosDarkTheme(),
+          home: ClubMaterialThemeBridge(
+            child: Scaffold(
+              body: Builder(
+                builder: (context) {
+                  resolvedTheme = Theme.of(context);
+                  resolvedColors = context.clubColors;
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(resolvedTheme.brightness, Brightness.dark);
+      expect(
+        resolvedTheme.scaffoldBackgroundColor,
+        ClubColors.dark.groupedBackground,
+      );
+      expect(resolvedColors, ClubColors.dark);
     });
   });
 }
