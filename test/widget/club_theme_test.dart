@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -47,6 +48,8 @@ void main() {
         (WidgetTester tester) async {
       late ThemeData resolvedTheme;
       late ClubColors resolvedColors;
+      late Brightness cupertinoBrightness;
+      late Color cupertinoPrimaryColor;
 
       await tester.pumpWidget(
         MacosApp(
@@ -58,6 +61,9 @@ void main() {
                 builder: (context) {
                   resolvedTheme = Theme.of(context);
                   resolvedColors = context.clubColors;
+                  final cupertinoTheme = CupertinoTheme.of(context);
+                  cupertinoBrightness = cupertinoTheme.brightness!;
+                  cupertinoPrimaryColor = cupertinoTheme.primaryColor;
                   return const SizedBox.shrink();
                 },
               ),
@@ -72,6 +78,8 @@ void main() {
         ClubColors.dark.groupedBackground,
       );
       expect(resolvedColors, ClubColors.dark);
+      expect(cupertinoBrightness, Brightness.dark);
+      expect(cupertinoPrimaryColor, ClubColors.dark.primary);
     });
   });
 }

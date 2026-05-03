@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 // 添加字体设置组件
 class FontFamilySetting extends ConsumerWidget {
@@ -25,12 +26,13 @@ class FontFamilySetting extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
+    final colors = context.clubColors;
 
     return ClubListTile(
       leading: Icon(
         Icons.font_download,
         size: 20,
-        color: Colors.blue,
+        color: colors.primary,
       ),
       title: const Text('字体设置'),
       subtitle: const Text('为桌面平台选择字体(下次打开时才会应用)'),

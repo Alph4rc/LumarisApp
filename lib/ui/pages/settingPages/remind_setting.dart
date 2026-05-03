@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class RemindSetting extends ConsumerWidget {
@@ -13,6 +14,7 @@ class RemindSetting extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
+    final colors = context.clubColors;
 
     return Column(
       children: [
@@ -22,7 +24,7 @@ class RemindSetting extends ConsumerWidget {
           leading: Icon(
             Icons.schedule,
             size: 20,
-            color: CupertinoColors.systemGreen,
+            color: colors.success,
           ),
           title: const Text('课程通知'),
           subtitle: const Text('上课前进行提醒'),

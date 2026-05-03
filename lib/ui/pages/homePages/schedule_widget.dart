@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ScheduleWidget extends ConsumerStatefulWidget {
   const ScheduleWidget({super.key});
@@ -152,6 +153,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
 
   Widget _buildScheduleItem(
       CourseModel course, ScheduleItem item, bool isTablet) {
+    final colors = context.clubColors;
     return Material(
       borderRadius: ClubRadii.card,
       color: Colors.transparent,
@@ -190,10 +192,10 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.access_time,
                           size: 18,
-                          color: Colors.grey,
+                          color: colors.secondaryLabel,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -201,7 +203,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
-                            color: Colors.grey[600],
+                            color: colors.secondaryLabel,
                           ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -210,16 +212,16 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                     ),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on,
                           size: 18,
-                          color: Colors.grey,
+                          color: colors.secondaryLabel,
                         ),
                         const SizedBox(width: 6),
                         Text(item.location,
                             style: TextStyle(
                               fontSize: 15,
-                              color: Colors.grey[600],
+                              color: colors.secondaryLabel,
                               fontWeight: FontWeight.w400,
                             )),
                       ],
@@ -236,6 +238,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
   }
 
   Widget buildCourse(ScheduleItem course, bool isTablet) {
+    final colors = context.clubColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -245,7 +248,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
           style: TextStyle(
             fontSize: isTablet ? 24 : 22,
             fontWeight: FontWeight.w600,
-            color: CupertinoColors.label.resolveFrom(context),
+            color: colors.label,
           ),
         ),
         SizedBox(height: isTablet ? 16 : 14),
@@ -253,7 +256,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
           children: [
             Icon(
               CupertinoIcons.placemark_fill,
-              color: CupertinoColors.systemBlue,
+              color: colors.primary,
               size: isTablet ? 22 : 20,
             ),
             SizedBox(width: isTablet ? 12 : 10),
@@ -274,7 +277,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
           children: [
             Icon(
               CupertinoIcons.person_2_fill,
-              color: CupertinoColors.systemRed,
+              color: colors.danger,
               size: isTablet ? 22 : 20,
             ),
             SizedBox(width: isTablet ? 12 : 10),
@@ -296,7 +299,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
           children: [
             Icon(
               CupertinoIcons.calendar,
-              color: CupertinoColors.systemGreen,
+              color: colors.success,
               size: isTablet ? 22 : 20,
             ),
             SizedBox(width: isTablet ? 12 : 10),

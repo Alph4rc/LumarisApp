@@ -10,6 +10,8 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.centerTitle = true,
     this.titleWidget,
     this.bottom,
+    this.showBackButton,
+    this.onBackPressed,
   });
 
   final String? title;
@@ -19,12 +21,18 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool centerTitle;
   final Widget? titleWidget;
   final PreferredSizeWidget? bottom;
+  final bool? showBackButton;
+  final VoidCallback? onBackPressed;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
+    final route = ModalRoute.of(context);
+    final canPop = Navigator.of(context).canPop() || (route?.canPop ?? false);
+    final shouldShowBackButton = showBackButton ?? canPop;
+
     return AppBar(
       title: titleWidget ??
           Text(
@@ -35,11 +43,15 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
       actions: actions,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-        tooltip: 'Back',
-      ),
+      automaticallyImplyLeading: false,
+      leading: shouldShowBackButton
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed:
+                  onBackPressed ?? () => Navigator.of(context).maybePop(),
+              tooltip: 'Back',
+            )
+          : null,
       backgroundColor: backgroundColor,
       elevation: elevation,
       centerTitle: centerTitle,

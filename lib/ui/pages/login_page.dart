@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
@@ -164,9 +165,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final groupBackgroundColor =
-        isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final colors = context.clubColors;
+    final groupBackgroundColor = colors.cardBackground;
 
     if (_isLoading) {
       return const Scaffold(
@@ -208,7 +208,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     borderRadius: ClubRadii.tile,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: colors.shadowColor.withValues(alpha: 0.9),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),

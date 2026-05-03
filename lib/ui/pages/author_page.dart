@@ -42,13 +42,13 @@ class AuthorPage extends StatelessWidget {
                     children: [
                       _buildHeader(context),
                       const SizedBox(height: 32),
-                      _buildSectionHeader('核心团队'),
+                      _buildSectionHeader(context, '核心团队'),
                       _buildTeamSection(context),
                       const SizedBox(height: 32),
-                      _buildSectionHeader('特别致谢'),
+                      _buildSectionHeader(context, '特别致谢'),
                       _buildThanksSection(context),
                       const SizedBox(height: 32),
-                      _buildSectionHeader('联系我们'),
+                      _buildSectionHeader(context, '联系我们'),
                       _buildContactSection(context),
                       const SizedBox(height: 48),
                       _buildFooter(context),
@@ -113,17 +113,17 @@ class AuthorPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
           title.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: CupertinoColors.systemGrey,
+            color: context.clubColors.secondaryLabel,
             letterSpacing: 0.5,
           ),
         ),

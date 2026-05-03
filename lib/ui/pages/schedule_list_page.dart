@@ -21,6 +21,7 @@ import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
@@ -170,6 +171,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Widget _buildWeekInfo(BuildContext context, bool isDark) {
     final scheduleState = ref.watch(scheduleStoreProvider);
+    final colors = context.clubColors;
     return Builder(builder: (context) {
       final weekText = scheduleState.currentWeek <= 0
           ? '距离开学还有${-scheduleState.currentWeek + 1}周'
@@ -190,7 +192,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: colors.label,
                 ),
               ),
               const SizedBox(height: 2),
@@ -473,6 +475,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   void _showCourseActions(CourseModel course) {
+    final colors = context.clubColors;
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Column(
@@ -487,8 +491,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
             },
           ),
           ClubListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text('删除课程', style: TextStyle(color: Colors.red)),
+            leading: Icon(Icons.delete, color: colors.danger),
+            title: Text('删除课程', style: TextStyle(color: colors.danger)),
             onTap: () {
               Navigator.pop(context);
               _deleteCustomCourse(course);
@@ -515,6 +519,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   Future<void> _deleteCustomCourse(CourseModel course) async {
+    final colors = context.clubColors;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -527,7 +533,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: colors.danger),
             child: const Text('删除'),
           ),
         ],

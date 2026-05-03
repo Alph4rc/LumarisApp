@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
 class EditableTileWrapper extends ConsumerStatefulWidget {
@@ -130,6 +131,8 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
   }
 
   Widget _buildHideButton(TileEditNotifier controller) {
+    final colors = context.clubColors;
+
     return GestureDetector(
       onTap: () async {
         try {
@@ -141,12 +144,12 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.grey.shade400.withValues(alpha: 0.9), // iOS style grey
+          color: colors.secondaryLabel.withValues(alpha: 0.9),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
+        child: Icon(
           Icons.remove, // Simple minus
-          color: Colors.white,
+          color: colors.onAccent,
           size: 16,
         ),
       ),

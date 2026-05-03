@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import '../../../state/payment_store.dart';
 import '../club_card.dart';
 
@@ -13,6 +13,7 @@ class PaymentTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final payment = ref.watch(paymentStoreProvider);
+    final colors = context.clubColors;
 
     return ClubCard(
       child: Material(
@@ -39,9 +40,7 @@ class PaymentTile extends ConsumerWidget {
               if (!payment.isLoading && payment.hasData) {
                 final amount = payment.totalRecharge;
                 final isLow = amount <= 10;
-                final primaryColor = isLow
-                    ? CupertinoColors.destructiveRed
-                    : CupertinoColors.systemOrange;
+                final primaryColor = isLow ? colors.danger : colors.warning;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,15 +66,14 @@ class PaymentTile extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: CupertinoColors.destructiveRed
-                                  .withValues(alpha: 0.12),
+                              color: colors.dangerSoft,
                               borderRadius: ClubRadii.navigation,
                             ),
-                            child: const Text(
+                            child: Text(
                               '余额不足',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: CupertinoColors.destructiveRed,
+                                color: colors.danger,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -88,8 +86,7 @@ class PaymentTile extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.bodySmall?.color ??
-                            Colors.grey.shade600,
+                        color: colors.secondaryLabel,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -99,9 +96,7 @@ class PaymentTile extends ConsumerWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
-                        color: isLow
-                            ? CupertinoColors.destructiveRed
-                            : Theme.of(context).colorScheme.onSurface,
+                        color: isLow ? colors.danger : colors.label,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -117,12 +112,12 @@ class PaymentTile extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.12),
+                      color: colors.surfaceMuted,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.monetization_on_rounded,
-                      color: Colors.grey,
+                      color: colors.secondaryLabel,
                       size: 24,
                     ),
                   ),
@@ -132,8 +127,7 @@ class PaymentTile extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Theme.of(context).textTheme.bodySmall?.color ??
-                          Colors.grey.shade600,
+                      color: colors.secondaryLabel,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -146,8 +140,8 @@ class PaymentTile extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
                       color: payment.errorMessage.isNotEmpty
-                          ? CupertinoColors.destructiveRed
-                          : Colors.grey,
+                          ? colors.danger
+                          : colors.secondaryLabel,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

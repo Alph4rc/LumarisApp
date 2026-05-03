@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Modal 内部布局组件库
 ///
@@ -59,7 +60,7 @@ class ModalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
@@ -77,7 +78,7 @@ class ModalHeader extends StatelessWidget {
                     style: TextStyle(
                       fontSize: isTablet ? 24 : 22,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : Colors.black,
+                      color: colors.label,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -88,7 +89,7 @@ class ModalHeader extends StatelessWidget {
                       subtitle!,
                       style: TextStyle(
                         fontSize: isTablet ? 14 : 13,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                     ),
                   ],
@@ -125,7 +126,7 @@ class ModalInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +155,7 @@ class ModalInfoRow extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  color: colors.secondaryLabel,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -163,7 +164,7 @@ class ModalInfoRow extends StatelessWidget {
                 content,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: colors.label,
                   fontWeight: FontWeight.w500,
                 ),
                 maxLines: maxLines,
@@ -194,12 +195,12 @@ class ModalActionMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return PopupMenuButton<String>(
       icon: Icon(
         Icons.more_horiz,
-        color: isDark ? Colors.grey[400] : Colors.grey[600],
+        color: colors.secondaryLabel,
       ),
       itemBuilder: (context) => [
         if (onEdit != null)
@@ -218,9 +219,9 @@ class ModalActionMenu extends StatelessWidget {
             value: 'delete',
             child: Row(
               children: [
-                Icon(Icons.delete, size: 20, color: Colors.red[400]),
+                Icon(Icons.delete, size: 20, color: colors.danger),
                 const SizedBox(width: 12),
-                Text('删除', style: TextStyle(color: Colors.red[400])),
+                Text('删除', style: TextStyle(color: colors.danger)),
               ],
             ),
           ),

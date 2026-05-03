@@ -18,6 +18,7 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 class ScorePage extends ConsumerStatefulWidget {
@@ -149,6 +150,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   void _handleFoolishMode() {
+    final colors = context.clubColors;
     setState(() {
       _isFool = true;
       for (final item in _scoreList) {
@@ -161,11 +163,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
     showClubSnackBar(
       context,
-      const Row(
+      Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('是的，在下绩点5.0'),
-          Icon(Icons.mood, color: Colors.black12),
+          const Text('是的，在下绩点5.0'),
+          Icon(Icons.mood, color: colors.quaternaryLabel),
         ],
       ),
     );
@@ -173,6 +175,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     // 检查是否为游客模式
     if (!ref.watch(userStoreProvider).isLogin) {
       return Scaffold(
@@ -183,7 +186,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
               Icon(
                 Icons.warning,
                 size: 48,
-                color: Colors.grey[400],
+                color: colors.secondaryLabel,
               ),
               SizedBox(height: 16),
               Text(
@@ -198,7 +201,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
                 '请先去登录即可查看成绩',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: colors.secondaryLabel,
                 ),
               ),
               SizedBox(height: 24),
@@ -374,6 +377,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
     required String label,
     bool withInfo = false,
   }) {
+    final colors = context.clubColors;
     return Column(
       children: [
         Icon(
@@ -391,17 +395,17 @@ class _ScorePageState extends ConsumerState<ScorePage>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (withInfo)
-              const Icon(
+              Icon(
                 Icons.info_outline,
                 size: 9,
-                color: Colors.grey,
+                color: colors.secondaryLabel,
               ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey,
+                color: colors.secondaryLabel,
               ),
             ),
           ],
@@ -635,31 +639,36 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildScoreMeta(ScoreModel item) {
+    final colors = context.clubColors;
     return Wrap(
       spacing: 16,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.time, size: 16, color: Colors.grey[600]),
+            Icon(CupertinoIcons.time, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('${item.credit}学分', style: TextStyle(color: Colors.grey[600]))
+            Text('${item.credit}学分',
+                style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.location, size: 16, color: Colors.grey[600]),
+            Icon(CupertinoIcons.location,
+                size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('成绩 ${item.grade}', style: TextStyle(color: Colors.grey[600]))
+            Text('成绩 ${item.grade}',
+                style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.star, size: 16, color: Colors.grey[600]),
+            Icon(CupertinoIcons.star, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('绩点 ${item.gpa}', style: TextStyle(color: Colors.grey[600]))
+            Text('绩点 ${item.gpa}',
+                style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
       ],
@@ -681,6 +690,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildScoreDetailsContent(ScoreModel score, bool isTablet) {
+    final colors = context.clubColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
@@ -695,28 +705,28 @@ class _ScorePageState extends ConsumerState<ScorePage>
             icon: CupertinoIcons.star_fill,
             label: '课程学分',
             content: '${score.credit} 学分',
-            color: const Color(0xFFFFCC00),
+            color: colors.yellow,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.chart_bar_fill,
             label: '课程成绩',
             content: score.grade,
-            color: const Color(0xFFFF3B30),
+            color: colors.danger,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.star_circle_fill,
             label: '课程绩点',
             content: score.gpa,
-            color: const Color(0xFF34C759),
+            color: colors.success,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.doc_text_fill,
             label: '成绩详情',
             content: score.gradeDetail,
-            color: const Color(0xFF007AFF),
+            color: colors.primary,
             maxLines: 5,
           ),
         ],

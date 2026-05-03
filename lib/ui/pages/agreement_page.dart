@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class AgreementPage extends ConsumerWidget {
   const AgreementPage({super.key});
@@ -38,8 +39,7 @@ class AgreementPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Scaffold(
       body: SafeArea(
@@ -67,7 +67,7 @@ class AgreementPage extends ConsumerWidget {
                     children: [
                       SizedBox(height: topSpacing),
                       // App 图标
-                      _buildAppIcon(isDark, isWide),
+                      _buildAppIcon(context, isWide),
                       const SizedBox(height: 24),
                       // 标题
                       Text(
@@ -75,7 +75,7 @@ class AgreementPage extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: isWide ? 30 : 26,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black,
+                          color: colors.label,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -83,7 +83,7 @@ class AgreementPage extends ConsumerWidget {
                         '欢迎使用 iOS Club App',
                         style: TextStyle(
                           fontSize: isWide ? 17 : 16,
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: colors.secondaryLabel,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -95,7 +95,7 @@ class AgreementPage extends ConsumerWidget {
                           '在使用本应用前，请仔细阅读并同意以下协议。我们将严格遵守相关法律法规，保护您的个人信息安全。',
                           style: TextStyle(
                             fontSize: isWide ? 16 : 15,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: colors.label,
                             height: 1.6,
                           ),
                         ),
@@ -106,10 +106,10 @@ class AgreementPage extends ConsumerWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: _buildAgreementCard(
-                          isDark: isDark,
+                          context: context,
                           isWide: isWide,
                           icon: CupertinoIcons.shield_fill,
-                          iconColor: CupertinoColors.systemBlue,
+                          iconColor: colors.primary,
                           title: '隐私协议',
                           description: '了解我们如何收集、使用和保护你的个人信息',
                           onTap: () => _viewPrivacyPolicy(context),
@@ -120,10 +120,10 @@ class AgreementPage extends ConsumerWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: _buildAgreementCard(
-                          isDark: isDark,
+                          context: context,
                           isWide: isWide,
                           icon: CupertinoIcons.doc_text_fill,
-                          iconColor: CupertinoColors.systemPurple,
+                          iconColor: colors.purple,
                           title: '用户协议',
                           description: '了解使用本应用的权利、义务和免责条款',
                           onTap: () => _viewUserAgreement(context),
@@ -138,7 +138,7 @@ class AgreementPage extends ConsumerWidget {
                           '点击上方卡片可查看协议全文。继续使用即表示你已阅读并同意以上协议。',
                           style: TextStyle(
                             fontSize: isWide ? 14 : 13,
-                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            color: colors.secondaryLabel,
                             height: 1.5,
                           ),
                           textAlign: TextAlign.center,
@@ -149,7 +149,7 @@ class AgreementPage extends ConsumerWidget {
                       Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
-                        child: _buildButtons(context, ref, isDark, isWide),
+                        child: _buildButtons(context, ref, isWide),
                       ),
                       SizedBox(height: isDesktop ? 40 : 24),
                     ],
@@ -163,7 +163,8 @@ class AgreementPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppIcon(bool isDark, bool isWide) {
+  Widget _buildAppIcon(BuildContext context, bool isWide) {
+    final colors = context.clubColors;
     final size = isWide ? 100.0 : 90.0;
     return Container(
       width: size,
@@ -172,8 +173,7 @@ class AgreementPage extends ConsumerWidget {
         borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
         boxShadow: [
           BoxShadow(
-            color:
-                (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+            color: colors.shadowColor.withValues(alpha: 0.8),
             blurRadius: 16,
             spreadRadius: 2,
           ),
@@ -192,9 +192,9 @@ class AgreementPage extends ConsumerWidget {
   Widget _buildButtons(
     BuildContext context,
     WidgetRef ref,
-    bool isDark,
     bool isWide,
   ) {
+    final colors = context.clubColors;
     final buttonHeight = isWide ? 52.0 : 50.0;
     final fontSize = isWide ? 18.0 : 17.0;
 
@@ -220,13 +220,13 @@ class AgreementPage extends ConsumerWidget {
           height: buttonHeight,
           child: CupertinoButton(
             onPressed: _onDisagree,
-            color: isDark ? Colors.grey[800] : CupertinoColors.systemGrey5,
+            color: colors.surfaceRaised,
             child: Text(
               '不同意',
               style: TextStyle(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w500,
-                color: isDark ? Colors.grey[400] : Colors.grey[700],
+                color: colors.secondaryLabel,
               ),
             ),
           ),
@@ -236,7 +236,7 @@ class AgreementPage extends ConsumerWidget {
   }
 
   Widget _buildAgreementCard({
-    required bool isDark,
+    required BuildContext context,
     required bool isWide,
     required IconData icon,
     required Color iconColor,
@@ -244,8 +244,9 @@ class AgreementPage extends ConsumerWidget {
     required String description,
     required VoidCallback onTap,
   }) {
+    final colors = context.clubColors;
     return Material(
-      color: isDark ? Colors.grey[850] : CupertinoColors.systemGrey6,
+      color: colors.surfaceRaised,
       borderRadius: ClubRadii.panel,
       child: InkWell(
         borderRadius: ClubRadii.panel,
@@ -273,7 +274,7 @@ class AgreementPage extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: isWide ? 17 : 16,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.black,
+                        color: colors.label,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -281,7 +282,7 @@ class AgreementPage extends ConsumerWidget {
                       description,
                       style: TextStyle(
                         fontSize: isWide ? 14 : 13,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                     ),
                   ],
@@ -290,8 +291,7 @@ class AgreementPage extends ConsumerWidget {
               Icon(
                 CupertinoIcons.chevron_right,
                 size: isWide ? 20 : 18,
-                color:
-                    isDark ? Colors.grey[600] : CupertinoColors.tertiaryLabel,
+                color: colors.tertiaryLabel,
               ),
             ],
           ),
@@ -307,10 +307,9 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final titleColor = isDark ? Colors.white : Colors.black;
+    final colors = context.clubColors;
+    final textColor = colors.label;
+    final titleColor = colors.label;
 
     return Scaffold(
       appBar: AppBar(
@@ -321,15 +320,14 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
         ),
       ),
       body: _buildResponsiveContent(
-        isDark: isDark,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitle('iOS Club App 隐私协议', titleColor),
             const SizedBox(height: 8),
-            _buildSubtitle('更新日期：2025年1月1日', isDark),
+            _buildSubtitle(context, '更新日期：2025年1月1日'),
             const SizedBox(height: 8),
-            _buildSubtitle('生效日期：2025年1月1日', isDark),
+            _buildSubtitle(context, '生效日期：2025年1月1日'),
             const SizedBox(height: 20),
             _buildBodyText(
               '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team（以下简称"我们"）开发和运营。'
@@ -395,9 +393,13 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
   Widget _buildTitle(String text, Color color) => Text(text,
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold));
 
-  Widget _buildSubtitle(String text, bool isDark) => Text(text,
-      style: TextStyle(
-          fontSize: 13, color: isDark ? Colors.grey[400] : Colors.grey[600]));
+  Widget _buildSubtitle(BuildContext context, String text) {
+    final colors = context.clubColors;
+    return Text(
+      text,
+      style: TextStyle(fontSize: 13, color: colors.secondaryLabel),
+    );
+  }
 
   Widget _buildSectionTitle(String text, Color color) => Text(text,
       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600));
@@ -412,10 +414,9 @@ class _UserAgreementContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final titleColor = isDark ? Colors.white : Colors.black;
+    final colors = context.clubColors;
+    final textColor = colors.label;
+    final titleColor = colors.label;
 
     return Scaffold(
       appBar: AppBar(
@@ -426,15 +427,14 @@ class _UserAgreementContentPage extends StatelessWidget {
         ),
       ),
       body: _buildResponsiveContent(
-        isDark: isDark,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitle('iOS Club App 用户协议', titleColor),
             const SizedBox(height: 8),
-            _buildSubtitle('更新日期：2025年1月1日', isDark),
+            _buildSubtitle(context, '更新日期：2025年1月1日'),
             const SizedBox(height: 8),
-            _buildSubtitle('生效日期：2025年1月1日', isDark),
+            _buildSubtitle(context, '生效日期：2025年1月1日'),
             const SizedBox(height: 20),
             _buildBodyText(
               '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team'
@@ -488,9 +488,13 @@ class _UserAgreementContentPage extends StatelessWidget {
   Widget _buildTitle(String text, Color color) => Text(text,
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold));
 
-  Widget _buildSubtitle(String text, bool isDark) => Text(text,
-      style: TextStyle(
-          fontSize: 13, color: isDark ? Colors.grey[400] : Colors.grey[600]));
+  Widget _buildSubtitle(BuildContext context, String text) {
+    final colors = context.clubColors;
+    return Text(
+      text,
+      style: TextStyle(fontSize: 13, color: colors.secondaryLabel),
+    );
+  }
 
   Widget _buildSectionTitle(String text, Color color) => Text(text,
       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600));
@@ -501,7 +505,6 @@ class _UserAgreementContentPage extends StatelessWidget {
 
 /// 响应式内容包裹器：桌面/平板端限制最大宽度并居中
 Widget _buildResponsiveContent({
-  required bool isDark,
   required Widget child,
 }) {
   return LayoutBuilder(

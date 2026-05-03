@@ -4,6 +4,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/models/link_model.dart';
@@ -15,6 +16,7 @@ class LinkPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Scaffold(
       appBar: ClubAppBar(
         title: '校园导航',
@@ -37,7 +39,7 @@ class LinkPage extends StatelessWidget {
                       "加载失败",
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -102,6 +104,7 @@ class ScoreBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
@@ -120,7 +123,7 @@ class ScoreBuilder extends StatelessWidget {
                     width: 4,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1),
+                      color: colors.indigo,
                       borderRadius: ClubRadii.indicatorBorder,
                     ),
                   ),
@@ -173,6 +176,7 @@ class _LinkItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -214,7 +218,7 @@ class _LinkItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.2,
-                  color: Colors.grey[500],
+                  color: colors.tertiaryLabel,
                 ),
               ),
             ],

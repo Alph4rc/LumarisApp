@@ -13,6 +13,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -104,9 +105,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     super.build(context);
     final isDesktop = PlatformUtils.isDesktop;
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final cardColor = isDark ? Colors.grey[900] : Colors.white;
+    final colors = context.clubColors;
 
     return Scaffold(
         appBar: ClubAppBar(
@@ -120,20 +119,20 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
               if (!isDesktop) ...[
                 _buildSectionTitle('日历订阅'),
                 const SizedBox(height: 12),
-                _buildCalendarSection(context, isDark, cardColor),
+                _buildCalendarSection(context, colors),
                 const SizedBox(height: 24),
               ],
               _buildSectionTitle('课表管理'),
               const SizedBox(height: 12),
-              _buildManagementSection(context, isDark, cardColor),
+              _buildManagementSection(context, colors),
               const SizedBox(height: 24),
               _buildSectionTitle('课表背景'),
               const SizedBox(height: 12),
-              _buildBackgroundSection(context, isDark, cardColor),
+              _buildBackgroundSection(context, colors),
               const SizedBox(height: 24),
               _buildSectionTitle('忽略课程'),
               const SizedBox(height: 12),
-              _buildIgnoreCourseSection(context, isDark, cardColor),
+              _buildIgnoreCourseSection(context, colors),
             ],
           ),
         ));
@@ -150,15 +149,14 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildCalendarSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildCalendarSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: Column(
         children: [
           ClubListTile(
             leading: Icon(
               Icons.calendar_today_outlined,
-              color: isDark ? Colors.blue[300] : Colors.blue[600],
+              color: colors.primary,
             ),
             title: const Text(
               '导入到日历',
@@ -181,7 +179,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                   '订阅链接',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    color: colors.secondaryLabel,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -189,7 +187,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[800] : Colors.grey[100],
+                    color: colors.surfaceRaised,
                     borderRadius: ClubRadii.control,
                   ),
                   child: Row(
@@ -199,7 +197,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                           'https$url',
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                            color: colors.secondaryLabel,
                             fontFamily: 'monospace',
                           ),
                           maxLines: 1,
@@ -237,8 +235,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildManagementSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildManagementSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: Column(
         children: [
@@ -258,9 +255,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                             children: [
                               Icon(
                                 Icons.edit_calendar_outlined,
-                                color: isDark
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
+                                color: colors.secondaryLabel,
                               ),
                               const SizedBox(width: 12),
                               const Text(
@@ -289,7 +284,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                     children: [
                       Icon(
                         Icons.grid_on_outlined,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                       const SizedBox(width: 12),
                       const Text(
@@ -318,13 +313,12 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildBackgroundSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildBackgroundSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: Column(
         children: [
-          _buildBackgroundOption('无背景', '', isDark),
-          _buildBackgroundOption('自定义图片', 'custom', isDark),
+          _buildBackgroundOption(context, '无背景', ''),
+          _buildBackgroundOption(context, '自定义图片', 'custom'),
           if (settingsStore.scheduleBackground == 'custom') ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(56, 12, 16, 12),
@@ -337,7 +331,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                           : settingsStore.customBackgroundImage,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -355,7 +349,12 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildBackgroundOption(String title, String value, bool isDark) {
+  Widget _buildBackgroundOption(
+    BuildContext context,
+    String title,
+    String value,
+  ) {
+    final colors = context.clubColors;
     final isSelected = settingsStore.scheduleBackground == value;
     return Material(
       borderRadius: ClubRadii.card,
@@ -378,7 +377,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                 isSelected ? Icons.check_circle : Icons.circle_outlined,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : (isDark ? Colors.grey[600] : Colors.grey[400]),
+                    : colors.tertiaryLabel,
               ),
               const SizedBox(width: 16),
               Text(
@@ -395,8 +394,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildIgnoreCourseSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildIgnoreCourseSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: ListView.builder(
         shrinkWrap: true,
@@ -522,7 +520,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: context.clubColors.surfaceRaised,
                   borderRadius: ClubRadii.xsBorder,
                 ),
                 child: Row(
@@ -576,7 +574,7 @@ class CourseIgnoreItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     return Material(
         color: Colors.transparent,
         borderRadius: ClubRadii.card,
@@ -593,7 +591,7 @@ class CourseIgnoreItem extends StatelessWidget {
                         : Icons.check_box_outline_blank,
                     color: ignore.isCompleted
                         ? Theme.of(context).colorScheme.primary
-                        : (isDark ? Colors.grey[600] : Colors.grey[400]),
+                        : colors.tertiaryLabel,
                   ),
                   const SizedBox(width: 12),
                   Expanded(

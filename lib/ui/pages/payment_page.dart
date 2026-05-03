@@ -91,26 +91,26 @@ class PaymentPage extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '校园一卡通',
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: colors.onAccent.withValues(alpha: 0.7),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               Icon(
                 Icons.contactless_outlined,
-                color: Colors.white.withValues(alpha: 0.6),
+                color: colors.onAccent.withValues(alpha: 0.6),
                 size: 24,
               ),
             ],
           ),
           const SizedBox(height: 32),
-          const Text(
+          Text(
             '当前余额',
             style: TextStyle(
-              color: Colors.white,
+              color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w400,
             ),
@@ -120,8 +120,8 @@ class PaymentPage extends ConsumerWidget {
             payment.hasData
                 ? '¥${payment.totalRecharge.toStringAsFixed(2)}'
                 : '¥ ---',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: colors.onAccent,
               fontSize: 36,
               fontWeight: FontWeight.w800,
               letterSpacing: -1,
@@ -133,7 +133,8 @@ class PaymentPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildRecentTransactionsSection(PaymentState payment, ClubColors colors) {
+  Widget _buildRecentTransactionsSection(
+      PaymentState payment, ClubColors colors) {
     final recentRecords = payment.records
         .where((r) =>
             r.turnoverType.contains('支付') ||
@@ -282,4 +283,3 @@ class PaymentPage extends ConsumerWidget {
     );
   }
 }
-

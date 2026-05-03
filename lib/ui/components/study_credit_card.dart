@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import 'club_card.dart';
 
@@ -298,14 +299,18 @@ class StudyCreditCard extends StatelessWidget {
   }
 
   Color _getProgressColor(double progress, ThemeData theme) {
+    final colors = theme.extension<ClubColors>() ??
+        (theme.brightness == Brightness.dark
+            ? ClubColors.dark
+            : ClubColors.light);
     if (progress >= 1.0) {
-      return Colors.green.shade600;
+      return colors.success;
     } else if (progress >= 0.8) {
-      return Colors.blue.shade600;
+      return colors.primary;
     } else if (progress >= 0.5) {
-      return Colors.orange.shade600;
+      return colors.warning;
     } else {
-      return Colors.red.shade600;
+      return colors.danger;
     }
   }
 }

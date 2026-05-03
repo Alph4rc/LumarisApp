@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class UserAgreementPage extends StatelessWidget {
   const UserAgreementPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final titleColor = isDark ? Colors.white : Colors.black;
+    final colors = context.clubColors;
+    final textColor = colors.label;
+    final titleColor = colors.label;
 
     return Scaffold(
       appBar: const ClubAppBar(title: '用户协议'),
@@ -20,9 +20,9 @@ class UserAgreementPage extends StatelessWidget {
           children: [
             _buildTitle('iOS Club App 用户协议', titleColor),
             const SizedBox(height: 8),
-            _buildSubtitle('更新日期：2025年1月1日', isDark),
+            _buildSubtitle(context, '更新日期：2025年1月1日'),
             const SizedBox(height: 8),
-            _buildSubtitle('生效日期：2025年1月1日', isDark),
+            _buildSubtitle(context, '生效日期：2025年1月1日'),
             const SizedBox(height: 20),
             _buildBodyText(
               '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team'
@@ -231,12 +231,13 @@ class UserAgreementPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSubtitle(String text, bool isDark) {
+  Widget _buildSubtitle(BuildContext context, String text) {
+    final colors = context.clubColors;
     return Text(
       text,
       style: TextStyle(
         fontSize: 13,
-        color: isDark ? Colors.grey[400] : Colors.grey[600],
+        color: colors.secondaryLabel,
       ),
     );
   }

@@ -20,6 +20,7 @@ import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -142,15 +143,6 @@ Future<void> _configureMacosWindowUtils() async {
   await config.apply();
 }
 
-Widget _getHomePage() {
-  // Windows 平台返回 WindowPage
-  if (PlatformUtils.isWindows) {
-    return const WindowPage();
-  }
-
-  return const MainApp();
-}
-
 void initApp(ProviderContainer container) {
   runApp(UncontrolledProviderScope(
     container: container,
@@ -161,35 +153,47 @@ void initApp(ProviderContainer container) {
 class _AppLauncher extends ConsumerWidget {
   const _AppLauncher();
 
+  Widget _buildAppShell(Widget child) {
+    if (PlatformUtils.isWindows) {
+      return WindowPage(child: child);
+    }
+
+    return MainApp(child: child);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsStore = ref.watch(settingsStoreProvider);
+    final router = ref.watch(appRouterProvider);
     // 直接从 settingsStore 获取需要的字体信息
     final fontFamily = settingsStore.fontFamily.isEmpty
         ? PlatformUtils.getWindowsFontFamily()
         : PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
 
     if (PlatformUtils.isMacOS) {
-      return MacosApp(
+      return MacosApp.router(
         title: 'iOS Club App',
         debugShowCheckedModeBanner: false,
         theme: ClubTheme.macosLightTheme(),
         darkTheme: ClubTheme.macosDarkTheme(),
         themeMode: settingsStore.themeMode,
-        home: ClubMaterialThemeBridge(
+        routerConfig: router,
+        builder: (context, child) => ClubMaterialThemeBridge(
           fontFamily: fontFamily,
-          child: const MainApp(),
+          child: _buildAppShell(child ?? const SizedBox.shrink()),
         ),
       );
     }
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
       theme: ClubTheme.lightTheme(fontFamily: fontFamily),
       darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
       themeMode: settingsStore.themeMode,
-      home: _getHomePage(),
+      routerConfig: router,
+      builder: (context, child) =>
+          _buildAppShell(child ?? const SizedBox.shrink()),
     );
   }
 }
@@ -208,7 +212,12 @@ void requestPermissions() async {
 }
 
 class WindowPage extends StatefulWidget {
-  const WindowPage({super.key});
+  const WindowPage({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
 
   @override
   State<WindowPage> createState() => _WindowPageState();
@@ -250,7 +259,7 @@ class _WindowPageState extends State<WindowPage>
   }
 
   @override
-  Widget build(BuildContext context) => const MainApp();
+  Widget build(BuildContext context) => MainApp(child: widget.child);
 
   @override
   void onWindowClose() async {

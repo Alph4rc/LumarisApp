@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程卡片组件
 ///
@@ -25,6 +26,7 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final courseColor = CourseColorManager.generateSoftColor(course.courseName);
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
@@ -55,7 +57,7 @@ class CourseCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: baseFontSize + addNum,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white70,
+                    color: colors.onAccent.withValues(alpha: 0.9),
                     overflow: TextOverflow.ellipsis,
                   ),
                   maxLines: 3,
@@ -66,7 +68,7 @@ class CourseCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: (isTablet ? 10 : 9) + addNum,
                     overflow: TextOverflow.ellipsis,
-                    color: Colors.white70,
+                    color: colors.onAccent.withValues(alpha: 0.9),
                   ),
                   maxLines: 2,
                 ),
@@ -76,7 +78,7 @@ class CourseCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: (isTablet ? 10 : 8) + addNum,
                     overflow: TextOverflow.ellipsis,
-                    color: Colors.white70,
+                    color: colors.onAccent.withValues(alpha: 0.9),
                   ),
                 ),
               ],

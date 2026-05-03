@@ -130,7 +130,7 @@ class SchoolBusPage extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? Colors.white : colors.secondaryLabel,
+                    color: isSelected ? colors.onAccent : colors.secondaryLabel,
                   ),
                 ),
               ),
@@ -271,24 +271,28 @@ class SchoolBusPage extends ConsumerWidget {
         ModalHeader(title: bus.lineName),
         const SizedBox(height: 12),
         _buildInfoRow(
+          context: context,
           icon: Icons.access_time_filled_rounded,
           label: '出发时间',
           content: bus.runTime,
           color: colors.primary,
         ),
         _buildInfoRow(
+          context: context,
           icon: Icons.location_on_rounded,
           label: '终点站',
           content: bus.arrivalStation,
           color: colors.danger,
         ),
         _buildInfoRow(
+          context: context,
           icon: Icons.schedule_rounded,
           label: '预计到达',
           content: bus.arrivalTime,
           color: colors.success,
         ),
         _buildInfoRow(
+          context: context,
           icon: Icons.info_outline_rounded,
           label: '班次信息',
           content: bus.description,
@@ -303,12 +307,14 @@ class SchoolBusPage extends ConsumerWidget {
   }
 
   Widget _buildInfoRow({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String content,
     required Color color,
     int maxLines = 1,
   }) {
+    final colors = context.clubColors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -329,10 +335,10 @@ class SchoolBusPage extends ConsumerWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                    color: colors.secondaryLabel,
                   ),
                 ),
                 const SizedBox(height: 2),

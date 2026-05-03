@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class HomePageSetting extends ConsumerWidget {
   const HomePageSetting({super.key});
@@ -19,12 +20,13 @@ class HomePageSetting extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
+    final colors = context.clubColors;
 
     return ClubListTile(
       leading: Icon(
         Icons.pageview,
         size: 20,
-        color: Colors.blue,
+        color: colors.primary,
       ),
       title: const Text('打开应用的第一个页面'),
       trailing: Text(_pageNames[settings.pageIndex]),

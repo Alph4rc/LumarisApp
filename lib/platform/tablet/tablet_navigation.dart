@@ -72,9 +72,9 @@ class _TabletNavigationState extends State<TabletNavigation> {
                       ),
                       borderRadius: ClubRadii.navigation,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.dashboard_rounded,
-                      color: Colors.white,
+                      color: colors.onAccent,
                       size: 24,
                     ),
                   ),
@@ -192,20 +192,20 @@ class TabletDrawerNavigation extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Icon(
                     Icons.dashboard_rounded,
                     size: 48,
-                    color: Colors.white,
+                    color: colors.onAccent,
                   ),
                   SizedBox(height: 16),
                   Text(
                     'iOS Club App',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colors.onAccent,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,

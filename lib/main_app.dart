@@ -21,7 +21,12 @@ import 'core/services/git_service.dart';
 import 'features/system/update/check_update_manager.dart';
 
 class MainApp extends ConsumerStatefulWidget {
-  const MainApp({super.key});
+  const MainApp({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
 
   @override
   ConsumerState<MainApp> createState() => _MainAppState();
@@ -252,21 +257,10 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     AppRouter.go(route);
   }
 
-  Widget _app() {
-    final router = ref.watch(appRouterProvider);
-
-    return Router.withConfig(
-      config: router,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsStoreProvider);
-
-    if (!settings.hasAcceptedAgreement) {
-      return const AgreementPage();
-    }
+    final routedChild = widget.child;
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -286,8 +280,10 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     final isTabletPortrait = isTablet && screenWidth <= screenHeight;
 
     // macOS - 使用原生 macOS UI
+    late final Widget shell;
+
     if (isMacOS) {
-      return MacosWindow(
+      shell = MacosWindow(
         sidebar: macosUISidebar(
           items: _destinations,
           selectedIndex: _currentIndex,
@@ -301,13 +297,11 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
             color: MacosTheme.of(context).canvasColor,
           ),
         ),
-        child: _app(),
+        child: routedChild,
       );
-    }
-
-    // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
-    if (isWindows || isLinux) {
-      return Scaffold(
+    } else if (isWindows || isLinux) {
+      // Windows/Linux - 使用 Windows 11 Fluent Design 风格侧边栏
+      shell = Scaffold(
         body: SafeArea(
           child: Row(
             children: [
@@ -319,59 +313,67 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
                 },
               ),
               Expanded(
-                child: _app(),
+                child: routedChild,
               ),
             ],
           ),
         ),
       );
-    }
-
-    // 平板横屏 - 使用 NavigationRail
-    if (isTabletLandscape) {
-      return TabletNavigation(
+    } else if (isTabletLandscape) {
+      // 平板横屏 - 使用 NavigationRail
+      shell = TabletNavigation(
         items: _destinations,
         selectedIndex: _currentIndex,
         onItemSelected: (int index) {
           _navigateToMainRoute(index);
         },
-        child: _app(),
+        child: routedChild,
       );
-    }
-
-    // 平板竖屏 - 使用 Drawer
-    if (isTabletPortrait) {
-      return TabletDrawerNavigation(
+    } else if (isTabletPortrait) {
+      // 平板竖屏 - 使用 Drawer
+      shell = TabletDrawerNavigation(
         items: _destinations,
         selectedIndex: _currentIndex,
         onItemSelected: (int index) {
           _navigateToMainRoute(index);
         },
-        child: _app(),
+        child: routedChild,
+      );
+    } else {
+      // 手机 - 使用底部导航栏（仅在四个主页面显示）
+      shell = Scaffold(
+        body: SafeArea(child: routedChild),
+        bottomNavigationBar: _showBottomNav
+            ? BottomNavigation(
+                destinations: _destinations.sublist(0, 4).map((destination) {
+                  return NavigationDestination(
+                    icon: Icon(destination.icon),
+                    selectedIcon: Icon(destination.selectedIcon),
+                    label: destination.label,
+                  );
+                }).toList(),
+                selectedIndex: _currentIndex,
+                onDestinationSelected: (int index) {
+                  _navigateToMainRoute(index);
+                },
+                backgroundColor: Theme.of(context)
+                    .scaffoldBackgroundColor
+                    .withValues(alpha: 0.95),
+              )
+            : null,
       );
     }
 
-    // 手机 - 使用底部导航栏（仅在四个主页面显示）
-    return Scaffold(
-      body: SafeArea(child: _app()),
-      bottomNavigationBar: _showBottomNav
-          ? BottomNavigation(
-              destinations: _destinations.sublist(0, 4).map((destination) {
-                return NavigationDestination(
-                  icon: Icon(destination.icon),
-                  selectedIcon: Icon(destination.selectedIcon),
-                  label: destination.label,
-                );
-              }).toList(),
-              selectedIndex: _currentIndex,
-              onDestinationSelected: (int index) {
-                _navigateToMainRoute(index);
-              },
-              backgroundColor: Theme.of(context)
-                  .scaffoldBackgroundColor
-                  .withValues(alpha: 0.95),
-            )
-          : null,
+    if (settings.hasAcceptedAgreement) {
+      return shell;
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        shell,
+        const AgreementPage(),
+      ],
     );
   }
 }

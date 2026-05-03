@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 优化的图片加载组件
 class OptimizedImage extends StatelessWidget {
@@ -79,22 +80,23 @@ class OptimizedImage extends StatelessWidget {
           }
 
           // 显示占位符
-          return placeholder ?? _defaultPlaceholder();
+          return placeholder ?? _defaultPlaceholder(context);
         },
         errorBuilder: (context, error, stackTrace) {
           // 图片加载失败
-          return errorWidget ?? _defaultErrorWidget();
+          return errorWidget ?? _defaultErrorWidget(context);
         },
       ),
     );
   }
 
   /// 默认占位符
-  Widget _defaultPlaceholder() {
+  Widget _defaultPlaceholder(BuildContext context) {
+    final colors = context.clubColors;
     return Container(
       width: width,
       height: height,
-      color: Colors.grey[200],
+      color: colors.surfaceRaised,
       child: Center(
         child: SizedBox(
           width: width != null ? width! * 0.5 : 24,
@@ -106,14 +108,15 @@ class OptimizedImage extends StatelessWidget {
   }
 
   /// 默认错误占位符
-  Widget _defaultErrorWidget() {
+  Widget _defaultErrorWidget(BuildContext context) {
+    final colors = context.clubColors;
     return Container(
       width: width,
       height: height,
-      color: Colors.grey[200],
+      color: colors.surfaceRaised,
       child: Icon(
         Icons.error_outline,
-        color: Colors.grey[400],
+        color: colors.secondaryLabel,
         size: width != null ? width! * 0.5 : 24,
       ),
     );
@@ -262,7 +265,7 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
           : Container(
               width: widget.width,
               height: widget.height,
-              color: Colors.grey[200],
+              color: context.clubColors.surfaceRaised,
             ),
     );
   }

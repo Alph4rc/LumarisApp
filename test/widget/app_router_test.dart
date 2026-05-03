@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/main_app.dart';
 import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:ios_club_app/ui/pages/home_page.dart';
 import 'package:ios_club_app/ui/pages/link_page.dart';
@@ -85,5 +88,39 @@ void main() {
 
     expect(AppRouter.currentLocation, AppRoutes.agreement);
     expect(find.byType(AgreementPage), findsOneWidget);
+  });
+
+  testWidgets('main shell can switch layouts without duplicating global keys',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    await PrefsService.instance.setBool(PrefsKeys.AGREEMENT_ACCEPTED, true);
+
+    final childKey = GlobalKey();
+    final routedChild = SizedBox(key: childKey);
+
+    Future<void> pumpShell(Size size) async {
+      await tester.binding.setSurfaceSize(size);
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: MainApp(child: routedChild),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    await pumpShell(const Size(390, 844));
+    expect(find.byKey(childKey), findsOneWidget);
+
+    await pumpShell(const Size(1024, 768));
+    expect(find.byKey(childKey), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    debugDefaultTargetPlatformOverride = null;
   });
 }

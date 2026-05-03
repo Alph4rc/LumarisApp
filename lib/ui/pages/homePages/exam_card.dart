@@ -11,6 +11,7 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ExamCard extends StatefulWidget {
   const ExamCard({super.key});
@@ -100,7 +101,7 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Widget examWrap(ExamData exam) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Wrap(
       spacing: 16,
@@ -112,14 +113,14 @@ class _ExamCardState extends State<ExamCard> {
             Icon(
               CupertinoIcons.clock,
               size: 16,
-              color: isDark ? Colors.white60 : Colors.black54,
+              color: colors.secondaryLabel,
             ),
             const SizedBox(width: 6),
             Text(
               exam.time,
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.white60 : Colors.black54,
+                color: colors.secondaryLabel,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -132,14 +133,14 @@ class _ExamCardState extends State<ExamCard> {
               Icon(
                 CupertinoIcons.placemark,
                 size: 16,
-                color: isDark ? Colors.white60 : Colors.black54,
+                color: colors.secondaryLabel,
               ),
               const SizedBox(width: 6),
               Text(
                 exam.location,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? Colors.white60 : Colors.black54,
+                  color: colors.secondaryLabel,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -152,14 +153,14 @@ class _ExamCardState extends State<ExamCard> {
               Icon(
                 CupertinoIcons.calendar,
                 size: 16,
-                color: isDark ? Colors.white60 : Colors.black54,
+                color: colors.secondaryLabel,
               ),
               const SizedBox(width: 6),
               Text(
                 '座位号 ${exam.seat}',
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? Colors.white60 : Colors.black54,
+                  color: colors.secondaryLabel,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -290,6 +291,7 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Widget _buildExamTip(ExamData exam) {
+    final colors = context.clubColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -299,7 +301,7 @@ class _ExamCardState extends State<ExamCard> {
           icon: CupertinoIcons.clock,
           label: '考试时间',
           content: exam.time,
-          color: const Color(0xFF34C759),
+          color: colors.success,
         ),
         if (exam.location.isNotEmpty) ...[
           const ModalSpacing(),
@@ -307,7 +309,7 @@ class _ExamCardState extends State<ExamCard> {
             icon: CupertinoIcons.placemark,
             label: '考试地点',
             content: exam.location,
-            color: const Color(0xFFFF9500),
+            color: colors.warning,
           ),
         ],
         if (exam.seat.isNotEmpty) ...[
@@ -316,7 +318,7 @@ class _ExamCardState extends State<ExamCard> {
             icon: CupertinoIcons.calendar,
             label: '座位号',
             content: exam.seat,
-            color: const Color(0xFFFF3B30),
+            color: colors.danger,
           ),
         ],
       ],

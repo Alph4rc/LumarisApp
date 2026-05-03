@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -188,7 +189,7 @@ class UpdateManager {
                       downloadProgress.speedText,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: context.clubColors.secondaryLabel,
                       ),
                     ),
                   ],

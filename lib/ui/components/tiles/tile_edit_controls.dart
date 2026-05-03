@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Controls for entering and exiting tile edit mode
 class TileEditControls extends ConsumerWidget {
@@ -36,8 +37,8 @@ class TileEditControls extends ConsumerWidget {
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: isEditMode
-                ? _buildDoneButton(controller)
-                : _buildEditButton(controller),
+                ? _buildDoneButton(context, controller)
+                : _buildEditButton(context, controller),
           ),
         ],
       ),
@@ -45,29 +46,33 @@ class TileEditControls extends ConsumerWidget {
   }
 
   /// Build edit button
-  Widget _buildEditButton(TileEditNotifier controller) {
+  Widget _buildEditButton(BuildContext context, TileEditNotifier controller) {
+    final colors = context.clubColors;
+
     return TextButton.icon(
       key: const ValueKey('edit_button'),
       onPressed: () => controller.toggleEditMode(),
       icon: const Icon(Icons.edit_outlined, size: 18),
       label: const Text('编辑'),
       style: TextButton.styleFrom(
-        foregroundColor: Colors.blue,
+        foregroundColor: colors.primary,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
     );
   }
 
   /// Build done button
-  Widget _buildDoneButton(TileEditNotifier controller) {
+  Widget _buildDoneButton(BuildContext context, TileEditNotifier controller) {
+    final colors = context.clubColors;
+
     return ElevatedButton.icon(
       key: const ValueKey('done_button'),
       onPressed: () => controller.toggleEditMode(),
       icon: const Icon(Icons.check, size: 18),
       label: const Text('完成'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: colors.primary,
+        foregroundColor: colors.onAccent,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         elevation: 2,
       ),
@@ -89,13 +94,14 @@ class EditModeIndicator extends ConsumerWidget {
     final isEditMode = ref.watch(
       tileEditControllerProvider.select((value) => value.isEditMode),
     );
+    final colors = context.clubColors;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         border: isEditMode
             ? Border.all(
-                color: Colors.blue.withValues(alpha: 0.3),
+                color: colors.primary.withValues(alpha: 0.3),
                 width: 2,
               )
             : null,
@@ -130,6 +136,7 @@ class AvailableTilesList extends ConsumerWidget {
     final controller = ref.read(tileEditControllerProvider.notifier);
     final allTiles = tileEditState.config.configurations;
     final hiddenTiles = allTiles.where((t) => !t.isVisible).toList();
+    final colors = context.clubColors;
 
     if (hiddenTiles.isEmpty) {
       return const SizedBox.shrink();
@@ -164,13 +171,13 @@ class AvailableTilesList extends ConsumerWidget {
                     ClubListTile(
                       leading: Container(
                         padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
+                        decoration: BoxDecoration(
+                          color: colors.success,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.add,
-                          color: Colors.white,
+                          color: colors.onAccent,
                           size: 16,
                         ),
                       ),

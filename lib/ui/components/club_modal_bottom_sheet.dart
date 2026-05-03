@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
     {bool isScrollControlled = true, double maxHeight = 0}) {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final colors = context.clubColors;
   final a = MediaQuery.of(context).size.width;
 
   if (maxHeight == 0) {
@@ -28,9 +29,7 @@ Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
               height: 5,
               margin: const EdgeInsets.only(top: 12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : Colors.grey[300],
+                color: colors.borderStrong.withValues(alpha: 0.8),
                 borderRadius: ClubRadii.pill,
               ),
             ),

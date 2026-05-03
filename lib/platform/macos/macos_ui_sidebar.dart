@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
@@ -61,12 +62,13 @@ Sidebar macosUISidebar({
     bottom: Consumer(
       builder: (context, ref, child) {
         final userState = ref.watch(userStoreProvider);
+        final colors = context.clubColors;
 
         return Container(
           decoration: BoxDecoration(
             border: Border(
               top: BorderSide(
-                color: CupertinoColors.separator.resolveFrom(context),
+                color: colors.separator,
                 width: 0.5,
               ),
             ),
@@ -80,13 +82,13 @@ Sidebar macosUISidebar({
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: CupertinoColors.systemBlue.resolveFrom(context),
+                color: colors.primary,
                 shape: BoxShape.circle,
               ),
-              child: const MacosIcon(
+              child: MacosIcon(
                 CupertinoIcons.person_fill,
                 size: 18,
-                color: CupertinoColors.white,
+                color: colors.onAccent,
               ),
             ),
             title: FutureBuilder(
@@ -116,7 +118,7 @@ Sidebar macosUISidebar({
               userState.isLogin ? '教务系统' : '点击登录',
               style: TextStyle(
                 fontSize: 11,
-                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                color: colors.secondaryLabel,
                 overflow: TextOverflow.ellipsis,
               ),
               maxLines: 1,

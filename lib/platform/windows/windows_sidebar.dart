@@ -115,10 +115,10 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.apple, // 使用 Apple 图标或保持 dashboard
               size: 18,
-              color: Colors.white,
+              color: context.clubColors.onAccent,
             ),
           ),
           const SizedBox(width: 12),
@@ -148,7 +148,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
   }) {
     // 选中态颜色 - 模仿 macOS 强调色
     final selectedBgColor = colorScheme.primary;
-    final selectedTextColor = Colors.white;
+    final selectedTextColor = context.clubColors.onAccent;
 
     // 悬停态颜色
     final hoverBgColor = isDark
@@ -215,7 +215,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Colors.white.withValues(alpha: 0.2)
+                          ? context.clubColors.onAccent.withValues(alpha: 0.2)
                           : context.clubColors.cardOverlay,
                       borderRadius: ClubRadii.navigation,
                     ),
@@ -223,7 +223,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                       item.badge!,
                       style: TextStyle(
                         color: isSelected
-                            ? Colors.white
+                            ? context.clubColors.onAccent
                             : context.clubColors.label,
                         fontSize: 11,
                         fontWeight: FontWeight.w500,

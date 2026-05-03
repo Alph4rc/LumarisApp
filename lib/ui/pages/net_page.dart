@@ -4,6 +4,7 @@ import 'package:ios_club_app/core/services/net_service.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class NetPage extends StatefulWidget {
   const NetPage({super.key});
@@ -131,12 +132,12 @@ class _DataContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     // Apple 风格配色
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final primaryTextColor = isDark ? Colors.white : Colors.black;
-    final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[600];
+    final cardColor = colors.cardBackground;
+    final primaryTextColor = colors.label;
+    final secondaryTextColor = colors.secondaryLabel;
 
     return CustomScrollView(
       physics:
@@ -178,7 +179,8 @@ class _DataContent extends StatelessWidget {
                             borderRadius: ClubRadii.card, // Apple 风格圆角
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color:
+                                    colors.shadowColor.withValues(alpha: 0.8),
                                 blurRadius: 20,
                                 offset: const Offset(0, 4),
                               ),
@@ -257,7 +259,8 @@ class _DataContent extends StatelessWidget {
                             borderRadius: ClubRadii.panel,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color:
+                                    colors.shadowColor.withValues(alpha: 0.8),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),
@@ -267,7 +270,7 @@ class _DataContent extends StatelessWidget {
                             children: [
                               _DetailRow(
                                 icon: Icons.person_rounded,
-                                iconColor: Colors.blue,
+                                iconColor: colors.primary,
                                 title: '用户名',
                                 value: data['user_name'] ?? '未知',
                                 isFirst: true,
@@ -275,7 +278,7 @@ class _DataContent extends StatelessWidget {
                               const _Divider(),
                               _DetailRow(
                                 icon: Icons.wifi_rounded,
-                                iconColor: Colors.green,
+                                iconColor: colors.success,
                                 title: 'IP 地址',
                                 value: data['online_ip'] ?? '未知',
                                 onTap: () => _copyToClipboard(
@@ -285,7 +288,7 @@ class _DataContent extends StatelessWidget {
                               const _Divider(),
                               _DetailRow(
                                 icon: Icons.shopping_bag_rounded,
-                                iconColor: Colors.orange,
+                                iconColor: colors.warning,
                                 title: '产品套餐',
                                 value: data['products_name'] ?? '未知',
                                 isLast: true,
@@ -337,8 +340,7 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Material(
       color: Colors.transparent,
@@ -361,7 +363,7 @@ class _DetailRow extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 16,
-                  color: Colors.white,
+                  color: colors.onAccent,
                 ),
               ),
               const SizedBox(width: 12),
@@ -370,7 +372,7 @@ class _DetailRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: colors.label,
                 ),
               ),
               const Spacer(),
@@ -378,7 +380,7 @@ class _DetailRow extends StatelessWidget {
                 value,
                 style: TextStyle(
                   fontSize: 15,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  color: colors.secondaryLabel,
                 ),
               ),
               if (showArrow) ...[
@@ -386,7 +388,7 @@ class _DetailRow extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,
-                  color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  color: colors.tertiaryLabel,
                 ),
               ],
             ],
@@ -402,11 +404,11 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     return Divider(
       height: 1,
       indent: 50, // Icon width + padding
-      color: isDark ? Colors.grey[800] : Colors.grey[200],
+      color: colors.separator,
     );
   }
 }
@@ -436,11 +438,12 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline_rounded, size: 48, color: Colors.red[300]),
+          Icon(Icons.error_outline_rounded, size: 48, color: colors.danger),
           const SizedBox(height: 16),
           Text(
             '加载失败',
@@ -452,7 +455,7 @@ class _ErrorView extends StatelessWidget {
             child: Text(
               error,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: colors.secondaryLabel),
             ),
           ),
           const SizedBox(height: 24),
@@ -472,15 +475,16 @@ class _EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox_rounded, size: 64, color: Colors.grey[400]),
+          Icon(Icons.inbox_rounded, size: 64, color: colors.secondaryLabel),
           const SizedBox(height: 16),
           Text(
             '暂无数据',
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(color: colors.secondaryLabel, fontSize: 16),
           ),
         ],
       ),

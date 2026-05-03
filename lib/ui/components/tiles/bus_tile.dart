@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import '../club_card.dart';
 
 class BusTile extends ConsumerWidget {
@@ -13,6 +13,7 @@ class BusTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final busStore = ref.watch(busTileStoreProvider);
+    final colors = context.clubColors;
 
     return ClubCard(
       child: Material(
@@ -35,7 +36,7 @@ class BusTile extends ConsumerWidget {
               }
 
               final busData = busStore.busCount;
-              final primaryColor = CupertinoColors.activeGreen;
+              final primaryColor = colors.success;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,8 +82,7 @@ class BusTile extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Theme.of(context).textTheme.bodySmall?.color ??
-                          Colors.grey.shade600,
+                      color: colors.secondaryLabel,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -92,9 +92,7 @@ class BusTile extends ConsumerWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
-                      color: busData > 0
-                          ? Theme.of(context).colorScheme.onSurface
-                          : Colors.grey,
+                      color: busData > 0 ? colors.label : colors.secondaryLabel,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

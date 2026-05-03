@@ -17,6 +17,7 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ElectricityPage extends ConsumerStatefulWidget {
   const ElectricityPage({super.key});
@@ -99,7 +100,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final statusColor = electricityState.electricity <= 10
         ? colorScheme.error
-        : _successColor(colorScheme);
+        : _successColor(context);
 
     return SizedBox(
       width: double.infinity,
@@ -158,8 +159,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: electricityState.hasData 
-                  ? statusColor.withValues(alpha: 0.1) 
+              color: electricityState.hasData
+                  ? statusColor.withValues(alpha: 0.1)
                   : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(20),
             ),
@@ -169,7 +170,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                   : '点击右上角添加电费数据',
               style: TextStyle(
                 fontSize: 13,
-                color: electricityState.hasData ? statusColor : colorScheme.onSurfaceVariant,
+                color: electricityState.hasData
+                    ? statusColor
+                    : colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -250,7 +253,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
@@ -300,7 +304,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 value: '¥${totalCost.toStringAsFixed(2)}',
               ),
             ),
-            Container(width: 1, height: 40, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            Container(
+                width: 1,
+                height: 40,
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
             Expanded(
               child: _buildMinimalMetric(
                 label: '今日花费',
@@ -318,7 +325,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 value: '¥${averageDailyCost.toStringAsFixed(2)}',
               ),
             ),
-            Container(width: 1, height: 40, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            Container(
+                width: 1,
+                height: 40,
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
             Expanded(
               child: _buildMinimalMetric(
                 label: '峰值时段',
@@ -480,25 +490,25 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     return '${data.timestamp.hour}:00 / ¥${data.value.toStringAsFixed(1)}';
   }
 
-  Color _successColor(ColorScheme colorScheme) {
-    return colorScheme.brightness == Brightness.dark
-        ? const Color(0xFF30D158)
-        : const Color(0xFF248A3D);
+  Color _successColor(BuildContext context) {
+    return context.clubColors.success;
   }
 
   Widget _buildSettingsSection() {
     final electricityState = ref.watch(electricityStoreProvider);
     final controller = ref.read(electricityStoreProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return AnimatedCard(
       delay: const Duration(milliseconds: 300),
       child: ClubCard(
         child: Column(
           children: [
             ClubListTile(
-              leading: Icon(CupertinoIcons.square_grid_2x2, color: colorScheme.primary),
-              title: const Text('添加到首页', style: TextStyle(fontWeight: FontWeight.w500)),
+              leading: Icon(CupertinoIcons.square_grid_2x2,
+                  color: colorScheme.primary),
+              title: const Text('添加到首页',
+                  style: TextStyle(fontWeight: FontWeight.w500)),
               subtitle: const Text('在首页显示电费磁贴'),
               trailing: CupertinoSwitch(
                 value: electricityState.tiles.contains('电费'),
@@ -509,10 +519,13 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               ),
             ),
             ClubListTile(
-              leading: Icon(CupertinoIcons.money_yen_circle, color: colorScheme.primary),
-              title: const Text('电费充值', style: TextStyle(fontWeight: FontWeight.w500)),
+              leading: Icon(CupertinoIcons.money_yen_circle,
+                  color: colorScheme.primary),
+              title: const Text('电费充值',
+                  style: TextStyle(fontWeight: FontWeight.w500)),
               subtitle: const Text('跳转至微信进行电费充值'),
-              trailing: Icon(CupertinoIcons.chevron_right, size: 16, color: colorScheme.onSurfaceVariant),
+              trailing: Icon(CupertinoIcons.chevron_right,
+                  size: 16, color: colorScheme.onSurfaceVariant),
               onTap: () async {
                 final prefs = PrefsService.instance;
                 var url = prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
@@ -544,7 +557,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           CupertinoActionSheetAction(
             onPressed: () async {
               Navigator.of(context).pop();
-              await ref.read(electricityStoreProvider.notifier).refreshElectricityData();
+              await ref
+                  .read(electricityStoreProvider.notifier)
+                  .refreshElectricityData();
             },
             child: const Text('刷新数据'),
           ),
@@ -580,7 +595,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               ),
               const SizedBox(height: 16),
               Card(
-                color: CupertinoColors.systemBackground,
+                color: Theme.of(context).cardColor,
                 elevation: 0,
                 child: CupertinoTextField(
                   controller: _urlController,

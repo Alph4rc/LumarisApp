@@ -8,6 +8,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
@@ -70,6 +71,7 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
+    final colors = context.clubColors;
 
     return Column(
       children: [
@@ -78,16 +80,19 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
               const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           leading: isNeedUpdate
               ? Badge(
-                  backgroundColor: Colors.red,
+                  backgroundColor: colors.danger,
                   child: Icon(
                     Icons.update,
                     size: 20,
                   ),
                 )
-              : Icon(Icons.verified, size: 20, color: Colors.green),
+              : Icon(Icons.verified, size: 20, color: colors.success),
           title: const Text('版本'),
           subtitle: Text(version),
-          subtitleTextStyle: TextStyle(fontSize: 13, color: Colors.grey),
+          subtitleTextStyle: TextStyle(
+            fontSize: 13,
+            color: colors.secondaryLabel,
+          ),
           onTap: () async {
             _handleTap(); // 处理点击事件
 
@@ -116,11 +121,14 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
             leading: Icon(
               Icons.update,
               size: 20,
-              color: Colors.amber,
+              color: colors.warning,
             ),
             title: const Text('更新日志'),
             subtitle: const Text('忽略版本更新'),
-            subtitleTextStyle: TextStyle(fontSize: 12, color: Colors.grey),
+            subtitleTextStyle: TextStyle(
+              fontSize: 12,
+              color: colors.secondaryLabel,
+            ),
             trailing: CupertinoSwitch(
               value: settings.updateIgnored,
               onChanged: (bool value) async {

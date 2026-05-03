@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/models/course_color_manager.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ProgramPage extends ConsumerStatefulWidget {
   const ProgramPage({super.key});
@@ -105,7 +106,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
         ),
       ),
       body: Builder(builder: (context) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final colors = context.clubColors;
 
         if (programState.isLoading) {
           return const Center(
@@ -128,14 +129,14 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                     Icon(
                       CupertinoIcons.exclamationmark_circle,
                       size: 50,
-                      color: Colors.red.shade300,
+                      color: colors.danger,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       '加载失败',
                       style: TextStyle(
                         fontSize: 17,
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        color: colors.secondaryLabel,
                       ),
                     ),
                   ],
@@ -157,14 +158,14 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                     Icon(
                       CupertinoIcons.exclamationmark_circle,
                       size: 50,
-                      color: Colors.red.shade300,
+                      color: colors.danger,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       '暂无数据',
                       style: TextStyle(
                         fontSize: 17,
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        color: colors.secondaryLabel,
                       ),
                     ),
                   ],
@@ -197,14 +198,14 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                       ),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.08),
+                        color: colors.warningSoft,
                         borderRadius: ClubRadii.panel,
                       ),
                       child: Row(
                         children: [
                           Icon(
                             CupertinoIcons.info_circle,
-                            color: Colors.orange.shade700,
+                            color: colors.warning,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -212,9 +213,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                               '刷新失败，当前展示的是上次同步的培养方案',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDarkMode
-                                    ? Colors.white70
-                                    : Colors.black54,
+                                color: colors.secondaryLabel,
                               ),
                             ),
                           ),
@@ -255,8 +254,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: colors.label,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -264,9 +262,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                                 course.courseTypeName,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: colors.secondaryLabel,
                                 ),
                               ),
                             ],

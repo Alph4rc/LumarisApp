@@ -14,6 +14,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import 'package:ios_club_app/core/models/course_color_manager.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -142,6 +143,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Widget _buildProfileContent() {
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     // 判断是否为平板布局（宽度大于600）
@@ -180,7 +182,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           isLogin ? '教务系统账号' : '游客',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: colors.secondaryLabel,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -205,7 +207,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       return AnimatedCard(
                         delay: Duration(milliseconds: 50 * index),
                         child: Center(
-                          child: profileButtonItems[index].build(),
+                          child: profileButtonItems[index].build(context),
                         ),
                       );
                     },
@@ -279,7 +281,8 @@ class ProfileButtonItem {
       this.route = '',
       this.onPressed});
 
-  Widget build() {
+  Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Material(
         borderRadius: ClubRadii.panel,
         color: Colors.transparent,
@@ -300,10 +303,10 @@ class ProfileButtonItem {
                 ),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey),
+                      color: colors.secondaryLabel),
                 )
               ],
             ),

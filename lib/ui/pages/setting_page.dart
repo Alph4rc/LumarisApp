@@ -94,10 +94,10 @@ class SettingPage extends ConsumerWidget {
                 _buildSectionTitle(context, '关于'),
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
-                  _buildTeamTile(),
-                  _buildLicenseTile(),
-                  _buildPrivacyPolicyTile(),
-                  _buildUserAgreementTile(),
+                  _buildTeamTile(context),
+                  _buildLicenseTile(context),
+                  _buildPrivacyPolicyTile(context),
+                  _buildUserAgreementTile(context),
                 ]),
                 const SizedBox(height: 24),
                 // 其他
@@ -279,12 +279,12 @@ class SettingPage extends ConsumerWidget {
     }
   }
 
-  Widget _buildTeamTile() {
+  Widget _buildTeamTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.person_2_fill,
         size: 20,
-        color: ClubColors.light.warning,
+        color: context.clubColors.warning,
       ),
       title: const Text('制作团队'),
       subtitle: const Text('iOS Club App 开发组'),
@@ -294,12 +294,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLicenseTile() {
+  Widget _buildLicenseTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.doc_text_fill,
         size: 20,
-        color: ClubColors.light.success,
+        color: context.clubColors.success,
       ),
       title: const Text('开源协议'),
       subtitle: const Text('MIT License'),
@@ -309,12 +309,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildPrivacyPolicyTile() {
+  Widget _buildPrivacyPolicyTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.shield_fill,
         size: 20,
-        color: ClubColors.light.primary,
+        color: context.clubColors.primary,
       ),
       title: const Text('隐私协议'),
       subtitle: const Text('了解我们如何保护你的隐私'),
@@ -324,12 +324,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserAgreementTile() {
+  Widget _buildUserAgreementTile(BuildContext context) {
     return ClubListTile(
       leading: Icon(
         CupertinoIcons.doc_text_fill,
         size: 20,
-        color: const Color(0xFFAF52DE),
+        color: context.clubColors.purple,
       ),
       title: const Text('用户协议'),
       subtitle: const Text('使用本应用即表示你同意本协议'),
@@ -519,8 +519,8 @@ class SettingPage extends ConsumerWidget {
           child: Center(
             child: Text(
               step,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: colors.onAccent,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
