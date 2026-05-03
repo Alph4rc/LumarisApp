@@ -81,7 +81,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(kTextTabBarHeight),
+          preferredSize: const Size.fromHeight(44),
           child: programState.isLoading ||
                   programState.isError ||
                   programState.programs.isEmpty ||
@@ -90,6 +90,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
               : TabBar(
                   controller: _tabController,
                   isScrollable: true,
+                  tabAlignment: TabAlignment.center,
                   tabs: programState.programs.asMap().entries.map((entry) {
                     final program = entry.value;
                     final term = program.term == '特殊分组'
@@ -100,8 +101,6 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                       child: Text(controller.semesterNames[term]),
                     );
                   }).toList(),
-                  tabAlignment: TabAlignment.start,
-                  dividerColor: Colors.transparent,
                 ),
         ),
       ),

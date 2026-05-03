@@ -71,9 +71,11 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
         centerTitle: true,
         elevation: 0,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
+          preferredSize: const Size.fromHeight(44),
           child: TabBar(
             controller: _tabController,
+            isScrollable: true,
+            tabAlignment: TabAlignment.center,
             tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
           ),
         ),

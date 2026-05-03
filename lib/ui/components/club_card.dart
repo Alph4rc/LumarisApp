@@ -27,19 +27,18 @@ class ClubCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.cardBackground,
         borderRadius: borderRadius,
-        border: Border.all(color: colors.separator.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: colors.separator.withValues(alpha: 0.1), // Very subtle border
+          width: 0.5,
+        ),
         boxShadow: theme.brightness == Brightness.dark
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 8,
+                  color: colors.shadowColor,
+                  blurRadius: 20,
                   offset: const Offset(0, 4),
+                  spreadRadius: -2,
                 ),
               ],
       ),

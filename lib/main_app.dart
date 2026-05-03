@@ -10,7 +10,6 @@ import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
@@ -100,13 +99,23 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _updateSystemUIOverlayStyle();
+  }
 
+  void _updateSystemUIOverlayStyle() {
     final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
+
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-          statusBarIconBrightness: brightness == Brightness.light
-              ? Brightness.dark
-              : Brightness.light),
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: brightness,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+      ),
     );
   }
 
@@ -244,19 +253,10 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   }
 
   Widget _app() {
-    final settings = ref.watch(settingsStoreProvider);
     final router = ref.watch(appRouterProvider);
-    final fontFamily = settings.fontFamily.isEmpty
-        ? PlatformUtils.getWindowsFontFamily()
-        : PlatformUtils.getDesktopFontFamily(settings.fontFamily);
 
-    return MaterialApp.router(
-      title: 'iOS Club App',
-      debugShowCheckedModeBanner: false,
-      theme: ClubTheme.lightTheme(fontFamily: fontFamily),
-      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
-      themeMode: settings.themeMode,
-      routerConfig: router,
+    return Router.withConfig(
+      config: router,
     );
   }
 

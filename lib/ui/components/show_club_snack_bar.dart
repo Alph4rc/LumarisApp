@@ -12,8 +12,11 @@ void showClubSnackBar(BuildContext context, Widget child) {
       behavior: SnackBarBehavior.floating,
       backgroundColor: colors.cardBackground,
       shape: RoundedRectangleBorder(
-        borderRadius: ClubRadii.control,
-        side: BorderSide(color: colors.separator),
+        borderRadius: ClubRadii.card,
+        side: BorderSide(
+          color: colors.separator.withValues(alpha: 0.1),
+          width: 0.5,
+        ),
       ),
     ),
   );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthorPage extends StatelessWidget {
@@ -10,18 +11,22 @@ class AuthorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Scaffold(
+      backgroundColor: colors.groupedBackground,
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverAppBar.large(
-            title: const Text(
+            title: Text(
               '关于作者',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: colors.label,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            backgroundColor: colors.groupedBackground,
             centerTitle: false,
             elevation: 0,
             scrolledUnderElevation: 0,
@@ -35,18 +40,18 @@ class AuthorPage extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                   child: Column(
                     children: [
-                      _buildHeader(context, isDark),
+                      _buildHeader(context),
                       const SizedBox(height: 32),
                       _buildSectionHeader('核心团队'),
-                      _buildTeamSection(context, isDark),
+                      _buildTeamSection(context),
                       const SizedBox(height: 32),
                       _buildSectionHeader('特别致谢'),
-                      _buildThanksSection(context, isDark),
+                      _buildThanksSection(context),
                       const SizedBox(height: 32),
                       _buildSectionHeader('联系我们'),
-                      _buildContactSection(context, isDark),
+                      _buildContactSection(context),
                       const SizedBox(height: 48),
-                      _buildFooter(context, isDark),
+                      _buildFooter(context),
                     ],
                   ),
                 ),
@@ -58,7 +63,8 @@ class AuthorPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(BuildContext context) {
+    final colors = context.clubColors;
     return Column(
       children: [
         const SizedBox(height: 16),
@@ -69,9 +75,10 @@ class AuthorPage extends StatelessWidget {
             borderRadius: ClubRadii.tile,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
+                color: colors.shadowColor,
                 blurRadius: 20,
-                offset: const Offset(0, 10),
+                offset: const Offset(0, 8),
+                spreadRadius: -2,
               ),
             ],
           ),
@@ -84,11 +91,12 @@ class AuthorPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'iOS Club App Team',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
+            color: colors.label,
             letterSpacing: -0.5,
           ),
         ),
@@ -98,9 +106,7 @@ class AuthorPage extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
-            color: isDark
-                ? CupertinoColors.systemGrey
-                : CupertinoColors.secondaryLabel,
+            color: colors.secondaryLabel,
           ),
         ),
       ],
@@ -109,7 +115,7 @@ class AuthorPage extends StatelessWidget {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, bottom: 8),
+      padding: const EdgeInsets.only(left: 8, bottom: 8),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
@@ -125,7 +131,8 @@ class AuthorPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamSection(BuildContext context, bool isDark) {
+  Widget _buildTeamSection(BuildContext context) {
+    final colors = context.clubColors;
     final members = [
       {'name': 'LuckyFish', 'role': 'Lead Developer'},
       {'name': 'zealous', 'role': 'Developer'},
@@ -134,29 +141,33 @@ class AuthorPage extends StatelessWidget {
 
     return ClubCard(
       child: Column(
-        children: members.asMap().entries.map((entry) {
-          final index = entry.key;
-          final member = entry.value;
+        children: List.generate(members.length, (index) {
+          final member = members[index];
+          final isFirst = index == 0;
           final isLast = index == members.length - 1;
 
           return Column(
             children: [
               ClubListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                borderRadius: BorderRadius.vertical(
+                  top: isFirst ? ClubRadii.cardRadius : Radius.zero,
+                  bottom: isLast ? ClubRadii.cardRadius : Radius.zero,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 leading: Container(
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? CupertinoColors.systemGrey6.darkColor
-                        : CupertinoColors.systemGrey6,
-                    shape: BoxShape.circle,
+                    color: colors.primary.withValues(alpha: 0.1),
+                    borderRadius: ClubRadii.control,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.person_fill,
                     size: 20,
-                    color: CupertinoColors.systemBlue,
+                    color: colors.primary,
                   ),
                 ),
                 title: Text(
@@ -170,16 +181,10 @@ class AuthorPage extends StatelessWidget {
                   member['role']!,
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark
-                        ? CupertinoColors.systemGrey
-                        : CupertinoColors.secondaryLabel,
+                    color: colors.secondaryLabel,
                   ),
                 ),
-                trailing: const Icon(
-                  CupertinoIcons.chevron_forward,
-                  size: 14,
-                  color: CupertinoColors.systemGrey3,
-                ),
+                showChevron: true,
                 onTap: () {
                   // Future: Show profile or GitHub
                 },
@@ -187,30 +192,29 @@ class AuthorPage extends StatelessWidget {
               if (!isLast)
                 Divider(
                   height: 1,
-                  indent: 68,
+                  indent: 64,
                   thickness: 0.5,
-                  color: isDark
-                      ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
-                      : CupertinoColors.systemGrey4.withValues(alpha: 0.5),
+                  color: colors.separator.withValues(alpha: 0.1),
                 ),
             ],
           );
-        }).toList(),
+        }),
       ),
     );
   }
 
-  Widget _buildThanksSection(BuildContext context, bool isDark) {
+  Widget _buildThanksSection(BuildContext context) {
+    final colors = context.clubColors;
     return ClubCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.heart_fill,
-                color: CupertinoColors.systemRed,
+                color: colors.danger,
                 size: 18,
               ),
               const SizedBox(width: 8),
@@ -219,7 +223,7 @@ class AuthorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: colors.label,
                 ),
               ),
             ],
@@ -230,9 +234,7 @@ class AuthorPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
-              color: isDark
-                  ? CupertinoColors.systemGrey
-                  : CupertinoColors.label.withValues(alpha: 0.8),
+              color: colors.label.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -240,34 +242,41 @@ class AuthorPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactSection(BuildContext context, bool isDark) {
+  Widget _buildContactSection(BuildContext context) {
+    final colors = context.clubColors;
     final items = [
       {
         'title': 'GitHub 仓库',
         'icon': CupertinoIcons.doc_text_fill,
-        'color': CupertinoColors.systemGrey,
+        'color': colors.secondaryLabel,
         'url': 'https://github.com/iOS-Club-XAUAT/ios_club_app'
       },
       {
         'title': '加入我们',
         'icon': CupertinoIcons.person_2_fill,
-        'color': CupertinoColors.systemBlue,
+        'color': colors.primary,
         'url': 'https://iosclub.org'
       },
     ];
 
     return ClubCard(
       child: Column(
-        children: items.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
+        children: List.generate(items.length, (index) {
+          final item = items[index];
+          final isFirst = index == 0;
           final isLast = index == items.length - 1;
 
           return Column(
             children: [
               ClubListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                borderRadius: BorderRadius.vertical(
+                  top: isFirst ? ClubRadii.cardRadius : Radius.zero,
+                  bottom: isLast ? ClubRadii.cardRadius : Radius.zero,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 leading: Icon(
                   item['icon'] as IconData,
                   color: item['color'] as Color,
@@ -277,11 +286,7 @@ class AuthorPage extends StatelessWidget {
                   item['title'] as String,
                   style: const TextStyle(fontSize: 17),
                 ),
-                trailing: const Icon(
-                  CupertinoIcons.chevron_forward,
-                  size: 14,
-                  color: CupertinoColors.systemGrey3,
-                ),
+                showChevron: true,
                 onTap: () async {
                   final url = Uri.parse(item['url'] as String);
                   if (await canLaunchUrl(url)) {
@@ -294,25 +299,24 @@ class AuthorPage extends StatelessWidget {
                   height: 1,
                   indent: 56,
                   thickness: 0.5,
-                  color: isDark
-                      ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
-                      : CupertinoColors.systemGrey4.withValues(alpha: 0.5),
+                  color: colors.separator.withValues(alpha: 0.1),
                 ),
             ],
           );
-        }).toList(),
+        }),
       ),
     );
   }
 
-  Widget _buildFooter(BuildContext context, bool isDark) {
+  Widget _buildFooter(BuildContext context) {
+    final colors = context.clubColors;
     return Column(
       children: [
         Text(
           '© 2026 iOS Club',
           style: TextStyle(
             fontSize: 13,
-            color: CupertinoColors.systemGrey,
+            color: colors.tertiaryLabel,
           ),
         ),
         const SizedBox(height: 4),
@@ -320,9 +324,7 @@ class AuthorPage extends StatelessWidget {
           'Made with ❤️ in Xi\'an',
           style: TextStyle(
             fontSize: 12,
-            color: isDark
-                ? CupertinoColors.systemGrey.withValues(alpha: 0.5)
-                : CupertinoColors.systemGrey2,
+            color: colors.quaternaryLabel,
           ),
         ),
       ],

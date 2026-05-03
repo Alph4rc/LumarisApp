@@ -24,8 +24,8 @@ class ClubRadii {
   static const Radius controlRadius = smRadius;
   static const Radius navigationRadius = mdRadius;
   static const Radius panelRadius = lgRadius;
-  static const Radius cardRadius = xlRadius;
-  static const Radius tileRadius = xxlRadius;
+  static const Radius cardRadius = Radius.circular(18); // Increased from 20 (xl) to be more specific
+  static const Radius tileRadius = Radius.circular(22); // Increased from 24 (xxl) to be more specific
 
   static const BorderRadius xsBorder = BorderRadius.all(xsRadius);
   static const BorderRadius control = BorderRadius.all(controlRadius);

@@ -142,16 +142,6 @@ Future<void> _configureMacosWindowUtils() async {
   await config.apply();
 }
 
-String? _getFontFamily(ProviderContainer container) {
-  if (PlatformUtils.isDesktop) {
-    final settingsStore = container.read(settingsStoreProvider.notifier);
-    // 如果设置了自定义字体，则使用自定义字体，否则使用系统默认字体
-    return PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
-  }
-  // Windows 平台返回默认字体
-  return PlatformUtils.getWindowsFontFamily();
-}
-
 Widget _getHomePage() {
   // Windows 平台返回 WindowPage
   if (PlatformUtils.isWindows) {
@@ -162,35 +152,43 @@ Widget _getHomePage() {
 }
 
 void initApp(ProviderContainer container) {
-  final settingsStore = container.read(settingsStoreProvider.notifier);
-  final fontFamily = _getFontFamily(container);
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: const _AppLauncher(),
+  ));
+}
 
-  if (PlatformUtils.isMacOS) {
-    runApp(UncontrolledProviderScope(
-      container: container,
-      child: MacosApp(
+class _AppLauncher extends ConsumerWidget {
+  const _AppLauncher();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsStore = ref.watch(settingsStoreProvider);
+    // 直接从 settingsStore 获取需要的字体信息
+    final fontFamily = settingsStore.fontFamily.isEmpty
+        ? PlatformUtils.getWindowsFontFamily()
+        : PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
+
+    if (PlatformUtils.isMacOS) {
+      return MacosApp(
         title: 'iOS Club App',
         debugShowCheckedModeBanner: false,
         theme: ClubTheme.macosLightTheme(),
         darkTheme: ClubTheme.macosDarkTheme(),
         themeMode: settingsStore.themeMode,
         home: const MainApp(),
-      ),
-    ));
-    return;
-  }
+      );
+    }
 
-  runApp(UncontrolledProviderScope(
-    container: container,
-    child: MaterialApp(
+    return MaterialApp(
       title: 'iOS Club App',
       debugShowCheckedModeBanner: false,
       theme: ClubTheme.lightTheme(fontFamily: fontFamily),
       darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
       themeMode: settingsStore.themeMode,
       home: _getHomePage(),
-    ),
-  ));
+    );
+  }
 }
 
 void requestPermissions() async {
