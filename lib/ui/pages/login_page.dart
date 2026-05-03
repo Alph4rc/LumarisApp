@@ -12,7 +12,7 @@ import 'package:ios_club_app/features/education/services/education_refresh_servi
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';

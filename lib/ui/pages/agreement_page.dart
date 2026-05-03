@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 class AgreementPage extends ConsumerWidget {
   const AgreementPage({super.key});

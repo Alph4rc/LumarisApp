@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 /// 课程详情弹窗组件
 ///

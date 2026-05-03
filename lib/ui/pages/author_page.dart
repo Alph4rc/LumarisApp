@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthorPage extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/timeline_column.dart';
 

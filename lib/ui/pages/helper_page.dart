@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class HelperPage extends StatefulWidget {

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 
 /// Controls for entering and exiting tile edit mode

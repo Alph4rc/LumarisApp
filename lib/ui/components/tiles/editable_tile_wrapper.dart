@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
 class EditableTileWrapper extends ConsumerStatefulWidget {

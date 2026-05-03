@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 /// Apple 风格侧边栏 (参考 iCloud / App Store 设计)
 ///

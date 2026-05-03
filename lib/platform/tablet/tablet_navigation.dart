@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 /// 平板设备导航组件
 ///

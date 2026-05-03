@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import '../club_card.dart';
 

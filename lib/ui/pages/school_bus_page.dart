@@ -7,7 +7,7 @@ import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';

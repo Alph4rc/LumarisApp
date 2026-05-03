@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 
 Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
     {bool isScrollControlled = true, double maxHeight = 0}) {

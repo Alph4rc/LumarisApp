@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/net_service.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 

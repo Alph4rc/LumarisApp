@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/services/link_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 

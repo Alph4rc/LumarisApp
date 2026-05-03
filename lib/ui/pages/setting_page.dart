@@ -18,7 +18,7 @@ import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 import 'package:ios_club_app/ui/pages/settingPages/show_tomorrow_setting.dart';

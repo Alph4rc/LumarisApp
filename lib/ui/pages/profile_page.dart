@@ -11,7 +11,7 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/info_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 

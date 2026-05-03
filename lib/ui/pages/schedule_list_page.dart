@@ -18,7 +18,7 @@ import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/components/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
