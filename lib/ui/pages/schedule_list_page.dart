@@ -13,13 +13,14 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
@@ -145,27 +146,24 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   Widget _buildTopBar(BuildContext context, bool isDesktop, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                // 左侧：周次导航
-                if (!isDesktop) _buildWeekInfo(context, isDark),
-                if (isDesktop) _buildDesktopWeekNav(context),
-                const Spacer(),
-                // 右侧：操作按钮
-                _buildActionButtons(context, isDark),
-              ],
-            ),
-            // 样式选择器
-            if (_showStyleSelector) ...[
-              const SizedBox(height: 12),
-              _buildStyleSelector(),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // 左侧：周次导航
+              if (!isDesktop) _buildWeekInfo(context, isDark),
+              if (isDesktop) _buildDesktopWeekNav(context),
+              const Spacer(),
+              // 右侧：操作按钮
+              _buildActionButtons(context, isDark),
             ],
+          ),
+          // 样式选择器
+          if (_showStyleSelector) ...[
+            const SizedBox(height: 12),
+            _buildStyleSelector(),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -430,64 +428,46 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   /// 显示冲突课程选择列表
   void _showConflictCourseSelector(List<CourseModel> courses) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.grey[900] : Colors.white,
-          borderRadius: ClubRadii.sheetTop,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '选择要查看的课程',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black,
-              ),
+    showClubModalBottomSheet(
+      context,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '选择要查看的课程',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 16),
-            ...courses.map((course) => ClubListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Container(
-                    width: 8,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: CourseColorManager.generateSoftColor(
-                          course.courseName),
-                      borderRadius: ClubRadii.xsBorder,
-                    ),
+          ),
+          const SizedBox(height: 16),
+          ...courses.map((course) => ClubListTile(
+                leading: Container(
+                  width: 8,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color:
+                        CourseColorManager.generateSoftColor(course.courseName),
+                    borderRadius: ClubRadii.xsBorder,
                   ),
-                  title: Text(
-                    course.courseName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : Colors.black,
-                    ),
+                ),
+                title: Text(
+                  course.courseName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
                   ),
-                  subtitle: Text(
-                    '${course.room} · 第${course.startUnit}-${course.endUnit}节',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showCourseDetail(course);
-                  },
-                )),
-            const SizedBox(height: 8),
-          ],
-        ),
+                ),
+                subtitle: Text(
+                  '${course.room} · 第${course.startUnit}-${course.endUnit}节',
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showCourseDetail(course);
+                },
+              )),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }

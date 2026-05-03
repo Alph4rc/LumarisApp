@@ -44,7 +44,7 @@ class ClubListTile extends StatelessWidget {
     final effectivePadding = contentPadding ??
         EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: subtitle == null ? 20 : 12,
+          vertical: subtitle == null ? 14 : 10,
         );
     final effectiveBorderRadius =
         borderRadius.resolve(Directionality.of(context));
