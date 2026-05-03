@@ -45,6 +45,7 @@ void main() {
       expiryTime: DateTime.now()
           .subtract(const Duration(seconds: 1))
           .millisecondsSinceEpoch,
+      requestUrl: url,
     );
     await box.put(key, entry.toJson());
   }
@@ -73,6 +74,24 @@ void main() {
       await cache.set('https://example.com/api/list', data);
       final result = await cache.get<List>('https://example.com/api/list');
       expect(result, data);
+    });
+
+    test('should_hash_long_url_keys_to_fit_hive_limit', () async {
+      final longQuery = List.generate(
+        40,
+        (index) => 'segment_$index=${'value' * 8}',
+      ).join('&');
+      final url = 'https://example.com/api/very/long/path?$longQuery';
+      final data = {'ok': true};
+
+      await cache.set(url, data);
+
+      final result = await cache.get<Map>(url);
+      final box = Hive.box(HiveManager.requestCacheBoxName);
+      final storedKey = box.keys.single as String;
+
+      expect(result, data);
+      expect(storedKey.length, lessThanOrEqualTo(255));
     });
 
     test('should_return_null_for_expired_entry_and_delete_it', () async {
@@ -211,10 +230,14 @@ void main() {
     // 通过检查存储条目的过期时间来验证策略是否生效
     Future<int> getExpiryMs(String url) async {
       final box = Hive.box(HiveManager.requestCacheBoxName);
-      // no params → paramsString = '' → key ends with '_'
-      final key = 'request_cache_${Uri.encodeComponent(url)}_';
-      final raw = box.get(key);
-      return CacheEntry.fromJson(Map<String, dynamic>.from(raw)).expiryTime;
+      for (final raw in box.values) {
+        final entry = CacheEntry.fromJson(Map<String, dynamic>.from(raw));
+        if (entry.requestUrl == url) {
+          return entry.expiryTime;
+        }
+      }
+
+      fail('No cache entry found for $url');
     }
 
     test('should_apply_medium_term_policy_for_course_url', () async {
