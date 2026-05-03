@@ -42,37 +42,37 @@ class ClubColors extends ThemeExtension<ClubColors> {
 
   static const ClubColors light = ClubColors(
     appBackground: Color(0xFFFFFFFF),
-    groupedBackground: Color(0xFFF2F2F7), // iOS System Grouped Background
-    cardBackground: Color(0xFFFFFFFF),    // iOS Secondary System Grouped Background
-    cardOverlay: Color(0xB3FFFFFF),       // More subtle transparency (0.7)
-    separator: Color(0x333C3C43),         // iOS System Separator (approx 0.2 opacity)
+    groupedBackground: Color(0xFFF8F8F8), // Neutralized iOS-style background
+    cardBackground: Color(0xFFFFFFFF),
+    cardOverlay: Color(0xB3FFFFFF),
+    separator: Color(0x333C3C43),
     label: Color(0xFF000000),
-    secondaryLabel: Color(0x993C3C43),    // iOS Secondary Label
-    tertiaryLabel: Color(0x4D3C3C43),     // iOS Tertiary Label
-    quaternaryLabel: Color(0x2E3C3C43),   // iOS Quaternary Label
-    primary: Color(0xFF007AFF),           // iOS System Blue
-    success: Color(0xFF34C759),           // iOS System Green
-    warning: Color(0xFFFF9500),           // iOS System Orange
-    danger: Color(0xFFFF3B30),            // iOS System Red
-    selectionFill: Color(0x1F787880),     // iOS System Fill
-    shadowColor: Color(0x1A000000),       // Subtler shadow
+    secondaryLabel: Color(0x993C3C43),
+    tertiaryLabel: Color(0x4D3C3C43),
+    quaternaryLabel: Color(0x2E3C3C43),
+    primary: Color(0xFF007AFF),
+    success: Color(0xFF34C759),
+    warning: Color(0xFFFF9500),
+    danger: Color(0xFFFF3B30),
+    selectionFill: Color(0x1F787880),
+    shadowColor: Color(0x1A000000),
   );
 
   static const ClubColors dark = ClubColors(
     appBackground: Color(0xFF000000),
-    groupedBackground: Color(0xFF000000), // iOS System Background (Dark)
-    cardBackground: Color(0xFF1C1C1E),    // iOS Secondary System Grouped Background (Dark)
+    groupedBackground: Color(0xFF000000),
+    cardBackground: Color(0xFF1C1C1E),
     cardOverlay: Color(0x1FEBEBF5),
-    separator: Color(0x33545458),         // iOS System Separator (Dark)
+    separator: Color(0x33545458),
     label: Color(0xFFFFFFFF),
-    secondaryLabel: Color(0x99EBEBF5),    // iOS Secondary Label (Dark)
-    tertiaryLabel: Color(0x4DEBEBF5),     // iOS Tertiary Label (Dark)
-    quaternaryLabel: Color(0x2EEBEBF5),   // iOS Quaternary Label (Dark)
-    primary: Color(0xFF0A84FF),           // iOS System Blue (Dark)
-    success: Color(0xFF30D158),           // iOS System Green (Dark)
-    warning: Color(0xFFFF9F0A),           // iOS System Orange (Dark)
-    danger: Color(0xFFFF453A),            // iOS System Red (Dark)
-    selectionFill: Color(0x33787880),     // iOS System Fill (Dark)
+    secondaryLabel: Color(0x99EBEBF5),
+    tertiaryLabel: Color(0x4DEBEBF5),
+    quaternaryLabel: Color(0x2EEBEBF5),
+    primary: Color(0xFF0A84FF),
+    success: Color(0xFF30D158),
+    warning: Color(0xFFFF9F0A),
+    danger: Color(0xFFFF453A),
+    selectionFill: Color(0x33787880),
     shadowColor: Color(0x00000000),
   );
 
@@ -207,9 +207,11 @@ class ClubTheme {
       onError: Colors.white,
       surface: colors.cardBackground,
       onSurface: colors.label,
+      surfaceTint: Colors.transparent, // Disable Material 3 surface tinting
     );
 
     final baseTheme = ThemeData(
+      useMaterial3: true,
       brightness: brightness,
       fontFamily: fontFamily,
       colorScheme: colorScheme,
