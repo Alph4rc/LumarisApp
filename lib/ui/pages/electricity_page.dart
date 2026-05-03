@@ -267,13 +267,6 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 ),
                 const SizedBox(height: 18),
                 _buildHourlyCostScroller(data),
-                const SizedBox(height: 18),
-                _buildDailyCostList(dailySummaries),
-                const SizedBox(height: 18),
-                SizedBox(
-                  height: 170,
-                  child: _buildChart(data),
-                ),
               ],
             );
           }),
@@ -443,7 +436,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       width: 72,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: ClubRadii.card,
       ),
       child: Column(
@@ -493,183 +486,6 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     );
   }
 
-  Widget _buildDailyCostList(List<_ElectricityDailySummary> dailySummaries) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final maxCost = dailySummaries.map((item) => item.cost).reduce(max);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          '每日汇总',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Column(
-          children: dailySummaries.reversed.take(7).map((summary) {
-            final ratio = maxCost <= 0 ? 0.0 : summary.cost / maxCost;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 48,
-                    child: Text(
-                      _formatWeekday(summary.date),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: ClubRadii.xsBorder,
-                      child: LinearProgressIndicator(
-                        minHeight: 8,
-                        value: ratio.clamp(0.02, 1.0).toDouble(),
-                        backgroundColor:
-                            colorScheme.outlineVariant.withValues(alpha: 0.5),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 72,
-                    child: Text(
-                      '¥${summary.cost.toStringAsFixed(2)}',
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChart(List<ElectricData> data) {
-    final colorScheme = Theme.of(context).colorScheme;
-    if (data.isEmpty) {
-      return Center(
-        child: EmptyWidget(
-          title: '没有数据',
-          subtitle: '',
-          icon: Icons.hourglass_empty,
-        ),
-      );
-    }
-    final dataMaxValue = data.map((e) => e.value).reduce(max);
-    final calculatedMaxY = max(dataMaxValue.ceilToDouble() * 1.2, 1.0);
-
-    final chartWidth = max(data.length * 40.0, 280.0);
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: SizedBox(
-        width: chartWidth,
-        height: 170,
-        child: BarChart(
-          BarChartData(
-            barTouchData: BarTouchData(
-              enabled: false,
-              touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (group) =>
-                    colorScheme.primary.withValues(alpha: 0.86),
-                tooltipPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                  return BarTooltipItem(
-                    '${rod.toY.toStringAsFixed(1)}元',
-                    TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                    ),
-                  );
-                },
-              ),
-            ),
-            titlesData: FlTitlesData(
-              show: true,
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 30,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (index < 0 || index >= data.length) {
-                      return const SizedBox.shrink();
-                    }
-
-                    final style = TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      color: colorScheme.onSurfaceVariant,
-                    );
-                    final hour = data[index].timestamp.hour;
-                    return SideTitleWidget(
-                      meta: meta,
-                      space: 4,
-                      child: Text('${hour}h', style: style),
-                    );
-                  },
-                ),
-              ),
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            ),
-            borderData: FlBorderData(show: false),
-            barGroups: data
-                .asMap()
-                .map((index, electricData) {
-                  return MapEntry(
-                    index,
-                    BarChartGroupData(
-                      x: index,
-                      barRods: [
-                        BarChartRodData(
-                          toY: electricData.value,
-                          gradient: LinearGradient(
-                            colors: [
-                              colorScheme.primary.withValues(alpha: 0.3),
-                              colorScheme.primary,
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                          width: 16,
-                          borderRadius: ClubRadii.xsBorder,
-                        ),
-                      ],
-                    ),
-                  );
-                })
-                .values
-                .toList(),
-            gridData: FlGridData(show: false),
-            alignment: BarChartAlignment.spaceAround,
-            maxY: calculatedMaxY,
-          ),
-        ),
-      ),
-    );
-  }
-
   List<_ElectricityDailySummary> _buildDailySummaries(List<ElectricData> data) {
     final dailyCosts = <DateTime, double>{};
     for (final item in data) {
@@ -706,15 +522,6 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
   String _formatShortDate(DateTime date) {
     return '${date.month}/${date.day}';
-  }
-
-  String _formatWeekday(DateTime date) {
-    if (_isSameDay(date, DateTime.now())) {
-      return '今天';
-    }
-
-    const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    return weekdays[date.weekday - 1];
   }
 
   Color _successColor(ColorScheme colorScheme) {
