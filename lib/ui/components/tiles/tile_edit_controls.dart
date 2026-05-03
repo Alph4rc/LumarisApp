@@ -161,41 +161,31 @@ class AvailableTilesList extends ConsumerWidget {
           ClubCard(
             padding: EdgeInsets.zero,
             child: Column(
-              children: hiddenTiles.asMap().entries.map((entry) {
-                final index = entry.key;
-                final tileId = entry.value.id;
-                final isLast = index == hiddenTiles.length - 1;
-
-                return Column(
-                  children: [
-                    ClubListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: colors.success,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: colors.onAccent,
-                          size: 16,
-                        ),
-                      ),
-                      title: Text(
-                        tileId,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () => controller.toggleVisibility(tileId),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 4.0),
+              children: hiddenTiles.map((tile) {
+                final tileId = tile.id;
+                return ClubListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: colors.success,
+                      shape: BoxShape.circle,
                     ),
-                    if (!isLast)
-                      const Divider(
-                          height: 1, indent: 48, endIndent: 16, thickness: 0.5),
-                  ],
+                    child: Icon(
+                      Icons.add,
+                      color: colors.onAccent,
+                      size: 16,
+                    ),
+                  ),
+                  title: Text(
+                    tileId,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onTap: () => controller.toggleVisibility(tileId),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 4.0),
                 );
               }).toList(),
             ),

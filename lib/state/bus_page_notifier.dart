@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
+import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
 
 typedef BusPageFetcher = Future<BusModel> Function({
   String? dayDate,
@@ -63,7 +62,8 @@ class BusPageNotifier extends Notifier<BusPageState> {
   }
 
   Future<void> _loadTiles() async {
-    final tiles = PrefsService.instance.getStringList(PrefsKeys.TILES) ?? [];
+    final config = await TileService.getTileConfigurations();
+    final tiles = config.getVisibleTiles().map((tile) => tile.id).toList();
     state = state.copyWith(
       tiles: tiles,
       isShowBus: tiles.contains('校车'),
@@ -129,16 +129,11 @@ class BusPageNotifier extends Notifier<BusPageState> {
   }
 
   Future<void> toggleShowBus(bool value) async {
-    final tiles = [...state.tiles];
     if (value) {
-      if (!tiles.contains('校车')) {
-        tiles.add('校车');
-      }
+      await TileService.addTile('校车');
     } else {
-      tiles.remove('校车');
+      await TileService.removeTile('校车');
     }
-
-    state = state.copyWith(isShowBus: value, tiles: tiles);
-    await PrefsService.instance.setStringList(PrefsKeys.TILES, tiles);
+    await _loadTiles();
   }
 }
