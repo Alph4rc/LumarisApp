@@ -13,7 +13,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
+
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
@@ -43,7 +43,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget build(BuildContext context) {
     final electricityState = ref.watch(electricityStoreProvider);
     if (kIsWeb) {
-      return Scaffold(
+      return const Scaffold(
         appBar: ClubAppBar(
           title: '电费管理',
         ),
@@ -57,123 +57,124 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     return Scaffold(
         appBar: ClubAppBar(
           title: '电费管理',
+          actions: [
+            CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              onPressed: _handleElectricityAction,
+              child: Icon(
+                electricityState.hasData
+                    ? CupertinoIcons.arrow_2_circlepath
+                    : CupertinoIcons.add_circled_solid,
+                color: Theme.of(context).colorScheme.primary,
+                size: 24,
+              ),
+            ),
+          ],
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          physics: const BouncingScrollPhysics(),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 当前电费卡片
-              _buildCurrentElectricityCard(),
+              // 当前电费头部
+              _buildCurrentElectricityHeader(),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 32),
 
               // 电费图表卡片
-              electricityState.hasData ? _buildChartCard() : Container(),
+              if (electricityState.hasData) _buildChartCard(),
 
-              electricityState.hasData ? SizedBox(height: 20) : Container(),
+              if (electricityState.hasData) const SizedBox(height: 24),
 
               // 设置选项
-              _buildSettingsSection(),
+              if (electricityState.hasData) _buildSettingsSection(),
             ],
           ),
         ));
   }
 
-  Widget _buildCurrentElectricityCard() {
+  Widget _buildCurrentElectricityHeader() {
     final electricityState = ref.watch(electricityStoreProvider);
     final colorScheme = Theme.of(context).colorScheme;
-    final primaryColor = colorScheme.primary;
     final statusColor = electricityState.electricity <= 10
         ? colorScheme.error
         : _successColor(colorScheme);
-    return AnimatedCard(
-      child: ClubCard(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.1),
-                      borderRadius: ClubRadii.control,
-                    ),
-                    child: Icon(
-                      CupertinoIcons.bolt_fill,
-                      color: primaryColor,
-                      size: 24,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    '当前电费',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Spacer(),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: _handleElectricityAction,
-                    child: Icon(
-                      electricityState.hasData
-                          ? CupertinoIcons.refresh
-                          : CupertinoIcons.add,
-                      color: primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              electricityState.hasData
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '¥${electricityState.electricity.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          electricityState.electricity <= 10 ? '余额不足' : '余额充足',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: statusColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '暂无数据',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '点击右上角添加电费数据',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-            ],
+
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 16),
+          Text(
+            '当前余额',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          if (electricityState.hasData)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, right: 4.0),
+                  child: Text(
+                    '¥',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                Text(
+                  electricityState.electricity.toStringAsFixed(2),
+                  style: TextStyle(
+                    fontSize: 56,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                    color: colorScheme.onSurface,
+                    letterSpacing: -1,
+                  ),
+                ),
+              ],
+            )
+          else
+            Text(
+              '暂无数据',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+                letterSpacing: -1,
+              ),
+            ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: electricityState.hasData 
+                  ? statusColor.withValues(alpha: 0.1) 
+                  : colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              electricityState.hasData
+                  ? (electricityState.electricity <= 10 ? '余额不足，请及时充值' : '余额充足')
+                  : '点击右上角添加电费数据',
+              style: TextStyle(
+                fontSize: 13,
+                color: electricityState.hasData ? statusColor : colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -185,7 +186,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       delay: const Duration(milliseconds: 150),
       child: ClubCard(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           child: Builder(builder: (context) {
             if (electricityState.isLoading) {
               return const SizedBox(
@@ -210,7 +211,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                   child: EmptyWidget(
                     title: '没有用电明细',
                     subtitle: '刷新后会在这里展示每小时花费',
-                    icon: Icons.hourglass_empty,
+                    icon: CupertinoIcons.chart_bar_alt_fill,
                   ),
                 ),
               );
@@ -239,6 +240,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
                       '用电花费',
@@ -247,24 +249,31 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      '近${dailySummaries.length}天',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: colorScheme.onSurfaceVariant,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '近${dailySummaries.length}天',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 _buildCostOverview(
                   totalCost: totalCost,
                   todayCost: todayCost,
                   averageDailyCost: averageDailyCost,
                   peakData: peakData,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 32),
                 _buildHourlyCostScroller(data),
               ],
             );
@@ -281,109 +290,70 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     required ElectricData peakData,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: colorScheme.primary.withValues(alpha: 0.08),
-        borderRadius: ClubRadii.card,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildCostMetric(
-                  label: '实际花费',
-                  value: '¥${totalCost.toStringAsFixed(2)}',
-                  icon: CupertinoIcons.bolt_fill,
-                  color: colorScheme.primary,
-                ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _buildMinimalMetric(
+                label: '总计花费',
+                value: '¥${totalCost.toStringAsFixed(2)}',
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildCostMetric(
-                  label: '今日花费',
-                  value: '¥${todayCost.toStringAsFixed(2)}',
-                  icon: CupertinoIcons.sun_max_fill,
-                  color: _warningColor(colorScheme),
-                ),
+            ),
+            Container(width: 1, height: 40, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            Expanded(
+              child: _buildMinimalMetric(
+                label: '今日花费',
+                value: '¥${todayCost.toStringAsFixed(2)}',
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildCostMetric(
-                  label: '日均花费',
-                  value: '¥${averageDailyCost.toStringAsFixed(2)}',
-                  icon: Icons.bar_chart,
-                  color: _successColor(colorScheme),
-                ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _buildMinimalMetric(
+                label: '日均花费',
+                value: '¥${averageDailyCost.toStringAsFixed(2)}',
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildCostMetric(
-                  label: '峰值时段',
-                  value: _formatHourCost(peakData),
-                  icon: Icons.local_fire_department,
-                  color: colorScheme.error,
-                ),
+            ),
+            Container(width: 1, height: 40, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            Expanded(
+              child: _buildMinimalMetric(
+                label: '峰值时段',
+                value: _formatHourCost(peakData),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildCostMetric({
+  Widget _buildMinimalMetric({
     required String label,
     required String value,
-    required IconData icon,
-    required Color color,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Row(
+    return Column(
       children: [
-        Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: ClubRadii.control,
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: color,
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onSurface,
+            letterSpacing: -0.5,
           ),
         ),
       ],
@@ -398,20 +368,21 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          '小时花费',
+          '每小时明细',
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: recentData.map((item) {
               return Padding(
-                padding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(right: 16),
                 child: _buildHourlyCostTile(
                   data: item,
                   maxValue: maxValue,
@@ -431,42 +402,31 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final fillRatio = maxValue <= 0 ? 0.0 : data.value / maxValue;
 
-    return Container(
-      width: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      decoration: BoxDecoration(
-        color: colorScheme.primary.withValues(alpha: 0.08),
-        borderRadius: ClubRadii.card,
-      ),
+    return SizedBox(
+      width: 44,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            _formatShortDate(data.timestamp),
+            data.value.toStringAsFixed(1),
             style: TextStyle(
               fontSize: 11,
+              fontWeight: FontWeight.w600,
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            '${data.timestamp.hour}:00',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           SizedBox(
-            width: 10,
-            height: 48,
+            height: 80,
             child: Align(
               alignment: Alignment.bottomCenter,
               child: FractionallySizedBox(
-                heightFactor: fillRatio.clamp(0.08, 1.0).toDouble(),
+                heightFactor: fillRatio.clamp(0.05, 1.0).toDouble(),
                 child: Container(
+                  width: 12,
                   decoration: BoxDecoration(
                     color: colorScheme.primary,
-                    borderRadius: ClubRadii.xsBorder,
+                    borderRadius: BorderRadius.circular(6),
                   ),
                 ),
               ),
@@ -474,10 +434,11 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           ),
           const SizedBox(height: 12),
           Text(
-            '¥${data.value.toStringAsFixed(1)}',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+            '${data.timestamp.hour}:00',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
             ),
           ),
         ],
@@ -516,11 +477,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   String _formatHourCost(ElectricData data) {
-    return '${data.timestamp.hour}:00 ¥${data.value.toStringAsFixed(1)}';
-  }
-
-  String _formatShortDate(DateTime date) {
-    return '${date.month}/${date.day}';
+    return '${data.timestamp.hour}:00 / ¥${data.value.toStringAsFixed(1)}';
   }
 
   Color _successColor(ColorScheme colorScheme) {
@@ -529,49 +486,40 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         : const Color(0xFF248A3D);
   }
 
-  Color _warningColor(ColorScheme colorScheme) {
-    return colorScheme.brightness == Brightness.dark
-        ? const Color(0xFFFFB340)
-        : const Color(0xFFB85D00);
-  }
-
   Widget _buildSettingsSection() {
     final electricityState = ref.watch(electricityStoreProvider);
     final controller = ref.read(electricityStoreProvider.notifier);
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return AnimatedCard(
       delay: const Duration(milliseconds: 300),
       child: ClubCard(
         child: Column(
           children: [
-            electricityState.hasData
-                ? Column(
-                    children: [
-                      ClubListTile(
-                        leading: Icon(Icons.home),
-                        title: Text('添加到首页'),
-                        subtitle: Text('在首页显示电费磁贴'),
-                        trailing: CupertinoSwitch(
-                          value: electricityState.tiles.contains('电费'),
-                          onChanged: (value) async {
-                            await controller.toggleTile('电费', value);
-                          },
-                        ),
-                      ),
-                      ClubListTile(
-                        leading: Icon(Icons.monetization_on_outlined),
-                        title: Text('电费充值'),
-                        subtitle: Text('跳转至微信进行电费充值'),
-                        onTap: () async {
-                          final prefs = PrefsService.instance;
-                          var url =
-                              prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
-                          url = url.replaceAll('wxAccount', 'wxCharge');
-                          await TileService.openInWeChat(url);
-                        },
-                      )
-                    ],
-                  )
-                : Container(),
+            ClubListTile(
+              leading: Icon(CupertinoIcons.square_grid_2x2, color: colorScheme.primary),
+              title: const Text('添加到首页', style: TextStyle(fontWeight: FontWeight.w500)),
+              subtitle: const Text('在首页显示电费磁贴'),
+              trailing: CupertinoSwitch(
+                value: electricityState.tiles.contains('电费'),
+                activeTrackColor: colorScheme.primary,
+                onChanged: (value) async {
+                  await controller.toggleTile('电费', value);
+                },
+              ),
+            ),
+            ClubListTile(
+              leading: Icon(CupertinoIcons.money_yen_circle, color: colorScheme.primary),
+              title: const Text('电费充值', style: TextStyle(fontWeight: FontWeight.w500)),
+              subtitle: const Text('跳转至微信进行电费充值'),
+              trailing: Icon(CupertinoIcons.chevron_right, size: 16, color: colorScheme.onSurfaceVariant),
+              onTap: () async {
+                final prefs = PrefsService.instance;
+                var url = prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
+                url = url.replaceAll('wxAccount', 'wxCharge');
+                await TileService.openInWeChat(url);
+              },
+            ),
           ],
         ),
       ),
@@ -587,70 +535,75 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   void _showRefreshDialog() {
-    showDialog(
+    showCupertinoModalPopup(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('电费管理'),
-        content: Text('选择要执行的操作'),
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('电费管理'),
+        message: const Text('选择要执行的操作'),
         actions: [
-          TextButton(
-            child: Text('取消'),
-            onPressed: () => Navigator.of(context).pop(),
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await ref.read(electricityStoreProvider.notifier).refreshElectricityData();
+            },
+            child: const Text('刷新数据'),
           ),
-          TextButton(
-            child: Text('更换房间'),
+          CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
               _showInputDialog();
             },
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref
-                  .read(electricityStoreProvider.notifier)
-                  .refreshElectricityData();
-            },
-            child: Text('刷新数据'),
+            child: const Text('更换房间'),
           ),
         ],
+        cancelButton: CupertinoActionSheetAction(
+          isDestructiveAction: true,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('取消'),
+        ),
       ),
     );
   }
 
   void _showInputDialog() {
-    // 对于这种自定义输入框的对话框，我们保留原来的 Material 风格
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('获取电费'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: 16),
-            Text(
-              '请按照以下步骤操作：\n\n1. 打开建大财务处电费详情页面\n2. 复制页面URL\n3. 粘贴到下方输入框',
-              style: TextStyle(fontSize: 14),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _urlController,
-              decoration: InputDecoration(
-                hintText: '请输入URL',
-                border: OutlineInputBorder(),
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('获取电费'),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Column(
+            children: [
+              const Text(
+                '请打开建大财务处电费详情页面，复制页面URL并粘贴到下方输入框',
+                style: TextStyle(fontSize: 13),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Card(
+                color: CupertinoColors.systemBackground,
+                elevation: 0,
+                child: CupertinoTextField(
+                  controller: _urlController,
+                  placeholder: '请输入URL',
+                  padding: const EdgeInsets.all(12),
+                  clearButtonMode: OverlayVisibilityMode.editing,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
-          TextButton(
-            child: Text('取消'),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
             onPressed: () {
               Navigator.of(context).pop();
               _urlController.clear();
             },
+            child: const Text('取消'),
           ),
-          TextButton(
+          CupertinoDialogAction(
+            isDefaultAction: true,
             onPressed: () async {
               Navigator.of(context).pop();
               final value = await TileService.getTextAfterKeyword(
@@ -660,10 +613,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 _urlController.clear();
                 final controller = ref.read(electricityStoreProvider.notifier);
                 await controller.setElectricityValue(value);
-                await controller.loadElectricityData(); // 重新加载所有数据
+                await controller.loadElectricityData();
               }
             },
-            child: Text('确定'),
+            child: const Text('确定'),
           ),
         ],
       ),

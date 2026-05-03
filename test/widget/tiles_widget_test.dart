@@ -30,10 +30,6 @@ List<Override> _overrides() => [
         (_) async => const PaymentData([], 20),
       ),
       tileVisibilityReaderProvider.overrideWithValue((_) async => true),
-      busPreferenceReaderProvider.overrideWithValue(() async => false),
-      oldBusFetcherProvider.overrideWithValue(
-        () async => BusModel(records: const [], total: 0),
-      ),
     ];
 
 void main() {

@@ -45,22 +45,6 @@ List<Override> _overrides() => [
         ),
       ),
       tileVisibilityReaderProvider.overrideWithValue((_) async => true),
-      busPreferenceReaderProvider.overrideWithValue(() async => false),
-      oldBusFetcherProvider.overrideWithValue(
-        () async => BusModel(
-          records: [
-            BusItem(
-              lineName: '草堂线',
-              description: '',
-              departureStation: 'A',
-              arrivalStation: 'B',
-              runTime: '10:00',
-              arrivalStationTime: '10:30',
-            ),
-          ],
-          total: 1,
-        ),
-      ),
     ];
 
 void main() {
