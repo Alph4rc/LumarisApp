@@ -6,6 +6,7 @@ import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -89,6 +90,45 @@ void main() {
       expect(await TileService.isTileVisible('校车'), isFalse);
       expect(state.isShowBus, isFalse);
       expect(state.tiles, isNot(contains('校车')));
+    });
+
+    test('should_reload_home_tiles_when_toggling_show_bus', () async {
+      await TileService.saveTileConfigurations(
+        TileConfigurationList(
+          configurations: const [
+            TileConfiguration(id: '电费', order: 0, isVisible: true),
+            TileConfiguration(id: '校车', order: 1, isVisible: false),
+            TileConfiguration(id: '饭卡', order: 2, isVisible: true),
+          ],
+          lastModified: DateTime.now(),
+        ),
+      );
+
+      final container = createContainer([
+        busPageAutoLoadProvider.overrideWithValue(false),
+      ]);
+
+      container.read(tileEditControllerProvider);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(
+        container
+            .read(tileEditControllerProvider)
+            .config
+            .getVisibleTiles()
+            .any((tile) => tile.id == '校车'),
+        isFalse,
+      );
+
+      await container.read(busControllerProvider.notifier).toggleShowBus(true);
+
+      expect(
+        container
+            .read(tileEditControllerProvider)
+            .config
+            .getVisibleTiles()
+            .any((tile) => tile.id == '校车'),
+        isTrue,
+      );
     });
   });
 }

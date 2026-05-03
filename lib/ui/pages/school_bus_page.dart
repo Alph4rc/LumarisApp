@@ -34,11 +34,7 @@ class SchoolBusPage extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            onPressed: () => _showSettingsModalBottomSheet(
-              context,
-              busState,
-              busController,
-            ),
+            onPressed: () => _showSettingsModalBottomSheet(context),
             tooltip: '设置',
           ),
           const SizedBox(width: 4),
@@ -230,34 +226,37 @@ class SchoolBusPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _showSettingsModalBottomSheet(
-    BuildContext context,
-    BusPageState busState,
-    BusPageNotifier busController,
-  ) async {
+  Future<void> _showSettingsModalBottomSheet(BuildContext context) async {
     await showClubModalBottomSheet(
       context,
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '页面设置',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+      Consumer(
+        builder: (context, ref, child) {
+          final busState = ref.watch(busControllerProvider);
+          final busController = ref.read(busControllerProvider.notifier);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '页面设置',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              ClubListTile(
+                title: const Text('显示校车磁贴'),
+                subtitle: const Text('在首页显示最近的班车信息'),
+                trailing: CupertinoSwitch(
+                  value: busState.isShowBus,
+                  onChanged: busController.toggleShowBus,
                 ),
-          ),
-          const SizedBox(height: 20),
-          ClubListTile(
-            title: const Text('显示校车磁贴'),
-            subtitle: const Text('在首页显示最近的班车信息'),
-            trailing: CupertinoSwitch(
-              value: busState.isShowBus,
-              onChanged: busController.toggleShowBus,
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
+              ),
+              const SizedBox(height: 8),
+            ],
+          );
+        },
       ),
     );
   }
