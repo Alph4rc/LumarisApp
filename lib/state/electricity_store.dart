@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/models/electric_data.dart';
-import 'package:ios_club_app/state/tile_edit_notifier.dart';
+import 'package:ios_club_app/features/education/services/electricity_service.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/state/tile_store_providers.dart';
 
 typedef ElectricityReader = Future<double?> Function();
@@ -10,13 +11,17 @@ typedef ElectricityWeeklyReader = Future<List<ElectricData>> Function();
 typedef ElectricityTileVisibilityReader = Future<bool> Function(String tileId);
 typedef ElectricityTileMutator = Future<void> Function(String tileId);
 
+final electricityServiceProvider = Provider<ElectricityService>((ref) {
+  return ElectricityService();
+});
+
 final electricityReaderProvider = Provider<ElectricityReader>((ref) {
-  return TileService.getTextAfterKeyword;
+  return () => ref.read(electricityServiceProvider).fetchCurrentBalance();
 });
 
 final electricityWeeklyReaderProvider =
     Provider<ElectricityWeeklyReader>((ref) {
-  return TileService.getElectricityWeeklyData;
+  return ref.read(electricityServiceProvider).fetchWeeklyData;
 });
 
 final electricityTileVisibilityReaderProvider =

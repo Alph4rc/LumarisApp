@@ -4,12 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-
 import 'package:ios_club_app/core/utils/animations/animations.dart';
-import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/core/models/electric_data.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -526,10 +522,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               trailing: Icon(CupertinoIcons.chevron_right,
                   size: 16, color: colorScheme.onSurfaceVariant),
               onTap: () async {
-                final prefs = PrefsService.instance;
-                var url = prefs.getString(PrefsKeys.ELECTRICITY_URL) ?? '';
-                url = url.replaceAll('wxAccount', 'wxCharge');
-                await TileService.openInWeChat(url);
+                await ref.read(electricityServiceProvider).openRechargePage();
               },
             ),
           ],
@@ -620,14 +613,21 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             isDefaultAction: true,
             onPressed: () async {
               Navigator.of(context).pop();
-              final value = await TileService.getTextAfterKeyword(
-                url: _urlController.text,
-              );
+              final value = await ref
+                  .read(electricityServiceProvider)
+                  .fetchCurrentBalance(
+                    url: _urlController.text,
+                  );
+              if (!mounted) {
+                return;
+              }
               if (value != null) {
                 _urlController.clear();
                 final controller = ref.read(electricityStoreProvider.notifier);
                 await controller.setElectricityValue(value);
                 await controller.loadElectricityData();
+              } else {
+                _urlController.clear();
               }
             },
             child: const Text('确定'),
