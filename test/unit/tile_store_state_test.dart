@@ -244,15 +244,13 @@ void main() {
   });
 
   group('BusTileStore', () {
-    test('should_load_old_bus_data_when_preference_is_false', () async {
-      var oldCalls = 0;
+    test('should_load_bus_data', () async {
+      var calls = 0;
       final container = _container([
-        busPreferenceReaderProvider.overrideWithValue(() async => false),
-        oldBusFetcherProvider.overrideWithValue(() async {
-          oldCalls++;
+        busFetcherProvider.overrideWithValue(() async {
+          calls++;
           return _busModel(2);
         }),
-        newBusFetcherProvider.overrideWithValue(() async => _busModel(9)),
       ]);
       final store = container.read(busTileStoreProvider.notifier);
 
@@ -260,52 +258,8 @@ void main() {
 
       final state = container.read(busTileStoreProvider);
       expect(state.isLoading, isFalse);
-      expect(state.useNewApi, isFalse);
       expect(state.busCount, 2);
-      expect(oldCalls, 1);
-    });
-
-    test('should_load_new_bus_data_when_preference_is_true', () async {
-      var newCalls = 0;
-      final container = _container([
-        busPreferenceReaderProvider.overrideWithValue(() async => true),
-        oldBusFetcherProvider.overrideWithValue(() async => _busModel(2)),
-        newBusFetcherProvider.overrideWithValue(() async {
-          newCalls++;
-          return _busModel(3);
-        }),
-      ]);
-      final store = container.read(busTileStoreProvider.notifier);
-
-      await store.loadBusData();
-
-      final state = container.read(busTileStoreProvider);
-      expect(state.isLoading, isFalse);
-      expect(state.useNewApi, isTrue);
-      expect(state.busCount, 3);
-      expect(newCalls, 1);
-    });
-
-    test('should_persist_preference_and_reload_when_toggling_new_api',
-        () async {
-      var savedPreference = false;
-      final container = _container([
-        busPreferenceReaderProvider
-            .overrideWithValue(() async => savedPreference),
-        busPreferenceWriterProvider
-            .overrideWithValue((value) async => savedPreference = value),
-        oldBusFetcherProvider.overrideWithValue(() async => _busModel(1)),
-        newBusFetcherProvider.overrideWithValue(() async => _busModel(4)),
-      ]);
-      final store = container.read(busTileStoreProvider.notifier);
-
-      await store.toggleUseNewApi(true);
-
-      final state = container.read(busTileStoreProvider);
-      expect(savedPreference, isTrue);
-      expect(state.useNewApi, isTrue);
-      expect(state.busCount, 4);
-      expect(state.isLoading, isFalse);
+      expect(calls, 1);
     });
   });
 }

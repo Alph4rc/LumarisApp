@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:ios_club_app/core/services/new_bus_api.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
@@ -55,21 +54,15 @@ class BusPageNotifier extends Notifier<BusPageState> {
   }
 
   Future<void> _fetchBusData({bool isInit = false}) async {
+    final currentSelectedDate = state.selectedDate;
     state = state.copyWith(isLoading: true, errorMessage: '');
 
     try {
-      var useNewApi = state.useNewApi;
-      if (isInit) {
-        useNewApi =
-            PrefsService.instance.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
-        state = state.copyWith(useNewApi: useNewApi);
-      }
+      final BusModel data = await BusService.getBus(dayDate: state.selectedDate);
 
-      final BusModel data;
-      if (useNewApi) {
-        data = await getBusFromNewData(time: state.selectedDate, loc: 'ALL');
-      } else {
-        data = await BusService.getBus(dayDate: state.selectedDate);
+      // 检查在异步请求期间用户是否切换了日期
+      if (state.selectedDate != currentSelectedDate) {
+        return;
       }
 
       final todayBusData = data.records;
@@ -79,9 +72,14 @@ class BusPageNotifier extends Notifier<BusPageState> {
 
       state = state.copyWith(todayBusData: todayBusData, busData: busData);
     } catch (e) {
+      if (state.selectedDate != currentSelectedDate) {
+        return;
+      }
       state = state.copyWith(errorMessage: '获取校车数据时出错: $e', busData: const []);
     } finally {
-      state = state.copyWith(isLoading: false);
+      if (state.selectedDate == currentSelectedDate) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 
@@ -113,11 +111,5 @@ class BusPageNotifier extends Notifier<BusPageState> {
 
     state = state.copyWith(isShowBus: value, tiles: tiles);
     await PrefsService.instance.setStringList(PrefsKeys.TILES, tiles);
-  }
-
-  Future<void> toggleUseNewApi(bool value) async {
-    state = state.copyWith(useNewApi: value);
-    await PrefsService.instance.setBool(PrefsKeys.USE_NEW_BUS_API, value);
-    await _fetchBusData();
   }
 }

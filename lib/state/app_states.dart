@@ -98,7 +98,6 @@ class BusTileState with _$BusTileState {
   const factory BusTileState({
     @Default(true) bool isLoading,
     @Default(0) int busCount,
-    @Default(false) bool useNewApi,
   }) = _BusTileState;
 }
 
@@ -147,7 +146,6 @@ class BusPageState with _$BusPageState {
     @Default('') String errorMessage,
     @Default(true) bool isCaoTang,
     @Default(false) bool isShowBus,
-    @Default(false) bool useNewApi,
     @Default(<String>[]) List<String> tiles,
   }) = _BusPageState;
 }

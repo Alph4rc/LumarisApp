@@ -63,13 +63,17 @@ class PaymentStore extends Notifier<PaymentState> {
   double get totalRecharge => state.totalRecharge;
   bool get isShowTile => state.isShowTile;
 
+  int _loadCount = 0;
+
   Future<void> loadData() async {
+    final currentLoadId = ++_loadCount;
     try {
       state = state.copyWith(isLoading: true, errorMessage: '');
 
       final studentId = await ref.read(paymentStudentIdReaderProvider)();
 
       if (studentId == null || studentId.isEmpty) {
+        if (currentLoadId != _loadCount) return;
         state = state.copyWith(errorMessage: '请先登录教务处账号');
         return;
       }
@@ -78,6 +82,8 @@ class PaymentStore extends Notifier<PaymentState> {
           await ref.read(paymentDataFetcherProvider)(studentId);
       final isVisible = await ref.read(tileVisibilityReaderProvider)('饭卡');
 
+      if (currentLoadId != _loadCount) return;
+
       state = state.copyWith(
         records: recordsResult.payments,
         totalRecharge: recordsResult.total,
@@ -85,9 +91,12 @@ class PaymentStore extends Notifier<PaymentState> {
         hasData: true,
       );
     } catch (e) {
+      if (currentLoadId != _loadCount) return;
       state = state.copyWith(errorMessage: '加载失败，点击重试');
     } finally {
-      state = state.copyWith(isLoading: false);
+      if (currentLoadId == _loadCount) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 

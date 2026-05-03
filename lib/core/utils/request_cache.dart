@@ -66,17 +66,23 @@ class RequestCache {
   /// URL模式到缓存策略的映射（按优先级从高到低排列，默认策略通过方法兜底）
   final Map<RegExp, CachePolicy> _urlCachePolicies = {
     // 课程相关API - 中短期缓存
-    RegExp(r'.*/course.*'): CachePolicy.mediumTerm,
+    RegExp(r'.*/course.*', caseSensitive: false): CachePolicy.mediumTerm,
     // 成绩相关API - 长期缓存
-    RegExp(r'.*/score.*'): CachePolicy.longTerm,
+    RegExp(r'.*/score.*', caseSensitive: false): CachePolicy.longTerm,
     // 校巴相关API - 短期缓存
-    RegExp(r'.*/bus.*'): CachePolicy.shortTerm,
+    RegExp(r'.*/bus.*', caseSensitive: false): CachePolicy.shortTerm,
+    // 饭卡相关API - 短期缓存
+    RegExp(r'.*/payment.*', caseSensitive: false): CachePolicy.shortTerm,
+    // 学生信息/时间相关API - 短期缓存
+    RegExp(r'.*/info.*', caseSensitive: false): CachePolicy.shortTerm,
+    // 电费相关API - 短期缓存
+    RegExp(r'.*/electric.*', caseSensitive: false): CachePolicy.shortTerm,
     // 考试相关API - 长期缓存
-    RegExp(r'.*/exam.*'): CachePolicy.longTerm,
+    RegExp(r'.*/exam.*', caseSensitive: false): CachePolicy.longTerm,
     // 培养方案相关API - 超长期缓存
-    RegExp(r'.*/program.*'): CachePolicy.veryLongTerm,
+    RegExp(r'.*/program.*', caseSensitive: false): CachePolicy.veryLongTerm,
     // App信息相关API - 中短期缓存
-    RegExp(r'.*/app.*'): CachePolicy.mediumTerm,
+    RegExp(r'.*/app.*', caseSensitive: false): CachePolicy.mediumTerm,
   };
 
   /// 初始化缓存

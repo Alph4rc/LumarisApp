@@ -21,6 +21,7 @@ final scheduleStoreProvider =
 
 class ScheduleStore extends Notifier<ScheduleState> {
   List<CourseModel> _allCoursesRemind = [];
+  int _refreshCount = 0;
 
   @override
   ScheduleState build() {
@@ -121,12 +122,16 @@ class ScheduleStore extends Notifier<ScheduleState> {
   }
 
   Future<void> refreshCourses() async {
+    final currentRefreshId = ++_refreshCount;
     AppLogger.debug('[ScheduleStore] 开始刷新课程');
     state = state.copyWith(isLoading: true);
     try {
       AppLogger.debug('[ScheduleStore] 调用 CourseService.getCourse');
 
       final weekData = await EduTimeService.getWeek(isRefresh: true);
+      
+      if (currentRefreshId != _refreshCount) return;
+      
       _handleWeekData(weekData);
 
       await CourseService.getCourse(isRefresh: true).timeout(
@@ -136,6 +141,8 @@ class ScheduleStore extends Notifier<ScheduleState> {
           throw TimeoutException('刷新课程超时');
         },
       );
+
+      if (currentRefreshId != _refreshCount) return;
 
       AppLogger.debug('[ScheduleStore] CourseService.getCourse 完成');
 
@@ -154,9 +161,11 @@ class ScheduleStore extends Notifier<ScheduleState> {
 
       AppLogger.debug('[ScheduleStore] 刷新课程成功');
     } on TimeoutException catch (e) {
+      if (currentRefreshId != _refreshCount) return;
       AppLogger.warning('[ScheduleStore] 刷新课程超时: $e');
       rethrow;
     } catch (e, stackTrace) {
+      if (currentRefreshId != _refreshCount) return;
       AppLogger.error(
         '[ScheduleStore] 刷新课程失败',
         error: e,
@@ -164,8 +173,10 @@ class ScheduleStore extends Notifier<ScheduleState> {
       );
       rethrow;
     } finally {
-      AppLogger.debug('[ScheduleStore] 设置 isLoading = false');
-      state = state.copyWith(isLoading: false);
+      if (currentRefreshId == _refreshCount) {
+        AppLogger.debug('[ScheduleStore] 设置 isLoading = false');
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 

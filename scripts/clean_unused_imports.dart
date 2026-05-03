@@ -8,7 +8,6 @@ void main() async {
   final filesToClean = [
     'lib/core/services/data_service.dart',
     'lib/core/services/exam_service.dart',
-    'lib/core/services/new_bus_api.dart',
     'lib/core/services/xauat_login.dart',
     'lib/core/utils/animations/animated_button.dart',
     'lib/core/utils/animations/animated_card.dart',
@@ -28,9 +27,6 @@ void main() async {
     ],
     'lib/core/services/exam_service.dart': [
       "import 'package:flutter/material.dart';"
-    ],
-    'lib/core/services/new_bus_api.dart': [
-      "import 'package:flutter/cupertino.dart';"
     ],
     'lib/core/services/xauat_login.dart': [
       "import 'package:flutter/foundation.dart';"

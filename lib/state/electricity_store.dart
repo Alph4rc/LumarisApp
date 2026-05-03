@@ -36,6 +36,8 @@ final electricityStoreProvider =
     NotifierProvider<ElectricityStore, ElectricityState>(ElectricityStore.new);
 
 class ElectricityStore extends Notifier<ElectricityState> {
+  int _loadCount = 0;
+
   @override
   ElectricityState build() {
     if (ref.read(tileStoreAutoLoadProvider)) {
@@ -51,6 +53,7 @@ class ElectricityStore extends Notifier<ElectricityState> {
   List<ElectricData> get weeklyData => List.unmodifiable(state.weeklyData);
 
   Future<void> loadElectricityData() async {
+    final currentLoadId = ++_loadCount;
     try {
       state = state.copyWith(isLoading: true);
 
@@ -58,6 +61,8 @@ class ElectricityStore extends Notifier<ElectricityState> {
       final isVisible =
           await ref.read(electricityTileVisibilityReaderProvider)('电费');
       final weekly = await ref.read(electricityWeeklyReaderProvider)();
+
+      if (currentLoadId != _loadCount) return;
 
       final nextTiles = [...state.tiles];
       if (isVisible) {
@@ -77,16 +82,21 @@ class ElectricityStore extends Notifier<ElectricityState> {
     } catch (_) {
       // Keep the last known values on transient failures.
     } finally {
-      state = state.copyWith(isLoading: false);
+      if (currentLoadId == _loadCount) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 
   Future<void> refreshElectricityData() async {
+    final currentLoadId = ++_loadCount;
     try {
       state = state.copyWith(isLoading: true);
 
       final value = await ref.read(electricityReaderProvider)();
       final weekly = await ref.read(electricityWeeklyReaderProvider)();
+
+      if (currentLoadId != _loadCount) return;
 
       state = state.copyWith(
         electricity: value ?? state.electricity,
@@ -96,7 +106,9 @@ class ElectricityStore extends Notifier<ElectricityState> {
     } catch (_) {
       // Keep the last known values on transient failures.
     } finally {
-      state = state.copyWith(isLoading: false);
+      if (currentLoadId == _loadCount) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 

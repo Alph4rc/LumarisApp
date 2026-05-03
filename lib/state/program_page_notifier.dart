@@ -7,6 +7,7 @@ final programControllerProvider =
     NotifierProvider<ProgramPageNotifier, ProgramState>(ProgramPageNotifier.new);
 
 class ProgramPageNotifier extends Notifier<ProgramState> {
+  int _loadCount = 0;
   final List<String> semesterNames = const [
     '大一上',
     '大一下',
@@ -33,14 +34,21 @@ class ProgramPageNotifier extends Notifier<ProgramState> {
   String get errorMessage => state.errorMessage;
 
   Future<void> loadPrograms() async {
+    final currentLoadId = ++_loadCount;
     try {
       state = state.copyWith(isLoading: true, isError: false);
       final result = await ProgramService.getPrograms();
+
+      if (currentLoadId != _loadCount) return;
+
       state = state.copyWith(programs: result);
     } catch (e) {
+      if (currentLoadId != _loadCount) return;
       state = state.copyWith(isError: true, errorMessage: e.toString());
     } finally {
-      state = state.copyWith(isLoading: false);
+      if (currentLoadId == _loadCount) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 

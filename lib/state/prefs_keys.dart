@@ -64,9 +64,6 @@ class PrefsKeys {
   /// 页面相关
   static const String PAGE_DATA = 'page_data';
 
-  /// 校车相关
-  static const String USE_NEW_BUS_API = 'use_new_bus_api';
-
   /// 触觉反馈相关
   static const String ENABLE_HAPTIC_FEEDBACK = 'enable_haptic_feedback';
 

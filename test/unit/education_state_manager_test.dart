@@ -82,32 +82,6 @@ void main() {
   });
 
   group('State Stores', () {
-    test('BusTileStore.toggleUseNewApi should persist flag and trigger reload',
-        () async {
-      var loadCount = 0;
-      final container = createContainer(overrides: [
-        oldBusFetcherProvider.overrideWithValue(() async {
-          loadCount++;
-          return _busModel(1);
-        }),
-        newBusFetcherProvider.overrideWithValue(() async {
-          loadCount++;
-          return _busModel(2);
-        }),
-      ]);
-      final store = container.read(busTileStoreProvider.notifier);
-
-      expect(container.read(busTileStoreProvider).useNewApi, isFalse);
-      await store.toggleUseNewApi(true);
-
-      expect(container.read(busTileStoreProvider).useNewApi, isTrue);
-      expect(loadCount, greaterThanOrEqualTo(1));
-      expect(
-        PrefsService.instance.getBool(PrefsKeys.USE_NEW_BUS_API),
-        isTrue,
-      );
-    });
-
     test('ElectricityStore.toggleTile should update local tile list', () async {
       final touchedTiles = <String>[];
       final container = createContainer(overrides: [
