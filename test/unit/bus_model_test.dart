@@ -24,7 +24,7 @@ void main() {
       expect(model.records.first.lineName, '1号线');
       expect(model.records.first.runTime, '01:20');
       expect(model.records.first.arrivalStationTime, '01小时 50分钟');
-      expect(model.records.first.totalTime, '3:10');
+      expect(model.records.first.arrivalTime, '3:10');
 
       final encoded = model.toJson();
       expect(encoded['total'], 1);
@@ -41,7 +41,7 @@ void main() {
       expect(fromJson.arrivalStation, '');
       expect(fromJson.runTime, '');
       expect(fromJson.arrivalStationTime, '');
-      expect(fromJson.totalTime, '');
+      expect(fromJson.arrivalTime, '');
     });
 
     test('should avoid substring and parse crashes on short time strings', () {
@@ -56,7 +56,7 @@ void main() {
 
       expect(item.runTime, '12');
       expect(item.arrivalStationTime, 'x');
-      expect(item.totalTime, '');
+      expect(item.arrivalTime, '');
     });
   });
 }

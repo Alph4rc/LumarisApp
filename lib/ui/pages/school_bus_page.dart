@@ -285,7 +285,7 @@ class SchoolBusPage extends ConsumerWidget {
         _buildInfoRow(
           icon: Icons.schedule_rounded,
           label: '预计到达',
-          content: bus.arrivalStationTime,
+          content: bus.arrivalTime,
           color: colors.success,
         ),
         _buildInfoRow(
@@ -388,7 +388,7 @@ class BusTimelineTile extends StatelessWidget {
                       color: colors.tertiaryLabel,
                     ),
                   ),
-                  _buildTimeDisplay(bus.arrivalStationTime, '到达', colors),
+                  _buildTimeDisplay(bus.arrivalTime, '到达', colors),
                   const Spacer(),
                   Container(
                     padding:
@@ -398,7 +398,7 @@ class BusTimelineTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      bus.totalTime,
+                      bus.arrivalStationTime,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

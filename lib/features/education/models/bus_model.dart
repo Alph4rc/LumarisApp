@@ -24,20 +24,25 @@ class BusModel {
 
 @JsonSerializable(explicitToJson: true)
 class BusItem {
+  /// 线路名称
   @JsonKey(fromJson: parseSchemaString)
   final String lineName;
+  /// 描述
   @JsonKey(fromJson: parseSchemaString)
   final String description;
+  /// 出发站
   @JsonKey(fromJson: parseSchemaString)
   final String departureStation;
+  /// 到达站
   @JsonKey(fromJson: parseSchemaString)
   final String arrivalStation;
   @JsonKey(fromJson: parseSchemaString)
   String runTime;
+  /// 到达终点所需时间
   @JsonKey(fromJson: parseSchemaString)
   String arrivalStationTime;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  String totalTime = '';
+  String arrivalTime = '';
 
   BusItem({
     required this.lineName,
@@ -73,7 +78,7 @@ class BusItem {
               m -= 60;
               h++;
             }
-            totalTime = '$h:${m < 10 ? '0$m' : m}';
+            arrivalTime = '$h:${m < 10 ? '0$m' : m}';
           }
         }
       }
