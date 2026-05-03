@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/features/education/models/link_model.dart';
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 
 class IconUtil {

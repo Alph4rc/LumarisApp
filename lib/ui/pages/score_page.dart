@@ -3,7 +3,7 @@ import 'dart:async' show TimeoutException, unawaited;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
 import 'package:ios_club_app/features/education/models/edu_fetch_models.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';

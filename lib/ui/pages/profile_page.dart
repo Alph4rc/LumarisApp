@@ -16,7 +16,7 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/study_credit_card.dart';

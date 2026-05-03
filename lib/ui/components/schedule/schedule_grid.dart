@@ -5,7 +5,7 @@ import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/timeline_column.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-import '../../../core/models/course_color_manager.dart';
+import '../../../core/services/course_color_manager.dart';
 import '../../../core/utils/platform_utils.dart';
 
 /// 课表网格组件

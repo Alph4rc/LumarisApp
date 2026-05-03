@@ -9,7 +9,7 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
