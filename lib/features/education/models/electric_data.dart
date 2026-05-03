@@ -1,44 +1,55 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'electric_data.g.dart';
+
+@JsonSerializable()
 class ElectricData {
+  @JsonKey(readValue: _readTimestamp, fromJson: _timestampFromJson)
   final DateTime timestamp;
+  @JsonKey(readValue: _readValue, fromJson: _valueFromJson)
   double value;
 
   ElectricData({required this.timestamp, required this.value});
 
-  factory ElectricData.fromJson(Map<String, dynamic> json) {
-    final rawTimestamp = json['timestamp'] ?? json['Timestamp'];
-    final rawValue = json['value'] ?? json['Value'];
+  factory ElectricData.fromJson(Map<String, dynamic> json) =>
+      _$ElectricDataFromJson(json);
 
-    if (rawTimestamp is! String) {
-      throw ArgumentError.value(
-        rawTimestamp,
-        'timestamp',
-        'Expected timestamp string',
-      );
-    }
+  Map<String, dynamic> toJson() => _$ElectricDataToJson(this);
+}
 
-    final timestamp = DateTime.tryParse(rawTimestamp);
-    if (timestamp == null) {
-      throw ArgumentError.value(
-        rawTimestamp,
-        'timestamp',
-        'Invalid timestamp format',
-      );
-    }
+Object? _readTimestamp(Map<dynamic, dynamic> json, String key) {
+  return json[key] ?? json['Timestamp'];
+}
 
-    if (rawValue is! num && rawValue is! String) {
-      throw ArgumentError.value(rawValue, 'value', 'Expected number or string');
-    }
-
-    return ElectricData(
-      timestamp: timestamp,
-      value: double.parse(rawValue.toString()),
+DateTime _timestampFromJson(dynamic rawTimestamp) {
+  if (rawTimestamp is! String) {
+    throw ArgumentError.value(
+      rawTimestamp,
+      'timestamp',
+      'Expected timestamp string',
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'timestamp': timestamp.toIso8601String(),
-      'value': value,
-    };
+  final timestamp = DateTime.tryParse(rawTimestamp);
+  if (timestamp == null) {
+    throw ArgumentError.value(
+      rawTimestamp,
+      'timestamp',
+      'Invalid timestamp format',
+    );
   }
+
+  return timestamp;
+}
+
+Object? _readValue(Map<dynamic, dynamic> json, String key) {
+  return json[key] ?? json['Value'];
+}
+
+double _valueFromJson(dynamic rawValue) {
+  if (rawValue is! num && rawValue is! String) {
+    throw ArgumentError.value(rawValue, 'value', 'Expected number or string');
+  }
+
+  return double.parse(rawValue.toString());
 }
