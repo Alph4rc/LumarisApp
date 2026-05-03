@@ -106,7 +106,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return [
       ProfileButtonItem(
           icon: CupertinoIcons.link_circle,
-          title: '建大导航',
+          title: '校园导航',
           route: AppRoutes.link),
       ProfileButtonItem(
           icon: Icons.settings, title: '设置/关于', route: AppRoutes.about),

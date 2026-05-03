@@ -16,7 +16,7 @@ class LinkPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ClubAppBar(
-        title: '建大导航',
+        title: '校园导航',
       ),
       body: FutureBuilder(
         future: LinkService.getLinks(),
