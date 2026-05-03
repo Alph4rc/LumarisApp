@@ -143,9 +143,12 @@ class SchoolBusPage extends ConsumerWidget {
     BusPageState busState,
     ClubColors colors,
   ) {
+    final busController = ref.read(busControllerProvider.notifier);
+
     if (busState.isLoading) {
-      return const Center(
-        child: LoadingStateView(
+      return _buildRefreshPlaceholder(
+        onRefresh: busController.refreshData,
+        child: const LoadingStateView(
           title: '正在获取校车班次',
           subtitle: '正在按日期整理两校区往返班车信息',
           showCard: false,
@@ -155,7 +158,8 @@ class SchoolBusPage extends ConsumerWidget {
 
     final hasBusData = busState.busData.isNotEmpty;
     if (busState.errorMessage.isNotEmpty && !hasBusData) {
-      return Center(
+      return _buildRefreshPlaceholder(
+        onRefresh: busController.refreshData,
         child: ClubCard(
           margin: const EdgeInsets.all(24),
           padding: const EdgeInsets.all(24),
@@ -172,8 +176,7 @@ class SchoolBusPage extends ConsumerWidget {
               const SizedBox(height: 20),
               CupertinoButton.filled(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                onPressed: () =>
-                    ref.read(busControllerProvider.notifier).refreshData(),
+                onPressed: busController.refreshData,
                 child: const Text('重试'),
               ),
             ],
@@ -183,44 +186,71 @@ class SchoolBusPage extends ConsumerWidget {
     }
 
     if (!hasBusData) {
-      return const EmptyWidget(
-        title: '今天没有车了',
-        subtitle: '明天再来吧',
-        icon: Icons.directions_bus_filled_rounded,
+      return _buildRefreshPlaceholder(
+        onRefresh: busController.refreshData,
+        child: const EmptyWidget(
+          title: '今天没有车了',
+          subtitle: '明天再来吧',
+          icon: Icons.directions_bus_filled_rounded,
+        ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      itemCount:
-          busState.busData.length + (busState.errorMessage.isNotEmpty ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (busState.errorMessage.isNotEmpty && index == 0) {
-          return ClubCard(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline_rounded,
-                  color: colors.warning,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    busState.errorMessage,
-                    style: TextStyle(color: colors.secondaryLabel),
+    return RefreshIndicator(
+      onRefresh: busController.refreshData,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: busState.busData.length +
+            (busState.errorMessage.isNotEmpty ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (busState.errorMessage.isNotEmpty && index == 0) {
+            return ClubCard(
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: colors.warning,
                   ),
-                ),
-              ],
-            ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      busState.errorMessage,
+                      style: TextStyle(color: colors.secondaryLabel),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          final busIndex = busState.errorMessage.isNotEmpty ? index - 1 : index;
+          final bus = busState.busData[busIndex];
+          return BusTimelineTile(
+            bus: bus,
+            onTap: () => _showModalBottomSheet(context, bus),
           );
-        }
-        final busIndex = busState.errorMessage.isNotEmpty ? index - 1 : index;
-        final bus = busState.busData[busIndex];
-        return BusTimelineTile(
-          bus: bus,
-          onTap: () => _showModalBottomSheet(context, bus),
+        },
+      ),
+    );
+  }
+
+  Widget _buildRefreshPlaceholder({
+    required Future<void> Function() onRefresh,
+    required Widget child,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return RefreshIndicator(
+          onRefresh: onRefresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: constraints.maxHeight,
+              child: Center(child: child),
+            ),
+          ),
         );
       },
     );

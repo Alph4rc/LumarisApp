@@ -118,60 +118,54 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
         }
 
         if (programState.isError) {
-          return RefreshIndicator(
-            onRefresh: controller.refreshPrograms,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
-                Column(
-                  children: [
-                    Icon(
-                      CupertinoIcons.exclamationmark_circle,
-                      size: 50,
-                      color: colors.danger,
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
+              Column(
+                children: [
+                  Icon(
+                    CupertinoIcons.exclamationmark_circle,
+                    size: 50,
+                    color: colors.danger,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '加载失败',
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: colors.secondaryLabel,
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '加载失败',
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: colors.secondaryLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           );
         }
 
         if (programState.programs.isEmpty) {
-          return RefreshIndicator(
-            onRefresh: controller.refreshPrograms,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
-                Column(
-                  children: [
-                    Icon(
-                      CupertinoIcons.exclamationmark_circle,
-                      size: 50,
-                      color: colors.danger,
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.28),
+              Column(
+                children: [
+                  Icon(
+                    CupertinoIcons.exclamationmark_circle,
+                    size: 50,
+                    color: colors.danger,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '暂无数据',
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: colors.secondaryLabel,
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '暂无数据',
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: colors.secondaryLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           );
         }
 
@@ -182,115 +176,112 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
           itemBuilder: (context, index) {
             final program = programState.programs[index];
 
-            return RefreshIndicator(
-              onRefresh: controller.refreshPrograms,
-              child: ListView.builder(
-                padding: const EdgeInsets.only(top: 16.0),
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: program.courses.length +
-                    (programState.errorMessage.isNotEmpty ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (programState.errorMessage.isNotEmpty && index == 0) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: colors.warningSoft,
-                        borderRadius: ClubRadii.panel,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.info_circle,
-                            color: colors.warning,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              '刷新失败，当前展示的是上次同步的培养方案',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: colors.secondaryLabel,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final courseIndex =
-                      programState.errorMessage.isNotEmpty ? index - 1 : index;
-                  final course = program.courses[courseIndex];
-                  final courseColor = CourseColorManager.generateSoftColor(
-                    course.courseTypeName,
-                  );
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
+            return ListView.builder(
+              padding: const EdgeInsets.only(top: 16.0),
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: program.courses.length +
+                  (programState.errorMessage.isNotEmpty ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (programState.errorMessage.isNotEmpty && index == 0) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
                       horizontal: 16.0,
-                      vertical: 12.0,
+                      vertical: 8.0,
+                    ),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: colors.warningSoft,
+                      borderRadius: ClubRadii.panel,
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: courseColor,
-                            shape: BoxShape.circle,
-                          ),
+                        Icon(
+                          CupertinoIcons.info_circle,
+                          color: colors.warning,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                course.name,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: colors.label,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                course.courseTypeName,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colors.secondaryLabel,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 5.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: courseColor.withValues(alpha: 0.15),
-                            borderRadius: ClubRadii.control,
-                          ),
                           child: Text(
-                            '${course.credits} 学分',
+                            '刷新失败，当前展示的是上次同步的培养方案',
                             style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: courseColor,
+                              fontSize: 13,
+                              color: colors.secondaryLabel,
                             ),
                           ),
                         ),
                       ],
                     ),
                   );
-                },
-              ),
+                }
+
+                final courseIndex =
+                    programState.errorMessage.isNotEmpty ? index - 1 : index;
+                final course = program.courses[courseIndex];
+                final courseColor = CourseColorManager.generateSoftColor(
+                  course.courseTypeName,
+                );
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 12.0,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: courseColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              course.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: colors.label,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              course.courseTypeName,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: colors.secondaryLabel,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 5.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: courseColor.withValues(alpha: 0.15),
+                          borderRadius: ClubRadii.control,
+                        ),
+                        child: Text(
+                          '${course.credits} 学分',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: courseColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );

@@ -68,27 +68,42 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 当前电费头部
-              _buildCurrentElectricityHeader(),
+        body: RefreshIndicator(
+          onRefresh: _handlePullToRefresh,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 当前电费头部
+                _buildCurrentElectricityHeader(),
 
-              const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
-              // 电费图表卡片
-              if (electricityState.hasData) _buildChartCard(),
+                // 电费图表卡片
+                if (electricityState.hasData) _buildChartCard(),
 
-              if (electricityState.hasData) const SizedBox(height: 24),
+                if (electricityState.hasData) const SizedBox(height: 24),
 
-              // 设置选项
-              if (electricityState.hasData) _buildSettingsSection(),
-            ],
+                // 设置选项
+                if (electricityState.hasData) _buildSettingsSection(),
+              ],
+            ),
           ),
         ));
+  }
+
+  Future<void> _handlePullToRefresh() async {
+    final controller = ref.read(electricityStoreProvider.notifier);
+    final electricityState = ref.read(electricityStoreProvider);
+    if (electricityState.hasData) {
+      await controller.refreshElectricityData();
+      return;
+    }
+    await controller.loadElectricityData();
   }
 
   Widget _buildCurrentElectricityHeader() {

@@ -30,7 +30,10 @@ class PaymentPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: _buildContent(context, payment, controller, colors),
+      body: RefreshIndicator(
+        onRefresh: controller.loadData,
+        child: _buildContent(context, payment, controller, colors),
+      ),
     );
   }
 
@@ -42,6 +45,9 @@ class PaymentPage extends ConsumerWidget {
   ) {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       children: [
         _buildBalanceCard(payment, colors),
         const SizedBox(height: 24),
