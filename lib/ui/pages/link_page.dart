@@ -7,7 +7,7 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ios_club_app/core/models/link_model.dart';
+import 'package:ios_club_app/features/education/models/link_model.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/icon_font.dart';
 

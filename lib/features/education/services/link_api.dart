@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:ios_club_app/core/models/link_model.dart';
+import 'package:ios_club_app/features/education/models/link_model.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 import 'edu_http_client_manager.dart';
