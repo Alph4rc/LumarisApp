@@ -98,7 +98,8 @@ class SchoolBusPage extends ConsumerWidget {
     ClubColors colors,
   ) {
     final dates = busController.availableDates.entries.toList();
-    final selectedIndex = dates.indexWhere((e) => e.key == busState.selectedDate);
+    final selectedIndex =
+        dates.indexWhere((e) => e.key == busState.selectedDate);
 
     return Container(
       height: 48,
@@ -115,7 +116,8 @@ class SchoolBusPage extends ConsumerWidget {
             child: GestureDetector(
               onTap: () => busController.selectDateByIndex(index),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? colors.primary
@@ -155,7 +157,8 @@ class SchoolBusPage extends ConsumerWidget {
       );
     }
 
-    if (busState.errorMessage.isNotEmpty) {
+    final hasBusData = busState.busData.isNotEmpty;
+    if (busState.errorMessage.isNotEmpty && !hasBusData) {
       return Center(
         child: ClubCard(
           margin: const EdgeInsets.all(24),
@@ -183,7 +186,7 @@ class SchoolBusPage extends ConsumerWidget {
       );
     }
 
-    if (busState.busData.isEmpty) {
+    if (!hasBusData) {
       return const EmptyWidget(
         title: '今天没有车了',
         subtitle: '明天再来吧',
@@ -193,9 +196,32 @@ class SchoolBusPage extends ConsumerWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      itemCount: busState.busData.length,
+      itemCount:
+          busState.busData.length + (busState.errorMessage.isNotEmpty ? 1 : 0),
       itemBuilder: (context, index) {
-        final bus = busState.busData[index];
+        if (busState.errorMessage.isNotEmpty && index == 0) {
+          return ClubCard(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: colors.warning,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    busState.errorMessage,
+                    style: TextStyle(color: colors.secondaryLabel),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        final busIndex = busState.errorMessage.isNotEmpty ? index - 1 : index;
+        final bus = busState.busData[busIndex];
         return BusTimelineTile(
           bus: bus,
           onTap: () => _showModalBottomSheet(context, bus),
@@ -365,7 +391,8 @@ class BusTimelineTile extends StatelessWidget {
                   _buildTimeDisplay(bus.arrivalStationTime, '到达', colors),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: colors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),

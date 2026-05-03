@@ -103,7 +103,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
       _applyScoreData(snapshot.data, isLoading: false);
       if (!mounted) return;
       if (snapshot.isStale && snapshot.data.isNotEmpty && showStaleMessage) {
-        showClubSnackBar(context, const Text('网络异常，已显示本地缓存数据'));
+        showClubSnackBar(context, const Text('刷新失败，已回退到本地数据'));
       }
     } on TimeoutException catch (e) {
       if (mounted) {

@@ -6,10 +6,13 @@ import 'edu_http_client_manager.dart';
 /// Info相关API
 class InfoApi {
   /// 获取学生信息完成度
-  static Future<List<InfoModel>> getInfoCompletion() async {
+  static Future<List<InfoModel>> getInfoCompletion({
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Info/Completion',
+        bypassCache: forceRefresh,
       );
       if (response is! List<dynamic>) {
         throw NetworkException('信息完成度返回格式错误', -1);

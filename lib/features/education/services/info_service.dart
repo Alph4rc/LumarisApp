@@ -10,14 +10,19 @@ import 'auth_service.dart';
 import 'info_api.dart';
 
 class InfoService {
-  static Future<void> getInfoCompletion({UserData? userData}) async {
+  static Future<void> getInfoCompletion({
+    UserData? userData,
+    bool forceRefresh = false,
+  }) async {
     final cookieData = userData ?? await AuthService.getUserData();
     if (cookieData == null) {
       return;
     }
 
     try {
-      final response = await InfoApi.getInfoCompletion();
+      final response = await InfoApi.getInfoCompletion(
+        forceRefresh: forceRefresh,
+      );
       final prefs = PrefsService.instance;
       await prefs.setString(
         PrefsKeys.INFO_DATA,
@@ -28,19 +33,21 @@ class InfoService {
     }
   }
 
-  static Future<List<InfoModel>> getInfoList() async {
+  static Future<List<InfoModel>> getInfoList(
+      {bool forceRefresh = false}) async {
     final prefs = PrefsService.instance;
     final jsonString = prefs.getString(PrefsKeys.INFO_DATA);
     final time = prefs.getInt(PrefsKeys.INFO_DATA_TIME);
     final now = DateTime.now().millisecondsSinceEpoch;
 
-    if (jsonString != null &&
+    if (!forceRefresh &&
+        jsonString != null &&
         time != null &&
         (time - now).abs() < 1000 * 60 * 60 * 3) {
       return _parseInfoList(jsonString);
     }
 
-    await getInfoCompletion();
+    await getInfoCompletion(forceRefresh: forceRefresh);
     final refreshed = prefs.getString(PrefsKeys.INFO_DATA);
     if (refreshed == null) {
       return [];

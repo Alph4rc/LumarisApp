@@ -51,10 +51,16 @@ class EducationRefreshService {
       }
 
       await Future.wait([
-        ScoreService.getSemester(userData: cookieData),
-        EduTimeService.syncTime(),
-        ExamService.getExam(userData: cookieData),
-        InfoService.getInfoCompletion(userData: cookieData),
+        ScoreService.fetchSemestersFromRemote(
+          userData: cookieData,
+          forceRefresh: true,
+        ),
+        EduTimeService.fetchTimeInfoFromRemote(forceRefresh: true),
+        ExamService.getExam(userData: cookieData, forceRefresh: true),
+        InfoService.getInfoCompletion(
+          userData: cookieData,
+          forceRefresh: true,
+        ),
       ]);
 
       await CourseService.getCourse(userData: cookieData, isRefresh: true);

@@ -6,6 +6,21 @@ import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
+typedef BusPageFetcher = Future<BusModel> Function({
+  String? dayDate,
+  bool forceRefresh,
+});
+
+final busPageAutoLoadProvider = Provider<bool>((ref) => true);
+final busPageFetcherProvider = Provider<BusPageFetcher>((ref) {
+  return ({String? dayDate, bool forceRefresh = false}) {
+    return BusService.getBus(
+      dayDate: dayDate,
+      forceRefresh: forceRefresh,
+    );
+  };
+});
+
 final busControllerProvider =
     NotifierProvider<BusPageNotifier, BusPageState>(BusPageNotifier.new);
 
@@ -17,13 +32,15 @@ class BusPageNotifier extends Notifier<BusPageState> {
     _generateWeeklyDates();
     final selectedDate =
         availableDates.isNotEmpty ? availableDates.keys.first : '';
-    Future<void>.microtask(() async {
-      state = state.copyWith(selectedDate: selectedDate);
-      if (selectedDate.isNotEmpty) {
-        await _fetchBusData(isInit: true);
-      }
-      await _loadTiles();
-    });
+    if (ref.read(busPageAutoLoadProvider)) {
+      Future<void>.microtask(() async {
+        state = state.copyWith(selectedDate: selectedDate);
+        if (selectedDate.isNotEmpty) {
+          await _fetchBusData(isInit: true);
+        }
+        await _loadTiles();
+      });
+    }
     return BusPageState(selectedDate: selectedDate);
   }
 
@@ -53,12 +70,20 @@ class BusPageNotifier extends Notifier<BusPageState> {
     );
   }
 
-  Future<void> _fetchBusData({bool isInit = false}) async {
+  Future<void> _fetchBusData({
+    bool isInit = false,
+    bool forceRefresh = false,
+  }) async {
     final currentSelectedDate = state.selectedDate;
+    final previousTodayBusData = state.todayBusData;
+    final previousBusData = state.busData;
     state = state.copyWith(isLoading: true, errorMessage: '');
 
     try {
-      final BusModel data = await BusService.getBus(dayDate: state.selectedDate);
+      final BusModel data = await ref.read(busPageFetcherProvider)(
+        dayDate: state.selectedDate,
+        forceRefresh: forceRefresh,
+      );
 
       // 检查在异步请求期间用户是否切换了日期
       if (state.selectedDate != currentSelectedDate) {
@@ -75,7 +100,11 @@ class BusPageNotifier extends Notifier<BusPageState> {
       if (state.selectedDate != currentSelectedDate) {
         return;
       }
-      state = state.copyWith(errorMessage: '获取校车数据时出错: $e', busData: const []);
+      state = state.copyWith(
+        errorMessage: '刷新失败，已保留上次校车数据',
+        todayBusData: previousTodayBusData,
+        busData: previousBusData,
+      );
     } finally {
       if (state.selectedDate == currentSelectedDate) {
         state = state.copyWith(isLoading: false);
@@ -96,7 +125,7 @@ class BusPageNotifier extends Notifier<BusPageState> {
   }
 
   Future<void> refreshData() async {
-    await _fetchBusData();
+    await _fetchBusData(forceRefresh: true);
   }
 
   Future<void> toggleShowBus(bool value) async {

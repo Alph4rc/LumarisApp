@@ -5,39 +5,96 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
-class NetPage extends StatelessWidget {
+class NetPage extends StatefulWidget {
   const NetPage({super.key});
 
   @override
+  State<NetPage> createState() => _NetPageState();
+}
+
+class _NetPageState extends State<NetPage> {
+  Map<String, dynamic>? _data;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData({bool forceRefresh = false}) async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = _data == null;
+      _error = null;
+    });
+
+    try {
+      final data = await NetService.get(forceRefresh: forceRefresh);
+      if (!mounted) return;
+      setState(() {
+        _data = data;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      if (_data != null) {
+        showClubSnackBar(
+          context,
+          const Text('刷新失败，已保留当前校园网数据'),
+        );
+      } else {
+        setState(() {
+          _error = e.toString();
+        });
+      }
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // 使用 Material 3 风格的 Scaffold，背景色跟随主题
     return Scaffold(
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: NetService.get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const _LoadingView();
-          }
-
-          if (snapshot.hasError) {
-            return _ErrorView(error: snapshot.error.toString());
-          }
-
-          if (snapshot.hasData) {
-            return _DataContent(data: snapshot.data!);
-          }
-
-          return const _EmptyView();
-        },
-      ),
+      body: _buildBody(),
     );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const _LoadingView();
+    }
+    if (_data != null) {
+      return _DataContent(
+        data: _data!,
+        onRefresh: () {
+          _loadData(forceRefresh: true);
+        },
+      );
+    }
+    if (_error != null) {
+      return _ErrorView(
+        error: _error!,
+        onRetry: () {
+          _loadData();
+        },
+      );
+    }
+    return const _EmptyView();
   }
 }
 
 class _DataContent extends StatelessWidget {
   final Map<String, dynamic> data;
+  final VoidCallback onRefresh;
 
-  const _DataContent({required this.data});
+  const _DataContent({
+    required this.data,
+    required this.onRefresh,
+  });
 
   String _formatBytes(dynamic bytes) {
     if (bytes == null) return '0 B';
@@ -93,18 +150,7 @@ class _DataContent extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () {
-                // 简单的刷新逻辑，重建页面
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        const NetPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
+              onPressed: onRefresh,
             ),
           ],
         ),
@@ -381,8 +427,12 @@ class _LoadingView extends StatelessWidget {
 
 class _ErrorView extends StatelessWidget {
   final String error;
+  final VoidCallback onRetry;
 
-  const _ErrorView({required this.error});
+  const _ErrorView({
+    required this.error,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -407,17 +457,7 @@ class _ErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      const NetPage(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
-            },
+            onPressed: onRetry,
             icon: const Icon(Icons.refresh),
             label: const Text('重试'),
           ),

@@ -14,14 +14,20 @@ import 'auth_service.dart';
 import 'exam_api.dart';
 
 class ExamService {
-  static Future<void> getExam({UserData? userData}) async {
+  static Future<void> getExam({
+    UserData? userData,
+    bool forceRefresh = false,
+  }) async {
     final cookieData = userData ?? await AuthService.getUserData();
     if (cookieData == null) {
       return;
     }
 
     try {
-      final response = await ExamApi.getExam(cookieData.studentId);
+      final response = await ExamApi.getExam(
+        cookieData.studentId,
+        forceRefresh: forceRefresh,
+      );
       final prefs = PrefsService.instance;
       await prefs.setString(PrefsKeys.EXAM_DATA, jsonEncode(response.toJson()));
     } catch (e, stackTrace) {
@@ -46,7 +52,11 @@ class ExamService {
       return ExamResult.error('未登录，请先登录');
     }
 
-    final result = await _fetchExamData(cookieData, now);
+    final result = await _fetchExamData(
+      cookieData,
+      now,
+      forceRefresh: isRefresh,
+    );
     if (result.$1 && result.$2 != null) {
       await _updateCache(prefs, result.$2!, now);
       final exams = _parseExamItemsFromResponse(result.$2!, now);
@@ -83,10 +93,14 @@ class ExamService {
 
   static Future<(bool, ExamResponse?, ExamResult)> _fetchExamData(
     UserData cookieData,
-    DateTime now,
-  ) async {
+    DateTime now, {
+    bool forceRefresh = false,
+  }) async {
     try {
-      final response = await ExamApi.getExam(cookieData.studentId);
+      final response = await ExamApi.getExam(
+        cookieData.studentId,
+        forceRefresh: forceRefresh,
+      );
       final prefs = PrefsService.instance;
       final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
       final mergedData = _mergeExamData(existingData, response, now);

@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -48,6 +49,7 @@ void main() {
     Hive.init(tempDir.path);
     final box = await Hive.openBox('request_cache');
     await box.clear();
+    await RequestCache.instance.initialize();
   });
 
   setUp(() async {
@@ -132,6 +134,41 @@ void main() {
       final data = await client.get('/ping');
       expect(data, isA<Map>());
       expect((data as Map<String, dynamic>)['ok'], isTrue);
+
+      client.dispose();
+    });
+
+    test('should bypass request cache when force refresh is requested',
+        () async {
+      await RequestCache.instance.set(
+        'http://api.test/ping',
+        <String, dynamic>{'cached': true},
+      );
+
+      var networkHits = 0;
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            networkHits++;
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'cached': false},
+              ),
+            );
+          },
+        ),
+      );
+
+      final cachedData = await client.get('/ping') as Map<String, dynamic>;
+      final refreshedData =
+          await client.get('/ping', bypassCache: true) as Map<String, dynamic>;
+
+      expect(cachedData['cached'], isTrue);
+      expect(refreshedData['cached'], isFalse);
+      expect(networkHits, 1);
 
       client.dispose();
     });

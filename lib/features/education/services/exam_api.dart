@@ -5,11 +5,15 @@ import 'edu_http_client_manager.dart';
 /// Exam相关API
 class ExamApi {
   /// 获取考试信息
-  static Future<ExamResponse> getExam(String studentId) async {
+  static Future<ExamResponse> getExam(
+    String studentId, {
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Exam',
         queryParameters: {'studentId': studentId},
+        bypassCache: forceRefresh,
       );
       if (response is! Map) {
         throw NetworkException('考试返回格式错误: ${response.runtimeType}', -1);

@@ -186,9 +186,46 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
               child: ListView.builder(
                 padding: const EdgeInsets.only(top: 16.0),
                 physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: program.courses.length,
+                itemCount: program.courses.length +
+                    (programState.errorMessage.isNotEmpty ? 1 : 0),
                 itemBuilder: (context, index) {
-                  final course = program.courses[index];
+                  if (programState.errorMessage.isNotEmpty && index == 0) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.08),
+                        borderRadius: ClubRadii.panel,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.info_circle,
+                            color: Colors.orange.shade700,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '刷新失败，当前展示的是上次同步的培养方案',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final courseIndex =
+                      programState.errorMessage.isNotEmpty ? index - 1 : index;
+                  final course = program.courses[courseIndex];
                   final courseColor = CourseColorManager.generateSoftColor(
                     course.courseTypeName,
                   );

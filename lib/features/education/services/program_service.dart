@@ -6,14 +6,19 @@ import 'auth_service.dart';
 import 'program_api.dart';
 
 class ProgramService {
-  static Future<List<PlanCourse>> getProgram() async {
+  static Future<List<PlanCourse>> getProgram({
+    bool forceRefresh = false,
+  }) async {
     final cookieData = await AuthService.getUserData();
     if (cookieData == null) {
       return [];
     }
 
     try {
-      final result = await ProgramApi.getProgram(cookieData.studentId);
+      final result = await ProgramApi.getProgram(
+        cookieData.studentId,
+        forceRefresh: forceRefresh,
+      );
       if (kDebugMode) {
         AppLogger.debug('找到了培养方案：${result.length}');
       }
@@ -25,14 +30,19 @@ class ProgramService {
     return [];
   }
 
-  static Future<List<PlanCourseList>> getPrograms() async {
+  static Future<List<PlanCourseList>> getPrograms({
+    bool forceRefresh = false,
+  }) async {
     final cookieData = await AuthService.getUserData();
     if (cookieData == null) {
       return [];
     }
 
     try {
-      final result = await ProgramApi.getProgramDic(cookieData.studentId);
+      final result = await ProgramApi.getProgramDic(
+        cookieData.studentId,
+        forceRefresh: forceRefresh,
+      );
       if (kDebugMode) {
         AppLogger.debug('找到了培养方案：${result.length}');
       }

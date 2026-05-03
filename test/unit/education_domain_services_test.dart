@@ -9,6 +9,7 @@ import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/features/education/models/semester_model.dart';
@@ -283,6 +284,103 @@ void main() {
       expect(PrefsService.instance.getString(PrefsKeys.TIME_DATA), isNotNull);
       expect(await CourseRepository().getCourses(), hasLength(1));
       expect(week.maxWeek, greaterThan(0));
+    });
+
+    test(
+        'EducationRefreshService.refreshWithExistingSession should bypass cache',
+        () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.USER_DATA,
+        '{"studentId":"2026999","cookie":"cookie-refresh-service"}',
+      );
+      await PrefsService.instance.setInt(
+        PrefsKeys.LAST_FETCH_TIME,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+
+      final seenPaths = <String>{};
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (<String>{
+              '/Score/Semester',
+              '/Info/Time',
+              '/Exam',
+              '/Info/Completion',
+              '/Course',
+            }.contains(options.path)) {
+              expect(
+                options.extra[CacheInterceptor.bypassCacheKey],
+                isTrue,
+                reason: 'Expected ${options.path} to bypass request cache',
+              );
+              seenPaths.add(options.path);
+            }
+
+            dynamic data;
+            switch (options.path) {
+              case '/Score/Semester':
+                data = <String, dynamic>{
+                  'data': <Map<String, String>>[
+                    <String, String>{'value': '2025-2', 'text': '2025-2'}
+                  ]
+                };
+              case '/Info/Time':
+                data = <String, dynamic>{
+                  'startTime': '2026-02-20T00:00:00.000',
+                  'endTime': '2026-07-20T00:00:00.000',
+                };
+              case '/Exam':
+                data = <String, dynamic>{
+                  'exams': <Map<String, dynamic>>[],
+                  'canClick': false,
+                  'error': null,
+                };
+              case '/Info/Completion':
+                data = <Map<String, dynamic>>[];
+              case '/Course':
+                data = <String, dynamic>{
+                  'success': true,
+                  'data': <Map<String, dynamic>>[
+                    <String, dynamic>{
+                      'lessonId': 'L2',
+                      'courseName': '数据库系统',
+                      'weekIndexes': <int>[1, 2],
+                      'teachers': <String>['Teacher'],
+                      'room': 'B202',
+                      'weekday': 2,
+                      'startUnit': 3,
+                      'endUnit': 4,
+                      'campus': '雁塔校区',
+                    },
+                  ],
+                  'expirationTime': '2026-03-23T00:00:00.000',
+                };
+              default:
+                fail('Unexpected path ${options.path}');
+            }
+
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: data,
+              ),
+            );
+          },
+        ),
+      );
+
+      final ok = await EducationRefreshService.refreshWithExistingSession();
+
+      expect(ok, isTrue);
+      expect(seenPaths, {
+        '/Score/Semester',
+        '/Info/Time',
+        '/Exam',
+        '/Info/Completion',
+        '/Course',
+      });
     });
 
     test('CourseService.getCourses should return local snapshot first',

@@ -5,10 +5,14 @@ import 'edu_http_client_manager.dart';
 /// Bus相关API
 class BusApi {
   /// 获取校巴信息
-  static Future<BusModel> getBus({String? dayDate}) async {
+  static Future<BusModel> getBus({
+    String? dayDate,
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Bus/${dayDate ?? ''}',
+        bypassCache: forceRefresh,
       );
       if (response is! Map) {
         throw NetworkException('校巴返回格式错误: ${response.runtimeType}', -1);
@@ -25,11 +29,12 @@ class BusApi {
 
   /// 获取新的校巴数据
   static Future<BusModel> getBusNewData(String time,
-      {String loc = 'ALL'}) async {
+      {String loc = 'ALL', bool forceRefresh = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Bus/NewData/$time',
         queryParameters: {'loc': loc},
+        bypassCache: forceRefresh,
       );
       if (response is! Map) {
         throw NetworkException('新校巴返回格式错误: ${response.runtimeType}', -1);
@@ -46,11 +51,12 @@ class BusApi {
 
   /// 获取旧的校巴数据
   static Future<BusModel> getBusOldData(String time,
-      {bool isShow = false}) async {
+      {bool isShow = false, bool forceRefresh = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Bus/OldData/$time',
         queryParameters: {'isShow': isShow},
+        bypassCache: forceRefresh,
       );
       if (response is! Map) {
         throw NetworkException('旧校巴返回格式错误: ${response.runtimeType}', -1);

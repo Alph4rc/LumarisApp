@@ -11,8 +11,12 @@ import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/education/services/exam_api.dart';
+import 'package:ios_club_app/features/education/services/info_api.dart';
 import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/features/education/services/payment_api.dart';
+import 'package:ios_club_app/features/education/services/program_api.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -26,10 +30,12 @@ void main() {
       'education_api_success_paths_test_',
     );
     Hive.init(tempDir.path);
+    await RequestCache.instance.initialize();
   });
 
   setUp(() async {
     await PrefsService.instance.clear();
+    await RequestCache.instance.clear();
     EduHttpClientManager.resetForTest();
     LoginService.setLoginOverrideForTest(null);
     final manager = EduHttpClientManager.initialize();
@@ -56,6 +62,65 @@ void main() {
   });
 
   group('education API success paths', () {
+    test('refresh-aware APIs should mark requests as bypassing cache',
+        () async {
+      final seenPaths = <String>{};
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(
+              options.extra[CacheInterceptor.bypassCacheKey],
+              isTrue,
+              reason: 'Expected ${options.path} to bypass request cache',
+            );
+            seenPaths.add(options.path);
+
+            dynamic data;
+            switch (options.path) {
+              case '/Info/Completion':
+                data = <Map<String, dynamic>>[];
+              case '/Exam':
+                data = <String, dynamic>{
+                  'exams': <Map<String, dynamic>>[],
+                  'canClick': false,
+                  'error': null,
+                };
+              case '/Program':
+                data = <Map<String, dynamic>>[];
+              case '/Program/GetDic':
+                data = <String, dynamic>{};
+              case '/Bus/2026-04-27':
+                data = <String, dynamic>{'records': <dynamic>[], 'total': 0};
+              default:
+                fail('Unexpected path ${options.path}');
+            }
+
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: data,
+              ),
+            );
+          },
+        ),
+      );
+
+      await InfoApi.getInfoCompletion(forceRefresh: true);
+      await ExamApi.getExam('2026001', forceRefresh: true);
+      await ProgramApi.getProgram('2026001', forceRefresh: true);
+      await ProgramApi.getProgramDic('2026001', forceRefresh: true);
+      await BusApi.getBus(dayDate: '2026-04-27', forceRefresh: true);
+
+      expect(seenPaths, {
+        '/Info/Completion',
+        '/Exam',
+        '/Program',
+        '/Program/GetDic',
+        '/Bus/2026-04-27',
+      });
+    });
+
     test('BusApi.getBusNewData should pass time and loc query parameters',
         () async {
       EduHttpClientManager.instance.dio.interceptors.add(

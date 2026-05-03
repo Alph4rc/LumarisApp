@@ -5,9 +5,15 @@ import 'package:ios_club_app/features/education/models/bus_model.dart';
 import 'bus_api.dart';
 
 class BusService {
-  static Future<BusModel> getBus({String? dayDate}) async {
+  static Future<BusModel> getBus({
+    String? dayDate,
+    bool forceRefresh = false,
+  }) async {
     try {
-      final response = await BusApi.getBus(dayDate: dayDate);
+      final response = await BusApi.getBus(
+        dayDate: dayDate,
+        forceRefresh: forceRefresh,
+      );
       final now = DateTime.now();
       var result = response;
       if (result.records.isNotEmpty &&

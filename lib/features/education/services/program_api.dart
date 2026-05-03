@@ -6,7 +6,7 @@ import 'edu_http_client_manager.dart';
 class ProgramApi {
   /// 获取培养方案
   static Future<List<PlanCourse>> getProgram(String studentId,
-      {String? name}) async {
+      {String? name, bool forceRefresh = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Program',
@@ -14,6 +14,7 @@ class ProgramApi {
           'id': studentId,
           'name': name,
         },
+        bypassCache: forceRefresh,
       );
       if (response is! List<dynamic>) {
         throw NetworkException('培养方案返回格式错误', -1);
@@ -29,11 +30,14 @@ class ProgramApi {
 
   /// 获取培养方案字典
   static Future<Map<String, List<PlanCourse>>> getProgramDic(
-      String studentId) async {
+    String studentId, {
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Program/GetDic',
         queryParameters: {'id': studentId},
+        bypassCache: forceRefresh,
       );
       if (response is! Map) {
         throw NetworkException('培养方案字典返回格式错误: ${response.runtimeType}', -1);
