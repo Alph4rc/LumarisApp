@@ -795,6 +795,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       content: Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               '请打开建大财务处电费详情页面，复制页面URL并粘贴到下方输入框',
@@ -927,6 +928,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       content: Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               '系统会使用当前绑定的宿舍电费页面，在余额低于设定阈值时发送邮件提醒。',
@@ -1045,6 +1047,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       content: Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             _buildSubscriptionDetailLine(
               label: '提醒邮箱',
