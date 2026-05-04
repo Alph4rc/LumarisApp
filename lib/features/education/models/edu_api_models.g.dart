@@ -93,6 +93,22 @@ Map<String, dynamic> _$CreateElectricitySubscriptionRequestToJson(
   return val;
 }
 
+ElectricitySubscriptionQueryResponse
+    _$ElectricitySubscriptionQueryResponseFromJson(Map<String, dynamic> json) =>
+        ElectricitySubscriptionQueryResponse(
+          email: parseSchemaString(json['email']),
+          hasSubscription: parseSchemaBool(json['hasSubscription']),
+          subscriptionId: parseSchemaString(json['subscriptionId']),
+        );
+
+Map<String, dynamic> _$ElectricitySubscriptionQueryResponseToJson(
+        ElectricitySubscriptionQueryResponse instance) =>
+    <String, dynamic>{
+      'email': instance.email,
+      'hasSubscription': instance.hasSubscription,
+      'subscriptionId': instance.subscriptionId,
+    };
+
 ElectricitySubscriptionResponse _$ElectricitySubscriptionResponseFromJson(
         Map<String, dynamic> json) =>
     ElectricitySubscriptionResponse(

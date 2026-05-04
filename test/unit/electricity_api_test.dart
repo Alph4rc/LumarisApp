@@ -251,7 +251,7 @@ void main() {
       expect(subscription.lastCheckedAt, isNull);
     });
 
-    test('should_get_electricity_subscription_with_optional_email', () async {
+    test('should_get_electricity_subscription_by_email', () async {
       EduHttpClientManager.instance.dio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
@@ -264,28 +264,23 @@ void main() {
               Response<dynamic>(
                 requestOptions: options,
                 statusCode: 200,
-                data: <Map<String, dynamic>>[
-                  <String, dynamic>{
-                    'id': 'sub-1',
-                    'url': 'https://example.com/wxAccount?id=1',
-                    'email': 'codex@example.com',
-                    'threshold': 8,
-                    'isActive': true,
-                    'createdAt': '2026-05-01T10:00:00Z',
-                    'updatedAt': '2026-05-01T10:30:00Z',
-                    'nextCheckAt': '2026-05-01T11:00:00Z',
-                    'lastCheckedAt': '2026-05-01T10:45:00Z',
-                    'lastKnownBalance': 13.2,
-                    'lastAlertedAt': null,
-                    'lastAlertedBalance': null,
-                    'lastErrorMessage': '',
-                  },
-                ],
+                data: <String, dynamic>{
+                  'email': 'codex@example.com',
+                  'hasSubscription': true,
+                  'subscriptionId': 'sub-1',
+                },
               ),
             );
           },
         ),
       );
+
+      final result =
+          await ElectricityApi.getSubscription(' codex@example.com ');
+
+      expect(result.email, 'codex@example.com');
+      expect(result.hasSubscription, isTrue);
+      expect(result.subscriptionId, 'sub-1');
     });
 
     test('should_delete_electricity_subscription', () async {

@@ -126,6 +126,99 @@ void main() {
     expect(find.text('添加低余额提醒'), findsOneWidget);
   });
 
+  testWidgets(
+      'ElectricityPage should show delete entry for active subscription',
+      (tester) async {
+    final service = ElectricityService(
+      subscriptionQueryReader: (email) async =>
+          const ElectricitySubscriptionQueryResponse(
+        email: 'codex@example.com',
+        hasSubscription: true,
+        subscriptionId: 'sub-1',
+      ),
+    );
+    await service.saveSubscriptionEmail('codex@example.com');
+
+    final container = ProviderContainer(
+      overrides: [
+        tileStoreAutoLoadProvider.overrideWithValue(false),
+        electricityReaderProvider.overrideWithValue(() async => 23.5),
+        electricityWeeklyReaderProvider
+            .overrideWithValue(() async => <ElectricData>[]),
+        electricityTileVisibilityReaderProvider
+            .overrideWithValue((_) async => false),
+        electricityServiceProvider.overrideWithValue(service),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(electricityStoreProvider.notifier)
+        .loadElectricityData();
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: _wrapWithApp(const ElectricityPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('已开启低余额提醒'), findsOneWidget);
+    expect(find.text('删除订阅'), findsOneWidget);
+  });
+
+  testWidgets('ElectricityPage should delete active subscription',
+      (tester) async {
+    var deletedId = '';
+    var hasSubscription = true;
+    final service = ElectricityService(
+      subscriptionQueryReader: (email) async =>
+          ElectricitySubscriptionQueryResponse(
+        email: 'codex@example.com',
+        hasSubscription: hasSubscription,
+        subscriptionId: hasSubscription ? 'sub-1' : '',
+      ),
+      subscriptionDeleter: (id) async {
+        deletedId = id;
+        hasSubscription = false;
+      },
+    );
+    await service.saveSubscriptionEmail('codex@example.com');
+
+    final container = ProviderContainer(
+      overrides: [
+        tileStoreAutoLoadProvider.overrideWithValue(false),
+        electricityReaderProvider.overrideWithValue(() async => 23.5),
+        electricityWeeklyReaderProvider
+            .overrideWithValue(() async => <ElectricData>[]),
+        electricityTileVisibilityReaderProvider
+            .overrideWithValue((_) async => false),
+        electricityServiceProvider.overrideWithValue(service),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(electricityStoreProvider.notifier)
+        .loadElectricityData();
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: _wrapWithApp(const ElectricityPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('删除订阅'));
+    await tester.tap(find.text('删除订阅'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('删除'));
+    await tester.pumpAndSettle();
+
+    expect(deletedId, 'sub-1');
+    expect(find.text('添加低余额提醒'), findsOneWidget);
+  });
+
   testWidgets('SchoolBusPage should expose pull to refresh', (tester) async {
     await tester.pumpWidget(
       ProviderScope(

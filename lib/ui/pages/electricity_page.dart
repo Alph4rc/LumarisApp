@@ -32,6 +32,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   bool _isSubscriptionLoading = false;
   bool _hasLoadedSubscriptions = false;
   String _subscriptionEmail = '';
+  bool _hasActiveSubscription = false;
+  String _subscriptionId = '';
 
   @override
   void initState() {
@@ -639,26 +641,31 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             else ...[
               ClubListTile(
                 leading: Icon(
-                  CupertinoIcons.bell,
+                  _hasActiveSubscription
+                      ? CupertinoIcons.check_mark_circled_solid
+                      : CupertinoIcons.bell,
                   color: colorScheme.primary,
                 ),
-                title: const Text(
-                  '添加低余额提醒',
+                title: Text(
+                  _hasActiveSubscription ? '已开启低余额提醒' : '添加低余额提醒',
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(
-                  _subscriptionEmail.isEmpty
-                      ? '设置阈值后，余额低于该金额时会收到邮件提醒'
-                      : '当前邮箱 $_subscriptionEmail，余额低于该金额时会收到邮件提醒',
+                  _buildSubscriptionSummary(),
                 ),
                 trailing: Icon(
-                  CupertinoIcons.add_circled,
+                  _hasActiveSubscription
+                      ? CupertinoIcons.chevron_right
+                      : CupertinoIcons.add_circled,
                   size: 18,
-                  color: colorScheme.primary,
+                  color: _hasActiveSubscription
+                      ? colorScheme.onSurfaceVariant
+                      : colorScheme.primary,
                 ),
-                onTap: _showCreateSubscriptionDialog,
+                onTap: _hasActiveSubscription
+                    ? _showDeleteSubscriptionDialog
+                    : _showCreateSubscriptionDialog,
               ),
-              _buildDivider(),
               if (_isSubscriptionLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 28),
@@ -714,15 +721,6 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Container(
-      height: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      color:
-          Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.4),
     );
   }
 
@@ -861,6 +859,14 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     try {
       final service = ref.read(electricityServiceProvider);
       final email = await service.getSavedSubscriptionEmail();
+      var hasActiveSubscription = false;
+      var subscriptionId = '';
+
+      if (email.isNotEmpty) {
+        final query = await service.getSubscription(email: email);
+        hasActiveSubscription = query.hasSubscription;
+        subscriptionId = query.subscriptionId;
+      }
 
       if (!mounted) {
         return;
@@ -868,6 +874,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
       setState(() {
         _subscriptionEmail = email;
+        _hasActiveSubscription = hasActiveSubscription;
+        _subscriptionId = subscriptionId;
         _hasLoadedSubscriptions = true;
       });
     } catch (e) {
@@ -988,6 +996,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
       setState(() {
         _subscriptionEmail = email;
+        _hasActiveSubscription = true;
         _isSubscriptionLoading = false;
         _hasLoadedSubscriptions = false;
       });
@@ -1001,6 +1010,94 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         return;
       }
       showClubSnackBar(context, Text('创建电费订阅失败: $e'));
+      setState(() {
+        _isSubscriptionLoading = false;
+      });
+    }
+  }
+
+  String _buildSubscriptionSummary() {
+    if (_hasActiveSubscription && _subscriptionEmail.isNotEmpty) {
+      return '当前邮箱 $_subscriptionEmail 已开启低余额邮件提醒';
+    }
+    if (_subscriptionEmail.isNotEmpty) {
+      return '当前邮箱 $_subscriptionEmail，可继续创建新的低余额提醒';
+    }
+    return '设置阈值后，余额低于该金额时会收到邮件提醒';
+  }
+
+  void _showDeleteSubscriptionDialog() {
+    if (_subscriptionId.isEmpty) {
+      showClubSnackBar(context, const Text('当前没有可删除的订阅'));
+      return;
+    }
+
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: const Text('删除订阅'),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(
+            _subscriptionEmail.isEmpty
+                ? '确定要删除当前低余额提醒吗？'
+                : '确定要删除 $_subscriptionEmail 的低余额提醒吗？',
+            style: const TextStyle(fontSize: 13),
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('取消'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              await _deleteSubscription();
+            },
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteSubscription() async {
+    if (_subscriptionId.isEmpty) {
+      showClubSnackBar(context, const Text('当前没有可删除的订阅'));
+      return;
+    }
+
+    setState(() {
+      _isSubscriptionLoading = true;
+    });
+
+    try {
+      await ref.read(electricityServiceProvider).deleteSubscription(
+            _subscriptionId,
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _hasActiveSubscription = false;
+        _subscriptionId = '';
+        _isSubscriptionLoading = false;
+        _hasLoadedSubscriptions = false;
+      });
+      await _loadSubscriptions(force: true);
+      if (!mounted) {
+        return;
+      }
+      showClubSnackBar(context, const Text('低余额提醒已删除'));
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      showClubSnackBar(context, Text('删除电费订阅失败: $e'));
       setState(() {
         _isSubscriptionLoading = false;
       });

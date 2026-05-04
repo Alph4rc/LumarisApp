@@ -101,6 +101,21 @@ void main() {
       });
     });
 
+    test('should deserialize subscription query response', () {
+      final response = ElectricitySubscriptionQueryResponse.fromJson(
+        <String, dynamic>{
+          'email': 'codex@example.com',
+          'hasSubscription': true,
+          'subscriptionId': 'sub-1',
+        },
+      );
+
+      expect(response.email, 'codex@example.com');
+      expect(response.hasSubscription, isTrue);
+      expect(response.subscriptionId, 'sub-1');
+      expect(response.toJson()['subscriptionId'], 'sub-1');
+    });
+
     test('should deserialize subscription response with nullable fields', () {
       final response = ElectricitySubscriptionResponse.fromJson(
         <String, dynamic>{

@@ -102,6 +102,30 @@ class CreateElectricitySubscriptionRequest {
 }
 
 @JsonSerializable(explicitToJson: true)
+class ElectricitySubscriptionQueryResponse {
+  @JsonKey(fromJson: parseSchemaString)
+  final String email;
+  @JsonKey(fromJson: parseSchemaBool)
+  final bool hasSubscription;
+  @JsonKey(fromJson: parseSchemaString)
+  final String subscriptionId;
+
+  const ElectricitySubscriptionQueryResponse({
+    required this.email,
+    required this.hasSubscription,
+    required this.subscriptionId,
+  });
+
+  factory ElectricitySubscriptionQueryResponse.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      _$ElectricitySubscriptionQueryResponseFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$ElectricitySubscriptionQueryResponseToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
 class ElectricitySubscriptionResponse {
   @JsonKey(fromJson: parseSchemaString)
   final String id;

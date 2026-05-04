@@ -15,6 +15,8 @@ typedef ElectricitySubscriptionCreator = Future<ElectricitySubscriptionResponse>
     Function(
   CreateElectricitySubscriptionRequest request,
 );
+typedef ElectricitySubscriptionQueryReader
+    = Future<ElectricitySubscriptionQueryResponse> Function(String email);
 typedef ElectricitySubscriptionDeleter = Future<void> Function(String id);
 
 /// 电费数据服务
@@ -26,12 +28,15 @@ class ElectricityService {
     ElectricityWeeklyDataReader? weeklyDataReader,
     ElectricityRechargeUrlReader? rechargeUrlReader,
     ElectricitySubscriptionCreator? subscriptionCreator,
+    ElectricitySubscriptionQueryReader? subscriptionQueryReader,
     ElectricitySubscriptionDeleter? subscriptionDeleter,
   })  : _balanceReader = balanceReader ?? ElectricityApi.getCurrentBalance,
         _weeklyDataReader = weeklyDataReader ?? ElectricityApi.getWeeklyData,
         _rechargeUrlReader = rechargeUrlReader ?? ElectricityApi.getRechargeUrl,
         _subscriptionCreator =
             subscriptionCreator ?? ElectricityApi.createSubscription,
+        _subscriptionQueryReader =
+            subscriptionQueryReader ?? ElectricityApi.getSubscription,
         _subscriptionDeleter =
             subscriptionDeleter ?? ElectricityApi.deleteSubscription;
 
@@ -39,6 +44,7 @@ class ElectricityService {
   final ElectricityWeeklyDataReader _weeklyDataReader;
   final ElectricityRechargeUrlReader _rechargeUrlReader;
   final ElectricitySubscriptionCreator _subscriptionCreator;
+  final ElectricitySubscriptionQueryReader _subscriptionQueryReader;
   final ElectricitySubscriptionDeleter _subscriptionDeleter;
 
   Future<double?> fetchCurrentBalance({String? url}) async {
@@ -141,6 +147,20 @@ class ElectricityService {
         threshold: threshold,
       ),
     );
+  }
+
+  Future<ElectricitySubscriptionQueryResponse> getSubscription({
+    String? email,
+  }) async {
+    final trimmedEmail = email?.trim() ?? '';
+    final resolvedEmail = trimmedEmail.isNotEmpty
+        ? trimmedEmail
+        : await getSavedSubscriptionEmail();
+    if (resolvedEmail.isEmpty) {
+      throw StateError('请先输入订阅邮箱');
+    }
+
+    return _subscriptionQueryReader(resolvedEmail);
   }
 
   Future<void> deleteSubscription(String id) async {

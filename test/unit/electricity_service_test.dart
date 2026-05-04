@@ -276,6 +276,70 @@ void main() {
       );
     });
 
+    test('should_query_subscription_with_explicit_email', () async {
+      String? receivedEmail;
+      final service = ElectricityService(
+        subscriptionQueryReader: (email) async {
+          receivedEmail = email;
+          return const ElectricitySubscriptionQueryResponse(
+            email: 'codex@example.com',
+            hasSubscription: true,
+            subscriptionId: 'sub-1',
+          );
+        },
+      );
+
+      final result =
+          await service.getSubscription(email: ' codex@example.com ');
+
+      expect(receivedEmail, 'codex@example.com');
+      expect(result.hasSubscription, isTrue);
+      expect(result.subscriptionId, 'sub-1');
+    });
+
+    test('should_query_subscription_with_saved_email_when_not_provided',
+        () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.ELECTRICITY_SUBSCRIPTION_EMAIL,
+        'cached@example.com',
+      );
+
+      String? receivedEmail;
+      final service = ElectricityService(
+        subscriptionQueryReader: (email) async {
+          receivedEmail = email;
+          return const ElectricitySubscriptionQueryResponse(
+            email: 'cached@example.com',
+            hasSubscription: false,
+            subscriptionId: '',
+          );
+        },
+      );
+
+      final result = await service.getSubscription();
+
+      expect(receivedEmail, 'cached@example.com');
+      expect(result.email, 'cached@example.com');
+      expect(result.hasSubscription, isFalse);
+    });
+
+    test('should_throw_when_querying_subscription_without_email', () async {
+      final service = ElectricityService(
+        subscriptionQueryReader: (_) async {
+          return const ElectricitySubscriptionQueryResponse(
+            email: 'unused@example.com',
+            hasSubscription: false,
+            subscriptionId: '',
+          );
+        },
+      );
+
+      await expectLater(
+        service.getSubscription,
+        throwsA(isA<StateError>()),
+      );
+    });
+
     test('should_delegate_subscription_delete', () async {
       String? deletedId;
       final service = ElectricityService(

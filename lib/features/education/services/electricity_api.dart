@@ -111,6 +111,29 @@ class ElectricityApi {
     }
   }
 
+  /// 查询电费订阅状态
+  static Future<ElectricitySubscriptionQueryResponse> getSubscription(
+    String email,
+  ) async {
+    try {
+      final response = await EduHttpClientManager.instance.get(
+        '/Electricity/Subscriptions',
+        queryParameters: <String, dynamic>{'email': email.trim()},
+      );
+
+      if (response is! Map) {
+        throw NetworkException('电费订阅查询返回格式错误: ${response.runtimeType}', -1);
+      }
+
+      return ElectricitySubscriptionQueryResponse.fromJson(
+        Map<String, dynamic>.from(response),
+      );
+    } catch (e) {
+      _handleError(e);
+      rethrow;
+    }
+  }
+
   /// 删除电费订阅
   static Future<void> deleteSubscription(String id) async {
     try {
