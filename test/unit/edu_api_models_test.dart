@@ -107,12 +107,14 @@ void main() {
           'email': 'codex@example.com',
           'hasSubscription': true,
           'subscriptionId': 'sub-1',
+          'threshold': '12.5',
         },
       );
 
       expect(response.email, 'codex@example.com');
       expect(response.hasSubscription, isTrue);
       expect(response.subscriptionId, 'sub-1');
+      expect(response.threshold, 12.5);
       expect(response.toJson()['subscriptionId'], 'sub-1');
     });
 

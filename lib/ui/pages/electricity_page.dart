@@ -34,6 +34,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   String _subscriptionEmail = '';
   bool _hasActiveSubscription = false;
   String _subscriptionId = '';
+  double? _subscriptionThreshold;
 
   @override
   void initState() {
@@ -663,9 +664,29 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                       : colorScheme.primary,
                 ),
                 onTap: _hasActiveSubscription
-                    ? _showDeleteSubscriptionDialog
+                    ? _showSubscriptionDetailDialog
                     : _showCreateSubscriptionDialog,
               ),
+              if (_hasActiveSubscription)
+                ClubListTile(
+                  leading: Icon(
+                    CupertinoIcons.delete,
+                    color: colorScheme.error,
+                  ),
+                  title: const Text(
+                    '删除订阅',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  subtitle: const Text(
+                    '取消当前邮箱的低余额提醒，之后可重新创建',
+                  ),
+                  trailing: Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 18,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  onTap: _showDeleteSubscriptionDialog,
+                ),
               if (_isSubscriptionLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 28),
@@ -861,11 +882,15 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       final email = await service.getSavedSubscriptionEmail();
       var hasActiveSubscription = false;
       var subscriptionId = '';
+      double? subscriptionThreshold;
+      var resolvedEmail = email;
 
       if (email.isNotEmpty) {
         final query = await service.getSubscription(email: email);
         hasActiveSubscription = query.hasSubscription;
         subscriptionId = query.subscriptionId;
+        subscriptionThreshold = query.threshold.toDouble();
+        resolvedEmail = query.email;
       }
 
       if (!mounted) {
@@ -873,9 +898,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       }
 
       setState(() {
-        _subscriptionEmail = email;
+        _subscriptionEmail = resolvedEmail;
         _hasActiveSubscription = hasActiveSubscription;
         _subscriptionId = subscriptionId;
+        _subscriptionThreshold = subscriptionThreshold;
         _hasLoadedSubscriptions = true;
       });
     } catch (e) {
@@ -997,6 +1023,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       setState(() {
         _subscriptionEmail = email;
         _hasActiveSubscription = true;
+        _subscriptionThreshold = threshold;
         _isSubscriptionLoading = false;
         _hasLoadedSubscriptions = false;
       });
@@ -1018,12 +1045,74 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
   String _buildSubscriptionSummary() {
     if (_hasActiveSubscription && _subscriptionEmail.isNotEmpty) {
-      return '当前邮箱 $_subscriptionEmail 已开启低余额邮件提醒';
+      return '当前邮箱 $_subscriptionEmail，低于 ${_formatThreshold(_subscriptionThreshold)} 元时提醒';
     }
-    if (_subscriptionEmail.isNotEmpty) {
-      return '当前邮箱 $_subscriptionEmail，可继续创建新的低余额提醒';
-    }
-    return '设置阈值后，余额低于该金额时会收到邮件提醒';
+    return '设置阈值后，余额低于该金额时将通过邮箱提醒';
+  }
+
+  void _showSubscriptionDetailDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: const Text('订阅内容'),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Column(
+            children: [
+              _buildSubscriptionDetailLine(
+                label: '提醒邮箱',
+                value: _subscriptionEmail.isEmpty ? '未设置' : _subscriptionEmail,
+              ),
+              const SizedBox(height: 10),
+              _buildSubscriptionDetailLine(
+                label: '提醒阈值',
+                value: '${_formatThreshold(_subscriptionThreshold)} 元',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('知道了'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionDetailLine({
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 5,
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   void _showDeleteSubscriptionDialog() {
@@ -1085,6 +1174,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       setState(() {
         _hasActiveSubscription = false;
         _subscriptionId = '';
+        _subscriptionThreshold = null;
         _isSubscriptionLoading = false;
         _hasLoadedSubscriptions = false;
       });
@@ -1107,6 +1197,16 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   bool _isValidEmail(String value) {
     final emailRegExp = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     return emailRegExp.hasMatch(value);
+  }
+
+  String _formatThreshold(double? threshold) {
+    if (threshold == null) {
+      return '--';
+    }
+    if (threshold == threshold.roundToDouble()) {
+      return threshold.toStringAsFixed(0);
+    }
+    return threshold.toStringAsFixed(2);
   }
 }
 

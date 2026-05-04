@@ -99,6 +99,7 @@ ElectricitySubscriptionQueryResponse
           email: parseSchemaString(json['email']),
           hasSubscription: parseSchemaBool(json['hasSubscription']),
           subscriptionId: parseSchemaString(json['subscriptionId']),
+          threshold: parseSchemaDouble(json['threshold']),
         );
 
 Map<String, dynamic> _$ElectricitySubscriptionQueryResponseToJson(
@@ -107,6 +108,7 @@ Map<String, dynamic> _$ElectricitySubscriptionQueryResponseToJson(
       'email': instance.email,
       'hasSubscription': instance.hasSubscription,
       'subscriptionId': instance.subscriptionId,
+      'threshold': instance.threshold,
     };
 
 ElectricitySubscriptionResponse _$ElectricitySubscriptionResponseFromJson(

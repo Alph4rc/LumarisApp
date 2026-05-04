@@ -135,6 +135,7 @@ void main() {
         email: 'codex@example.com',
         hasSubscription: true,
         subscriptionId: 'sub-1',
+        threshold: 10,
       ),
     );
     await service.saveSubscriptionEmail('codex@example.com');
@@ -167,6 +168,54 @@ void main() {
     expect(find.text('删除订阅'), findsOneWidget);
   });
 
+  testWidgets('ElectricityPage should show subscription details dialog',
+      (tester) async {
+    final service = ElectricityService(
+      subscriptionQueryReader: (email) async =>
+          const ElectricitySubscriptionQueryResponse(
+        email: 'codex@example.com',
+        hasSubscription: true,
+        subscriptionId: 'sub-1',
+        threshold: 12.5,
+      ),
+    );
+    await service.saveSubscriptionEmail('cached@example.com');
+
+    final container = ProviderContainer(
+      overrides: [
+        tileStoreAutoLoadProvider.overrideWithValue(false),
+        electricityReaderProvider.overrideWithValue(() async => 23.5),
+        electricityWeeklyReaderProvider
+            .overrideWithValue(() async => <ElectricData>[]),
+        electricityTileVisibilityReaderProvider
+            .overrideWithValue((_) async => false),
+        electricityServiceProvider.overrideWithValue(service),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(electricityStoreProvider.notifier)
+        .loadElectricityData();
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: _wrapWithApp(const ElectricityPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('已开启低余额提醒'));
+    await tester.tap(find.text('已开启低余额提醒'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('订阅内容'), findsOneWidget);
+    expect(find.text('提醒邮箱'), findsOneWidget);
+    expect(find.text('codex@example.com'), findsOneWidget);
+    expect(find.text('提醒阈值'), findsOneWidget);
+    expect(find.text('12.50 元'), findsOneWidget);
+  });
+
   testWidgets('ElectricityPage should delete active subscription',
       (tester) async {
     var deletedId = '';
@@ -177,6 +226,7 @@ void main() {
         email: 'codex@example.com',
         hasSubscription: hasSubscription,
         subscriptionId: hasSubscription ? 'sub-1' : '',
+        threshold: hasSubscription ? 10 : 0,
       ),
       subscriptionDeleter: (id) async {
         deletedId = id;

@@ -285,6 +285,7 @@ void main() {
             email: 'codex@example.com',
             hasSubscription: true,
             subscriptionId: 'sub-1',
+            threshold: 12.5,
           );
         },
       );
@@ -312,6 +313,7 @@ void main() {
             email: 'cached@example.com',
             hasSubscription: false,
             subscriptionId: '',
+            threshold: 0,
           );
         },
       );
@@ -330,6 +332,7 @@ void main() {
             email: 'unused@example.com',
             hasSubscription: false,
             subscriptionId: '',
+            threshold: 0,
           );
         },
       );

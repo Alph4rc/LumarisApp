@@ -109,11 +109,14 @@ class ElectricitySubscriptionQueryResponse {
   final bool hasSubscription;
   @JsonKey(fromJson: parseSchemaString)
   final String subscriptionId;
+  @JsonKey(fromJson: parseSchemaDouble)
+  final num threshold;
 
   const ElectricitySubscriptionQueryResponse({
     required this.email,
     required this.hasSubscription,
     required this.subscriptionId,
+    required this.threshold,
   });
 
   factory ElectricitySubscriptionQueryResponse.fromJson(
