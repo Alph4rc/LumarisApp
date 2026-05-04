@@ -199,6 +199,29 @@ void main() {
       client.dispose();
     });
 
+    test('should return delete response data', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.method, 'DELETE');
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 204,
+                data: null,
+              ),
+            );
+          },
+        ),
+      );
+
+      final data = await client.delete('/subscriptions/1');
+      expect(data, isNull);
+
+      client.dispose();
+    });
+
     test('should trigger relog failed state on 401 and throw auth exception',
         () async {
       var reloggingCalled = 0;
@@ -472,6 +495,33 @@ void main() {
 
       await expectLater(
         () => client.post('/bad-post', data: <String, dynamic>{'k': 'v'}),
+        throwsA(isA<NetworkException>()),
+      );
+
+      client.dispose();
+    });
+
+    test('should map delete dio error into network exception', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                response: Response<dynamic>(
+                  requestOptions: options,
+                  statusCode: 404,
+                ),
+                type: DioExceptionType.badResponse,
+              ),
+            );
+          },
+        ),
+      );
+
+      await expectLater(
+        () => client.delete('/bad-delete'),
         throwsA(isA<NetworkException>()),
       );
 

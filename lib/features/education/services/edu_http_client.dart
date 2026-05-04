@@ -342,6 +342,26 @@ class EduHttpClient {
     }
   }
 
+  // 通用DELETE请求方法
+  Future<dynamic> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final response = await _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return response.data;
+    } on DioException catch (e) {
+      DioErrorHandler.handleError(e);
+    }
+  }
+
   void dispose() {
     _dio.close();
   }

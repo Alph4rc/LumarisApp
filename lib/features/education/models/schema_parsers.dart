@@ -18,8 +18,42 @@ double parseSchemaDouble(dynamic value, {double fallback = 0.0}) {
   return fallback;
 }
 
+double? parseSchemaNullableDouble(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is num) {
+    return value.toDouble();
+  }
+  if (value is String && value.isNotEmpty) {
+    return double.parse(value);
+  }
+  return null;
+}
+
 String parseSchemaString(dynamic value, {String fallback = ''}) {
   return value?.toString() ?? fallback;
+}
+
+DateTime parseSchemaDateTime(dynamic value) {
+  final text = parseSchemaString(value);
+  final parsed = DateTime.tryParse(text);
+  if (parsed == null) {
+    throw FormatException('Invalid date time value: $value');
+  }
+  return parsed;
+}
+
+DateTime? parseSchemaNullableDateTime(dynamic value) {
+  final text = value?.toString();
+  if (text == null || text.isEmpty) {
+    return null;
+  }
+  final parsed = DateTime.tryParse(text);
+  if (parsed == null) {
+    throw FormatException('Invalid nullable date time value: $value');
+  }
+  return parsed;
 }
 
 bool parseSchemaBool(dynamic value, {bool fallback = false}) {

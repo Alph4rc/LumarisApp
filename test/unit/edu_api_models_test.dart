@@ -86,6 +86,49 @@ void main() {
     });
   });
 
+  group('Electricity subscription models', () {
+    test('should serialize create subscription request', () {
+      const request = CreateElectricitySubscriptionRequest(
+        url: 'https://example.com/wxAccount?id=1',
+        email: 'codex@example.com',
+        threshold: 9.8,
+      );
+
+      expect(request.toJson(), <String, dynamic>{
+        'url': 'https://example.com/wxAccount?id=1',
+        'email': 'codex@example.com',
+        'threshold': 9.8,
+      });
+    });
+
+    test('should deserialize subscription response with nullable fields', () {
+      final response = ElectricitySubscriptionResponse.fromJson(
+        <String, dynamic>{
+          'id': 'sub-1',
+          'url': 'https://example.com/wxAccount?id=1',
+          'email': 'codex@example.com',
+          'threshold': '10.5',
+          'isActive': true,
+          'createdAt': '2026-05-01T10:00:00Z',
+          'updatedAt': '2026-05-01T10:30:00Z',
+          'nextCheckAt': '2026-05-01T11:00:00Z',
+          'lastCheckedAt': null,
+          'lastKnownBalance': '15.0',
+          'lastAlertedAt': null,
+          'lastAlertedBalance': null,
+          'lastErrorMessage': '',
+        },
+      );
+
+      expect(response.id, 'sub-1');
+      expect(response.threshold, 10.5);
+      expect(response.createdAt, DateTime.parse('2026-05-01T10:00:00Z'));
+      expect(response.lastKnownBalance, 15.0);
+      expect(response.lastCheckedAt, isNull);
+      expect(response.toJson()['email'], 'codex@example.com');
+    });
+  });
+
   group('RawStringResponse', () {
     test('should wrap raw string responses', () {
       final result = RawStringResponse.fromResponse('plain-text-response');

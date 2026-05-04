@@ -68,6 +68,67 @@ Map<String, dynamic> _$ErrorWithMessageResponseToJson(
       'error': instance.error,
     };
 
+CreateElectricitySubscriptionRequest
+    _$CreateElectricitySubscriptionRequestFromJson(Map<String, dynamic> json) =>
+        CreateElectricitySubscriptionRequest(
+          url: parseSchemaString(json['url']),
+          email: parseSchemaString(json['email']),
+          threshold: parseSchemaNullableDouble(json['threshold']),
+        );
+
+Map<String, dynamic> _$CreateElectricitySubscriptionRequestToJson(
+    CreateElectricitySubscriptionRequest instance) {
+  final val = <String, dynamic>{
+    'url': instance.url,
+    'email': instance.email,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('threshold', instance.threshold);
+  return val;
+}
+
+ElectricitySubscriptionResponse _$ElectricitySubscriptionResponseFromJson(
+        Map<String, dynamic> json) =>
+    ElectricitySubscriptionResponse(
+      id: parseSchemaString(json['id']),
+      url: parseSchemaString(json['url']),
+      email: parseSchemaString(json['email']),
+      threshold: parseSchemaDouble(json['threshold']),
+      isActive: parseSchemaBool(json['isActive']),
+      createdAt: parseSchemaDateTime(json['createdAt']),
+      updatedAt: parseSchemaDateTime(json['updatedAt']),
+      nextCheckAt: parseSchemaDateTime(json['nextCheckAt']),
+      lastCheckedAt: parseSchemaNullableDateTime(json['lastCheckedAt']),
+      lastKnownBalance: parseSchemaNullableDouble(json['lastKnownBalance']),
+      lastAlertedAt: parseSchemaNullableDateTime(json['lastAlertedAt']),
+      lastAlertedBalance: parseSchemaNullableDouble(json['lastAlertedBalance']),
+      lastErrorMessage: parseSchemaString(json['lastErrorMessage']),
+    );
+
+Map<String, dynamic> _$ElectricitySubscriptionResponseToJson(
+        ElectricitySubscriptionResponse instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'url': instance.url,
+      'email': instance.email,
+      'threshold': instance.threshold,
+      'isActive': instance.isActive,
+      'createdAt': instance.createdAt.toIso8601String(),
+      'updatedAt': instance.updatedAt.toIso8601String(),
+      'nextCheckAt': instance.nextCheckAt.toIso8601String(),
+      'lastCheckedAt': instance.lastCheckedAt?.toIso8601String(),
+      'lastKnownBalance': instance.lastKnownBalance,
+      'lastAlertedAt': instance.lastAlertedAt?.toIso8601String(),
+      'lastAlertedBalance': instance.lastAlertedBalance,
+      'lastErrorMessage': instance.lastErrorMessage,
+    };
+
 ExamResponse _$ExamResponseFromJson(Map<String, dynamic> json) => ExamResponse(
       exams: _examListFromJson(json['exams']),
       canClick: parseSchemaBool(json['canClick']),

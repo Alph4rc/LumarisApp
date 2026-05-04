@@ -5,10 +5,12 @@ import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/course_api.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/education/services/electricity_api.dart';
 import 'package:ios_club_app/features/education/services/exam_api.dart';
 import 'package:ios_club_app/features/education/services/info_api.dart';
 import 'package:ios_club_app/features/education/services/login_api.dart';
@@ -63,6 +65,15 @@ void main() {
         () => BusApi.getBusNewData('0830', loc: 'ALL'),
         () => BusApi.getBusOldData('0830', isShow: true),
         () => CourseApi.getCourse('2026001'),
+        () => ElectricityApi.createSubscription(
+              const CreateElectricitySubscriptionRequest(
+                url: 'https://example.com/wxAccount?id=1',
+                email: 'codex@example.com',
+                threshold: 10,
+              ),
+            ),
+        () => ElectricityApi.getSubscriptions(email: 'codex@example.com'),
+        () => ElectricityApi.deleteSubscription('sub-1'),
         () => ExamApi.getExam('2026001'),
         () => InfoApi.getInfoCompletion(),
         () => InfoApi.getTime(),

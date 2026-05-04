@@ -7,6 +7,7 @@ import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/electricity_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -197,6 +198,123 @@ void main() {
       final rechargeUrl = await ElectricityApi.getRechargeUrl();
 
       expect(rechargeUrl, isNull);
+    });
+
+    test('should_create_electricity_subscription', () async {
+      final request = CreateElectricitySubscriptionRequest(
+        url: 'https://example.com/wxAccount?id=1',
+        email: 'codex@example.com',
+        threshold: 12.5,
+      );
+
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.method, 'POST');
+            expect(options.path, '/Electricity/Subscriptions');
+            expect(options.data, <String, dynamic>{
+              'url': 'https://example.com/wxAccount?id=1',
+              'email': 'codex@example.com',
+              'threshold': 12.5,
+            });
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{
+                  'id': 'sub-1',
+                  'url': 'https://example.com/wxAccount?id=1',
+                  'email': 'codex@example.com',
+                  'threshold': '12.5',
+                  'isActive': true,
+                  'createdAt': '2026-05-01T10:00:00Z',
+                  'updatedAt': '2026-05-01T10:30:00Z',
+                  'nextCheckAt': '2026-05-01T11:00:00Z',
+                  'lastCheckedAt': null,
+                  'lastKnownBalance': '15.0',
+                  'lastAlertedAt': null,
+                  'lastAlertedBalance': null,
+                  'lastErrorMessage': '',
+                },
+              ),
+            );
+          },
+        ),
+      );
+
+      final subscription = await ElectricityApi.createSubscription(request);
+
+      expect(subscription.id, 'sub-1');
+      expect(subscription.email, 'codex@example.com');
+      expect(subscription.threshold, 12.5);
+      expect(subscription.lastKnownBalance, 15.0);
+      expect(subscription.lastCheckedAt, isNull);
+    });
+
+    test('should_get_electricity_subscriptions_with_optional_email', () async {
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.method, 'GET');
+            expect(options.path, '/Electricity/Subscriptions');
+            expect(options.queryParameters, <String, dynamic>{
+              'email': 'codex@example.com',
+            });
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <Map<String, dynamic>>[
+                  <String, dynamic>{
+                    'id': 'sub-1',
+                    'url': 'https://example.com/wxAccount?id=1',
+                    'email': 'codex@example.com',
+                    'threshold': 8,
+                    'isActive': true,
+                    'createdAt': '2026-05-01T10:00:00Z',
+                    'updatedAt': '2026-05-01T10:30:00Z',
+                    'nextCheckAt': '2026-05-01T11:00:00Z',
+                    'lastCheckedAt': '2026-05-01T10:45:00Z',
+                    'lastKnownBalance': 13.2,
+                    'lastAlertedAt': null,
+                    'lastAlertedBalance': null,
+                    'lastErrorMessage': '',
+                  },
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      final subscriptions = await ElectricityApi.getSubscriptions(
+        email: ' codex@example.com ',
+      );
+
+      expect(subscriptions, hasLength(1));
+      expect(subscriptions.single.id, 'sub-1');
+      expect(subscriptions.single.lastCheckedAt,
+          DateTime.parse('2026-05-01T10:45:00Z'));
+    });
+
+    test('should_delete_electricity_subscription', () async {
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.method, 'DELETE');
+            expect(options.path, '/Electricity/Subscriptions/sub-1');
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 204,
+                data: null,
+              ),
+            );
+          },
+        ),
+      );
+
+      await ElectricityApi.deleteSubscription(' sub-1 ');
     });
   });
 }

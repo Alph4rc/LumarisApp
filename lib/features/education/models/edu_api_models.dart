@@ -77,6 +77,82 @@ class ErrorWithMessageResponse {
   Map<String, dynamic> toJson() => _$ErrorWithMessageResponseToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class CreateElectricitySubscriptionRequest {
+  @JsonKey(fromJson: parseSchemaString)
+  final String url;
+  @JsonKey(fromJson: parseSchemaString)
+  final String email;
+  @JsonKey(fromJson: parseSchemaNullableDouble)
+  final double? threshold;
+
+  const CreateElectricitySubscriptionRequest({
+    required this.url,
+    required this.email,
+    this.threshold,
+  });
+
+  factory CreateElectricitySubscriptionRequest.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      _$CreateElectricitySubscriptionRequestFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$CreateElectricitySubscriptionRequestToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class ElectricitySubscriptionResponse {
+  @JsonKey(fromJson: parseSchemaString)
+  final String id;
+  @JsonKey(fromJson: parseSchemaString)
+  final String url;
+  @JsonKey(fromJson: parseSchemaString)
+  final String email;
+  @JsonKey(fromJson: parseSchemaDouble)
+  final double threshold;
+  @JsonKey(fromJson: parseSchemaBool)
+  final bool isActive;
+  @JsonKey(fromJson: parseSchemaDateTime)
+  final DateTime createdAt;
+  @JsonKey(fromJson: parseSchemaDateTime)
+  final DateTime updatedAt;
+  @JsonKey(fromJson: parseSchemaDateTime)
+  final DateTime nextCheckAt;
+  @JsonKey(fromJson: parseSchemaNullableDateTime)
+  final DateTime? lastCheckedAt;
+  @JsonKey(fromJson: parseSchemaNullableDouble)
+  final double? lastKnownBalance;
+  @JsonKey(fromJson: parseSchemaNullableDateTime)
+  final DateTime? lastAlertedAt;
+  @JsonKey(fromJson: parseSchemaNullableDouble)
+  final double? lastAlertedBalance;
+  @JsonKey(fromJson: parseSchemaString)
+  final String lastErrorMessage;
+
+  const ElectricitySubscriptionResponse({
+    required this.id,
+    required this.url,
+    required this.email,
+    required this.threshold,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.nextCheckAt,
+    this.lastCheckedAt,
+    this.lastKnownBalance,
+    this.lastAlertedAt,
+    this.lastAlertedBalance,
+    required this.lastErrorMessage,
+  });
+
+  factory ElectricitySubscriptionResponse.fromJson(Map<String, dynamic> json) =>
+      _$ElectricitySubscriptionResponseFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$ElectricitySubscriptionResponseToJson(this);
+}
+
 @JsonSerializable(explicitToJson: true)
 class ExamResponse {
   @JsonKey(fromJson: _examListFromJson)
@@ -133,6 +209,26 @@ List<CourseModel> _courseListFromJson(dynamic value) {
         .toList();
   }
   return <CourseModel>[];
+}
+
+List<ElectricitySubscriptionResponse> electricitySubscriptionListFromJson(
+  dynamic value,
+) {
+  if (value is List) {
+    return value.map((item) {
+      if (item is! Map) {
+        throw ArgumentError.value(
+          item,
+          'value',
+          'Expected subscription list item to be a map',
+        );
+      }
+      return ElectricitySubscriptionResponse.fromJson(
+        Map<String, dynamic>.from(item),
+      );
+    }).toList();
+  }
+  return <ElectricitySubscriptionResponse>[];
 }
 
 List<ExamItem> _examListFromJson(dynamic value) {
