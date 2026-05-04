@@ -72,7 +72,6 @@ void main() {
                 threshold: 10,
               ),
             ),
-        () => ElectricityApi.getSubscriptions(email: 'codex@example.com'),
         () => ElectricityApi.deleteSubscription('sub-1'),
         () => ExamApi.getExam('2026001'),
         () => InfoApi.getInfoCompletion(),

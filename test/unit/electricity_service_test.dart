@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/features/education/models/electric_data.dart';
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/services/electricity_service.dart';
@@ -217,6 +218,75 @@ void main() {
         service.openRechargePage,
         throwsA(isA<String>()),
       );
+    });
+
+    test('should_save_and_read_subscription_email', () async {
+      final service = ElectricityService();
+
+      await service.saveSubscriptionEmail(' codex@example.com ');
+      final email = await service.getSavedSubscriptionEmail();
+
+      expect(email, 'codex@example.com');
+      expect(
+        PrefsService.instance
+            .getString(PrefsKeys.ELECTRICITY_SUBSCRIPTION_EMAIL),
+        'codex@example.com',
+      );
+    });
+
+    test('should_create_subscription_with_cached_url_and_persist_email',
+        () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.ELECTRICITY_URL,
+        'https://cached.example.com/e',
+      );
+
+      CreateElectricitySubscriptionRequest? receivedRequest;
+      final service = ElectricityService(
+        subscriptionCreator: (request) async {
+          receivedRequest = request;
+          return ElectricitySubscriptionResponse(
+            id: 'sub-1',
+            url: request.url,
+            email: request.email,
+            threshold: request.threshold ?? 0,
+            isActive: true,
+            createdAt: DateTime.parse('2026-05-01T10:00:00Z'),
+            updatedAt: DateTime.parse('2026-05-01T10:00:00Z'),
+            nextCheckAt: DateTime.parse('2026-05-01T11:00:00Z'),
+            lastErrorMessage: '',
+          );
+        },
+      );
+
+      final subscription = await service.createSubscription(
+        email: ' codex@example.com ',
+        threshold: 12.5,
+      );
+
+      expect(receivedRequest, isNotNull);
+      expect(receivedRequest!.url, 'https://cached.example.com/e');
+      expect(receivedRequest!.email, 'codex@example.com');
+      expect(receivedRequest!.threshold, 12.5);
+      expect(subscription.id, 'sub-1');
+      expect(
+        PrefsService.instance
+            .getString(PrefsKeys.ELECTRICITY_SUBSCRIPTION_EMAIL),
+        'codex@example.com',
+      );
+    });
+
+    test('should_delegate_subscription_delete', () async {
+      String? deletedId;
+      final service = ElectricityService(
+        subscriptionDeleter: (id) async {
+          deletedId = id;
+        },
+      );
+
+      await service.deleteSubscription('sub-1');
+
+      expect(deletedId, 'sub-1');
     });
   });
 }

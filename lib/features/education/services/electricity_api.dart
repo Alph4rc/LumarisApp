@@ -111,30 +111,6 @@ class ElectricityApi {
     }
   }
 
-  /// 获取电费订阅列表
-  static Future<List<ElectricitySubscriptionResponse>> getSubscriptions({
-    String? email,
-  }) async {
-    try {
-      final trimmedEmail = email?.trim();
-      final response = await EduHttpClientManager.instance.get(
-        '/Electricity/Subscriptions',
-        queryParameters: trimmedEmail == null || trimmedEmail.isEmpty
-            ? null
-            : <String, dynamic>{'email': trimmedEmail},
-      );
-
-      if (response is! List) {
-        throw NetworkException('电费订阅列表返回格式错误: ${response.runtimeType}', -1);
-      }
-
-      return electricitySubscriptionListFromJson(response);
-    } catch (e) {
-      _handleError(e);
-      rethrow;
-    }
-  }
-
   /// 删除电费订阅
   static Future<void> deleteSubscription(String id) async {
     try {

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/electric_data.dart';
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
+import 'package:ios_club_app/features/education/services/electricity_service.dart';
+import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/state/tile_store_providers.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
@@ -10,6 +15,7 @@ import 'package:ios_club_app/ui/pages/payment_page.dart';
 import 'package:ios_club_app/ui/pages/program_page.dart';
 import 'package:ios_club_app/ui/pages/school_bus_page.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _wrapWithApp(Widget child) {
   return MaterialApp(
@@ -20,6 +26,12 @@ Widget _wrapWithApp(Widget child) {
 }
 
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await PrefsService.init();
+    await PrefsService.instance.clear();
+  });
+
   testWidgets('ProgramPage should not expose pull to refresh', (tester) async {
     final container = ProviderContainer(
       overrides: [
@@ -80,6 +92,38 @@ void main() {
     );
 
     expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
+
+  testWidgets('ElectricityPage should render subscription section',
+      (tester) async {
+    final container = ProviderContainer(
+      overrides: [
+        tileStoreAutoLoadProvider.overrideWithValue(false),
+        electricityReaderProvider.overrideWithValue(() async => 23.5),
+        electricityWeeklyReaderProvider
+            .overrideWithValue(() async => <ElectricData>[]),
+        electricityTileVisibilityReaderProvider
+            .overrideWithValue((_) async => false),
+        electricityServiceProvider.overrideWithValue(
+          ElectricityService(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(electricityStoreProvider.notifier)
+        .loadElectricityData();
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: _wrapWithApp(const ElectricityPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('低余额订阅'), findsOneWidget);
+    expect(find.text('添加低余额提醒'), findsOneWidget);
   });
 
   testWidgets('SchoolBusPage should expose pull to refresh', (tester) async {

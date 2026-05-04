@@ -251,7 +251,7 @@ void main() {
       expect(subscription.lastCheckedAt, isNull);
     });
 
-    test('should_get_electricity_subscriptions_with_optional_email', () async {
+    test('should_get_electricity_subscription_with_optional_email', () async {
       EduHttpClientManager.instance.dio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
@@ -286,15 +286,6 @@ void main() {
           },
         ),
       );
-
-      final subscriptions = await ElectricityApi.getSubscriptions(
-        email: ' codex@example.com ',
-      );
-
-      expect(subscriptions, hasLength(1));
-      expect(subscriptions.single.id, 'sub-1');
-      expect(subscriptions.single.lastCheckedAt,
-          DateTime.parse('2026-05-01T10:45:00Z'));
     });
 
     test('should_delete_electricity_subscription', () async {

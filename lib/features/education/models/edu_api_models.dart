@@ -211,26 +211,6 @@ List<CourseModel> _courseListFromJson(dynamic value) {
   return <CourseModel>[];
 }
 
-List<ElectricitySubscriptionResponse> electricitySubscriptionListFromJson(
-  dynamic value,
-) {
-  if (value is List) {
-    return value.map((item) {
-      if (item is! Map) {
-        throw ArgumentError.value(
-          item,
-          'value',
-          'Expected subscription list item to be a map',
-        );
-      }
-      return ElectricitySubscriptionResponse.fromJson(
-        Map<String, dynamic>.from(item),
-      );
-    }).toList();
-  }
-  return <ElectricitySubscriptionResponse>[];
-}
-
 List<ExamItem> _examListFromJson(dynamic value) {
   if (value is List) {
     return value
