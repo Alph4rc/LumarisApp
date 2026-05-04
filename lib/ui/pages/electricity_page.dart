@@ -12,6 +12,7 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -788,68 +789,61 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   void _showInputDialog() {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('获取电费'),
-        content: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            children: [
-              const Text(
-                '请打开建大财务处电费详情页面，复制页面URL并粘贴到下方输入框',
-                style: TextStyle(fontSize: 13),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '获取电费',
+      content: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Column(
+          children: [
+            const Text(
+              '请打开建大财务处电费详情页面，复制页面URL并粘贴到下方输入框',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              color: Theme.of(context).cardColor,
+              elevation: 0,
+              child: CupertinoTextField(
+                controller: _urlController,
+                placeholder: '请输入URL',
+                padding: const EdgeInsets.all(12),
+                clearButtonMode: OverlayVisibilityMode.editing,
+                style: const TextStyle(fontSize: 14),
               ),
-              const SizedBox(height: 16),
-              Card(
-                color: Theme.of(context).cardColor,
-                elevation: 0,
-                child: CupertinoTextField(
-                  controller: _urlController,
-                  placeholder: '请输入URL',
-                  padding: const EdgeInsets.all(12),
-                  clearButtonMode: OverlayVisibilityMode.editing,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        actions: [
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-              _urlController.clear();
-            },
-            child: const Text('取消'),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final value = await ref
-                  .read(electricityServiceProvider)
-                  .fetchCurrentBalance(
-                    url: _urlController.text,
-                  );
-              if (!mounted) {
-                return;
-              }
-              if (value != null) {
-                _urlController.clear();
-                final controller = ref.read(electricityStoreProvider.notifier);
-                await controller.setElectricityValue(value);
-                await controller.loadElectricityData();
-                await _loadSubscriptions(force: true);
-              } else {
-                _urlController.clear();
-              }
-            },
-            child: const Text('确定'),
-          ),
-        ],
       ),
+      actions: [
+        PlatformDialogAction<void>(
+          label: '取消',
+          isDestructiveAction: true,
+          onPressed: _urlController.clear,
+        ),
+        PlatformDialogAction<void>(
+          label: '确定',
+          isDefaultAction: true,
+          onPressed: () async {
+            final value =
+                await ref.read(electricityServiceProvider).fetchCurrentBalance(
+                      url: _urlController.text,
+                    );
+            if (!mounted) {
+              return;
+            }
+            if (value != null) {
+              _urlController.clear();
+              final controller = ref.read(electricityStoreProvider.notifier);
+              await controller.setElectricityValue(value);
+              await controller.loadElectricityData();
+              await _loadSubscriptions(force: true);
+            } else {
+              _urlController.clear();
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -927,64 +921,58 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       _subscriptionThresholdController.text = '10';
     }
 
-    showCupertinoDialog(
-      context: context,
-      builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('添加低余额提醒'),
-        content: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Column(
-            children: [
-              const Text(
-                '系统会使用当前绑定的宿舍电费页面，在余额低于设定阈值时发送邮件提醒。',
-                style: TextStyle(fontSize: 13),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '添加低余额提醒',
+      content: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Column(
+          children: [
+            const Text(
+              '系统会使用当前绑定的宿舍电费页面，在余额低于设定阈值时发送邮件提醒。',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              color: Theme.of(context).cardColor,
+              elevation: 0,
+              child: CupertinoTextField(
+                controller: _subscriptionEmailController,
+                placeholder: '提醒邮箱',
+                keyboardType: TextInputType.emailAddress,
+                padding: const EdgeInsets.all(12),
+                clearButtonMode: OverlayVisibilityMode.editing,
+                style: const TextStyle(fontSize: 14),
               ),
-              const SizedBox(height: 16),
-              Card(
-                color: Theme.of(dialogContext).cardColor,
-                elevation: 0,
-                child: CupertinoTextField(
-                  controller: _subscriptionEmailController,
-                  placeholder: '提醒邮箱',
-                  keyboardType: TextInputType.emailAddress,
-                  padding: const EdgeInsets.all(12),
-                  clearButtonMode: OverlayVisibilityMode.editing,
-                  style: const TextStyle(fontSize: 14),
-                ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              color: Theme.of(context).cardColor,
+              elevation: 0,
+              child: CupertinoTextField(
+                controller: _subscriptionThresholdController,
+                placeholder: '提醒阈值，例如 10',
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                padding: const EdgeInsets.all(12),
+                clearButtonMode: OverlayVisibilityMode.editing,
+                style: const TextStyle(fontSize: 14),
               ),
-              const SizedBox(height: 12),
-              Card(
-                color: Theme.of(dialogContext).cardColor,
-                elevation: 0,
-                child: CupertinoTextField(
-                  controller: _subscriptionThresholdController,
-                  placeholder: '提醒阈值，例如 10',
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  padding: const EdgeInsets.all(12),
-                  clearButtonMode: OverlayVisibilityMode.editing,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        actions: [
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('取消'),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await _createSubscription();
-            },
-            child: const Text('创建'),
-          ),
-        ],
       ),
+      actions: [
+        const PlatformDialogAction<void>(
+          label: '取消',
+          isDestructiveAction: true,
+        ),
+        PlatformDialogAction<void>(
+          label: '创建',
+          isDefaultAction: true,
+          onPressed: _createSubscription,
+        ),
+      ],
     );
   }
 
@@ -1051,34 +1039,31 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   void _showSubscriptionDetailDialog() {
-    showCupertinoDialog(
-      context: context,
-      builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('订阅内容'),
-        content: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Column(
-            children: [
-              _buildSubscriptionDetailLine(
-                label: '提醒邮箱',
-                value: _subscriptionEmail.isEmpty ? '未设置' : _subscriptionEmail,
-              ),
-              const SizedBox(height: 10),
-              _buildSubscriptionDetailLine(
-                label: '提醒阈值',
-                value: '${_formatThreshold(_subscriptionThreshold)} 元',
-              ),
-            ],
-          ),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '订阅内容',
+      content: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Column(
+          children: [
+            _buildSubscriptionDetailLine(
+              label: '提醒邮箱',
+              value: _subscriptionEmail.isEmpty ? '未设置' : _subscriptionEmail,
+            ),
+            const SizedBox(height: 10),
+            _buildSubscriptionDetailLine(
+              label: '提醒阈值',
+              value: '${_formatThreshold(_subscriptionThreshold)} 元',
+            ),
+          ],
         ),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('知道了'),
-          ),
-        ],
       ),
+      actions: const [
+        PlatformDialogAction<void>(
+          label: '知道了',
+          isDefaultAction: true,
+        ),
+      ],
     );
   }
 
@@ -1115,41 +1100,25 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     );
   }
 
-  void _showDeleteSubscriptionDialog() {
+  Future<void> _showDeleteSubscriptionDialog() async {
     if (_subscriptionId.isEmpty) {
       showClubSnackBar(context, const Text('当前没有可删除的订阅'));
       return;
     }
 
-    showCupertinoDialog(
-      context: context,
-      builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('删除订阅'),
-        content: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Text(
-            _subscriptionEmail.isEmpty
-                ? '确定要删除当前低余额提醒吗？'
-                : '确定要删除 $_subscriptionEmail 的低余额提醒吗？',
-            style: const TextStyle(fontSize: 13),
-          ),
-        ),
-        actions: [
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('取消'),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await _deleteSubscription();
-            },
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+    final confirmed = await PlatformDialog.showConfirmDialog(
+      context,
+      title: '删除订阅',
+      content: _subscriptionEmail.isEmpty
+          ? '确定要删除当前低余额提醒吗？'
+          : '确定要删除 $_subscriptionEmail 的低余额提醒吗？',
+      confirmText: '删除',
+      cancelText: '取消',
     );
+
+    if (confirmed == true) {
+      await _deleteSubscription();
+    }
   }
 
   Future<void> _deleteSubscription() async {

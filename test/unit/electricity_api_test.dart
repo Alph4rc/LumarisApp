@@ -260,6 +260,10 @@ void main() {
             expect(options.queryParameters, <String, dynamic>{
               'email': 'codex@example.com',
             });
+            expect(
+              options.extra[CacheInterceptor.bypassCacheKey],
+              isTrue,
+            );
             handler.resolve(
               Response<dynamic>(
                 requestOptions: options,
@@ -268,6 +272,7 @@ void main() {
                   'email': 'codex@example.com',
                   'hasSubscription': true,
                   'subscriptionId': 'sub-1',
+                  'threshold': 10,
                 },
               ),
             );
@@ -281,6 +286,7 @@ void main() {
       expect(result.email, 'codex@example.com');
       expect(result.hasSubscription, isTrue);
       expect(result.subscriptionId, 'sub-1');
+      expect(result.threshold, 10);
     });
 
     test('should_delete_electricity_subscription', () async {

@@ -12,6 +12,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 class TodoWidget extends ConsumerStatefulWidget {
   const TodoWidget({super.key});
@@ -273,101 +274,95 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
     titleController.text = todo?.title ?? '';
     deadlineController.text = todo?.deadline ?? '';
 
-    // 由于 PlatformDialog.showInputDialog 只返回字符串，我们需要使用自定义对话框
-    final result = await showDialog<TodoItem?>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title:
-              const Text('添加待办', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                      labelText: '标题',
-                      labelStyle: TextStyle(fontWeight: FontWeight.bold)),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '标题是必须项';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: deadlineController,
-                  decoration: InputDecoration(
-                    labelText: '截止日期',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.calendar_today),
-                      onPressed: () async {
-                        final pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null && context.mounted) {
-                          final pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          );
-                          if (pickedTime != null && context.mounted) {
-                            final dateTime = DateTime(
-                              pickedDate.year,
-                              pickedDate.month,
-                              pickedDate.day,
-                              pickedTime.hour,
-                              pickedTime.minute,
-                            );
-                            deadlineController.text =
-                                DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
-                          }
-                        }
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '截至日期是必须项';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('取消',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: () => Navigator.of(context).pop(null),
-            ),
-            TextButton(
-              child: Text(todo == null ? '添加' : '更改',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  final todoItem = TodoItem(
-                    title: titleController.text,
-                    deadline: deadlineController.text,
-                    // 如果是新的待办事项，生成唯一ID；如果是编辑现有待办事项，保留原有ID
-                    id: todo?.id ??
-                        DateTime.now().millisecondsSinceEpoch.toString(),
-                    isCompleted: todo?.isCompleted ?? false,
-                  );
-                  Navigator.of(context).pop(todoItem);
+    final result = await PlatformDialog.showCustomDialog<TodoItem?>(
+      context,
+      title: '添加待办',
+      content: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: '标题',
+                labelStyle: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return '标题是必须项';
                 }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: deadlineController,
+              decoration: InputDecoration(
+                labelText: '截止日期',
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () async {
+                    final pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2100),
+                    );
+                    if (pickedDate != null && context.mounted) {
+                      final pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (pickedTime != null && context.mounted) {
+                        final dateTime = DateTime(
+                          pickedDate.year,
+                          pickedDate.month,
+                          pickedDate.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
+                        deadlineController.text =
+                            DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+                      }
+                    }
+                  },
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return '截至日期是必须项';
+                }
+                return null;
               },
             ),
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        const PlatformDialogAction<TodoItem?>(
+          label: '取消',
+          value: null,
+        ),
+        PlatformDialogAction<TodoItem?>(
+          label: todo == null ? '添加' : '更改',
+          isDefaultAction: true,
+          autoPop: false,
+          onPressed: () {
+            if (formKey.currentState!.validate()) {
+              final todoItem = TodoItem(
+                title: titleController.text,
+                deadline: deadlineController.text,
+                id: todo?.id ??
+                    DateTime.now().millisecondsSinceEpoch.toString(),
+                isCompleted: todo?.isCompleted ?? false,
+              );
+              Navigator.of(context).pop(todoItem);
+            }
+          },
+        ),
+      ],
     );
 
     // 释放控制器资源

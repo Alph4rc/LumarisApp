@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ios_club_app/ui/components/permission_dialog.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 export 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionStatus;
@@ -129,14 +129,12 @@ class PermissionService {
     String? confirmText,
     String? cancelText,
   }) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) => PermissionDialog.rationale(
-        title: title,
-        content: content,
-        confirmText: confirmText,
-        cancelText: cancelText,
-      ),
+    final result = await PlatformDialog.showConfirmDialog(
+      context,
+      title: title ?? '需要权限',
+      content: content ?? '该功能需要您授予相应权限才能正常使用',
+      confirmText: confirmText ?? '去授权',
+      cancelText: cancelText ?? '取消',
     );
     return result ?? false;
   }
@@ -148,14 +146,12 @@ class PermissionService {
     String? settingsText,
     String? cancelText,
   }) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) => PermissionDialog.settingsRedirect(
-        title: title,
-        content: content,
-        settingsText: settingsText,
-        cancelText: cancelText,
-      ),
+    final result = await PlatformDialog.showConfirmDialog(
+      context,
+      title: title ?? '权限已拒绝',
+      content: content ?? '该权限已被永久拒绝，请前往系统设置手动开启',
+      confirmText: settingsText ?? '去设置',
+      cancelText: cancelText ?? '取消',
     );
     if (result == true) {
       await openAppSettings();

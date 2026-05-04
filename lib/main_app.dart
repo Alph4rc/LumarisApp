@@ -10,6 +10,7 @@ import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
@@ -125,52 +126,38 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   }
 
   void showUpdateDialog(ReleaseModel model) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('有新版本了！'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(model.name),
-              const SizedBox(height: 16),
-              Text(model.body),
-              const SizedBox(height: 16),
-            ],
-          ),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '有新版本了！',
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(model.name),
+            const SizedBox(height: 16),
+            Text(model.body),
+            const SizedBox(height: 16),
+          ],
         ),
-        actions: [
-          Wrap(
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('忽略本次更新'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final prefs = PrefsService.instance;
-                  prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('忽略所有更新'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  UpdateManager.showUpdateWithProgress(context, model.name);
-                },
-                child: const Text('现在就更新'),
-              ),
-            ],
-          )
-        ],
       ),
+      actions: [
+        const PlatformDialogAction<void>(label: '忽略本次更新'),
+        PlatformDialogAction<void>(
+          label: '忽略所有更新',
+          onPressed: () async {
+            final prefs = PrefsService.instance;
+            prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
+          },
+        ),
+        PlatformDialogAction<void>(
+          label: '现在就更新',
+          isDefaultAction: true,
+          onPressed: () async {
+            UpdateManager.showUpdateWithProgress(context, model.name);
+          },
+        ),
+      ],
     );
   }
 

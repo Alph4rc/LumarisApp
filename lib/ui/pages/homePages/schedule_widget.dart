@@ -14,6 +14,7 @@ import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -55,47 +56,45 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
             IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (alertContext) =>
-                          Consumer(builder: (context, ref, child) {
-                            final settings = ref.watch(settingsStoreProvider);
-                            final scheduleStore =
-                                ref.read(scheduleStoreProvider.notifier);
-                            final settingsStore =
-                                ref.read(settingsStoreProvider.notifier);
+                  PlatformDialog.showCustomDialog<void>(
+                    context,
+                    title: '设置',
+                    content: Consumer(builder: (context, ref, child) {
+                      final settings = ref.watch(settingsStoreProvider);
+                      final scheduleStore =
+                          ref.read(scheduleStoreProvider.notifier);
+                      final settingsStore =
+                          ref.read(settingsStoreProvider.notifier);
 
-                            return AlertDialog(
-                                title: const Text('设置'),
-                                content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ClubListTile(
-                                          title: const Text('显示明天的课表'),
-                                          trailing: CupertinoSwitch(
-                                              value: settings.isShowTomorrow,
-                                              onChanged: (value) async {
-                                                await scheduleStore
-                                                    .toggleShowTomorrow();
-                                              })),
-                                      if (PlatformUtils.isIOS ||
-                                          PlatformUtils.isAndroid)
-                                        ClubListTile(
-                                          title: const Text('课程通知'),
-                                          trailing: CupertinoSwitch(
-                                            value: settings.isRemind,
-                                            onChanged: (bool value) async {
-                                              await settingsStore
-                                                  .setIsRemind(value);
-                                              if (value && context.mounted) {
-                                                await NotificationService.set(
-                                                    context);
-                                              }
-                                            },
-                                          ),
-                                        )
-                                    ]));
-                          }));
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClubListTile(
+                            title: const Text('显示明天的课表'),
+                            trailing: CupertinoSwitch(
+                              value: settings.isShowTomorrow,
+                              onChanged: (value) async {
+                                await scheduleStore.toggleShowTomorrow();
+                              },
+                            ),
+                          ),
+                          if (PlatformUtils.isIOS || PlatformUtils.isAndroid)
+                            ClubListTile(
+                              title: const Text('课程通知'),
+                              trailing: CupertinoSwitch(
+                                value: settings.isRemind,
+                                onChanged: (bool value) async {
+                                  await settingsStore.setIsRemind(value);
+                                  if (value && context.mounted) {
+                                    await NotificationService.set(context);
+                                  }
+                                },
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
+                  );
                 })
           ]),
         ),

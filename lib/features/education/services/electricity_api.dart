@@ -119,6 +119,7 @@ class ElectricityApi {
       final response = await EduHttpClientManager.instance.get(
         '/Electricity/Subscriptions',
         queryParameters: <String, dynamic>{'email': email.trim()},
+        bypassCache: true,
       );
 
       if (response is! Map) {

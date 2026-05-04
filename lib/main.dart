@@ -23,6 +23,7 @@ import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -265,36 +266,24 @@ class _WindowPageState extends State<WindowPage>
   void onWindowClose() async {
     if (_isPreventClose && mounted) {
       // 显示退出选项
-      showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: const Text('关闭窗口'),
-            content: const Text('选择您要执行的操作'),
-            actions: [
-              TextButton(
-                child: const Text('取消'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text('最小化到任务栏'),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await windowManager.hide();
-                },
-              ),
-              TextButton(
-                child: const Text('退出程序'),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await _exitApp();
-                },
-              ),
-            ],
-          );
-        },
+      PlatformDialog.showCustomDialog<void>(
+        context,
+        title: '关闭窗口',
+        content: const Text('选择您要执行的操作'),
+        actions: [
+          const PlatformDialogAction<void>(label: '取消'),
+          PlatformDialogAction<void>(
+            label: '最小化到任务栏',
+            onPressed: () async {
+              await windowManager.hide();
+            },
+          ),
+          PlatformDialogAction<void>(
+            label: '退出程序',
+            isDestructiveAction: true,
+            onPressed: _exitApp,
+          ),
+        ],
       );
     }
   }

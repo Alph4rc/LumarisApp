@@ -18,6 +18,7 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
@@ -415,18 +416,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   void _showCreditInfoDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('说明'),
-        content: const Text('这里的学分是按照成绩算出来的，只要没有挂科就OK。教务系统给的一般来说要小于等于这个数'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('确定'),
-          ),
-        ],
-      ),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '说明',
+      content: const Text('这里的学分是按照成绩算出来的，只要没有挂科就OK。教务系统给的一般来说要小于等于这个数'),
+      actions: const [
+        PlatformDialogAction<void>(
+          label: '确定',
+          isDefaultAction: true,
+        ),
+      ],
     );
   }
 
@@ -680,9 +679,9 @@ class _ScorePageState extends ConsumerState<ScorePage>
     final content = _buildScoreDetailsContent(score, isTablet);
 
     if (isTablet) {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => SimpleDialog(children: [content]),
+      await PlatformDialog.showCustomDialog<void>(
+        context,
+        content: content,
       );
     } else {
       await showClubModalBottomSheet(context, content);

@@ -11,6 +11,7 @@ import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -501,63 +502,61 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   void showCalendarGuidanceDialog(BuildContext context) {
     final httpsUrl = 'webcal$url';
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('添加日历订阅'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('您的设备似乎没有应用可以直接处理日历订阅。请按照以下步骤手动添加:'),
-              const SizedBox(height: 16),
-              const Text('1. 打开您的日历应用'),
-              const Text('2. 找到"添加日历"或"订阅"选项'),
-              const Text('3. 选择"通过URL添加"或类似选项'),
-              const Text('4. 粘贴以下链接:'),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: context.clubColors.surfaceRaised,
-                  borderRadius: ClubRadii.xsBorder,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        httpsUrl,
-                        style: const TextStyle(fontFamily: 'monospace'),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.copy),
-                      onPressed: () async {
-                        await Clipboard.setData(ClipboardData(text: httpsUrl));
-                        if (context.mounted) {
-                          showClubSnackBar(
-                            context,
-                            const Text('链接已复制到剪贴板'),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '添加日历订阅',
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('您的设备似乎没有应用可以直接处理日历订阅。请按照以下步骤手动添加:'),
+            const SizedBox(height: 16),
+            const Text('1. 打开您的日历应用'),
+            const Text('2. 找到"添加日历"或"订阅"选项'),
+            const Text('3. 选择"通过URL添加"或类似选项'),
+            const Text('4. 粘贴以下链接:'),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: context.clubColors.surfaceRaised,
+                borderRadius: ClubRadii.xsBorder,
               ),
-              const SizedBox(height: 16),
-              const Text('注意: 不同的日历应用可能有不同的添加步骤。如果您遇到困难，请查阅您的日历应用帮助文档。'),
-            ],
-          ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      httpsUrl,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(text: httpsUrl));
+                      if (context.mounted) {
+                        showClubSnackBar(
+                          context,
+                          const Text('链接已复制到剪贴板'),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('注意: 不同的日历应用可能有不同的添加步骤。如果您遇到困难，请查阅您的日历应用帮助文档。'),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('明白了'),
-          ),
-        ],
       ),
+      actions: const [
+        PlatformDialogAction<void>(
+          label: '明白了',
+          isDefaultAction: true,
+        ),
+      ],
     );
   }
 }

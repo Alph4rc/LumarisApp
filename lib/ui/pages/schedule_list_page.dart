@@ -16,6 +16,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
@@ -519,25 +520,21 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   Future<void> _deleteCustomCourse(CourseModel course) async {
-    final colors = context.clubColors;
-
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除课程"${course.courseName}"吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: colors.danger),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+    final confirm = await PlatformDialog.showCustomDialog<bool>(
+      context,
+      title: '确认删除',
+      content: Text('确定要删除课程"${course.courseName}"吗？'),
+      actions: const [
+        PlatformDialogAction<bool>(
+          label: '取消',
+          value: false,
+        ),
+        PlatformDialogAction<bool>(
+          label: '删除',
+          value: true,
+          isDestructiveAction: true,
+        ),
+      ],
     );
 
     if (confirm == true) {

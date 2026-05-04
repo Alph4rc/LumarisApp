@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 /// 自定义课程管理页面
@@ -132,22 +133,21 @@ class _CustomCourseManagePageState
   }
 
   Future<void> _deleteCourse(CourseModel course) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除课程"${course.courseName}"吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+    final confirm = await PlatformDialog.showCustomDialog<bool>(
+      context,
+      title: '确认删除',
+      content: Text('确定要删除课程"${course.courseName}"吗？'),
+      actions: const [
+        PlatformDialogAction<bool>(
+          label: '取消',
+          value: false,
+        ),
+        PlatformDialogAction<bool>(
+          label: '删除',
+          value: true,
+          isDestructiveAction: true,
+        ),
+      ],
     );
 
     if (confirm == true) {
