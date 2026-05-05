@@ -208,7 +208,6 @@ void requestPermissions() async {
     Permission.notification,
     Permission.backgroundRefresh,
     Permission.storage,
-    Permission.requestInstallPackages,
   ]);
 }
 

@@ -5,9 +5,9 @@ import 'package:ios_club_app/features/education/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -23,7 +23,7 @@ class VersionSetting extends ConsumerStatefulWidget {
 class _VersionSettingState extends ConsumerState<VersionSetting> {
   late bool isNeedUpdate = false;
   late String version = '';
-  late String newVersion = '';
+  ReleaseModel? latestRelease;
   int tapCount = 0;
   DateTime? lastTapTime;
 
@@ -38,7 +38,7 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
           CheckUpdateManager.checkForUpdates().then((res) {
             isNeedUpdate = res.$1;
             if (res.$1) {
-              newVersion = res.$2.name;
+              latestRelease = res.$2;
             }
           });
         }
@@ -99,16 +99,32 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
             if (isNeedUpdate) {
               final result = await PlatformDialog.showConfirmDialog(
                 context,
-                title: '是否更新最新版本: $newVersion',
-                content: '发现新版本可用，是否立即更新？',
-                confirmText: '是的',
+                title: '是否更新最新版本: ${latestRelease?.name ?? ''}',
+                content: '发现新版本可用，将在浏览器中打开下载链接，是否继续？',
+                confirmText: '前往浏览器',
                 cancelText: '不要',
               );
 
               if (result == true) {
-                final a = await AppService.getReleases();
-                if (context.mounted) {
-                  UpdateManager.showUpdateWithProgress(context, a.name);
+                final release = latestRelease;
+                if (release == null) {
+                  return;
+                }
+                try {
+                  await AppService.updateApp(release);
+                  if (context.mounted) {
+                    showClubSnackBar(
+                      context,
+                      const Text('已打开浏览器，请在浏览器中下载安装更新'),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    showClubSnackBar(
+                      context,
+                      Text('打开更新链接失败: $e'),
+                    );
+                  }
                 }
               }
             }

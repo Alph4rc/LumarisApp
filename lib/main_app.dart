@@ -4,22 +4,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
+import 'package:ios_club_app/features/education/services/app_service.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
+import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/platform/android/download_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'bottom_navigation.dart';
+import 'platform/tablet/tablet_navigation.dart';
 import 'platform/macos/macos_ui_sidebar.dart';
 import 'platform/windows/windows_sidebar.dart';
-import 'platform/tablet/tablet_navigation.dart';
-import 'features/education/services/app_service.dart';
-import 'features/system/update/check_update_manager.dart';
 
 class MainApp extends ConsumerStatefulWidget {
   const MainApp({
@@ -151,10 +151,23 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
           },
         ),
         PlatformDialogAction<void>(
-          label: '现在就更新',
+          label: '前往浏览器更新',
           isDefaultAction: true,
           onPressed: () async {
-            UpdateManager.showUpdateWithProgress(context, model.name);
+            try {
+              await AppService.updateApp(model);
+              if (!mounted) return;
+              showClubSnackBar(
+                context,
+                const Text('已打开浏览器，请在浏览器中下载安装更新'),
+              );
+            } catch (e) {
+              if (!mounted) return;
+              showClubSnackBar(
+                context,
+                Text('打开更新链接失败: $e'),
+              );
+            }
           },
         ),
       ],

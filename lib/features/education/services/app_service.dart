@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/release_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 import 'app_api.dart';
@@ -20,10 +17,7 @@ class AppService {
 
       if (releases.isNotEmpty) {
         final reInfo = releases.first;
-        final re = ReleaseModel(
-          name: reInfo.name ?? '0.0.0',
-          body: reInfo.body ?? '',
-        );
+        final re = ReleaseModel.fromReleaseInfo(reInfo);
 
         if (re.body.contains('[强制更新]')) {
           return re;
@@ -32,7 +26,7 @@ class AppService {
         final bool? updateIgnored = prefs.getBool(PrefsKeys.UPDATE_IGNORED);
 
         if (updateIgnored != null && updateIgnored == true) {
-          return ReleaseModel(name: '0.0.0', body: '0.0.0');
+          return const ReleaseModel(name: '0.0.0', body: '0.0.0');
         }
 
         return re;
@@ -43,7 +37,7 @@ class AppService {
       }
     }
 
-    return ReleaseModel(name: '0.0.0', body: '0.0.0');
+    return const ReleaseModel(name: '0.0.0', body: '0.0.0');
   }
 
   static Future<(bool, ReleaseModel)> isNeedUpdate() async {
@@ -72,58 +66,35 @@ class AppService {
     return (resultList.length > currentList.length, result);
   }
 
-  static Future<void> updateApp(String name) async {
+  static String getReleaseDownloadUrl(ReleaseModel release) {
+    final assetUrl = release.downloadUrl?.trim();
+    if (assetUrl != null && assetUrl.isNotEmpty) {
+      return assetUrl;
+    }
+
+    return 'https://gitee.com/luckyfishisdashen/iOSClub.AppMobile/releases/download/${release.name}/app-release.apk';
+  }
+
+  static Future<void> updateApp(ReleaseModel release) async {
     final packageInfo = await PackageInfo.fromPlatform();
-    if (name != packageInfo.version) {
-      final url =
-          'https://gitee.com/luckyfishisdashen/iOSClub.AppMobile/releases/download/$name/app-release.apk';
+    if (release.name != packageInfo.version) {
+      final url = getReleaseDownloadUrl(release);
+      final uri = Uri.parse(url);
 
-      if (await canLaunchUrl(Uri.parse(url))) {
-        final downloadClient = BaseHttpClient(
-          enableCache: false,
-          connectTimeout: const Duration(minutes: 5),
-          receiveTimeout: const Duration(minutes: 5),
-          defaultHeaders: {
-            'Content-Type': 'application/vnd.android.package-archive',
-          },
+      if (await canLaunchUrl(uri)) {
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
         );
+        if (!launched) {
+          throw '无法在浏览器中打开更新链接';
+        }
 
-        try {
-          final bytes = await downloadClient.downloadBytes(url);
-
-          if (bytes.isNotEmpty) {
-            // 获取应用缓存目录
-            final directory = await getTemporaryDirectory();
-            final filePath = '${directory.path}/app-release.apk';
-
-            // 保存文件到本地
-            final file = File(filePath);
-            if (file.existsSync()) {
-              await file.delete();
-            } else {
-              await file.create();
-            }
-            await file.writeAsBytes(bytes);
-
-            try {
-              await OpenFile.open(filePath);
-            } catch (e) {
-              if (kDebugMode) {
-                AppLogger.debug('无法打开APK: $e');
-              }
-            }
-
-            if (kDebugMode) {
-              AppLogger.debug('APK下载成功: $filePath');
-            }
-          } else {
-            throw '下载失败，文件为空';
-          }
-        } finally {
-          downloadClient.dispose();
+        if (kDebugMode) {
+          AppLogger.debug('已在浏览器中打开更新链接: $url');
         }
       } else {
-        throw '无法下载';
+        throw '无法打开更新链接';
       }
     }
   }
@@ -132,16 +103,33 @@ class AppService {
 class ReleaseModel {
   final String name;
   final String body;
+  final String? downloadUrl;
 
-  ReleaseModel({
+  const ReleaseModel({
     required this.name,
     required this.body,
+    this.downloadUrl,
   });
+
+  factory ReleaseModel.fromReleaseInfo(ReleaseInfo releaseInfo) {
+    return ReleaseModel(
+      name: releaseInfo.name ?? '0.0.0',
+      body: releaseInfo.body ?? '',
+      downloadUrl: releaseInfo.assets
+          ?.map((asset) => asset.browserDownloadUrl?.trim())
+          .whereType<String>()
+          .firstWhere(
+            (url) => url.isNotEmpty && url.toLowerCase().contains('apk'),
+            orElse: () => '',
+          ),
+    );
+  }
 
   factory ReleaseModel.fromJson(Map<String, dynamic> json) {
     return ReleaseModel(
       name: json['name'],
       body: json['body'],
+      downloadUrl: json['downloadUrl'],
     );
   }
 }
