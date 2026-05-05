@@ -60,7 +60,7 @@ void main() {
 
     test('direct wrapper methods should throw NetworkException', () async {
       final calls = <Future<dynamic> Function()>[
-        () => AppApi.getAppInfo(token: 'x'),
+        () => AppApi.getAppInfo(),
         () => BusApi.getBus(dayDate: '2026-03-02'),
         () => BusApi.getBusNewData('0830', loc: 'ALL'),
         () => BusApi.getBusOldData('0830', isShow: true),

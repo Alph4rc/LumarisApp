@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
@@ -62,6 +63,56 @@ void main() {
   });
 
   group('education API success paths', () {
+    test('AppApi.getAppInfo should parse dynamic nested map releases',
+        () async {
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path != '/App/GetTag') {
+              handler.next(options);
+              return;
+            }
+
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <dynamic>[
+                  Map<dynamic, dynamic>.from({
+                    'id': 1,
+                    'tag_name': 'v1.2.3',
+                    'name': 'Release 1',
+                    'body': 'Notes',
+                    'author': Map<dynamic, dynamic>.from({
+                      'id': 10,
+                      'name': 'Alice',
+                    }),
+                    'created_at': '2026-05-06T00:00:00Z',
+                    'assets': <dynamic>[
+                      Map<dynamic, dynamic>.from({
+                        'browser_download_url':
+                            'https://downloads.example.com/app.apk',
+                        'name': 'app-release.apk',
+                      }),
+                    ],
+                  }),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      final releases = await AppApi.getAppInfo();
+
+      expect(releases, hasLength(1));
+      expect(releases.single.author?.name, 'Alice');
+      expect(
+        releases.single.assets?.single.browserDownloadUrl,
+        'https://downloads.example.com/app.apk',
+      );
+    });
+
     test('refresh-aware APIs should mark requests as bypassing cache',
         () async {
       final seenPaths = <String>{};

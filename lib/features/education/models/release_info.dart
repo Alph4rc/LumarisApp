@@ -29,7 +29,7 @@ class ReleaseInfo {
   });
 
   factory ReleaseInfo.fromJson(Map<String, dynamic> json) =>
-      _$ReleaseInfoFromJson(json);
+      _$ReleaseInfoFromJson(_normalizeJsonMap(json));
 
   Map<String, dynamic> toJson() => _$ReleaseInfoToJson(this);
 }
@@ -66,4 +66,23 @@ class AssetInfo {
       _$AssetInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$AssetInfoToJson(this);
+}
+
+Map<String, dynamic> _normalizeJsonMap(Map<dynamic, dynamic> json) {
+  return json.map(
+    (key, value) => MapEntry<String, dynamic>(
+      key.toString(),
+      _normalizeJsonValue(value),
+    ),
+  );
+}
+
+dynamic _normalizeJsonValue(dynamic value) {
+  if (value is Map) {
+    return _normalizeJsonMap(value);
+  }
+  if (value is List) {
+    return value.map(_normalizeJsonValue).toList();
+  }
+  return value;
 }

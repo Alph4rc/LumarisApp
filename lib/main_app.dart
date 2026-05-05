@@ -51,10 +51,8 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     AppRouter.router.routerDelegate.addListener(_syncNavigationState);
 
     if (PlatformUtils.isAndroid) {
-      CheckUpdateManager.checkForUpdates().then((result) async {
-        if (result.$1) {
-          showUpdateDialog(result.$2);
-        }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkForUpdatesOnStartup();
       });
     }
 
@@ -125,9 +123,49 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     );
   }
 
-  void showUpdateDialog(ReleaseModel model) {
+  Future<void> _checkForUpdatesOnStartup() async {
+    final result = await CheckUpdateManager.checkForUpdates();
+    if (!mounted || !result.$1) {
+      return;
+    }
+
+    final navigatorReady = await _waitForNavigatorContext();
+    if (navigatorReady == null || !mounted) {
+      return;
+    }
+
+    _showUpdateDialog(result.$2);
+  }
+
+  Future<BuildContext?> _waitForNavigatorContext() async {
+    for (var attempt = 0; attempt < 10; attempt++) {
+      if (!mounted) {
+        return null;
+      }
+
+      final navigatorContext = AppRouter.rootNavigatorKey.currentContext;
+      if (navigatorContext != null) {
+        return navigatorContext;
+      }
+
+      await Future<void>.delayed(const Duration(milliseconds: 16));
+    }
+
+    return null;
+  }
+
+  BuildContext? _currentNavigatorContext() {
+    return AppRouter.rootNavigatorKey.currentContext;
+  }
+
+  void _showUpdateDialog(ReleaseModel model) {
+    final navigatorContext = _currentNavigatorContext();
+    if (navigatorContext == null) {
+      return;
+    }
+
     PlatformDialog.showCustomDialog<void>(
-      context,
+      navigatorContext,
       title: '有新版本了！',
       content: SingleChildScrollView(
         child: Column(
@@ -156,15 +194,25 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
           onPressed: () async {
             try {
               await AppService.updateApp(model);
-              if (!mounted) return;
+              final currentNavigatorContext = _currentNavigatorContext();
+              if (!mounted ||
+                  currentNavigatorContext == null ||
+                  !currentNavigatorContext.mounted) {
+                return;
+              }
               showClubSnackBar(
-                context,
+                currentNavigatorContext,
                 const Text('已打开浏览器，请在浏览器中下载安装更新'),
               );
             } catch (e) {
-              if (!mounted) return;
+              final currentNavigatorContext = _currentNavigatorContext();
+              if (!mounted ||
+                  currentNavigatorContext == null ||
+                  !currentNavigatorContext.mounted) {
+                return;
+              }
               showClubSnackBar(
-                context,
+                currentNavigatorContext,
                 Text('打开更新链接失败: $e'),
               );
             }
