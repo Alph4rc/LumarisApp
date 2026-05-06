@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:latlong2/latlong.dart';
 import 'map_state.dart';
 
@@ -33,33 +35,59 @@ class MapNotifier extends Notifier<MapState> {
   }
 
   Future<void> checkLocationPermission() async {
+    if (state.isLoadingLocation) return; // Prevent concurrent requests
+    
     state = state.copyWith(isLoadingLocation: true);
+    AppLogger.debug('MapNotifier: Starting location check...');
 
     try {
-      // macOS location permission check via permission_handler might be tricky,
-      // but geolocator's requestPermission is generally more reliable across platforms.
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+      // 1. Explicitly request permission using our PermissionService
+      // This is more robust on Android as it uses permission_handler
+      final status = await PermissionService.request(Permission.location);
+      AppLogger.debug('MapNotifier: Permission status: $status');
+
+      if (status != PermissionStatus.granted &&
+          status != PermissionStatus.limited &&
+          status != PermissionStatus.provisional) {
+        state = state.copyWith(isLoadingLocation: false);
+        return;
       }
 
-      if (permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse) {
-        final position = await Geolocator.getCurrentPosition(
+      // 2. Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      AppLogger.debug('MapNotifier: GPS service enabled: $serviceEnabled');
+      if (!serviceEnabled) {
+        state = state.copyWith(isLoadingLocation: false);
+        return;
+      }
+
+      // 3. Get position
+      AppLogger.debug('MapNotifier: Attempting to get last known position...');
+      Position? position = await Geolocator.getLastKnownPosition();
+
+      if (position != null) {
+        AppLogger.debug('MapNotifier: Using last known position');
+      } else {
+        AppLogger.debug('MapNotifier: Last known position unavailable, requesting current position...');
+        position = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.bestForNavigation,
+            accuracy: LocationAccuracy.medium, // Use medium accuracy for faster results
+            timeLimit: Duration(seconds: 8), 
           ),
         );
-        final gcj02Location =
-            _wgs84ToGcj02(position.latitude, position.longitude);
-        state = state.copyWith(
-          currentLocation: gcj02Location,
-          isLoadingLocation: false,
-        );
-      } else {
-        state = state.copyWith(isLoadingLocation: false);
       }
+
+      AppLogger.debug('MapNotifier: Position received: ${position.latitude}, ${position.longitude}');
+
+      final gcj02Location =
+          _wgs84ToGcj02(position.latitude, position.longitude);
+      state = state.copyWith(
+        currentLocation: gcj02Location,
+        isLoadingLocation: false,
+      );
+      AppLogger.debug('MapNotifier: State updated with location');
     } catch (e) {
+      AppLogger.error('MapNotifier: Error during location check: $e');
       state = state.copyWith(isLoadingLocation: false);
     }
   }
