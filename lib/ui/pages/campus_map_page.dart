@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -17,12 +18,15 @@ class CampusMapPage extends ConsumerStatefulWidget {
 
 class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   late final MapController _mapController;
+  CampusPOI? _selectedPOI;
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
+  bool _isSidebarOpen = true;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-    // 初始执行定位请求
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(mapNotifierProvider.notifier).checkLocationPermission();
     });
@@ -31,230 +35,694 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   @override
   void dispose() {
     _mapController.dispose();
+    _sheetController.dispose();
     super.dispose();
   }
 
-  void _moveToLocation(LatLng loc) {
-    _mapController.move(loc, 17.5);
+  void _moveToLocation(LatLng loc, {double zoom = 17.5}) {
+    _mapController.move(loc, zoom);
+    HapticFeedback.lightImpact();
+  }
+
+  void _onPOITap(CampusPOI poi) {
+    setState(() {
+      _selectedPOI = poi;
+    });
+    _moveToLocation(poi.position);
+    _sheetController.animateTo(
+      0.35,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarOpen = !_isSidebarOpen;
+    });
+    HapticFeedback.mediumImpact();
   }
 
   @override
   Widget build(BuildContext context) {
     final mapState = ref.watch(mapNotifierProvider);
     final clubColors = context.clubColors;
+    final padding = MediaQuery.of(context).padding;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          // 1. 底层：FlutterMap 渲染高德地图
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              // 默认视角对准校园
-              initialCenter: mapState.campusPOIs.isNotEmpty
-                  ? mapState.campusPOIs.first.position
-                  : const LatLng(34.2312, 108.9632), // 西建大坐标兜底
-              initialZoom: 16.0,
-              maxZoom: 19.0,
-            ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 700;
+          final effectiveSidebarOpen = isWide && _isSidebarOpen;
+
+          return Stack(
             children: [
-              // 高德底图瓦片层
-              TileLayer(
-                urlTemplate:
-                    'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
-                subdomains: const ['1', '2', '3', '4'],
-                maxZoom: 19,
-              ),
-              // 地标及当前定位图层
-              MarkerLayer(
-                markers: [
-                  // 渲染校园建筑标识
-                  ...mapState.campusPOIs.map((poi) => Marker(
-                        point: poi.position,
-                        width: 120,
-                        height: 50,
-                        child: _buildPOIMarker(poi, clubColors),
-                      )),
-                  // 渲染我的位置
-                  if (mapState.currentLocation != null)
-                    Marker(
-                      point: mapState.currentLocation!,
-                      width: 50,
-                      height: 50,
-                      child: _buildMyLocationMarker(clubColors),
-                    )
+              // 1. Map Layer (Now always full screen)
+              FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  initialCenter: mapState.campusPOIs.isNotEmpty
+                      ? mapState.campusPOIs.first.position
+                      : const LatLng(34.2312, 108.9632),
+                  initialZoom: 16.0,
+                  maxZoom: 19.0,
+                  onTap: (_, __) {
+                    setState(() => _selectedPOI = null);
+                    _sheetController.animateTo(
+                      0.0,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+                    subdomains: const ['1', '2', '3', '4'],
+                    maxZoom: 19,
+                  ),
+                  MarkerLayer(
+                    markers: [
+                      ...mapState.campusPOIs.map((poi) => Marker(
+                            point: poi.position,
+                            width: 120,
+                            height: 60,
+                            child: GestureDetector(
+                              onTap: () => _onPOITap(poi),
+                              child: _buildPOIMarker(
+                                  poi, clubColors, _selectedPOI == poi),
+                            ),
+                          )),
+                      if (mapState.currentLocation != null)
+                        Marker(
+                          point: mapState.currentLocation!,
+                          width: 60,
+                          height: 60,
+                          child: _buildMyLocationMarker(clubColors),
+                        )
+                    ],
+                  ),
                 ],
               ),
+
+              // 2. Search & Categories Panel (Top - Mobile Only)
+              if (!isWide)
+                Positioned(
+                  top: padding.top + 12,
+                  left: 16,
+                  right: 16,
+                  child: _buildFloatingTopPanel(mapState, clubColors),
+                ),
+
+              // 3. Wide Screen Sidebar (Animated Floating)
+              if (isWide)
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOutCubic,
+                  top: padding.top + 20,
+                  left: effectiveSidebarOpen ? 20 : -320,
+                  bottom: 20,
+                  width: 320,
+                  child: _buildSidebar(mapState, clubColors),
+                ),
+
+              // 4. Sidebar Toggle Button (Wide Screen Only - Adjust position based on sidebar)
+              if (isWide)
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOutCubic,
+                  top: padding.top + 20,
+                  left: effectiveSidebarOpen ? 350 : 20,
+                  child: _buildSidebarToggle(clubColors),
+                ),
+
+              // 5. Map Controls (Right)
+              Positioned(
+                bottom: isWide ? 40 : 120,
+                right: 16,
+                child: _buildMapControls(mapState, clubColors),
+              ),
+
+              // 6. Bottom Sheet (Mobile)
+              if (!isWide) _buildPOIBottomSheet(clubColors),
             ],
-          ),
+          );
+        },
+      ),
+    );
+  }
 
-          // 2. 顶层：毛玻璃导航面板
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
-            left: 16,
-            right: 16,
-            child: _buildFrostedGlassDashboard(mapState, clubColors),
-          ),
-
-          // 3. 定位按钮
-          Positioned(
-            bottom: 48,
-            right: 16,
-            child: FloatingActionButton(
-              backgroundColor: clubColors.cardBackground.withValues(alpha: 0.8),
-              elevation: 4,
-              shape: const CircleBorder(),
-              onPressed: () {
-                if (mapState.currentLocation != null) {
-                  _moveToLocation(mapState.currentLocation!);
-                } else {
-                  ref
-                      .read(mapNotifierProvider.notifier)
-                      .checkLocationPermission();
-                }
-              },
-              child: mapState.isLoadingLocation
-                  ? SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: clubColors.primary,
-                      ))
-                  : Icon(Icons.my_location, color: clubColors.primary),
+  Widget _buildSidebarToggle(ClubColors colors) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.cardOverlay,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: colors.separator.withValues(alpha: 0.2),
+          width: 0.5,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: IconButton(
+            icon: Icon(
+              _isSidebarOpen
+                  ? Icons.chevron_left_rounded
+                  : Icons.menu_open_rounded,
+              color: colors.label,
             ),
+            onPressed: _toggleSidebar,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPOIMarker(CampusPOI poi, ClubColors colors, bool isSelected) {
+    return AnimatedScale(
+      scale: isSelected ? 1.2 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: isSelected ? colors.primary : colors.cardBackground,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.shadowColor.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                )
+              ],
+              border: Border.all(
+                color: isSelected
+                    ? Colors.white
+                    : colors.separator.withValues(alpha: 0.2),
+                width: 1.5,
+              ),
+            ),
+            child: Text(
+              poi.name,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? Colors.white : colors.label,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Icon(
+            Icons.location_on_rounded,
+            color: isSelected
+                ? colors.primary
+                : colors.primary.withValues(alpha: 0.7),
+            size: 24,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPOIMarker(CampusPOI poi, ClubColors colors) {
-    return Column(
+  Widget _buildMyLocationMarker(ClubColors colors) {
+    return Stack(
+      alignment: Alignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          width: 24,
+          height: 24,
           decoration: BoxDecoration(
-            color: colors.cardBackground,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadowColor,
-                blurRadius: 4,
-              )
-            ],
-            border: Border.all(
-              color: colors.separator.withValues(alpha: 0.1),
-              width: 0.5,
-            ),
+            color: colors.primary.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
           ),
-          child: Text(
-            poi.name,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: colors.primary,
+        ),
+        Container(
+          width: 14,
+          height: 14,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: colors.primary,
+                shape: BoxShape.circle,
+              ),
             ),
           ),
         ),
-        Icon(Icons.location_on, color: colors.primary, size: 22),
       ],
     );
   }
 
-  Widget _buildMyLocationMarker(ClubColors colors) {
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.primary.withValues(alpha: 0.2),
-        shape: BoxShape.circle,
-        border: Border.all(color: colors.primary, width: 2),
-      ),
-      child: Center(
-        child: Icon(Icons.circle, color: colors.primary, size: 16),
+  Widget _buildFloatingTopPanel(MapState mapState, ClubColors colors) {
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: ClubRadii.card,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 54,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: colors.cardOverlay,
+                borderRadius: ClubRadii.card,
+                border: Border.all(
+                  color: colors.separator.withValues(alpha: 0.2),
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search_rounded, color: colors.secondaryLabel),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '搜索地点或建筑...',
+                      style: TextStyle(
+                        color: colors.secondaryLabel,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: colors.primarySoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.map_rounded,
+                        color: colors.primary, size: 20),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: mapState.campusPOIs.map((poi) {
+              final isSelected = _selectedPOI == poi;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(poi.name),
+                  selected: isSelected,
+                  onSelected: (_) => _onPOITap(poi),
+                  backgroundColor: colors.cardOverlay,
+                  selectedColor: colors.primarySoft,
+                  labelStyle: TextStyle(
+                    color: isSelected ? colors.primary : colors.label,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    side: BorderSide(
+                      color: isSelected
+                          ? colors.primary
+                          : colors.separator.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                  ),
+                  showCheckmark: false,
+                  elevation: 0,
+                  pressElevation: 0,
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMapControls(MapState mapState, ClubColors colors) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Zoom Controls
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              width: 44,
+              decoration: BoxDecoration(
+                color: colors.cardOverlay,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: colors.separator.withValues(alpha: 0.2),
+                  width: 0.5,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildControlItem(
+                    icon: Icons.add_rounded,
+                    onTap: () => _mapController.move(
+                        _mapController.camera.center,
+                        _mapController.camera.zoom + 1),
+                    colors: colors,
+                  ),
+                  Divider(
+                      height: 1,
+                      color: colors.separator.withValues(alpha: 0.1)),
+                  _buildControlItem(
+                    icon: Icons.remove_rounded,
+                    onTap: () => _mapController.move(
+                        _mapController.camera.center,
+                        _mapController.camera.zoom - 1),
+                    colors: colors,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Location Control
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: colors.cardOverlay,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: colors.separator.withValues(alpha: 0.2),
+                  width: 0.5,
+                ),
+              ),
+              child: _buildControlItem(
+                icon: mapState.isLoadingLocation
+                    ? Icons.hourglass_empty_rounded
+                    : Icons.my_location_rounded,
+                onTap: () {
+                  if (mapState.currentLocation != null) {
+                    _moveToLocation(mapState.currentLocation!);
+                  } else {
+                    ref
+                        .read(mapNotifierProvider.notifier)
+                        .checkLocationPermission();
+                  }
+                },
+                colors: colors,
+                iconColor: mapState.currentLocation != null
+                    ? colors.primary
+                    : colors.label,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildControlItem({
+    required IconData icon,
+    required VoidCallback onTap,
+    required ClubColors colors,
+    Color? iconColor,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(
+            icon,
+            color: iconColor ?? colors.label,
+            size: 22,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildFrostedGlassDashboard(MapState mapState, ClubColors colors) {
+  Widget _buildSidebar(MapState mapState, ClubColors colors) {
     return ClipRRect(
       borderRadius: ClubRadii.card,
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: colors.cardOverlay,
+            color: colors.cardOverlay.withValues(alpha: 0.7),
             borderRadius: ClubRadii.card,
             border: Border.all(
-              color: colors.separator.withValues(alpha: 0.2),
-              width: 1.5,
+              color: colors.separator.withValues(alpha: 0.15),
+              width: 0.8,
             ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '建大地图',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                        color: colors.label,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '草堂校区 / 雁塔校区',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: colors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Divider(
+                    height: 1, color: colors.separator.withValues(alpha: 0.2)),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  itemCount: mapState.campusPOIs.length,
+                  separatorBuilder: (_, __) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Divider(
+                        height: 1,
+                        color: colors.separator.withValues(alpha: 0.1)),
+                  ),
+                  itemBuilder: (context, index) {
+                    final poi = mapState.campusPOIs[index];
+                    final isSelected = _selectedPOI == poi;
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 4),
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? colors.primary
+                              : colors.primarySoft.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.location_on_rounded,
+                          color: isSelected ? Colors.white : colors.primary,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        poi.name,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w600,
+                          color: isSelected ? colors.primary : colors.label,
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          poi.description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 13, color: colors.secondaryLabel),
+                        ),
+                      ),
+                      onTap: () => _onPOITap(poi),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPOIBottomSheet(ClubColors colors) {
+    return DraggableScrollableSheet(
+      controller: _sheetController,
+      initialChildSize: 0,
+      minChildSize: 0,
+      maxChildSize: 0.6,
+      snap: true,
+      builder: (context, scrollController) {
+        if (_selectedPOI == null) return const SizedBox.shrink();
+
+        return Container(
+          decoration: BoxDecoration(
+            color: colors.cardBackground,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: colors.shadowColor,
+                color: colors.shadowColor.withValues(alpha: 0.1),
                 blurRadius: 10,
                 spreadRadius: 2,
               )
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colors.primarySoft,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.map_rounded, color: colors.primary),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: colors.separator.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '建大地图',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                      color: colors.label,
-                    ),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  children: mapState.campusPOIs.map((poi) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: ActionChip(
-                        elevation: 0,
-                        backgroundColor: colors.surfaceRaised,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide.none,
-                        ),
-                        label: Text(
-                          poi.name,
+              const SizedBox(height: 24),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _selectedPOI!.name,
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                             color: colors.label,
                           ),
                         ),
-                        onPressed: () => _moveToLocation(poi.position),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              )
+                        const SizedBox(height: 6),
+                        Text(
+                          '西安建筑科技大学',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: colors.secondaryLabel,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.directions_rounded,
+                        color: Colors.white),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _buildInfoSection(
+                title: '建筑介绍',
+                content: _selectedPOI!.description,
+                icon: Icons.info_outline_rounded,
+                colors: colors,
+              ),
+              const SizedBox(height: 16),
+              _buildInfoSection(
+                title: '具体位置',
+                content:
+                    '${_selectedPOI!.position.latitude.toStringAsFixed(6)}, ${_selectedPOI!.position.longitude.toStringAsFixed(6)}',
+                icon: Icons.map_outlined,
+                colors: colors,
+              ),
             ],
           ),
-        ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoSection({
+    required String title,
+    required String content,
+    required IconData icon,
+    required ClubColors colors,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: colors.secondaryLabel),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: colors.secondaryLabel,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.5,
+              color: colors.label,
+            ),
+          ),
+        ],
       ),
     );
   }
