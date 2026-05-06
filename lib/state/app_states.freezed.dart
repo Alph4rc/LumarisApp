@@ -22,6 +22,7 @@ mixin _$SettingsState {
   int get pageIndex => throw _privateConstructorUsedError;
   bool get enableHapticFeedback => throw _privateConstructorUsedError;
   bool get updateIgnored => throw _privateConstructorUsedError;
+  bool get updateBetaEnabled => throw _privateConstructorUsedError;
   String get fontFamily => throw _privateConstructorUsedError;
   bool get showCourseGrid => throw _privateConstructorUsedError;
   bool get todoRemindEnabled => throw _privateConstructorUsedError;
@@ -50,6 +51,7 @@ abstract class $SettingsStateCopyWith<$Res> {
       int pageIndex,
       bool enableHapticFeedback,
       bool updateIgnored,
+      bool updateBetaEnabled,
       String fontFamily,
       bool showCourseGrid,
       bool todoRemindEnabled,
@@ -80,6 +82,7 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
     Object? pageIndex = null,
     Object? enableHapticFeedback = null,
     Object? updateIgnored = null,
+    Object? updateBetaEnabled = null,
     Object? fontFamily = null,
     Object? showCourseGrid = null,
     Object? todoRemindEnabled = null,
@@ -114,6 +117,10 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
       updateIgnored: null == updateIgnored
           ? _value.updateIgnored
           : updateIgnored // ignore: cast_nullable_to_non_nullable
+              as bool,
+      updateBetaEnabled: null == updateBetaEnabled
+          ? _value.updateBetaEnabled
+          : updateBetaEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
       fontFamily: null == fontFamily
           ? _value.fontFamily
@@ -170,6 +177,7 @@ abstract class _$$SettingsStateImplCopyWith<$Res>
       int pageIndex,
       bool enableHapticFeedback,
       bool updateIgnored,
+      bool updateBetaEnabled,
       String fontFamily,
       bool showCourseGrid,
       bool todoRemindEnabled,
@@ -198,6 +206,7 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
     Object? pageIndex = null,
     Object? enableHapticFeedback = null,
     Object? updateIgnored = null,
+    Object? updateBetaEnabled = null,
     Object? fontFamily = null,
     Object? showCourseGrid = null,
     Object? todoRemindEnabled = null,
@@ -232,6 +241,10 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
       updateIgnored: null == updateIgnored
           ? _value.updateIgnored
           : updateIgnored // ignore: cast_nullable_to_non_nullable
+              as bool,
+      updateBetaEnabled: null == updateBetaEnabled
+          ? _value.updateBetaEnabled
+          : updateBetaEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
       fontFamily: null == fontFamily
           ? _value.fontFamily
@@ -283,6 +296,7 @@ class _$SettingsStateImpl implements _SettingsState {
       this.pageIndex = 0,
       this.enableHapticFeedback = false,
       this.updateIgnored = false,
+      this.updateBetaEnabled = false,
       this.fontFamily = '',
       this.showCourseGrid = false,
       this.todoRemindEnabled = false,
@@ -313,6 +327,9 @@ class _$SettingsStateImpl implements _SettingsState {
   final bool updateIgnored;
   @override
   @JsonKey()
+  final bool updateBetaEnabled;
+  @override
+  @JsonKey()
   final String fontFamily;
   @override
   @JsonKey()
@@ -340,7 +357,7 @@ class _$SettingsStateImpl implements _SettingsState {
 
   @override
   String toString() {
-    return 'SettingsState(isRemind: $isRemind, remindTime: $remindTime, isShowTomorrow: $isShowTomorrow, pageIndex: $pageIndex, enableHapticFeedback: $enableHapticFeedback, updateIgnored: $updateIgnored, fontFamily: $fontFamily, showCourseGrid: $showCourseGrid, todoRemindEnabled: $todoRemindEnabled, themeMode: $themeMode, scheduleBackground: $scheduleBackground, customBackgroundImage: $customBackgroundImage, customBackgroundIsDark: $customBackgroundIsDark, schoolId: $schoolId, hasAcceptedAgreement: $hasAcceptedAgreement)';
+    return 'SettingsState(isRemind: $isRemind, remindTime: $remindTime, isShowTomorrow: $isShowTomorrow, pageIndex: $pageIndex, enableHapticFeedback: $enableHapticFeedback, updateIgnored: $updateIgnored, updateBetaEnabled: $updateBetaEnabled, fontFamily: $fontFamily, showCourseGrid: $showCourseGrid, todoRemindEnabled: $todoRemindEnabled, themeMode: $themeMode, scheduleBackground: $scheduleBackground, customBackgroundImage: $customBackgroundImage, customBackgroundIsDark: $customBackgroundIsDark, schoolId: $schoolId, hasAcceptedAgreement: $hasAcceptedAgreement)';
   }
 
   @override
@@ -360,6 +377,8 @@ class _$SettingsStateImpl implements _SettingsState {
                 other.enableHapticFeedback == enableHapticFeedback) &&
             (identical(other.updateIgnored, updateIgnored) ||
                 other.updateIgnored == updateIgnored) &&
+            (identical(other.updateBetaEnabled, updateBetaEnabled) ||
+                other.updateBetaEnabled == updateBetaEnabled) &&
             (identical(other.fontFamily, fontFamily) ||
                 other.fontFamily == fontFamily) &&
             (identical(other.showCourseGrid, showCourseGrid) ||
@@ -389,6 +408,7 @@ class _$SettingsStateImpl implements _SettingsState {
       pageIndex,
       enableHapticFeedback,
       updateIgnored,
+      updateBetaEnabled,
       fontFamily,
       showCourseGrid,
       todoRemindEnabled,
@@ -414,6 +434,7 @@ abstract class _SettingsState implements SettingsState {
       final int pageIndex,
       final bool enableHapticFeedback,
       final bool updateIgnored,
+      final bool updateBetaEnabled,
       final String fontFamily,
       final bool showCourseGrid,
       final bool todoRemindEnabled,
@@ -436,6 +457,8 @@ abstract class _SettingsState implements SettingsState {
   bool get enableHapticFeedback;
   @override
   bool get updateIgnored;
+  @override
+  bool get updateBetaEnabled;
   @override
   String get fontFamily;
   @override

@@ -26,6 +26,7 @@ class SettingsStore extends Notifier<SettingsState> {
   int get pageIndex => state.pageIndex;
   bool get enableHapticFeedback => state.enableHapticFeedback;
   bool get updateIgnored => state.updateIgnored;
+  bool get updateBetaEnabled => state.updateBetaEnabled;
   String get fontFamily => state.fontFamily;
   bool get showCourseGrid => state.showCourseGrid;
   bool get todoRemindEnabled => state.todoRemindEnabled;
@@ -52,6 +53,7 @@ class SettingsStore extends Notifier<SettingsState> {
       enableHapticFeedback:
           prefs.getBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK) ?? false,
       updateIgnored: prefs.getBool(PrefsKeys.UPDATE_IGNORED) ?? false,
+      updateBetaEnabled: prefs.getBool(PrefsKeys.UPDATE_BETA_ENABLED) ?? false,
       fontFamily: prefs.getString(PrefsKeys.FONT_FAMILY) ?? '',
       showCourseGrid: prefs.getBool(PrefsKeys.SHOW_COURSE_GRID) ?? false,
       todoRemindEnabled: prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED) ?? false,
@@ -112,6 +114,11 @@ class SettingsStore extends Notifier<SettingsState> {
   Future<void> setUpdateIgnored(bool value) async {
     state = state.copyWith(updateIgnored: value);
     await PrefsService.instance.setBool(PrefsKeys.UPDATE_IGNORED, value);
+  }
+
+  Future<void> setUpdateBetaEnabled(bool value) async {
+    state = state.copyWith(updateBetaEnabled: value);
+    await PrefsService.instance.setBool(PrefsKeys.UPDATE_BETA_ENABLED, value);
   }
 
   Future<void> setFontFamily(String value) async {
