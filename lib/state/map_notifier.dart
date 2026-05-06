@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:latlong2/latlong.dart';
 import 'map_state.dart';
 
@@ -41,19 +42,21 @@ class MapNotifier extends Notifier<MapState> {
     AppLogger.debug('MapNotifier: Starting location check...');
 
     try {
-      // 1. Explicitly request permission using our PermissionService
-      // This is more robust on Android as it uses permission_handler
-      final status = await PermissionService.request(Permission.location);
-      AppLogger.debug('MapNotifier: Permission status: $status');
+      // On macOS, permission_handler doesn't handle location permissions
+      // properly — geolocator manages its own CoreLocation permission flow.
+      if (!PlatformUtils.isMacOS) {
+        final status = await PermissionService.request(Permission.location);
+        AppLogger.debug('MapNotifier: Permission status: $status');
 
-      if (status != PermissionStatus.granted &&
-          status != PermissionStatus.limited &&
-          status != PermissionStatus.provisional) {
-        state = state.copyWith(isLoadingLocation: false);
-        return;
+        if (status != PermissionStatus.granted &&
+            status != PermissionStatus.limited &&
+            status != PermissionStatus.provisional) {
+          state = state.copyWith(isLoadingLocation: false);
+          return;
+        }
       }
 
-      // 2. Check if location services are enabled
+      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       AppLogger.debug('MapNotifier: GPS service enabled: $serviceEnabled');
       if (!serviceEnabled) {
