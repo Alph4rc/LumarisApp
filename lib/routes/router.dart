@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ios_club_app/ui/pages/campus_map_page.dart';
 
 import '../under_maintenance_screen.dart';
 import '../ui/pages/agreement_page.dart';
@@ -49,6 +50,7 @@ class AppRoutes {
   static const privacyPolicy = '/PrivacyPolicy';
   static const userAgreement = '/UserAgreement';
   static const author = '/Author';
+  static const campusMap = '/CampusMap';
 }
 
 class AppRouter {
@@ -145,6 +147,8 @@ class AppRouter {
         path: AppRoutes.author,
         builder: (context, state) => const AuthorPage(),
       ),
+      GoRoute(path: AppRoutes.campusMap,
+      builder: (context, state) => const CampusMapPage())
     ],
     errorBuilder: (context, state) => const UnderMaintenanceScreen(),
   );

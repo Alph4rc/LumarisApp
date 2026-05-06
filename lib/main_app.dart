@@ -258,6 +258,11 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
       selectedIcon: (CupertinoIcons.money_dollar_circle_fill),
       label: '饭卡',
     ),
+    SidebarDestination(
+      icon: (CupertinoIcons.map),
+      selectedIcon: (CupertinoIcons.map_fill),
+      label: '地图',
+    ),
   ];
 
   static const Map<int, String> _routeMap = {
@@ -268,6 +273,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     4: AppRoutes.electricity,
     5: AppRoutes.schoolBus,
     6: AppRoutes.payment,
+    7: AppRoutes.campusMap,
   };
 
   void _syncNavigationState() {
