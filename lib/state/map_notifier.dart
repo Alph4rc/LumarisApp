@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ios_club_app/core/services/permission_service.dart';
 import 'map_state.dart';
 
 class MapNotifier extends Notifier<MapState> {
@@ -13,17 +12,17 @@ class MapNotifier extends Notifier<MapState> {
         CampusPOI(
           name: '主图书馆',
           description: '24小时开放自习室',
-          position: LatLng(39.993203, 116.327096),
+          position: LatLng(34.232230, 108.964230),
         ),
         CampusPOI(
-          name: '第一教学楼',
-          description: '理科及多媒体教室',
-          position: LatLng(39.992520, 116.325881),
+          name: '草堂校区北门',
+          description: '学校主入口',
+          position: LatLng(34.053678, 108.775890),
         ),
         CampusPOI(
-          name: '学生食堂',
-          description: '风味餐厅与咖啡厅',
-          position: LatLng(39.994200, 116.326500),
+          name: '雁塔校区东门',
+          description: '历史悠久的老校区入口',
+          position: LatLng(34.233456, 108.965678),
         ),
       ],
     );
@@ -37,10 +36,15 @@ class MapNotifier extends Notifier<MapState> {
     state = state.copyWith(isLoadingLocation: true);
 
     try {
-      final status = await PermissionService.request(Permission.location);
-      if (status == PermissionStatus.granted ||
-          status == PermissionStatus.limited ||
-          status == PermissionStatus.provisional) {
+      // macOS location permission check via permission_handler might be tricky,
+      // but geolocator's requestPermission is generally more reliable across platforms.
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
         final position = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.bestForNavigation,

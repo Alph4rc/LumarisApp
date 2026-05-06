@@ -72,6 +72,14 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final clubColors = context.clubColors;
     final padding = MediaQuery.of(context).padding;
 
+    // Listen for location changes to auto-center once
+    ref.listen(mapNotifierProvider.select((s) => s.currentLocation),
+        (previous, next) {
+      if (previous == null && next != null) {
+        _moveToLocation(next);
+      }
+    });
+
     final filteredPOIs = mapState.searchQuery.isEmpty
         ? mapState.campusPOIs
         : mapState.campusPOIs
@@ -194,14 +202,14 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     return Container(
       decoration: BoxDecoration(
         color: colors.cardOverlay,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: colors.separator.withValues(alpha: 0.2),
           width: 0.5,
         ),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: IconButton(
@@ -375,7 +383,44 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ),
             ),
           ),
-        )
+        ),
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: filteredPOIs.map((poi) {
+              final isSelected = _selectedPOI == poi;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(poi.name),
+                  selected: isSelected,
+                  onSelected: (_) => _onPOITap(poi),
+                  backgroundColor: colors.cardOverlay,
+                  selectedColor: colors.primarySoft,
+                  labelStyle: TextStyle(
+                    color: isSelected ? colors.primary : colors.label,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    side: BorderSide(
+                      color: isSelected
+                          ? colors.primary
+                          : colors.separator.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                  ),
+                  showCheckmark: false,
+                  elevation: 0,
+                  pressElevation: 0,
+                ),
+              );
+            }).toList(),
+          ),
+        ),
       ],
     );
   }
