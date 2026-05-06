@@ -20,9 +20,9 @@ class UserAgreementPage extends StatelessWidget {
           children: [
             _buildTitle('iOS Club App 用户协议', titleColor),
             const SizedBox(height: 8),
-            _buildSubtitle(context, '更新日期：2025年1月1日'),
+            _buildSubtitle(context, '更新日期：2026年5月5日'),
             const SizedBox(height: 8),
-            _buildSubtitle(context, '生效日期：2025年1月1日'),
+            _buildSubtitle(context, '生效日期：2026年5月5日'),
             const SizedBox(height: 20),
             _buildBodyText(
               '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team'
