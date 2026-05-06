@@ -375,44 +375,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            children: filteredPOIs.map((poi) {
-              final isSelected = _selectedPOI == poi;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  label: Text(poi.name),
-                  selected: isSelected,
-                  onSelected: (_) => _onPOITap(poi),
-                  backgroundColor: colors.cardOverlay,
-                  selectedColor: colors.primarySoft,
-                  labelStyle: TextStyle(
-                    color: isSelected ? colors.primary : colors.label,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    fontSize: 13,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
-                    side: BorderSide(
-                      color: isSelected
-                          ? colors.primary
-                          : colors.separator.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                  ),
-                  showCheckmark: false,
-                  elevation: 0,
-                  pressElevation: 0,
-                ),
-              );
-            }).toList(),
-          ),
-        ),
+        )
       ],
     );
   }

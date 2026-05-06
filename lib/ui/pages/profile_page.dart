@@ -138,6 +138,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
       ProfileButtonItem(
+          icon: CupertinoIcons.map, title: '校园地图', route: AppRoutes.campusMap),
+      ProfileButtonItem(
           icon: Icons.help_outline, title: '帮助', route: AppRoutes.helper),
     ];
   }
