@@ -51,3 +51,6 @@ my-release-key.jks
 .env.example
 
 nul
+
+# FVM Version Cache
+.fvm/

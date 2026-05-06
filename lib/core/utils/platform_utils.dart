@@ -17,16 +17,6 @@ class _PlatformCheck {
 class PlatformUtils {
   static bool get isWeb => kIsWeb;
 
-  /// 检测是否在微信小程序环境
-  /// 微信小程序环境是基于 web 的，但需要特殊处理
-  static bool get isMPFlutter {
-    if (!kIsWeb) return false;
-    // 在编译时检查是否设置了 MPFLUTTER 标志
-    const mpflutterFlag =
-        bool.fromEnvironment('MPFLUTTER', defaultValue: false);
-    return mpflutterFlag;
-  }
-
   static bool get isMacOS {
     return _PlatformCheck._safeCheck(() {
       // 动态导入以避免在 web 环境中出错

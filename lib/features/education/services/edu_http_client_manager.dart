@@ -1,50 +1,82 @@
-import 'package:get/get.dart';
 import '../../../core/config/api_config.dart';
-import '../../../state/settings_store.dart';
 import 'edu_http_client.dart';
 
 /// 教务系统 HTTP 客户端管理器
 ///
-/// 提供全局单例的 EduHttpClient，支持动态切换学校配置
-class EduHttpClientManager extends GetxController {
-  static EduHttpClientManager get to => Get.find();
+/// 提供全局单例的 EduHttpClient，支持动态切换学校配置。
+/// 这是普通 Dart 服务管理器，不依赖 GetX 容器。
+class EduHttpClientManager {
+  EduHttpClientManager._({
+    SchoolConfig? school,
+    AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
+  }) : _authStateCallbacks = authStateCallbacks {
+    _initializeClient(school ?? ApiConfig.getDefaultSchool());
+  }
+
+  static EduHttpClientManager? _shared;
 
   late EduHttpClient _client;
+  late SchoolConfig _school;
+  AuthStateCallbacks _authStateCallbacks;
 
-  /// 获取当前的 HTTP 客户端实例
-  static EduHttpClient get instance => to._client;
-
-  @override
-  void onInit() {
-    super.onInit();
-    _initializeClient();
+  /// 初始化全局 HTTP 客户端管理器。
+  static EduHttpClientManager initialize({
+    SchoolConfig? school,
+    AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
+  }) {
+    _shared?.dispose();
+    _shared = EduHttpClientManager._(
+      school: school,
+      authStateCallbacks: authStateCallbacks,
+    );
+    return _shared!;
   }
 
-  /// 初始化 HTTP 客户端
-  void _initializeClient() {
-    // 从 SettingsStore 获取当前学校配置
-    try {
-      final currentSchool = SettingsStore.to.currentSchool;
-      _client = EduHttpClient(baseUrl: currentSchool.eduApiBaseUrl);
-    } catch (e) {
-      // 如果 SettingsStore 还未初始化，使用默认配置
-      final defaultSchool = ApiConfig.getDefaultSchool();
-      _client = EduHttpClient(baseUrl: defaultSchool.eduApiBaseUrl);
-    }
+  /// 获取当前管理器；如果尚未初始化，则使用默认学校配置。
+  static EduHttpClientManager get current {
+    return _shared ??= EduHttpClientManager._();
   }
 
-  /// 更新学校配置
+  /// 获取当前的 HTTP 客户端实例。
+  static EduHttpClient get instance => current._client;
+
+  /// 重置全局管理器，主要用于测试隔离。
+  static void resetForTest() {
+    _shared?.dispose();
+    _shared = null;
+  }
+
+  void _initializeClient(SchoolConfig school) {
+    _school = school;
+    _client = EduHttpClient(
+      baseUrl: school.eduApiBaseUrl,
+      authStateCallbacks: _authStateCallbacks,
+    );
+  }
+
+  /// 更新学校配置。
   ///
-  /// 当切换学校时调用此方法更新 API 基础 URL
+  /// 当切换学校时调用此方法更新 API 基础 URL。
   void updateSchoolConfig(SchoolConfig school) {
+    _school = school;
     _client.updateBaseUrl(school.eduApiBaseUrl);
   }
 
-  /// 重新初始化客户端
+  /// 重新初始化客户端。
   ///
-  /// 用于完全重置客户端实例（例如在登出后）
-  void reinitialize() {
+  /// 用于完全重置客户端实例（例如在登出后）。
+  void reinitialize({
+    SchoolConfig? school,
+    AuthStateCallbacks? authStateCallbacks,
+  }) {
     _client.dispose();
-    _initializeClient();
+    if (authStateCallbacks != null) {
+      _authStateCallbacks = authStateCallbacks;
+    }
+    _initializeClient(school ?? _school);
+  }
+
+  void dispose() {
+    _client.dispose();
   }
 }

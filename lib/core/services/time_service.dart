@@ -1,4 +1,4 @@
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 
 /// 单数为课程开始时间，双数为课程结束时间，草堂的第一个数据是早自习的
 class TimeService {

@@ -1,40 +1,36 @@
-import 'dart:async';
-import 'dart:convert';
+import 'dart:async' show TimeoutException, unawaited;
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/core/utils/animations/animated_card.dart';
 import 'package:ios_club_app/core/utils/animations/animated_list_item.dart';
-import 'package:ios_club_app/features/education/services/edu_api_client.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/features/education/models/edu_fetch_models.dart';
+import 'package:ios_club_app/features/education/services/score_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-
-import 'package:ios_club_app/core/repositories/score_repository.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
-class ScorePage extends StatefulWidget {
+class ScorePage extends ConsumerStatefulWidget {
   const ScorePage({super.key});
 
   @override
-  State<ScorePage> createState() => _ScorePageState();
+  ConsumerState<ScorePage> createState() => _ScorePageState();
 }
 
-class _ScorePageState extends State<ScorePage>
+class _ScorePageState extends ConsumerState<ScorePage>
     with SingleTickerProviderStateMixin {
-  final UserStore userStore = Get.find();
   final List<ScoreList> _scoreList = [];
   bool _isLoading = true;
   bool _isFool = false;
@@ -66,149 +62,51 @@ class _ScorePageState extends State<ScorePage>
   }
 
   Future<void> refresh({bool isRefresh = false}) async {
-    if (!isRefresh && !_isFool) {
-      final cachedData = await _tryGetCachedData();
-      if (cachedData != null) {
-        if (mounted) {
-          setState(() {
-            _scoreList
-              ..clear()
-              ..addAll(cachedData);
-            _selectorList.clear();
-            for (var i = 0; i < _scoreList.length; i++) {
-              var y = _scoreList.length - i + 1;
-              _selectorList.add(
-                  '大${yearStringList[y ~/ 2 - 1]}${y % 2 == 1 ? '下' : '上'}');
-            }
-            _isLoading = false;
-          });
-        }
-        return;
-      }
+    if (isRefresh || _isFool) {
+      await _loadScores(policy: FetchPolicy.refresh);
+      return;
     }
 
-    if (_isFool) {
-      final cachedData = await _tryGetCachedData();
-      if (cachedData != null) {
-        if (mounted) {
-          setState(() {
-            _scoreList
-              ..clear()
-              ..addAll(cachedData);
-            _isLoading = false;
-            _isFool = false;
-          });
-        }
-        return;
-      }
+    final localSnapshot =
+        await ScoreService.getScores(policy: FetchPolicy.localFirst);
+    if (localSnapshot.data.isNotEmpty) {
+      _applyScoreData(localSnapshot.data, isLoading: false);
+      unawaited(_loadScores(
+        policy: FetchPolicy.refresh,
+        keepCurrentDataWhileLoading: true,
+        showStaleMessage: false,
+      ));
+      return;
     }
 
-    await _fetchFreshData(isRefresh: isRefresh);
+    await _loadScores(policy: FetchPolicy.refresh);
   }
 
-  Future<List<ScoreList>?> _tryGetCachedData() async {
-    final prefs = PrefsService.instance;
-    final lastFetchTime = prefs.getInt(PrefsKeys.LAST_SCORE_TIME);
-    final now = DateTime.now().millisecondsSinceEpoch;
-
-    if (lastFetchTime != null &&
-        now - lastFetchTime < const Duration(hours: 1).inMilliseconds) {
-      try {
-        final scoreRepo = ScoreRepository();
-        final scores = await scoreRepo.getScores();
-        if (scores.isNotEmpty) return scores;
-      } catch (e) {
-        if (kDebugMode) {
-          AppLogger.error('Error reading cached score data: $e');
-        }
-      }
-    }
-    return null;
-  }
-
-  Future<void> _fetchFreshData({required bool isRefresh}) async {
+  Future<void> _loadScores({
+    required FetchPolicy policy,
+    bool keepCurrentDataWhileLoading = false,
+    bool showStaleMessage = true,
+  }) async {
     if (!mounted) return;
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = !keepCurrentDataWhileLoading;
+      _loadingText = '正在获取成绩数据...';
+    });
 
     try {
-      AppLogger.debug('[ScorePage] 开始获取成绩数据');
-
-      // 添加超时保护：获取用户数据最多5秒
-      final cookieData = await EduService.getUserData().timeout(
-        const Duration(seconds: 5),
+      final snapshot = await ScoreService.getScores(policy: policy).timeout(
+        const Duration(seconds: 15),
         onTimeout: () {
-          AppLogger.warning('[ScorePage] 获取用户数据超时');
-          return null;
+          throw TimeoutException('获取成绩数据超时');
         },
       );
 
-      if (cookieData == null) {
-        if (mounted) {
-          showClubSnackBar(context, const Text('获取用户凭证失败，请重新登录'));
-        }
-        return;
+      _applyScoreData(snapshot.data, isLoading: false);
+      if (!mounted) return;
+      if (snapshot.isStale && snapshot.data.isNotEmpty && showStaleMessage) {
+        showClubSnackBar(context, const Text('刷新失败，已回退到本地数据'));
       }
-
-      setState(() {
-        _loadingText = '正在获取所有学期数据...';
-      });
-
-      // 添加超时保护：获取学期列表最多10秒
-      final semesters =
-          await DataService.getSemester(isRefresh: isRefresh).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          AppLogger.warning('[ScorePage] 获取学期列表超时');
-          return <SemesterModel>[];
-        },
-      );
-
-      final freshScoreList = <ScoreList>[];
-      for (final semester in semesters) {
-        if (!mounted) break;
-
-        setState(() {
-          _loadingText = '正在获取 ${semester.name} 学期数据...';
-        });
-
-        AppLogger.debug('[ScorePage] 获取学期 ${semester.name} 的成绩');
-
-        // 添加超时保护：每个学期最多10秒
-        final semesterScores = await _fetchSemesterScores(
-          studentId: cookieData.studentId,
-          semester: semester,
-        ).timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            AppLogger.warning('[ScorePage] 获取学期 ${semester.name} 超时');
-            return null;
-          },
-        );
-
-        if (semesterScores != null) {
-          freshScoreList.add(semesterScores);
-        }
-      }
-
-      await _cacheFreshData(freshScoreList);
-
-      if (mounted) {
-        setState(() {
-          _scoreList
-            ..clear()
-            ..addAll(freshScoreList);
-          _isLoading = false;
-          _selectorList.clear();
-          for (var i = 0; i < _scoreList.length; i++) {
-            var y = _scoreList.length - i + 1;
-            _selectorList
-                .add('大${yearStringList[y ~/ 2 - 1]}${y % 2 == 1 ? '下' : '上'}');
-          }
-        });
-      }
-
-      AppLogger.debug('[ScorePage] 成绩数据获取完成');
     } on TimeoutException catch (e) {
       if (mounted) {
         showClubSnackBar(context, const Text('获取数据超时，请检查网络连接后重试'));
@@ -221,47 +119,39 @@ class _ScorePageState extends State<ScorePage>
       AppLogger.error('[ScorePage] 获取数据失败', error: e, stackTrace: stackTrace);
     } finally {
       _isFool = false;
-      // ✅ 确保 _isLoading 总是被设置为 false
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
       }
-      AppLogger.debug('[ScorePage] 设置 _isLoading = false');
     }
   }
 
-  /// 使用统一的 EduApiClient 获取学期成绩
-  /// EduHttpClient 已内置缓存、认证和重登录机制
-  Future<ScoreList?> _fetchSemesterScores({
-    required String studentId,
-    required SemesterModel semester,
-  }) async {
-    try {
-      final response =
-          await EduApiClient.getScore(studentId, semester.semester);
-      final list = jsonDecode(response) as List;
-      return ScoreList(
-        semester: semester,
-        list: list.map((e) => ScoreModel.fromJson(e)).toList(),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        AppLogger.error('Error fetching semester scores: $e');
-      }
-      return null;
-    }
+  void _applyScoreData(List<ScoreList> scores, {required bool isLoading}) {
+    if (!mounted) return;
+    setState(() {
+      _scoreList
+        ..clear()
+        ..addAll(scores);
+      _isLoading = isLoading;
+      _selectorList
+        ..clear()
+        ..addAll(_buildSelectorList(scores.length));
+    });
   }
 
-  Future<void> _cacheFreshData(List<ScoreList> freshData) async {
-    final prefs = PrefsService.instance;
-    final scoreRepo = ScoreRepository();
-    await scoreRepo.saveScores(freshData);
-    await prefs.setInt(
-        PrefsKeys.LAST_SCORE_TIME, DateTime.now().millisecondsSinceEpoch);
+  List<String> _buildSelectorList(int count) {
+    final selectorList = <String>[];
+    for (var i = 0; i < count; i++) {
+      final y = count - i + 1;
+      selectorList
+          .add('大${yearStringList[y ~/ 2 - 1]}${y % 2 == 1 ? '下' : '上'}');
+    }
+    return selectorList;
   }
 
   void _handleFoolishMode() {
+    final colors = context.clubColors;
     setState(() {
       _isFool = true;
       for (final item in _scoreList) {
@@ -274,11 +164,11 @@ class _ScorePageState extends State<ScorePage>
 
     showClubSnackBar(
       context,
-      const Row(
+      Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('是的，在下绩点5.0'),
-          Icon(Icons.mood, color: Colors.black12),
+          const Text('是的，在下绩点5.0'),
+          Icon(Icons.mood, color: colors.quaternaryLabel),
         ],
       ),
     );
@@ -286,8 +176,9 @@ class _ScorePageState extends State<ScorePage>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     // 检查是否为游客模式
-    if (!userStore.isLogin) {
+    if (!ref.watch(userStoreProvider).isLogin) {
       return Scaffold(
         body: Center(
           child: Column(
@@ -296,7 +187,7 @@ class _ScorePageState extends State<ScorePage>
               Icon(
                 Icons.warning,
                 size: 48,
-                color: Colors.grey[400],
+                color: colors.secondaryLabel,
               ),
               SizedBox(height: 16),
               Text(
@@ -311,14 +202,14 @@ class _ScorePageState extends State<ScorePage>
                 '请先去登录即可查看成绩',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: colors.secondaryLabel,
                 ),
               ),
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
                   // 导航到个人页面进行登录
-                  Get.toNamed('/Profile');
+                  AppRouter.go(AppRoutes.profile);
                 },
                 child: Text('前往登录'),
               ),
@@ -331,17 +222,11 @@ class _ScorePageState extends State<ScorePage>
     if (_isLoading) {
       return Scaffold(
         body: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 10),
-            Text(
-              _loadingText,
-              style: TextStyle(fontSize: 16),
-            )
-          ],
-        )),
+          child: LoadingStateView(
+            title: _loadingText,
+            subtitle: '正在读取缓存并同步教务成绩，网络较慢时可能需要几秒',
+          ),
+        ),
       );
     }
 
@@ -493,6 +378,7 @@ class _ScorePageState extends State<ScorePage>
     required String label,
     bool withInfo = false,
   }) {
+    final colors = context.clubColors;
     return Column(
       children: [
         Icon(
@@ -510,17 +396,17 @@ class _ScorePageState extends State<ScorePage>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (withInfo)
-              const Icon(
+              Icon(
                 Icons.info_outline,
                 size: 9,
-                color: Colors.grey,
+                color: colors.secondaryLabel,
               ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey,
+                color: colors.secondaryLabel,
               ),
             ),
           ],
@@ -530,18 +416,16 @@ class _ScorePageState extends State<ScorePage>
   }
 
   void _showCreditInfoDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('说明'),
-        content: const Text('这里的学分是按照成绩算出来的，只要没有挂科就OK。教务系统给的一般来说要小于等于这个数'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('确定'),
-          ),
-        ],
-      ),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '说明',
+      content: const Text('这里的学分是按照成绩算出来的，只要没有挂科就OK。教务系统给的一般来说要小于等于这个数'),
+      actions: const [
+        PlatformDialogAction<void>(
+          label: '确定',
+          isDefaultAction: true,
+        ),
+      ],
     );
   }
 
@@ -697,10 +581,10 @@ class _ScorePageState extends State<ScorePage>
     final isTablet = MediaQuery.of(context).size.width > 600;
 
     return Material(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: ClubRadii.navigation,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ClubRadii.navigation,
         onTap: () => _showScoreDetails(item),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -711,7 +595,7 @@ class _ScorePageState extends State<ScorePage>
                 height: 40,
                 decoration: BoxDecoration(
                   color: CourseColorManager.generateSoftColor(item.name),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: ClubRadii.indicatorBorder,
                 ),
               ),
               const SizedBox(width: 16),
@@ -754,31 +638,36 @@ class _ScorePageState extends State<ScorePage>
   }
 
   Widget _buildScoreMeta(ScoreModel item) {
+    final colors = context.clubColors;
     return Wrap(
       spacing: 16,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.time, size: 16, color: Colors.grey[600]),
+            Icon(CupertinoIcons.time, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('${item.credit}学分', style: TextStyle(color: Colors.grey[600]))
+            Text('${item.credit}学分',
+                style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.location, size: 16, color: Colors.grey[600]),
+            Icon(CupertinoIcons.location,
+                size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('成绩 ${item.grade}', style: TextStyle(color: Colors.grey[600]))
+            Text('成绩 ${item.grade}',
+                style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.star, size: 16, color: Colors.grey[600]),
+            Icon(CupertinoIcons.star, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('绩点 ${item.gpa}', style: TextStyle(color: Colors.grey[600]))
+            Text('绩点 ${item.gpa}',
+                style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
       ],
@@ -790,9 +679,9 @@ class _ScorePageState extends State<ScorePage>
     final content = _buildScoreDetailsContent(score, isTablet);
 
     if (isTablet) {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => SimpleDialog(children: [content]),
+      await PlatformDialog.showCustomDialog<void>(
+        context,
+        content: content,
       );
     } else {
       await showClubModalBottomSheet(context, content);
@@ -800,6 +689,7 @@ class _ScorePageState extends State<ScorePage>
   }
 
   Widget _buildScoreDetailsContent(ScoreModel score, bool isTablet) {
+    final colors = context.clubColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
@@ -814,28 +704,28 @@ class _ScorePageState extends State<ScorePage>
             icon: CupertinoIcons.star_fill,
             label: '课程学分',
             content: '${score.credit} 学分',
-            color: const Color(0xFFFFCC00),
+            color: colors.yellow,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.chart_bar_fill,
             label: '课程成绩',
             content: score.grade,
-            color: const Color(0xFFFF3B30),
+            color: colors.danger,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.star_circle_fill,
             label: '课程绩点',
             content: score.gpa,
-            color: const Color(0xFF34C759),
+            color: colors.success,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.doc_text_fill,
             label: '成绩详情',
             content: score.gradeDetail,
-            color: const Color(0xFF007AFF),
+            color: colors.primary,
             maxLines: 5,
           ),
         ],

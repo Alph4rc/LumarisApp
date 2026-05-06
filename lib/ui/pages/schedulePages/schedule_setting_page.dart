@@ -2,34 +2,41 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/image_brightness.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
-class ScheduleSettingPage extends StatefulWidget {
+class ScheduleSettingPage extends ConsumerStatefulWidget {
   const ScheduleSettingPage({super.key});
 
   @override
-  State<ScheduleSettingPage> createState() => _ScheduleSettingPageState();
+  ConsumerState<ScheduleSettingPage> createState() =>
+      _ScheduleSettingPageState();
 }
 
-class _ScheduleSettingPageState extends State<ScheduleSettingPage>
+class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     with AutomaticKeepAliveClientMixin {
-  final CourseStore courseStore = CourseStore.to;
-  final SettingsStore settingsStore = SettingsStore.to;
+  late CourseStore courseStore;
+  late SettingsStore settingsStore;
   List<String> totalList = [];
   List<String> ignoreList = [];
   late List<CourseIgnore> _ignores = [];
@@ -41,6 +48,8 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   @override
   void initState() {
     super.initState();
+    courseStore = ref.read(courseStoreProvider.notifier);
+    settingsStore = ref.read(settingsStoreProvider.notifier);
     _initData();
   }
 
@@ -69,7 +78,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
   Future<void> _loadCourseData() async {
     try {
       await courseStore.loadIgnoreCourses();
-      final courseNames = await DataService.getCourseName();
+      final courseNames = await CourseService.getCourseName();
 
       final ignores = courseNames
           .map((i) => CourseIgnore(
@@ -97,9 +106,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     super.build(context);
     final isDesktop = PlatformUtils.isDesktop;
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final cardColor = isDark ? Colors.grey[900] : Colors.white;
+    final colors = context.clubColors;
 
     return Scaffold(
         appBar: ClubAppBar(
@@ -113,20 +120,20 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
               if (!isDesktop) ...[
                 _buildSectionTitle('日历订阅'),
                 const SizedBox(height: 12),
-                _buildCalendarSection(context, isDark, cardColor),
+                _buildCalendarSection(context, colors),
                 const SizedBox(height: 24),
               ],
               _buildSectionTitle('课表管理'),
               const SizedBox(height: 12),
-              _buildManagementSection(context, isDark, cardColor),
+              _buildManagementSection(context, colors),
               const SizedBox(height: 24),
               _buildSectionTitle('课表背景'),
               const SizedBox(height: 12),
-              _buildBackgroundSection(context, isDark, cardColor),
+              _buildBackgroundSection(context, colors),
               const SizedBox(height: 24),
               _buildSectionTitle('忽略课程'),
               const SizedBox(height: 12),
-              _buildIgnoreCourseSection(context, isDark, cardColor),
+              _buildIgnoreCourseSection(context, colors),
             ],
           ),
         ));
@@ -143,15 +150,14 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     );
   }
 
-  Widget _buildCalendarSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildCalendarSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: Column(
         children: [
-          ListTile(
+          ClubListTile(
             leading: Icon(
               Icons.calendar_today_outlined,
-              color: isDark ? Colors.blue[300] : Colors.blue[600],
+              color: colors.primary,
             ),
             title: const Text(
               '导入到日历',
@@ -174,7 +180,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                   '订阅链接',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    color: colors.secondaryLabel,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -182,8 +188,8 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[800] : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
+                    color: colors.surfaceRaised,
+                    borderRadius: ClubRadii.control,
                   ),
                   child: Row(
                     children: [
@@ -192,7 +198,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                           'https$url',
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                            color: colors.secondaryLabel,
                             fontFamily: 'monospace',
                           ),
                           maxLines: 1,
@@ -230,17 +236,16 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     );
   }
 
-  Widget _buildManagementSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildManagementSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: Column(
         children: [
           Material(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: ClubRadii.card,
               child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () => Get.toNamed('/CustomCourseManage'),
+                  borderRadius: ClubRadii.card,
+                  onTap: () => AppRouter.push(AppRoutes.customCourseManage),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 16),
@@ -251,9 +256,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                             children: [
                               Icon(
                                 Icons.edit_calendar_outlined,
-                                color: isDark
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
+                                color: colors.secondaryLabel,
                               ),
                               const SizedBox(width: 12),
                               const Text(
@@ -273,7 +276,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
           Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: ClubRadii.card,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,7 +285,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                     children: [
                       Icon(
                         Icons.grid_on_outlined,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                       const SizedBox(width: 12),
                       const Text(
@@ -311,13 +314,12 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     );
   }
 
-  Widget _buildBackgroundSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildBackgroundSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: Column(
         children: [
-          _buildBackgroundOption('无背景', '', isDark),
-          _buildBackgroundOption('自定义图片', 'custom', isDark),
+          _buildBackgroundOption(context, '无背景', ''),
+          _buildBackgroundOption(context, '自定义图片', 'custom'),
           if (settingsStore.scheduleBackground == 'custom') ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(56, 12, 16, 12),
@@ -330,7 +332,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                           : settingsStore.customBackgroundImage,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -348,13 +350,18 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     );
   }
 
-  Widget _buildBackgroundOption(String title, String value, bool isDark) {
+  Widget _buildBackgroundOption(
+    BuildContext context,
+    String title,
+    String value,
+  ) {
+    final colors = context.clubColors;
     final isSelected = settingsStore.scheduleBackground == value;
     return Material(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: ClubRadii.card,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
         onTap: () {
           setState(() {
             settingsStore.setScheduleBackground(value);
@@ -363,7 +370,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: ClubRadii.navigation,
           ),
           child: Row(
             children: [
@@ -371,7 +378,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
                 isSelected ? Icons.check_circle : Icons.circle_outlined,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : (isDark ? Colors.grey[600] : Colors.grey[400]),
+                    : colors.tertiaryLabel,
               ),
               const SizedBox(width: 16),
               Text(
@@ -388,8 +395,7 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
     );
   }
 
-  Widget _buildIgnoreCourseSection(
-      BuildContext context, bool isDark, Color? cardColor) {
+  Widget _buildIgnoreCourseSection(BuildContext context, ClubColors colors) {
     return ClubCard(
       child: ListView.builder(
         shrinkWrap: true,
@@ -447,14 +453,19 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
 
   Future<void> _pickCustomBackgroundImage() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.image,
         withData: false,
       );
 
       if (result != null) {
         String filePath = result.files.single.path ?? result.files.single.name;
-        settingsStore.setCustomBackgroundImage(filePath);
+        await settingsStore.setCustomBackgroundImage(filePath);
+
+        // 异步计算图片亮暗，完成后更新 store
+        computeImageIsDark(filePath).then((isDark) {
+          settingsStore.setCustomBackgroundIsDark(isDark);
+        });
 
         if (mounted) {
           showClubSnackBar(
@@ -484,70 +495,68 @@ class _ScheduleSettingPageState extends State<ScheduleSettingPage>
       }
 
       courseStore.setIgnoreCourses(ignoreList);
-      return DataService.setIgnore(ignoreList);
+      return CourseService.setIgnore(ignoreList);
     });
   }
 
   void showCalendarGuidanceDialog(BuildContext context) {
     final httpsUrl = 'webcal$url';
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('添加日历订阅'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('您的设备似乎没有应用可以直接处理日历订阅。请按照以下步骤手动添加:'),
-              const SizedBox(height: 16),
-              const Text('1. 打开您的日历应用'),
-              const Text('2. 找到"添加日历"或"订阅"选项'),
-              const Text('3. 选择"通过URL添加"或类似选项'),
-              const Text('4. 粘贴以下链接:'),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        httpsUrl,
-                        style: const TextStyle(fontFamily: 'monospace'),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.copy),
-                      onPressed: () async {
-                        await Clipboard.setData(ClipboardData(text: httpsUrl));
-                        if (context.mounted) {
-                          showClubSnackBar(
-                            context,
-                            const Text('链接已复制到剪贴板'),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '添加日历订阅',
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('您的设备似乎没有应用可以直接处理日历订阅。请按照以下步骤手动添加:'),
+            const SizedBox(height: 16),
+            const Text('1. 打开您的日历应用'),
+            const Text('2. 找到"添加日历"或"订阅"选项'),
+            const Text('3. 选择"通过URL添加"或类似选项'),
+            const Text('4. 粘贴以下链接:'),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: context.clubColors.surfaceRaised,
+                borderRadius: ClubRadii.xsBorder,
               ),
-              const SizedBox(height: 16),
-              const Text('注意: 不同的日历应用可能有不同的添加步骤。如果您遇到困难，请查阅您的日历应用帮助文档。'),
-            ],
-          ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      httpsUrl,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(text: httpsUrl));
+                      if (context.mounted) {
+                        showClubSnackBar(
+                          context,
+                          const Text('链接已复制到剪贴板'),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('注意: 不同的日历应用可能有不同的添加步骤。如果您遇到困难，请查阅您的日历应用帮助文档。'),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('明白了'),
-          ),
-        ],
       ),
+      actions: const [
+        PlatformDialogAction<void>(
+          label: '明白了',
+          isDefaultAction: true,
+        ),
+      ],
     );
   }
 }
@@ -564,12 +573,12 @@ class CourseIgnoreItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     return Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
         child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: ClubRadii.card,
             onTap: () => onChanged(ignore, !ignore.isCompleted),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -581,12 +590,15 @@ class CourseIgnoreItem extends StatelessWidget {
                         : Icons.check_box_outline_blank,
                     color: ignore.isCompleted
                         ? Theme.of(context).colorScheme.primary
-                        : (isDark ? Colors.grey[600] : Colors.grey[400]),
+                        : colors.tertiaryLabel,
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    ignore.title,
-                    style: const TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      ignore.title,
+                      style: const TextStyle(fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

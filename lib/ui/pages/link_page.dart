@@ -1,23 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/services/club_service.dart';
+import 'package:ios_club_app/features/education/services/link_api.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ios_club_app/core/models/link_model.dart';
+import 'package:ios_club_app/features/education/models/link_model.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/icon_font.dart';
 
-class LinkPage extends StatelessWidget {
+class LinkPage extends StatefulWidget {
   const LinkPage({super.key});
 
   @override
+  State<LinkPage> createState() => _LinkPageState();
+}
+
+class _LinkPageState extends State<LinkPage> {
+  late Future<List<CategoryModel>> _linksFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _linksFuture = LinkApi.getLinks();
+  }
+
+  void _refreshLinks() {
+    setState(() {
+      _linksFuture = LinkApi.getLinks();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Scaffold(
       appBar: ClubAppBar(
-        title: '建大导航',
+        title: '校园导航',
+        actions: [
+          IconButton(
+            onPressed: _refreshLinks,
+            icon: const Icon(Icons.refresh),
+            tooltip: '刷新',
+          ),
+        ],
       ),
       body: FutureBuilder(
-        future: ClubService.getLinks(),
+        future: _linksFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
@@ -34,7 +65,7 @@ class LinkPage extends StatelessWidget {
                       "加载失败",
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -47,6 +78,11 @@ class LinkPage extends StatelessWidget {
                   ],
                 ),
               );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return EmptyWidget(
+                  title: '暂无导航数据',
+                  subtitle: '请重新进入此页，或检查当前网络',
+                  icon: Icons.link);
             } else {
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -66,20 +102,10 @@ class LinkPage extends StatelessWidget {
               );
             }
           } else {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text(
-                    "加载中...",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+            return const Center(
+              child: LoadingStateView(
+                title: '正在加载导航链接',
+                subtitle: '正在整理常用站点与分类入口',
               ),
             );
           }
@@ -104,6 +130,7 @@ class ScoreBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
@@ -122,8 +149,8 @@ class ScoreBuilder extends StatelessWidget {
                     width: 4,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1),
-                      borderRadius: BorderRadius.circular(2),
+                      color: colors.indigo,
+                      borderRadius: ClubRadii.indicatorBorder,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -175,10 +202,11 @@ class _LinkItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: ClubRadii.navigation,
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -201,7 +229,7 @@ class _LinkItem extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: ClubRadii.control,
                     ),
                   );
                 },
@@ -216,7 +244,7 @@ class _LinkItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.2,
-                  color: Colors.grey[500],
+                  color: colors.tertiaryLabel,
                 ),
               ),
             ],

@@ -1,19 +1,17 @@
-import 'dart:convert';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/features/education/models/raw_string_response.dart';
 import '../../../core/services/network_exception.dart';
 import 'edu_http_client_manager.dart';
 
 /// Payment相关API
 class PaymentApi {
   /// 获取缴费信息
-  static Future<String> getPayment(String id) async {
+  static Future<RawStringResponse> getPayment(String id) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Payment/$id',
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      return RawStringResponse.fromResponse(response);
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -21,15 +19,19 @@ class PaymentApi {
   }
 
   /// 获取缴费流水
-  static Future<String> getPaymentTurnover(String id) async {
+  static Future<PaymentData> getPaymentTurnover(String id) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Payment/$id/turnover',
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+
+      if (response is! Map) {
+        throw NetworkException('缴费流水返回格式错误: ${response.runtimeType}', -1);
+      }
+      // 转换为 Map<String, dynamic> 以确保类型安全
+      final Map<String, dynamic> typedResponse =
+          Map<String, dynamic>.from(response);
+      return PaymentData.fromJson(typedResponse);
     } catch (e) {
       _handleError(e);
       rethrow;

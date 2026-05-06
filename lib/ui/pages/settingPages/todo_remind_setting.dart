@@ -1,63 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-class TodoRemindSetting extends StatefulWidget {
+class TodoRemindSetting extends ConsumerWidget {
   const TodoRemindSetting({super.key});
 
   @override
-  State<StatefulWidget> createState() => _TodoRemindSettingState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsStoreProvider);
+    final settingsStore = ref.read(settingsStoreProvider.notifier);
+    final colors = context.clubColors;
 
-class _TodoRemindSettingState extends State<TodoRemindSetting> {
-  final SettingsStore settingsStore = SettingsStore.to;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            Icon(
-              Icons.notifications_active,
-              size: 20,
-              color: Colors.grey,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '待办事务提醒',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '在待办事务截止前进行提醒',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.5)
-                          : CupertinoColors.secondaryLabel,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Obx(() => CupertinoSwitch(
-                  value: settingsStore.todoRemindEnabled,
-                  onChanged: (bool value) async {
-                    await settingsStore.setTodoRemindEnabled(value);
-                    if (value && context.mounted) {
-                      await NotificationService.set(context);
-                    }
-                  },
-                ))
-          ],
-        ));
+    return ClubListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: Icon(
+        Icons.notifications_active,
+        size: 20,
+        color: colors.secondaryLabel,
+      ),
+      title: const Text('待办事务提醒'),
+      subtitle: const Text('在待办事务截止前进行提醒'),
+      trailing: CupertinoSwitch(
+        value: settings.todoRemindEnabled,
+        onChanged: (bool value) async {
+          await settingsStore.setTodoRemindEnabled(value);
+          if (value && context.mounted) {
+            await NotificationService.set(context);
+          }
+        },
+      ),
+    );
   }
 }

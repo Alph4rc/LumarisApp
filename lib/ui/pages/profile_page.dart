@@ -3,33 +3,34 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/info_model.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/models/info_model.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/services/info_service.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/study_credit_card.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  final UserStore userStore = UserStore.to;
-  final SettingsStore settingsStore = SettingsStore.to;
-
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _isLoading = true;
   String _username = '';
   int _dataRefreshKey = 0;
@@ -42,27 +43,19 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _checkLoginStatus() async {
     // 检查是否已有登录信息
+    final prefs = PrefsService.instance;
     final secureStorage = SecureStorageService.instance;
-    final username = await secureStorage.read(key: PrefsKeys.USERNAME);
-    final iosName = await secureStorage.read(key: PrefsKeys.CLUB_NAME);
+    final username = await secureStorage.read(key: PrefsKeys.USERNAME) ??
+        prefs.getString(PrefsKeys.USERNAME);
 
     // 重置 _username
     _username = '';
 
-    if (userStore.isLogin && username != null) {
+    if (username != null && username.isNotEmpty) {
       _username = username;
     }
-    if (userStore.isLoginMember && iosName != null) {
-      if (username == iosName) {
-        _username = iosName;
-      } else if (username != null) {
-        _username = '$username & $iosName';
-      } else {
-        _username = iosName;
-      }
-    }
 
-    if (!userStore.isLogin && !userStore.isLoginMember) {
+    if (!ref.read(userStoreProvider).isLogin) {
       // 没有登录信息，进入游客模式
       // await _enterGuestMode(); // 其实这里不需要做什么，只是确认状态
     }
@@ -75,8 +68,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _enterLoginMode({bool isOnlyLoginMember = false}) async {
-    final result = await Get.toNamed('/Login',
-        arguments: {'isOnlyLoginMember': isOnlyLoginMember});
+    final result = await AppRouter.push<bool>(
+      AppRoutes.login,
+      extra: {'isOnlyLoginMember': isOnlyLoginMember},
+    );
     // 如果登录成功返回 true
     if (result == true) {
       await _checkLoginStatus();
@@ -94,44 +89,48 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: LoadingStateView(
+            title: '正在读取账号信息',
+            subtitle: '正在同步本地登录状态和个人资料入口，请稍等一下',
+          ),
         ),
       );
     }
 
     return Scaffold(
-      body: Obx(() => _buildProfileContent()),
+      body: _buildProfileContent(),
     );
   }
 
   List<ProfileButtonItem> get profileButtonItems {
+    final isLogin = ref.watch(userStoreProvider).isLogin;
     return [
       ProfileButtonItem(
-          icon: CupertinoIcons.link_circle, title: '建大导航', route: '/Link'),
-      ProfileButtonItem(icon: Icons.settings, title: '设置/关于', route: '/About'),
+          icon: CupertinoIcons.link_circle,
+          title: '校园导航',
+          route: AppRoutes.link),
       ProfileButtonItem(
-          title: '校车', icon: Icons.directions_bus_rounded, route: '/SchoolBus'),
+          icon: Icons.settings, title: '设置/关于', route: AppRoutes.about),
       ProfileButtonItem(
-          icon: Icons.apple,
-          title: userStore.isLoginMember ? '社团详情' : '登录社团iMember',
-          onPressed: () {
-            if (!userStore.isLoginMember) {
-              _enterLoginMode(isOnlyLoginMember: true);
-            } else {
-              Navigator.pushNamed(context, '/iMember');
-            }
-          }),
+          title: '校车',
+          icon: Icons.directions_bus_rounded,
+          route: AppRoutes.schoolBus),
       if (!kIsWeb)
         ProfileButtonItem(
-            icon: CupertinoIcons.bolt_fill, title: '电费', route: '/Electricity'),
-      if (userStore.isLogin)
-        ProfileButtonItem(icon: Icons.toc, title: '培养方案', route: '/Program'),
-      ProfileButtonItem(
-          icon: Icons.monetization_on_outlined, title: '饭卡', route: '/Payment'),
-      if (!kIsWeb)
+            icon: CupertinoIcons.bolt_fill,
+            title: '电费',
+            route: AppRoutes.electricity),
+      if (isLogin)
         ProfileButtonItem(
-            icon: Icons.wifi_outlined, title: '校园网', route: '/Net'),
-      if (!userStore.isLogin)
+            icon: Icons.toc, title: '培养方案', route: AppRoutes.program),
+      ProfileButtonItem(
+          icon: Icons.monetization_on_outlined,
+          title: '饭卡',
+          route: AppRoutes.payment),
+      // if (!kIsWeb)
+      //   ProfileButtonItem(
+      //       icon: Icons.wifi_outlined, title: '校园网', route: AppRoutes.net),
+      if (!isLogin)
         ProfileButtonItem(
             icon: Icons.login,
             title: '登录教务系统',
@@ -139,12 +138,14 @@ class _ProfilePageState extends State<ProfilePage> {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
       ProfileButtonItem(
-          icon: Icons.help_outline, title: '帮助', route: '/Helper'),
+          icon: Icons.help_outline, title: '帮助', route: AppRoutes.helper),
     ];
   }
 
   Widget _buildProfileContent() {
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -178,16 +179,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           maxLines: 1,
                         ),
                         Text(
-                          userStore.isLogin && userStore.isLoginMember
-                              ? '教务系统账号 & iMember账号'
-                              : userStore.isLogin
-                                  ? '教务系统账号'
-                                  : userStore.isLoginMember
-                                      ? 'iMember账号'
-                                      : '游客',
+                          isLogin ? '教务系统账号' : '游客',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: colors.secondaryLabel,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -212,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       return AnimatedCard(
                         delay: Duration(milliseconds: 50 * index),
                         child: Center(
-                          child: profileButtonItems[index].build(),
+                          child: profileButtonItems[index].build(context),
                         ),
                       );
                     },
@@ -222,12 +217,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   )),
             ),
           ),
-          if (userStore.isLogin) const SizedBox(height: 16),
-          if (userStore.isLogin)
+          if (isLogin) const SizedBox(height: 16),
+          if (isLogin)
             FutureBuilder(
                 key: ValueKey('info_data_$_dataRefreshKey'),
                 // 添加超时保护：最多10秒
-                future: DataService.getInfoList().timeout(
+                future: InfoService.getInfoList().timeout(
                   const Duration(seconds: 10),
                   onTimeout: () {
                     AppLogger.warning('[ProfilePage] 获取信息列表超时');
@@ -236,10 +231,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(),
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: LoadingStateView(
+                        title: '正在同步学业信息',
+                        subtitle: '正在读取学分与个人信息卡片',
+                        compact: true,
+                        showCard: true,
                       ),
                     );
                   }
@@ -283,29 +281,32 @@ class ProfileButtonItem {
       this.route = '',
       this.onPressed});
 
-  Widget build() {
+  Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Material(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: ClubRadii.panel,
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: ClubRadii.panel,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Hero(
-                    tag: title,
-                    child: Icon(icon,
-                        size: 32,
-                        color: CourseColorManager.generateSoftColor(title,
-                            isDark: true))),
+                Icon(
+                  icon,
+                  size: 32,
+                  color: CourseColorManager.generateSoftColor(
+                    title,
+                    isDark: true,
+                  ),
+                ),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey),
+                      color: colors.secondaryLabel),
                 )
               ],
             ),
@@ -314,7 +315,7 @@ class ProfileButtonItem {
             if (route.isEmpty) {
               onPressed?.call();
             } else {
-              Get.toNamed(route);
+              AppRouter.push(route);
             }
           },
         ));

@@ -1,4 +1,9 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'tile_configuration.g.dart';
+
 /// Represents the configuration for a single tile on the home page
+@JsonSerializable(explicitToJson: true)
 class TileConfiguration {
   /// Unique identifier for the tile (e.g., "电费", "校车", "饭卡")
   final String id;
@@ -15,23 +20,10 @@ class TileConfiguration {
     required this.isVisible,
   });
 
-  /// Create from JSON
-  factory TileConfiguration.fromJson(Map<String, dynamic> json) {
-    return TileConfiguration(
-      id: json['id'] as String,
-      order: json['order'] as int,
-      isVisible: json['isVisible'] as bool,
-    );
-  }
+  factory TileConfiguration.fromJson(Map<String, dynamic> json) =>
+      _$TileConfigurationFromJson(json);
 
-  /// Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'order': order,
-      'isVisible': isVisible,
-    };
-  }
+  Map<String, dynamic> toJson() => _$TileConfigurationToJson(this);
 
   /// Create a copy with modified fields
   TileConfiguration copyWith({
@@ -64,6 +56,7 @@ class TileConfiguration {
 }
 
 /// Represents the complete set of tile configurations for a user
+@JsonSerializable(explicitToJson: true)
 class TileConfigurationList {
   /// Ordered list of tile configurations
   final List<TileConfiguration> configurations;
@@ -88,25 +81,10 @@ class TileConfigurationList {
     );
   }
 
-  /// Create from JSON
-  factory TileConfigurationList.fromJson(Map<String, dynamic> json) {
-    final configList = (json['configurations'] as List)
-        .map((e) => TileConfiguration.fromJson(e as Map<String, dynamic>))
-        .toList();
+  factory TileConfigurationList.fromJson(Map<String, dynamic> json) =>
+      _$TileConfigurationListFromJson(json);
 
-    return TileConfigurationList(
-      configurations: configList,
-      lastModified: DateTime.parse(json['lastModified'] as String),
-    );
-  }
-
-  /// Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'configurations': configurations.map((e) => e.toJson()).toList(),
-      'lastModified': lastModified.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toJson() => _$TileConfigurationListToJson(this);
 
   /// Get list of visible tiles sorted by order
   List<TileConfiguration> getVisibleTiles() {
@@ -162,12 +140,10 @@ class TileConfigurationList {
 
     final tile = configurations[tileIndex];
     final nextVisible = !tile.isVisible;
-
-    // Enforce at least one visible tile.
     final visibleCount = configurations.where((t) => t.isVisible).length;
-    if (!nextVisible && visibleCount <= 1) {
-      throw StateError('At least one tile must remain visible');
-    }
+
+    // We allow hiding all tiles, so no restriction is needed.
+    // The UI handles empty state.
 
     final newConfigurations = List<TileConfiguration>.from(configurations);
     if (nextVisible) {

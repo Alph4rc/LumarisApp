@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程详情弹窗组件
 ///
@@ -20,7 +22,7 @@ class CourseDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
     final isDesktop =
@@ -29,10 +31,8 @@ class CourseDetailSheet extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
-        borderRadius: isDesktop
-            ? BorderRadius.circular(20)
-            : const BorderRadius.vertical(top: Radius.circular(20)),
+        color: colors.cardBackground,
+        borderRadius: isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -47,14 +47,14 @@ class CourseDetailSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: isTablet ? 24 : 22,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.black,
+                    color: colors.label,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (course.isCustom && (onEdit != null || onDelete != null))
-                _buildActionMenu(context, isDark),
+                _buildActionMenu(context),
             ],
           ),
           SizedBox(height: isTablet ? 24 : 20),
@@ -65,8 +65,7 @@ class CourseDetailSheet extends StatelessWidget {
             icon: CupertinoIcons.location_solid,
             label: '上课地点',
             content: course.room,
-            color: const Color(0xFF007AFF),
-            isDark: isDark,
+            color: colors.primary,
           ),
           SizedBox(height: isTablet ? 16 : 14),
 
@@ -77,8 +76,7 @@ class CourseDetailSheet extends StatelessWidget {
                 : CupertinoIcons.person_fill,
             label: '授课教师',
             content: course.teachers.join(', '),
-            color: const Color(0xFFFF3B30),
-            isDark: isDark,
+            color: colors.danger,
           ),
           SizedBox(height: isTablet ? 16 : 14),
 
@@ -87,8 +85,7 @@ class CourseDetailSheet extends StatelessWidget {
             icon: CupertinoIcons.calendar,
             label: '上课时间',
             content: _formatScheduleInfo(),
-            color: const Color(0xFF34C759),
-            isDark: isDark,
+            color: colors.success,
           ),
 
           if (course.campus.isNotEmpty) ...[
@@ -98,8 +95,7 @@ class CourseDetailSheet extends StatelessWidget {
               icon: CupertinoIcons.building_2_fill,
               label: '上课校区',
               content: course.campus,
-              color: const Color(0xFFFF9500),
-              isDark: isDark,
+              color: colors.warning,
             ),
           ],
 
@@ -110,8 +106,7 @@ class CourseDetailSheet extends StatelessWidget {
               icon: CupertinoIcons.star_fill,
               label: '课程学分',
               content: course.credits,
-              color: const Color(0xFFFFCC00),
-              isDark: isDark,
+              color: colors.yellow,
             ),
           ],
 
@@ -121,11 +116,12 @@ class CourseDetailSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildActionMenu(BuildContext context, bool isDark) {
+  Widget _buildActionMenu(BuildContext context) {
+    final colors = context.clubColors;
     return PopupMenuButton(
       icon: Icon(
         Icons.more_horiz,
-        color: isDark ? Colors.grey[400] : Colors.grey[600],
+        color: colors.secondaryLabel,
       ),
       itemBuilder: (context) => [
         if (onEdit != null)
@@ -144,9 +140,9 @@ class CourseDetailSheet extends StatelessWidget {
             value: 'delete',
             child: Row(
               children: [
-                Icon(Icons.delete, size: 20, color: Colors.red[400]),
+                Icon(Icons.delete, size: 20, color: colors.danger),
                 const SizedBox(width: 12),
-                Text('删除课程', style: TextStyle(color: Colors.red[400])),
+                Text('删除课程', style: TextStyle(color: colors.danger)),
               ],
             ),
           ),
@@ -168,8 +164,8 @@ class CourseDetailSheet extends StatelessWidget {
     required String label,
     required String content,
     required Color color,
-    required bool isDark,
   }) {
+    final colors = context.clubColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -179,7 +175,7 @@ class CourseDetailSheet extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: ClubRadii.control,
           ),
           child: Icon(
             icon,
@@ -197,7 +193,7 @@ class CourseDetailSheet extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  color: colors.secondaryLabel,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -206,7 +202,7 @@ class CourseDetailSheet extends StatelessWidget {
                 content,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: colors.label,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -240,7 +236,7 @@ class CourseDetailSheet extends StatelessWidget {
         context: context,
         builder: (context) => Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: ClubRadii.card,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),

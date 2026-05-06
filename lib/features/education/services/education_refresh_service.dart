@@ -1,0 +1,78 @@
+import 'package:ios_club_app/core/utils/app_logger.dart';
+
+import 'auth_service.dart';
+import 'course_service.dart';
+import 'edu_time_service.dart';
+import 'education_cache_service.dart';
+import 'exam_service.dart';
+import 'info_service.dart';
+import 'score_service.dart';
+
+typedef CourseRefreshCallback = Future<void> Function();
+
+class EducationRefreshService {
+  static CourseRefreshCallback? _courseRefreshCallback;
+
+  static void setCourseRefreshCallback(CourseRefreshCallback? callback) {
+    _courseRefreshCallback = callback;
+  }
+
+  static void resetForTest() {
+    _courseRefreshCallback = null;
+  }
+
+  static Future<bool> loginAndRefresh(String username, String password) async {
+    await EducationCacheService.clearEduCache();
+    final loginResult = await AuthService.loginFromData(username, password);
+    if (!loginResult) {
+      return false;
+    }
+    return refreshWithExistingSession();
+  }
+
+  static Future<bool> refresh() async {
+    try {
+      final loginResult = await AuthService.login();
+      if (!loginResult) {
+        return false;
+      }
+      return refreshWithExistingSession();
+    } catch (e, stackTrace) {
+      AppLogger.error('刷新数据失败', error: e, stackTrace: stackTrace);
+      return false;
+    }
+  }
+
+  static Future<bool> refreshWithExistingSession() async {
+    try {
+      final cookieData = await AuthService.getUserData();
+      if (cookieData == null) {
+        return false;
+      }
+
+      await Future.wait([
+        ScoreService.fetchSemestersFromRemote(
+          userData: cookieData,
+          forceRefresh: true,
+        ),
+        EduTimeService.fetchTimeInfoFromRemote(forceRefresh: true),
+        ExamService.getExam(userData: cookieData, forceRefresh: true),
+        InfoService.getInfoCompletion(
+          userData: cookieData,
+          forceRefresh: true,
+        ),
+      ]);
+
+      await CourseService.getCourse(userData: cookieData, isRefresh: true);
+
+      final callback = _courseRefreshCallback;
+      if (callback != null) {
+        await callback();
+      }
+      return true;
+    } catch (e, stackTrace) {
+      AppLogger.error('刷新数据失败', error: e, stackTrace: stackTrace);
+      return false;
+    }
+  }
+}

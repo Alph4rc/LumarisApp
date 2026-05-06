@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -9,19 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  const launcherChannel = MethodChannel('plugins.flutter.io/url_launcher');
 
   setUp(() async {
     // Clear shared preferences before each test
     SharedPreferences.setMockInitialValues({});
     await PrefsService.init();
-    TileService.resetDioForTest();
-  });
-
-  tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(launcherChannel, null);
-    TileService.resetDioForTest();
   });
 
   group('TileService - Configuration Methods', () {
@@ -121,7 +111,7 @@ void main() {
       expect(config.getVisibleTiles().length, 1);
     });
 
-    test('should_throw_exception_when_hiding_all_tiles', () async {
+    test('should_allow_hiding_all_tiles_for_empty_state', () async {
       final initialConfig = TileConfigurationList(
         configurations: [
           const TileConfiguration(id: '电费', order: 0, isVisible: true),
@@ -130,10 +120,11 @@ void main() {
       );
       await TileService.saveTileConfigurations(initialConfig);
 
-      expect(
-        () => TileService.toggleTileVisibility('电费'),
-        throwsA(isA<TileConfigurationException>()),
-      );
+      await TileService.toggleTileVisibility('电费');
+
+      final config = await TileService.getTileConfigurations();
+      expect(config.getVisibleTiles(), isEmpty);
+      expect(config.configurations.single.isVisible, isFalse);
     });
 
     test('should_reset_to_default_configuration', () async {
@@ -341,193 +332,6 @@ void main() {
       final loaded = await TileService.getTileConfigurations();
       final visible = loaded.getVisibleTiles().map((e) => e.id).toList();
       expect(visible, ['电费']);
-    });
-  });
-
-  group('TileService - Electricity HTML parsing', () {
-    test('getTextAfterKeyword should parse balance from html and persist url',
-        () async {
-      final dio = Dio();
-      dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.resolve(
-              Response<dynamic>(
-                requestOptions: options,
-                statusCode: 200,
-                data: '<html><body>充值余额：¥12.5</body></html>',
-              ),
-            );
-          },
-        ),
-      );
-      TileService.setDioForTest(dio);
-
-      final value =
-          await TileService.getTextAfterKeyword(url: 'https://example.com/e');
-      expect(value, 12.5);
-      expect(PrefsService.instance.getString(PrefsKeys.ELECTRICITY_URL),
-          'https://example.com/e');
-    });
-
-    test('getTextAfterKeyword should return null on non-200 response',
-        () async {
-      final dio = Dio();
-      dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.resolve(
-              Response<dynamic>(
-                requestOptions: options,
-                statusCode: 500,
-                data: 'err',
-              ),
-            );
-          },
-        ),
-      );
-      TileService.setDioForTest(dio);
-
-      final value =
-          await TileService.getTextAfterKeyword(url: 'https://example.com/e');
-      expect(value, isNull);
-    });
-
-    test('getTextAfterKeyword should return null when number is invalid',
-        () async {
-      final dio = Dio();
-      dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.resolve(
-              Response<dynamic>(
-                requestOptions: options,
-                statusCode: 200,
-                data: '<html><body>充值余额：¥N/A</body></html>',
-              ),
-            );
-          },
-        ),
-      );
-      TileService.setDioForTest(dio);
-
-      final value =
-          await TileService.getTextAfterKeyword(url: 'https://example.com/e');
-      expect(value, isNull);
-    });
-
-    test('getTextAfterKeyword should return null when url is empty', () async {
-      await PrefsService.instance.remove(PrefsKeys.ELECTRICITY_URL);
-      final value = await TileService.getTextAfterKeyword(url: '');
-      expect(value, isNull);
-    });
-
-    test('getTextAfterKeyword should return null on request failure', () async {
-      final value =
-          await TileService.getTextAfterKeyword(url: 'http://127.0.0.1:1/x');
-      expect(value, isNull);
-    });
-
-    test('getElectricityWeeklyData should return empty when url missing',
-        () async {
-      await PrefsService.instance.remove(PrefsKeys.ELECTRICITY_URL);
-      final list = await TileService.getElectricityWeeklyData();
-      expect(list, isEmpty);
-    });
-
-    test('getElectricityWeeklyData should parse and aggregate hourly values',
-        () async {
-      await PrefsService.instance
-          .setString(PrefsKeys.ELECTRICITY_URL, 'https://x/wxAccount?id=1');
-      final dio = Dio();
-      dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.resolve(
-              Response<dynamic>(
-                requestOptions: options,
-                statusCode: 200,
-                data: '''
-<table>
-  <tr><td>1</td><td>2026/03/02 10:00</td><td>1.5</td></tr>
-  <tr><td>2</td><td>2026/03/02 10:30</td><td>0.5</td></tr>
-  <tr><td>3</td><td>2026/03/02 11:00</td><td>2.0</td></tr>
-</table>
-''',
-              ),
-            );
-          },
-        ),
-      );
-      TileService.setDioForTest(dio);
-
-      final list = await TileService.getElectricityWeeklyData();
-      expect(list, hasLength(2));
-      expect(list[0].value, 2.0);
-      expect(list[1].value, 2.0);
-      expect(list[0].timestamp.hour, 10);
-      expect(list[1].timestamp.hour, 11);
-    });
-  });
-
-  group('TileService - URL launch behavior', () {
-    test('openInWeChat should prefer wechat url scheme when available',
-        () async {
-      final launched = <String>[];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(launcherChannel, (call) async {
-        final url = (call.arguments is Map)
-            ? (call.arguments['url'] as String? ?? '')
-            : call.arguments.toString();
-        if (call.method == 'canLaunch' || call.method == 'canLaunchUrl') {
-          return url.startsWith('weixin://');
-        }
-        if (call.method == 'launch' || call.method == 'launchUrl') {
-          launched.add(url);
-          return true;
-        }
-        return null;
-      });
-
-      await TileService.openInWeChat('https://example.com/a');
-      expect(launched.single, startsWith('weixin://dl/business/'));
-    });
-
-    test('openInWeChat should fallback to browser when wechat unavailable',
-        () async {
-      final launched = <String>[];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(launcherChannel, (call) async {
-        final url = (call.arguments is Map)
-            ? (call.arguments['url'] as String? ?? '')
-            : call.arguments.toString();
-        if (call.method == 'canLaunch' || call.method == 'canLaunchUrl') {
-          return url.startsWith('http');
-        }
-        if (call.method == 'launch' || call.method == 'launchUrl') {
-          launched.add(url);
-          return true;
-        }
-        return null;
-      });
-
-      await TileService.openInWeChat('https://example.com/a');
-      expect(launched.single, 'https://example.com/a');
-    });
-
-    test('openInWeChat should throw when no launcher is available', () async {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(launcherChannel, (call) async {
-        if (call.method == 'canLaunch' || call.method == 'canLaunchUrl') {
-          return false;
-        }
-        return null;
-      });
-
-      await expectLater(
-        () => TileService.openInWeChat('https://example.com/a'),
-        throwsA(isA<String>()),
-      );
     });
   });
 }

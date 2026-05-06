@@ -5,7 +5,7 @@ import 'package:ios_club_app/core/services/retry_policy.dart';
 
 class NetService {
   static final RequestCache _cache = RequestCache.instance;
-  static final Dio _dio = Dio(BaseOptions(
+  static Dio _dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 3),
     receiveTimeout: const Duration(seconds: 3),
   ));
@@ -23,15 +23,17 @@ class NetService {
     }
   }
 
-  static Future<Map<String, dynamic>> get() async {
+  static Future<Map<String, dynamic>> get({bool forceRefresh = false}) async {
     _ensureInitialized();
 
     const url = 'http://10.99.144.34/cgi-bin/rad_user_info?callback=json';
 
     // 尝试从缓存获取数据
-    final cachedData = await _cache.get<Map<String, dynamic>>(url);
-    if (cachedData != null) {
-      return cachedData;
+    if (!forceRefresh) {
+      final cachedData = await _cache.get<Map<String, dynamic>>(url);
+      if (cachedData != null) {
+        return cachedData;
+      }
     }
 
     try {
@@ -55,5 +57,18 @@ class NetService {
     } on DioException catch (e) {
       DioErrorHandler.handleError(e);
     }
+  }
+
+  static void setDioForTest(Dio dio) {
+    _dio = dio;
+    _initialized = false;
+  }
+
+  static void resetForTest() {
+    _dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 3),
+      receiveTimeout: const Duration(seconds: 3),
+    ));
+    _initialized = false;
   }
 }

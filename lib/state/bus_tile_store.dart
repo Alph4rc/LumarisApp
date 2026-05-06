@@ -1,58 +1,43 @@
-import 'package:get/get.dart';
-import 'package:ios_club_app/core/models/bus_model.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
-import 'package:ios_club_app/core/services/new_bus_api.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/models/bus_model.dart';
+import 'package:ios_club_app/features/education/services/bus_service.dart';
+import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/state/tile_store_providers.dart';
 
-class BusTileStore extends GetxController {
-  final RxBool isLoading = true.obs;
-  final RxInt busCount = 0.obs;
-  //final Rx<BusModel> busData = BusModel(records: [], total: 0).obs;
-  final RxBool useNewApi = false.obs;
+typedef BusFetcher = Future<BusModel> Function();
 
+final busFetcherProvider = Provider<BusFetcher>((ref) {
+  return BusService.getBus;
+});
+
+final busTileStoreProvider =
+    NotifierProvider<BusTileStore, BusTileState>(BusTileStore.new);
+
+class BusTileStore extends Notifier<BusTileState> {
   @override
-  void onInit() {
-    super.onInit();
-    loadBusData();
+  BusTileState build() {
+    if (ref.read(tileStoreAutoLoadProvider)) {
+      Future<void>.microtask(loadBusData);
+    }
+    return const BusTileState();
   }
 
-  Future<void> loadPreferences() async {
-    final prefs = PrefsService.instance;
-    useNewApi.value = prefs.getBool(PrefsKeys.USE_NEW_BUS_API) ?? false;
-  }
+  bool get isLoading => state.isLoading;
+  int get busCount => state.busCount;
 
   Future<void> loadBusData() async {
     try {
-      isLoading.value = true;
+      state = state.copyWith(isLoading: true);
 
-      // 加载API偏好设置
-      await loadPreferences();
+      final data = await ref.read(busFetcherProvider)();
 
-      BusModel data;
-      if (useNewApi.value) {
-        // 使用新API
-        data = await getBusFromNewData(loc: 'ALL');
-      } else {
-        // 使用旧API
-        data = await EduService.getBus();
-      }
-
-      //busData.value = data;
-      busCount.value = data.records.length;
+      state = state.copyWith(busCount: data.records.length);
     } finally {
-      isLoading.value = false;
+      state = state.copyWith(isLoading: false);
     }
   }
 
   Future<void> refreshBusData() async {
     await loadBusData();
-  }
-
-  Future<void> toggleUseNewApi(bool value) async {
-    useNewApi.value = value;
-    final prefs = PrefsService.instance;
-    await prefs.setBool(PrefsKeys.USE_NEW_BUS_API, useNewApi.value);
-    await loadBusData(); // 切换后重新加载数据
   }
 }

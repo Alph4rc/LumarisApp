@@ -1,144 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
+import 'package:ios_club_app/features/education/models/electric_data.dart';
+import 'package:ios_club_app/core/models/tile_configuration.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
+import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class _TestElectricityStore extends ElectricityStore {
-  @override
-  void onInit() {}
-}
-
-class _TestPaymentStore extends PaymentStore {
-  @override
-  void onInit() {}
-}
-
-Widget _wrap(Widget child) {
-  return GetMaterialApp(
-    home: Scaffold(
-      body: SizedBox(width: 300, height: 200, child: child),
-    ),
-    getPages: <GetPage<dynamic>>[
-      GetPage<dynamic>(name: '/Electricity', page: () => const SizedBox()),
-      GetPage<dynamic>(name: '/Payment', page: () => const SizedBox()),
-    ],
-  );
-}
+List<Override> _overrides() => [
+      tileConfigurationReaderProvider.overrideWithValue(
+        () async => TileConfigurationList.defaultConfig(),
+      ),
+      tileConfigurationWriterProvider.overrideWithValue((config) async {}),
+      availableTilesReaderProvider.overrideWithValue(
+        () => const ['电费', '校车', '饭卡'],
+      ),
+      electricityReaderProvider.overrideWithValue(() async => 23.5),
+      electricityWeeklyReaderProvider.overrideWithValue(
+        () async => [ElectricData(timestamp: DateTime(2026), value: 1)],
+      ),
+      electricityTileVisibilityReaderProvider
+          .overrideWithValue((_) async => true),
+      studentIsLoginReaderProvider.overrideWithValue(() => true),
+      paymentStudentIdReaderProvider.overrideWithValue(() async => 'student-1'),
+      paymentDataFetcherProvider.overrideWithValue(
+        (_) async => const PaymentData(
+          [
+            PaymentModel(
+              turnoverType: '充值',
+              datetimeStr: '2026-04-27',
+              resume: '测试',
+              amount: 20,
+            ),
+          ],
+          20,
+        ),
+      ),
+      tileVisibilityReaderProvider.overrideWithValue((_) async => true),
+    ];
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    Get.testMode = true;
-    Get.reset();
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({'username': 'student-1'});
+    await PrefsService.init();
   });
 
-  tearDown(() {
-    Get.reset();
-  });
+  testWidgets('tiles_render_loaded_states', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: _overrides(),
+        child: const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                SizedBox(width: 180, height: 180, child: ElectricityTile()),
+                SizedBox(width: 180, height: 180, child: PaymentTile()),
+                SizedBox(width: 180, height: 180, child: BusTile()),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
-  group('ElectricityTile', () {
-    testWidgets('shows loading indicator when store is loading',
-        (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = true;
-      store.hasData.value = false;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-
-    testWidgets('shows low balance style when amount is small', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = true;
-      store.electricity.value = 8.0;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.text('当前电费'), findsOneWidget);
-      expect(find.text('¥8.00'), findsOneWidget);
-      expect(find.text('余额不足'), findsOneWidget);
-    });
-
-    testWidgets('shows normal state when amount is sufficient', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = true;
-      store.electricity.value = 18.5;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.text('¥18.50'), findsOneWidget);
-      expect(find.text('余额不足'), findsNothing);
-    });
-
-    testWidgets('shows subscribe hint when no data exists', (tester) async {
-      final store = Get.put<ElectricityStore>(_TestElectricityStore());
-      store.isLoading.value = false;
-      store.hasData.value = false;
-
-      await tester.pumpWidget(_wrap(const ElectricityTile()));
-      expect(find.text('电费查询'), findsOneWidget);
-      expect(find.text('点击订阅'), findsOneWidget);
-    });
-  });
-
-  group('PaymentTile', () {
-    testWidgets('shows loading indicator when store is loading',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = true;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-
-    testWidgets('shows low balance state when recharge value is low',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 9.2;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('当前余额'), findsOneWidget);
-      expect(find.text('¥9.20'), findsOneWidget);
-      expect(find.text('余额不足'), findsOneWidget);
-    });
-
-    testWidgets('shows normal balance state when value is sufficient',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 30.0;
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('¥30.00'), findsOneWidget);
-      expect(find.text('余额不足'), findsNothing);
-    });
-
-    testWidgets('shows bind hint when no value and no error', (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 0;
-      store.errorMessage.value = '';
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('饭卡余额'), findsOneWidget);
-      expect(find.text('点击绑定'), findsOneWidget);
-    });
-
-    testWidgets('shows error message when no value but has error',
-        (tester) async {
-      final store = Get.put<PaymentStore>(_TestPaymentStore());
-      store.isLoading.value = false;
-      store.totalRecharge.value = 0;
-      store.errorMessage.value = '请先绑定饭卡';
-
-      await tester.pumpWidget(_wrap(const PaymentTile()));
-      expect(find.text('请先绑定饭卡'), findsOneWidget);
-      expect(find.text('点击绑定'), findsNothing);
-    });
+    expect(find.text('当前电费'), findsOneWidget);
+    expect(find.text('当前余额'), findsOneWidget);
+    expect(find.text('今日校车'), findsOneWidget);
   });
 }

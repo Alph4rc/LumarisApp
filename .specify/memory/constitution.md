@@ -17,9 +17,9 @@ Sync Impact Report:
 
 ### I. Platform-First Architecture
 
-Every feature MUST support all target platforms (iOS, Android, macOS, Windows, Linux, Web, WeChat Mini Program) unless explicitly scoped otherwise. Platform-specific code MUST be isolated in `lib/platform/` with clear abstraction boundaries. All platform detection MUST use `PlatformUtils` from `lib/core/utils/platform_utils.dart` - direct usage of `dart:io Platform` is FORBIDDEN as it breaks WeChat Mini Program compatibility.
+Every feature MUST support all target platforms (iOS, Android, macOS, Windows, Linux, Web) unless explicitly scoped otherwise. Platform-specific code MUST be isolated in `lib/platform/` with clear abstraction boundaries. All platform detection MUST use `PlatformUtils` from `lib/core/utils/platform_utils.dart`.
 
-**Rationale**: The app targets 7+ platforms including WeChat Mini Program which has unique runtime constraints. Direct platform checks cause `TypeError` in MPFlutter environment. Centralized platform utilities ensure consistent behavior and prevent runtime crashes.
+**Rationale**: Centralized platform utilities ensure consistent behavior across platforms and prevent runtime crashes when `dart:io` is unavailable (e.g., web).
 
 ### II. State Management via GetX
 
@@ -64,7 +64,7 @@ All async operations MUST have try-catch blocks with appropriate error handling.
 
 ### Cross-Platform Requirements
 
-- All UI code MUST work on mobile (iOS/Android), desktop (Windows/macOS/Linux), web, and WeChat Mini Program
+- All UI code MUST work on mobile (iOS/Android), desktop (Windows/macOS/Linux), and web
 - Navigation MUST adapt: bottom bar for mobile, sidebar for desktop, native macOS sidebar for macOS
 - Fonts MUST use `PlatformUtils.getDesktopFontFamily()` for consistent rendering on desktop platforms
 - Platform-specific features (widgets, background services) MUST gracefully degrade on unsupported platforms
@@ -89,7 +89,7 @@ All async operations MUST have try-catch blocks with appropriate error handling.
 **Naming Conventions**:
 - Classes: `PascalCase` (CourseModel, UserService)
 - Variables/methods: `camelCase` (courseName, getUserData)
-- Constants: `lowerCamelCase` (kIsMPFlutter)
+- Constants: `lowerCamelCase`
 - Private members: prefix with `_` (_initializeData)
 
 ### Service Layer Pattern

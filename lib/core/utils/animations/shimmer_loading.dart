@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Shimmer闪光加载效果
 ///
@@ -74,15 +75,16 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
+          final colors = context.clubColors;
           return ShaderMask(
             shaderCallback: (bounds) {
               return LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: const [
-                  Color(0xFFEBEBF4),
-                  Color(0xFFF4F4F4),
-                  Color(0xFFEBEBF4),
+                colors: [
+                  colors.skeletonBase,
+                  colors.skeletonHighlight,
+                  colors.skeletonBase,
                 ],
                 stops: [
                   _animation.value - 0.3,
@@ -94,14 +96,14 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
             child: widget.skeleton ?? child,
           );
         },
-        child: widget.skeleton ?? _buildDefaultSkeleton(),
+        child: widget.skeleton ?? _buildDefaultSkeleton(context),
       ),
     );
   }
 
-  Widget _buildDefaultSkeleton() {
+  Widget _buildDefaultSkeleton(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: context.clubColors.cardBackground,
     );
   }
 }
@@ -123,12 +125,14 @@ class SkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
+
     return Container(
       width: width,
       height: height,
       margin: margin,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.cardBackground,
         borderRadius: borderRadius ?? BorderRadius.circular(4),
       ),
     );
@@ -148,12 +152,14 @@ class SkeletonCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
+
     return Container(
       width: size,
       height: size,
       margin: margin,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: colors.cardBackground,
         shape: BoxShape.circle,
       ),
     );
@@ -175,12 +181,14 @@ class SkeletonLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
+
     return Container(
       width: width,
       height: height,
       margin: margin,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.cardBackground,
         borderRadius: BorderRadius.circular(height / 2),
       ),
     );
@@ -251,12 +259,14 @@ class CardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
+
     return Container(
       height: height ?? 200,
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.cardBackground,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

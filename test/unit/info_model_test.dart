@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/models/info_model.dart';
+import 'package:ios_club_app/features/education/models/info_model.dart';
 
 void main() {
   group('TotalData', () {

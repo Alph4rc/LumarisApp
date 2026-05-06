@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'dart:async' show Future;
 
 class LicensePage extends StatefulWidget {
@@ -40,7 +41,12 @@ class _LicensePageState extends State<LicensePage> {
     return Scaffold(
       appBar: ClubAppBar(title: '开源许可证'),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: LoadingStateView(
+                title: '正在读取许可证',
+                subtitle: '正在加载应用附带的开源协议文本',
+              ),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: SelectableText(_licenseText),

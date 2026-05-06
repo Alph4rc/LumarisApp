@@ -1,12 +1,11 @@
 # iOS Club App
 
-这是一个基于 Flutter 的跨平台移动应用程序，专为 iOS Club 设计，旨在提供课程信息、日程安排、成员管理等功能。
+这是一个基于 Flutter 的跨平台移动应用程序，旨在提供课程信息、日程安排、成绩查询、校园服务等功能。
 
 ## 主要功能
 
 - **课程管理**：展示课程列表，包括课程名称、时间、地点等信息。
 - **日程安排**：提供日程设置和展示功能。
-- **成员管理**：展示俱乐部成员信息。
 - **考试信息**：显示考试安排。
 - **待办事项**：管理日常任务。
 - **成绩查询**：查看个人成绩。
@@ -69,6 +68,8 @@ UPDATE_CHANNEL=gitee
    flutter build apk --obfuscate --split-debug-info=xx --no-tree-shake-icons --target-platform android-arm64 --split-per-abi
    ```
    
+可以加入 `--dart-define=UPDATE_CHANNEL=appstore` 来表明使用应用商店版本
+   
 3. Android (aab):
    ```bash
    flutter build appbundle --obfuscate --split-debug-info=xx --no-tree-shake-icons --target-platform android-arm64
@@ -88,17 +89,12 @@ UPDATE_CHANNEL=gitee
    
 6. iOS (ipa):
    ```bash
-   flutter build ios
+   flutter build ipa
    ```
 
 7. Linux
    ```bash
    flutter build linux
-   ```
-   
-8. 微信小程序
-   ```bash
-   
    ```
 
 ## 贡献指南

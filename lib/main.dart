@@ -2,88 +2,80 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:display_mode/display_mode.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/platform/android/background_service.dart';
-import 'package:ios_club_app/state/init.dart';
-import 'package:ios_club_app/features/system/update/check_update_manager.dart';
-import 'package:ios_club_app/platform/ios/background_service.dart';
-import 'package:ios_club_app/core/utils/performance_monitor.dart';
-import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/state/auth_state_notifier.dart';
+import 'package:ios_club_app/core/services/hive_manager.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/features/education/services/auth_service.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
+import 'package:ios_club_app/features/system/widget_service.dart';
+import 'package:ios_club_app/platform/android/background_service.dart';
+import 'package:ios_club_app/platform/ios/background_service.dart';
+import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'main_app.dart';
-import 'package:ios_club_app/core/services/hive_manager.dart';
-import 'package:ios_club_app/features/education/services/edu_service.dart';
-import 'package:ios_club_app/state/settings_store.dart';
-
-import 'package:mpflutter_core/mpflutter_core.dart' show runMPApp;
-import 'package:mpflutter_wechat_api/mpflutter_wechat_api.dart' show wx;
 
 void main() async {
-  // 确保在所有平台上都初始化 WidgetsFlutterBinding
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 日志系统已就绪（AppLogger 是静态类，无需初始化）
   AppLogger.info('iOS Club App 启动中...');
 
-  // 初始化 Hive 数据库
-  await HiveManager.init();
+  // Hive 和 SharedPreferences 互相独立，并行初始化
+  await Future.wait([
+    HiveManager.init(),
+    PrefsService.init(),
+  ]);
 
-  // 在微信小程序环境中，跳过大部分平台特定的初始化
-  if (PlatformUtils.isMPFlutter) {
-    // 初始化 SharedPreferences
-    await PrefsService.init();
-    // 只初始化必要的 Stores
-    initStores();
-    // 直接启动应用
-    initApp();
-    return;
+  if (PlatformUtils.isIOS) {
+    await WidgetService.initialize();
   }
 
-  // 以下代码只在非微信小程序环境中执行
+  final providerContainer = ProviderContainer();
+  final settingsStore = providerContainer.read(settingsStoreProvider.notifier);
+  final authStateNotifier =
+      providerContainer.read(authStateNotifierProvider.notifier);
+  final courseStore = providerContainer.read(courseStoreProvider.notifier);
 
-  // 初始化 SharedPreferences（最先初始化，其他服务可能依赖它）
-  await PrefsService.init();
+  EduHttpClientManager.initialize(
+    school: settingsStore.currentSchool,
+    authStateCallbacks: AuthStateCallbacks(
+      onRelogging: authStateNotifier.startRelogging,
+      onRelogSuccess: authStateNotifier.relogSuccess,
+      onRelogFailed: authStateNotifier.relogFailed,
+    ),
+  );
+  EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
-  // 尝试迁移旧的凭证数据到安全存储
-  await EduService.migrateCredentials();
-
-  // 初始化性能监控
-  PerformanceMonitor().initialize();
-
-  // 初始化请求缓存
-  await RequestCache().initialize();
-
-  // 初始化Stores
-  initStores();
-
-  // 平台特定初始化 - 使用统一的平台判断
   if (!PlatformUtils.isMacOS) {
     requestPermissions();
   }
 
   if (PlatformUtils.isDesktop) {
-    // 初始化 window_manager
     await windowManager.ensureInitialized();
 
-    // 根据平台配置不同的窗口选项
     if (PlatformUtils.isMacOS) {
-      // macOS 专用窗口配置
       WindowOptions windowOptions = const WindowOptions(
         minimumSize: Size(800, 600),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.hidden,
-        // 隐藏标题栏以使用原生macOS样式
         title: 'iOS Club App',
       );
 
@@ -92,7 +84,6 @@ void main() async {
         await windowManager.focus();
       });
     } else {
-      // 其他桌面平台的窗口配置
       WindowOptions windowOptions = const WindowOptions(
         minimumSize: Size(800, 600),
         center: true,
@@ -106,11 +97,6 @@ void main() async {
         await windowManager.focus();
       });
     }
-  } else if (PlatformUtils.isAndroid) {
-    // 只在Android平台调用FlutterDisplayMode
-    await FlutterDisplayMode.setHighRefreshRate();
-    await BackgroundService.initializeService();
-    await BackgroundService.startService();
   } else if (PlatformUtils.isIOS) {
     await IOSBackgroundService.initializeService();
     await IOSBackgroundService.startService();
@@ -120,10 +106,36 @@ void main() async {
     await _configureMacosWindowUtils();
   }
 
-  // 初始化更新管理器
-  await CheckUpdateManager.init();
+  // 先渲染 UI，再执行非关键初始化
+  initApp(providerContainer);
 
-  initApp();
+  // 延后到首帧渲染之后：凭证迁移、请求缓存、后台服务等
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _deferredInit();
+  });
+}
+
+/// 延后执行的非关键初始化，避免阻塞首帧渲染
+Future<void> _deferredInit() async {
+  // 凭证迁移（SecureStorage 在安卓上可能较慢）和请求缓存并行执行
+  await Future.wait([
+    AuthService.migrateCredentials(),
+    RequestCache().initialize(),
+  ]);
+
+  if (PlatformUtils.isAndroid) {
+    await FlutterDisplayMode.setHighRefreshRate();
+    await BackgroundService.initializeService();
+    await BackgroundService.startService();
+  }
+
+  if (PlatformUtils.isMobile) {
+    await NotificationService.instance.initialize();
+    Future.delayed(const Duration(seconds: 2), () async {
+      await TaskExecutor.checkAndSendCourseReminder();
+      await TaskExecutor.updateWidget();
+    });
+  }
 }
 
 /// 配置macOS窗口样式
@@ -132,134 +144,80 @@ Future<void> _configureMacosWindowUtils() async {
   await config.apply();
 }
 
-String? _getFontFamily() {
-  if (PlatformUtils.isDesktop) {
-    // 获取设置存储实例
-    final settingsStore = SettingsStore.to;
-    // 如果设置了自定义字体，则使用自定义字体，否则使用系统默认字体
-    return PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
-  }
-  // Windows 平台返回默认字体
-  return PlatformUtils.getWindowsFontFamily();
-}
-
-Widget _getHomePage() {
-  // 在微信小程序环境中，直接返回 MainApp
-  if (PlatformUtils.isMPFlutter) {
-    return const MainApp();
-  }
-
-  // Windows 平台返回 WindowPage
-  if (PlatformUtils.isWindows) {
-    return const WindowPage();
-  }
-
-  return const MainApp();
-}
-
-void initApp() {
-  if (PlatformUtils.isMacOS) {
-    runApp(MacosApp(
-      title: 'iOS Club App',
-      debugShowCheckedModeBanner: false,
-      theme: MacosThemeData.light().copyWith(
-        primaryColor: CupertinoColors.systemBlue,
-        pushButtonTheme: const PushButtonThemeData(
-          color: CupertinoColors.systemBlue,
-          secondaryColor: CupertinoColors.systemGrey,
-        ),
-        // 帮助按钮主题
-        helpButtonTheme: const HelpButtonThemeData(
-          color: CupertinoColors.systemBlue,
-        ),
-      ),
-      darkTheme: MacosThemeData.dark().copyWith(
-        primaryColor: CupertinoColors.systemBlue,
-        brightness: Brightness.dark,
-        pushButtonTheme: const PushButtonThemeData(
-          color: CupertinoColors.systemBlue,
-          secondaryColor: CupertinoColors.systemGrey,
-        ),
-        helpButtonTheme: const HelpButtonThemeData(
-          color: CupertinoColors.systemBlue,
-        ),
-      ),
-      // 跟随系统设置自动切换亮暗模式
-      themeMode: ThemeMode.system,
-      home: const MainApp(),
-    ));
-    return;
-  }
-
-  if (PlatformUtils.isMPFlutter) {
-    try {
-      wx.$$context$$;
-      runMPApp(MaterialApp(
-        title: 'iOS Club App',
-        debugShowCheckedModeBanner: false,
-        home: const MainApp(),
-      ));
-      return;
-    } catch (e) {
-      //
-    }
-  }
-
-  runApp(MaterialApp(
-    title: 'iOS Club App',
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      fontFamily: _getFontFamily(),
-      appBarTheme: AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-    ),
-    darkTheme: ThemeData(
-      fontFamily: _getFontFamily(),
-      brightness: Brightness.dark,
-      appBarTheme: const AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-    ),
-    home: _getHomePage(),
+void initApp(ProviderContainer container) {
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: const _AppLauncher(),
   ));
 }
 
-void requestPermissions() async {
-  // 在 Web、微信小程序和 macOS 平台中不请求权限，避免 MissingPluginException
-  if (PlatformUtils.isWeb ||
-      PlatformUtils.isMPFlutter ||
-      PlatformUtils.isMacOS) {
-    return;
-  }
+class _AppLauncher extends ConsumerWidget {
+  const _AppLauncher();
 
-  List<Permission> permissions = [
-    Permission.notification,
-    Permission.backgroundRefresh,
-    Permission.storage,
-    Permission.requestInstallPackages,
-  ];
-
-  // 只请求尚未授予的权限
-  List<Permission> permissionsToRequest = [];
-  for (var permission in permissions) {
-    PermissionStatus status = await permission.status;
-    if (status != PermissionStatus.granted) {
-      permissionsToRequest.add(permission);
+  Widget _buildAppShell(Widget child) {
+    if (PlatformUtils.isWindows) {
+      return WindowPage(child: child);
     }
+
+    return MainApp(child: child);
   }
 
-  if (permissionsToRequest.isNotEmpty) {
-    await permissionsToRequest.request();
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsStore = ref.watch(settingsStoreProvider);
+    final router = ref.watch(appRouterProvider);
+    // 直接从 settingsStore 获取需要的字体信息
+    final fontFamily = settingsStore.fontFamily.isEmpty
+        ? PlatformUtils.getWindowsFontFamily()
+        : PlatformUtils.getDesktopFontFamily(settingsStore.fontFamily);
+
+    if (PlatformUtils.isMacOS) {
+      return MacosApp.router(
+        title: 'iOS Club App',
+        debugShowCheckedModeBanner: false,
+        theme: ClubTheme.macosLightTheme(),
+        darkTheme: ClubTheme.macosDarkTheme(),
+        themeMode: settingsStore.themeMode,
+        routerConfig: router,
+        builder: (context, child) => ClubMaterialThemeBridge(
+          fontFamily: fontFamily,
+          child: _buildAppShell(child ?? const SizedBox.shrink()),
+        ),
+      );
+    }
+
+    return MaterialApp.router(
+      title: 'iOS Club App',
+      debugShowCheckedModeBanner: false,
+      theme: ClubTheme.lightTheme(fontFamily: fontFamily),
+      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
+      themeMode: settingsStore.themeMode,
+      routerConfig: router,
+      builder: (context, child) =>
+          _buildAppShell(child ?? const SizedBox.shrink()),
+    );
   }
 }
 
+void requestPermissions() async {
+  if (PlatformUtils.isWeb || PlatformUtils.isMacOS) {
+    return;
+  }
+
+  await PermissionService.requestMultiple([
+    Permission.notification,
+    Permission.backgroundRefresh,
+    Permission.storage,
+  ]);
+}
+
 class WindowPage extends StatefulWidget {
-  const WindowPage({super.key});
+  const WindowPage({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
 
   @override
   State<WindowPage> createState() => _WindowPageState();
@@ -301,42 +259,30 @@ class _WindowPageState extends State<WindowPage>
   }
 
   @override
-  Widget build(BuildContext context) => const MainApp();
+  Widget build(BuildContext context) => MainApp(child: widget.child);
 
   @override
   void onWindowClose() async {
     if (_isPreventClose && mounted) {
       // 显示退出选项
-      showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: const Text('关闭窗口'),
-            content: const Text('选择您要执行的操作'),
-            actions: [
-              TextButton(
-                child: const Text('取消'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text('最小化到任务栏'),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await windowManager.hide();
-                },
-              ),
-              TextButton(
-                child: const Text('退出程序'),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await _exitApp();
-                },
-              ),
-            ],
-          );
-        },
+      PlatformDialog.showCustomDialog<void>(
+        context,
+        title: '关闭窗口',
+        content: const Text('选择您要执行的操作'),
+        actions: [
+          const PlatformDialogAction<void>(label: '取消'),
+          PlatformDialogAction<void>(
+            label: '最小化到任务栏',
+            onPressed: () async {
+              await windowManager.hide();
+            },
+          ),
+          PlatformDialogAction<void>(
+            label: '退出程序',
+            isDestructiveAction: true,
+            onPressed: _exitApp,
+          ),
+        ],
       );
     }
   }

@@ -6,7 +6,6 @@ void main() {
     test('should return correct values for Web environment', () {
       // 在测试环境中，我们主要检查工具类不会抛出异常
       expect(() => PlatformUtils.isWeb, returnsNormally);
-      expect(() => PlatformUtils.isMPFlutter, returnsNormally);
       expect(() => PlatformUtils.isMacOS, returnsNormally);
       expect(() => PlatformUtils.isWindows, returnsNormally);
       expect(() => PlatformUtils.isLinux, returnsNormally);

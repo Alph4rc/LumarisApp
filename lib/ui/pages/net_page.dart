@@ -1,41 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/net_service.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-class NetPage extends StatelessWidget {
+class NetPage extends StatefulWidget {
   const NetPage({super.key});
 
   @override
+  State<NetPage> createState() => _NetPageState();
+}
+
+class _NetPageState extends State<NetPage> {
+  Map<String, dynamic>? _data;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData({bool forceRefresh = false}) async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = _data == null;
+      _error = null;
+    });
+
+    try {
+      final data = await NetService.get(forceRefresh: forceRefresh);
+      if (!mounted) return;
+      setState(() {
+        _data = data;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      if (_data != null) {
+        showClubSnackBar(
+          context,
+          const Text('刷新失败，已保留当前校园网数据'),
+        );
+      } else {
+        setState(() {
+          _error = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // 使用 Material 3 风格的 Scaffold，背景色跟随主题
     return Scaffold(
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: NetService.get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const _LoadingView();
-          }
-
-          if (snapshot.hasError) {
-            return _ErrorView(error: snapshot.error.toString());
-          }
-
-          if (snapshot.hasData) {
-            return _DataContent(data: snapshot.data!);
-          }
-
-          return const _EmptyView();
-        },
-      ),
+      body: _buildBody(),
     );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const _LoadingView();
+    }
+    if (_data != null) {
+      return _DataContent(
+        data: _data!,
+        onRefresh: () {
+          _loadData(forceRefresh: true);
+        },
+      );
+    }
+    if (_error != null) {
+      return _ErrorView(
+        error: _error!,
+        onRetry: () {
+          _loadData();
+        },
+      );
+    }
+    return const _EmptyView();
   }
 }
 
 class _DataContent extends StatelessWidget {
   final Map<String, dynamic> data;
+  final VoidCallback onRefresh;
 
-  const _DataContent({required this.data});
+  const _DataContent({
+    required this.data,
+    required this.onRefresh,
+  });
 
   String _formatBytes(dynamic bytes) {
     if (bytes == null) return '0 B';
@@ -72,12 +133,12 @@ class _DataContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     // Apple 风格配色
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final primaryTextColor = isDark ? Colors.white : Colors.black;
-    final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[600];
+    final cardColor = colors.cardBackground;
+    final primaryTextColor = colors.label;
+    final secondaryTextColor = colors.secondaryLabel;
 
     return CustomScrollView(
       physics:
@@ -91,18 +152,7 @@ class _DataContent extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () {
-                // 简单的刷新逻辑，重建页面
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) =>
-                        const NetPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
+              onPressed: onRefresh,
             ),
           ],
         ),
@@ -127,11 +177,11 @@ class _DataContent extends StatelessWidget {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: cardColor,
-                            borderRadius:
-                                BorderRadius.circular(20), // Apple 风格圆角
+                            borderRadius: ClubRadii.card, // Apple 风格圆角
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color:
+                                    colors.shadowColor.withValues(alpha: 0.8),
                                 blurRadius: 20,
                                 offset: const Offset(0, 4),
                               ),
@@ -173,7 +223,7 @@ class _DataContent extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color:
                                       theme.primaryColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: ClubRadii.card,
                                 ),
                                 child: Text(
                                   "在线时长: ${timeFormat(data['sum_seconds'])}",
@@ -207,10 +257,11 @@ class _DataContent extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: cardColor,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: ClubRadii.panel,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color:
+                                    colors.shadowColor.withValues(alpha: 0.8),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),
@@ -220,7 +271,7 @@ class _DataContent extends StatelessWidget {
                             children: [
                               _DetailRow(
                                 icon: Icons.person_rounded,
-                                iconColor: Colors.blue,
+                                iconColor: colors.primary,
                                 title: '用户名',
                                 value: data['user_name'] ?? '未知',
                                 isFirst: true,
@@ -228,7 +279,7 @@ class _DataContent extends StatelessWidget {
                               const _Divider(),
                               _DetailRow(
                                 icon: Icons.wifi_rounded,
-                                iconColor: Colors.green,
+                                iconColor: colors.success,
                                 title: 'IP 地址',
                                 value: data['online_ip'] ?? '未知',
                                 onTap: () => _copyToClipboard(
@@ -238,7 +289,7 @@ class _DataContent extends StatelessWidget {
                               const _Divider(),
                               _DetailRow(
                                 icon: Icons.shopping_bag_rounded,
-                                iconColor: Colors.orange,
+                                iconColor: colors.warning,
                                 title: '产品套餐',
                                 value: data['products_name'] ?? '未知',
                                 isLast: true,
@@ -290,16 +341,15 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.vertical(
-          top: isFirst ? const Radius.circular(16) : Radius.zero,
-          bottom: isLast ? const Radius.circular(16) : Radius.zero,
+          top: isFirst ? ClubRadii.panelRadius : Radius.zero,
+          bottom: isLast ? ClubRadii.panelRadius : Radius.zero,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -309,12 +359,12 @@ class _DetailRow extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: iconColor,
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: ClubRadii.control,
                 ),
                 child: Icon(
                   icon,
                   size: 16,
-                  color: Colors.white,
+                  color: colors.onAccent,
                 ),
               ),
               const SizedBox(width: 12),
@@ -323,7 +373,7 @@ class _DetailRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: colors.label,
                 ),
               ),
               const Spacer(),
@@ -331,7 +381,7 @@ class _DetailRow extends StatelessWidget {
                 value,
                 style: TextStyle(
                   fontSize: 15,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  color: colors.secondaryLabel,
                 ),
               ),
               if (showArrow) ...[
@@ -339,7 +389,7 @@ class _DetailRow extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,
-                  color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  color: colors.tertiaryLabel,
                 ),
               ],
             ],
@@ -355,11 +405,11 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     return Divider(
       height: 1,
       indent: 50, // Icon width + padding
-      color: isDark ? Colors.grey[800] : Colors.grey[200],
+      color: colors.separator,
     );
   }
 }
@@ -370,23 +420,31 @@ class _LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: CircularProgressIndicator.adaptive(),
+      child: LoadingStateView(
+        title: '正在读取校园网数据',
+        subtitle: '正在同步流量、在线时长和账号信息',
+      ),
     );
   }
 }
 
 class _ErrorView extends StatelessWidget {
   final String error;
+  final VoidCallback onRetry;
 
-  const _ErrorView({required this.error});
+  const _ErrorView({
+    required this.error,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline_rounded, size: 48, color: Colors.red[300]),
+          Icon(Icons.error_outline_rounded, size: 48, color: colors.danger),
           const SizedBox(height: 16),
           Text(
             '加载失败',
@@ -398,22 +456,12 @@ class _ErrorView extends StatelessWidget {
             child: Text(
               error,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: colors.secondaryLabel),
             ),
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation1, animation2) =>
-                      const NetPage(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
-            },
+            onPressed: onRetry,
             icon: const Icon(Icons.refresh),
             label: const Text('重试'),
           ),
@@ -428,15 +476,16 @@ class _EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox_rounded, size: 64, color: Colors.grey[400]),
+          Icon(Icons.inbox_rounded, size: 64, color: colors.secondaryLabel),
           const SizedBox(height: 16),
           Text(
             '暂无数据',
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(color: colors.secondaryLabel, fontSize: 16),
           ),
         ],
       ),

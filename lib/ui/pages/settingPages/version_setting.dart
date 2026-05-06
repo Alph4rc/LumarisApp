@@ -1,27 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/core/services/git_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/platform/android/download_service.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 
-class VersionSetting extends StatefulWidget {
+class VersionSetting extends ConsumerStatefulWidget {
   const VersionSetting({super.key});
 
   @override
-  State<StatefulWidget> createState() => _VersionSettingState();
+  ConsumerState<VersionSetting> createState() => _VersionSettingState();
 }
 
-class _VersionSettingState extends State<VersionSetting> {
-  final SettingsStore settingsStore = SettingsStore.to;
+class _VersionSettingState extends ConsumerState<VersionSetting> {
   late bool isNeedUpdate = false;
   late String version = '';
-  late String newVersion = '';
+  ReleaseModel? latestRelease;
   int tapCount = 0;
   DateTime? lastTapTime;
 
@@ -36,7 +38,7 @@ class _VersionSettingState extends State<VersionSetting> {
           CheckUpdateManager.checkForUpdates().then((res) {
             isNeedUpdate = res.$1;
             if (res.$1) {
-              newVersion = res.$2.name;
+              latestRelease = res.$2;
             }
           });
         }
@@ -57,7 +59,7 @@ class _VersionSettingState extends State<VersionSetting> {
 
     if (tapCount >= 5) {
       // 显示彩蛋页面
-      Get.toNamed('/Egg');
+      AppRouter.push(AppRoutes.egg);
 
       // 重置计数器
       tapCount = 0;
@@ -67,100 +69,87 @@ class _VersionSettingState extends State<VersionSetting> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = ref.watch(settingsStoreProvider);
+    final settingsStore = ref.read(settingsStoreProvider.notifier);
+    final colors = context.clubColors;
+
     return Column(
       children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                child: Row(
-                  children: [
-                    isNeedUpdate
-                        ? Badge(
-                            backgroundColor: Colors.red,
-                            child: Icon(
-                              Icons.update,
-                              size: 20,
-                            ),
-                          )
-                        : Icon(Icons.verified, size: 20, color: Colors.green),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '版本',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(version,
-                              style:
-                                  TextStyle(fontSize: 13, color: Colors.grey))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                _handleTap(); // 处理点击事件
+        ClubListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          leading: isNeedUpdate
+              ? Badge(
+                  backgroundColor: colors.danger,
+                  child: Icon(
+                    Icons.update,
+                    size: 20,
+                  ),
+                )
+              : Icon(Icons.verified, size: 20, color: colors.success),
+          title: const Text('版本'),
+          subtitle: Text(version),
+          subtitleTextStyle: TextStyle(
+            fontSize: 13,
+            color: colors.secondaryLabel,
+          ),
+          onTap: () async {
+            _handleTap(); // 处理点击事件
 
-                if (isNeedUpdate) {
-                  final result = await PlatformDialog.showConfirmDialog(
-                    context,
-                    title: '是否更新最新版本: $newVersion',
-                    content: '发现新版本可用，是否立即更新？',
-                    confirmText: '是的',
-                    cancelText: '不要',
-                  );
+            if (isNeedUpdate) {
+              final result = await PlatformDialog.showConfirmDialog(
+                context,
+                title: '是否更新最新版本: ${latestRelease?.name ?? ''}',
+                content: '发现新版本可用，将在浏览器中打开下载链接，是否继续？',
+                confirmText: '前往浏览器',
+                cancelText: '不要',
+              );
 
-                  if (result == true) {
-                    final a = await GiteeService.getReleases();
-                    if (context.mounted) {
-                      UpdateManager.showUpdateWithProgress(context, a.name);
-                    }
+              if (result == true) {
+                final release = latestRelease;
+                if (release == null) {
+                  return;
+                }
+                try {
+                  await AppService.updateApp(release);
+                  if (context.mounted) {
+                    showClubSnackBar(
+                      context,
+                      const Text('已打开浏览器，请在浏览器中下载安装更新'),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    showClubSnackBar(
+                      context,
+                      Text('打开更新链接失败: $e'),
+                    );
                   }
                 }
-              }),
+              }
+            }
+          },
         ),
         if (CheckUpdateManager.shouldCheckForUpdates())
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.update,
-                  size: 20,
-                  color: Colors.amber,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '更新日志',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '忽略版本更新',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-                Obx(() => CupertinoSwitch(
-                      value: settingsStore.updateIgnored,
-                      onChanged: (bool value) async {
-                        await settingsStore.setUpdateIgnored(value);
-                      },
-                    ))
-              ],
+          ClubListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            leading: Icon(
+              Icons.update,
+              size: 20,
+              color: colors.warning,
+            ),
+            title: const Text('更新日志'),
+            subtitle: const Text('忽略版本更新'),
+            subtitleTextStyle: TextStyle(
+              fontSize: 12,
+              color: colors.secondaryLabel,
+            ),
+            trailing: CupertinoSwitch(
+              value: settings.updateIgnored,
+              onChanged: (bool value) async {
+                await settingsStore.setUpdateIgnored(value);
+              },
             ),
           ),
       ],

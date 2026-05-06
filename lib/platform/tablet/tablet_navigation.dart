@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 平板设备导航组件
 ///
@@ -32,7 +35,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Scaffold(
       body: Row(
@@ -43,9 +46,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
             curve: Curves.easeInOut,
             child: NavigationRail(
               extended: _isExtended,
-              backgroundColor: isDark
-                  ? Colors.grey[900]?.withValues(alpha: 0.95)
-                  : Colors.grey[50]?.withValues(alpha: 0.95),
+              backgroundColor: colors.cardOverlay,
               elevation: 2,
               selectedIndex: widget.selectedIndex,
               onDestinationSelected: widget.onItemSelected,
@@ -69,11 +70,11 @@ class _TabletNavigationState extends State<TabletNavigation> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: ClubRadii.navigation,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.dashboard_rounded,
-                      color: Colors.white,
+                      color: colors.onAccent,
                       size: 24,
                     ),
                   ),
@@ -114,7 +115,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                 size: 28,
               ),
               unselectedIconTheme: IconThemeData(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: colors.secondaryLabel,
                 size: 24,
               ),
               selectedLabelTextStyle: TextStyle(
@@ -124,14 +125,14 @@ class _TabletNavigationState extends State<TabletNavigation> {
                 letterSpacing: 0.2,
               ),
               unselectedLabelTextStyle: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: colors.secondaryLabel,
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 letterSpacing: 0.2,
               ),
               indicatorColor: colorScheme.primary.withValues(alpha: 0.15),
               indicatorShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: ClubRadii.navigation,
               ),
               minWidth: 72,
               minExtendedWidth: 220,
@@ -166,14 +167,14 @@ class TabletDrawerNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('iOS Club App'),
         centerTitle: false,
         elevation: 0,
-        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+        backgroundColor: colors.cardBackground,
       ),
       drawer: Drawer(
         width: 280,
@@ -191,20 +192,20 @@ class TabletDrawerNavigation extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Icon(
                     Icons.dashboard_rounded,
                     size: 48,
-                    color: Colors.white,
+                    color: colors.onAccent,
                   ),
                   SizedBox(height: 16),
                   Text(
                     'iOS Club App',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colors.onAccent,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -228,37 +229,28 @@ class TabletDrawerNavigation extends StatelessWidget {
                       horizontal: 12,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colorScheme.primary.withValues(alpha: 0.12)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
+                    child: ClubListTile(
                       leading: Icon(
                         isSelected ? item.selectedIcon : item.icon,
                         color: isSelected
                             ? colorScheme.primary
-                            : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                            : colors.secondaryLabel,
                       ),
                       title: Text(
                         item.label,
                         style: TextStyle(
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w400,
-                          color: isSelected
-                              ? colorScheme.primary
-                              : (isDark ? Colors.grey[300] : Colors.grey[800]),
+                          color:
+                              isSelected ? colorScheme.primary : colors.label,
                         ),
                       ),
-                      selected: isSelected,
                       onTap: () {
                         onItemSelected(index);
                         Navigator.pop(context); // 关闭抽屉
                       },
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      selected: isSelected,
+                      borderRadius: ClubRadii.navigation,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,

@@ -8,7 +8,6 @@ void main() async {
   final filesToClean = [
     'lib/core/services/data_service.dart',
     'lib/core/services/exam_service.dart',
-    'lib/core/services/new_bus_api.dart',
     'lib/core/services/xauat_login.dart',
     'lib/core/utils/animations/animated_button.dart',
     'lib/core/utils/animations/animated_card.dart',
@@ -19,8 +18,6 @@ void main() async {
     'lib/features/system/widget_service.dart',
     'lib/state/schedule_store.dart',
     'lib/ui/components/modal_components.dart',
-    'lib/ui/pages/memberPages/member_data_page.dart',
-    'lib/ui/pages/memberPages/staff_data_page.dart',
   ];
 
   // 需要移除的导入映射
@@ -30,9 +27,6 @@ void main() async {
     ],
     'lib/core/services/exam_service.dart': [
       "import 'package:flutter/material.dart';"
-    ],
-    'lib/core/services/new_bus_api.dart': [
-      "import 'package:flutter/cupertino.dart';"
     ],
     'lib/core/services/xauat_login.dart': [
       "import 'package:flutter/foundation.dart';"
@@ -63,12 +57,6 @@ void main() async {
       "import 'package:flutter/foundation.dart';"
     ],
     'lib/ui/components/modal_components.dart': [
-      "import 'package:ios_club_app/core/utils/app_logger.dart';"
-    ],
-    'lib/ui/pages/memberPages/member_data_page.dart': [
-      "import 'package:ios_club_app/core/utils/app_logger.dart';"
-    ],
-    'lib/ui/pages/memberPages/staff_data_page.dart': [
       "import 'package:ios_club_app/core/utils/app_logger.dart';"
     ],
   };

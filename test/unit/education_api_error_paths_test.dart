@@ -1,16 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/course_api.dart';
-import 'package:ios_club_app/features/education/services/edu_api_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/features/education/services/electricity_api.dart';
 import 'package:ios_club_app/features/education/services/exam_api.dart';
 import 'package:ios_club_app/features/education/services/info_api.dart';
 import 'package:ios_club_app/features/education/services/login_api.dart';
@@ -42,10 +42,8 @@ void main() {
 
       tempDir = await Directory.systemTemp.createTemp('edu_api_error_');
       Hive.init(tempDir.path);
-
-      Get.testMode = true;
-      Get.reset();
-      final manager = Get.put(EduHttpClientManager());
+      EduHttpClientManager.resetForTest();
+      final manager = EduHttpClientManager.initialize();
       manager.updateSchoolConfig(
         const SchoolConfig(
           id: 'offline',
@@ -57,16 +55,25 @@ void main() {
 
     tearDownAll(() async {
       // Do not close Hive here to avoid interfering with pending cache tasks.
-      Get.reset();
+      EduHttpClientManager.resetForTest();
     });
 
     test('direct wrapper methods should throw NetworkException', () async {
       final calls = <Future<dynamic> Function()>[
-        () => AppApi.getAppInfo(token: 'x'),
+        () => AppApi.getAppInfo(),
         () => BusApi.getBus(dayDate: '2026-03-02'),
         () => BusApi.getBusNewData('0830', loc: 'ALL'),
         () => BusApi.getBusOldData('0830', isShow: true),
         () => CourseApi.getCourse('2026001'),
+        () => ElectricityApi.createSubscription(
+              const CreateElectricitySubscriptionRequest(
+                url: 'https://example.com/wxAccount?id=1',
+                email: 'codex@example.com',
+                threshold: 10,
+              ),
+            ),
+        () => ElectricityApi.getSubscription('codex@example.com'),
+        () => ElectricityApi.deleteSubscription('sub-1'),
         () => ExamApi.getExam('2026001'),
         () => InfoApi.getInfoCompletion(),
         () => InfoApi.getTime(),
@@ -81,33 +88,6 @@ void main() {
       ];
 
       for (final call in calls) {
-        await expectStringOrNetworkException(call);
-      }
-    });
-
-    test(
-        'EduApiClient delegated methods should execute without unexpected type',
-        () async {
-      final delegatedCalls = <Future<dynamic> Function()>[
-        () => EduApiClient.getSemester('2026001'),
-        () => EduApiClient.getCourse('2026001'),
-        () => EduApiClient.getScore('2026001', '2025-2'),
-        () => EduApiClient.getExam('2026001'),
-        () => EduApiClient.getInfoCompletion(),
-        () => EduApiClient.getThisSemester(),
-        () => EduApiClient.getProgram('2026001'),
-        () => EduApiClient.getProgramDic('2026001'),
-        () => EduApiClient.getTime(),
-        () => EduApiClient.getBus(dayDate: '2026-03-02'),
-        () => EduApiClient.getAppInfo(token: 'x'),
-        () => EduApiClient.getBusNewData('0830', loc: 'ALL'),
-        () => EduApiClient.getBusOldData('0830', isShow: false),
-        () => EduApiClient.login('u1', 'p1'),
-        () => EduApiClient.getPayment('p1'),
-        () => EduApiClient.getPaymentTurnover('p1'),
-      ];
-
-      for (final call in delegatedCalls) {
         await expectStringOrNetworkException(call);
       }
     });

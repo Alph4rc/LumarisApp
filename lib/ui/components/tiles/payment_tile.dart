@@ -1,40 +1,46 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/routes/router.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import '../../../state/payment_store.dart';
 import '../club_card.dart';
 
-class PaymentTile extends StatelessWidget {
+class PaymentTile extends ConsumerWidget {
   const PaymentTile({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<PaymentStore>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final payment = ref.watch(paymentStoreProvider);
+    final colors = context.clubColors;
 
     return ClubCard(
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(24),
-          onTap: () => Get.toNamed('/Payment'),
+          borderRadius: ClubRadii.tile,
+          onTap: () => AppRouter.push(AppRoutes.payment),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Obx(() {
+            child: Builder(builder: (context) {
               // Loading state
-              if (controller.isLoading.value) {
+              if (payment.isLoading) {
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: LoadingStateView(
+                    title: '正在读取饭卡',
+                    subtitle: '',
+                    compact: true,
+                    padding: EdgeInsets.zero,
+                  ),
                 );
               }
 
               // Has Data state
-              if (!controller.isLoading.value &&
-                  controller.totalRecharge.value != 0) {
-                final amount = controller.totalRecharge.value;
+              if (!payment.isLoading && payment.hasData) {
+                final amount = payment.totalRecharge;
                 final isLow = amount <= 10;
-                final primaryColor = isLow
-                    ? CupertinoColors.destructiveRed
-                    : CupertinoColors.systemOrange;
+                final primaryColor = isLow ? colors.danger : colors.warning;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,13 +54,10 @@ class PaymentTile extends StatelessWidget {
                             color: primaryColor.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
-                          child: Hero(
-                            tag: '饭卡',
-                            child: Icon(
-                              Icons.monetization_on_rounded,
-                              color: primaryColor,
-                              size: 24,
-                            ),
+                          child: Icon(
+                            Icons.monetization_on_rounded,
+                            color: primaryColor,
+                            size: 24,
                           ),
                         ),
                         const Spacer(),
@@ -63,15 +66,14 @@ class PaymentTile extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: CupertinoColors.destructiveRed
-                                  .withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
+                              color: colors.dangerSoft,
+                              borderRadius: ClubRadii.navigation,
                             ),
-                            child: const Text(
+                            child: Text(
                               '余额不足',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: CupertinoColors.destructiveRed,
+                                color: colors.danger,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -84,8 +86,7 @@ class PaymentTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.bodySmall?.color ??
-                            Colors.grey.shade600,
+                        color: colors.secondaryLabel,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -95,9 +96,7 @@ class PaymentTile extends StatelessWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
-                        color: isLow
-                            ? CupertinoColors.destructiveRed
-                            : Theme.of(context).colorScheme.onSurface,
+                        color: isLow ? colors.danger : colors.label,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -113,12 +112,12 @@ class PaymentTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.12),
+                      color: colors.surfaceMuted,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.monetization_on_rounded,
-                      color: Colors.grey,
+                      color: colors.secondaryLabel,
                       size: 24,
                     ),
                   ),
@@ -128,22 +127,21 @@ class PaymentTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Theme.of(context).textTheme.bodySmall?.color ??
-                          Colors.grey.shade600,
+                      color: colors.secondaryLabel,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    controller.errorMessage.value.isNotEmpty
-                        ? controller.errorMessage.value
-                        : '点击绑定',
+                    payment.errorMessage.isNotEmpty
+                        ? payment.errorMessage
+                        : '点击查看',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
-                      color: controller.errorMessage.value.isNotEmpty
-                          ? CupertinoColors.destructiveRed
-                          : Colors.grey,
+                      color: payment.errorMessage.isNotEmpty
+                          ? colors.danger
+                          : colors.secondaryLabel,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

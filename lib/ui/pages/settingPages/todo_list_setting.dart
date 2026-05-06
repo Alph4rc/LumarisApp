@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/core/services/todo_service.dart';
-import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class TodoListSetting extends StatefulWidget {
   const TodoListSetting({super.key});
@@ -12,8 +10,6 @@ class TodoListSetting extends StatefulWidget {
 }
 
 class _TodoListSettingState extends State<TodoListSetting> {
-  final SettingsStore settingsStore = SettingsStore.to;
-
   @override
   void initState() {
     super.initState();
@@ -21,48 +17,20 @@ class _TodoListSettingState extends State<TodoListSetting> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            Icon(
-              CupertinoIcons.cloud_upload_fill,
-              size: 20,
-              color: Colors.grey,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '是否将待办保存至云端',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '该服务已暂停', // '将待办事务保存至社团官网',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.5)
-                          : CupertinoColors.secondaryLabel,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Obx(() => CupertinoSwitch(
-                  value: settingsStore.isUpdateToClub,
-                  onChanged: (bool value) async {
-                    await settingsStore.setIsUpdateToClub(value);
-                    if (value) {
-                      await TodoService.nowToUpdate();
-                    }
-                  },
-                ))
-          ],
-        ));
+    final colors = context.clubColors;
+    return ClubListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: Icon(
+        CupertinoIcons.cloud_upload_fill,
+        size: 20,
+        color: colors.secondaryLabel,
+      ),
+      title: const Text('是否将待办保存至云端'),
+      subtitle: const Text('该服务已暂停'),
+      trailing: const CupertinoSwitch(
+        value: false,
+        onChanged: null,
+      ),
+    );
   }
 }

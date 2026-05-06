@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:intl/intl.dart';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
-import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/system/notifications/course_reminder_helper.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
@@ -60,7 +61,7 @@ class NotificationService {
     );
 
     await notifications.initialize(
-      initSettings,
+      settings: initSettings,
     );
 
     await notifications
@@ -84,6 +85,12 @@ class NotificationService {
         ));
 
     isInit = true;
+  }
+
+  /// 取消所有已排期的通知
+  Future<void> cancelAllNotifications() async {
+    await notifications.cancelAll();
+    AppLogger.debug('所有通知已取消');
   }
 
   Future<void> scheduleCourseReminder(
@@ -118,12 +125,19 @@ class NotificationService {
     AppLogger.debug('Scheduling notification at $tzDateTime with id=$id');
 
     try {
+      // 增加安全检查：如果待处理通知接近 500 个，停止安排
+      final pendingCount = (await notifications.pendingNotificationRequests()).length;
+      if (pendingCount >= 450) {
+        AppLogger.debug('Warning: Approaching 500 alarm limit ($pendingCount). Skipping schedule.');
+        return;
+      }
+
       await notifications.zonedSchedule(
-        id,
-        title,
-        '$body 将在$notificationTime分钟后开始',
-        tzDateTime,
-        NotificationDetails(
+        id: id,
+        title: title,
+        body: '$body 将在$notificationTime分钟后开始',
+        scheduledDate: tzDateTime,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_course_reminders',
             '课程通知',
@@ -154,7 +168,7 @@ class NotificationService {
 
     // 如果待办事项已完成，取消提醒
     if (todo.isCompleted) {
-      await notifications.cancel(todo.id.hashCode);
+      await notifications.cancel(id: todo.id.hashCode);
       return;
     }
 
@@ -198,11 +212,11 @@ class NotificationService {
 
     try {
       await notifications.zonedSchedule(
-        todo.id.hashCode, // 使用唯一ID作为通知ID
-        '待办事务提醒',
-        '您的待办事务 ${todo.title} 已到期',
-        tzNotificationTime,
-        const NotificationDetails(
+        id: todo.id.hashCode, // 使用唯一ID作为通知ID
+        title: '待办事务提醒',
+        body: '您的待办事务 ${todo.title} 已到期',
+        scheduledDate: tzNotificationTime,
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_todo_reminders',
             '待办事务提醒',
@@ -234,44 +248,33 @@ class NotificationService {
     }
 
     // 先取消之前的通知
-    await notifications.cancel(todo.id.hashCode);
+    await notifications.cancel(id: todo.id.hashCode);
     // 再根据新状态决定是否重新安排通知
     await scheduleTodoNotification(todo, todoRemindEnabled);
   }
 
   static Future<void> set(BuildContext context) async {
-    if (await Permission.scheduleExactAlarm.isGranted) {
-      await remind();
-      return;
-    }
-
-    if (context.mounted) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text('请允许使用闹钟'),
-                content: Text('您需要允许使用闹钟才能使用通知功能'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('取消'),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await Permission.scheduleExactAlarm.request();
-                      if (await Permission.scheduleExactAlarm.isGranted) {
-                        await remind();
-                      }
-                    },
-                    child: Text('去设置'),
-                  )
-                ]);
-          });
-    }
+    // 请求精确闹钟权限
+    await PermissionService.request(
+      Permission.scheduleExactAlarm,
+      onGranted: () async {
+        // 在 Android 上进一步请求忽略电池优化权限，以确保后台任务存活
+        if (PlatformUtils.isAndroid) {
+          await PermissionService.request(
+            Permission.ignoreBatteryOptimizations,
+            context: context,
+            dialogTitle: '允许后台运行',
+            dialogContent: '为了确保课程提醒能准时响铃，请允许应用在后台运行（忽略电池优化）。',
+            settingsText: '去设置',
+          );
+        }
+        await remind();
+      },
+      context: context,
+      dialogTitle: '请允许使用闹钟',
+      dialogContent: '您需要允许使用闹钟才能使用通知功能',
+      settingsText: '去设置',
+    );
   }
 
   static Future<void> remind() async {
@@ -279,44 +282,65 @@ class NotificationService {
       await NotificationService.instance.initialize();
     }
 
-    final a = await DataService.getTodayOrTomorrowCourse();
-    final now = DateTime.now();
+    final a = await CourseService.getTodayOrTomorrowCourse(isTomorrow: true);
+    final targetDate =
+        a.$1 ? DateTime.now().add(const Duration(days: 1)) : DateTime.now();
 
     for (var course in a.$2) {
-      final time = TimeService.getStartAndEnd(course);
-      final spilt = time.start.split(':');
-
-      if (spilt.length < 2) continue;
+      final target = CourseReminderHelper.buildTarget(
+        course: course,
+        courseDate: targetDate,
+      );
+      if (target == null) continue;
 
       await NotificationService.instance.scheduleCourseReminder(
-          id: course.hashCode,
-          title: '课程提醒',
-          body: course.courseName,
-          courseTime: DateTime(now.year, now.month, now.day,
-              int.parse(spilt[0]), int.parse(spilt[1])));
+        id: target.notificationId,
+        title: '课程提醒',
+        body: course.courseName,
+        courseTime: target.courseTime,
+      );
     }
   }
 
-  static Future<void> remindList(List<CourseModel> a) async {
+  static Future<void> remindList(
+    List<CourseModel> a, {
+    DateTime? targetDate,
+    Set<int>? existingIds,
+  }) async {
     if (!NotificationService.instance.isInit) {
       await NotificationService.instance.initialize();
     }
 
-    final now = DateTime.now();
+    final effectiveDate = targetDate ?? DateTime.now();
+
+    // 如果未提供 existingIds，则获取所有待处理的通知，用于去重
+    final Set<int> idsToCompare;
+    if (existingIds == null) {
+      final pendingRequests = await NotificationService.instance.notifications
+          .pendingNotificationRequests();
+      idsToCompare = pendingRequests.map((r) => r.id).toSet();
+    } else {
+      idsToCompare = existingIds;
+    }
 
     for (var course in a) {
-      final time = TimeService.getStartAndEnd(course);
+      final target = CourseReminderHelper.buildTarget(
+        course: course,
+        courseDate: effectiveDate,
+      );
+      if (target == null) continue;
 
-      final spilt = time.start.split(':');
-
-      if (spilt.length < 2) continue;
+      // 如果通知已存在，跳过，避免重复调度引发通知闪烁或系统限制
+      if (idsToCompare.contains(target.notificationId)) {
+        continue;
+      }
 
       await NotificationService.instance.scheduleCourseReminder(
-          id: course.hashCode,
-          title: '课程提醒',
-          body: course.courseName,
-          courseTime: DateTime(now.year, now.month, now.day,
-              int.parse(spilt[0]), int.parse(spilt[1])));
+        id: target.notificationId,
+        title: '课程提醒',
+        body: course.courseName,
+        courseTime: target.courseTime,
+      );
     }
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/models/time_info.dart';
+import 'package:ios_club_app/features/education/models/time_info.dart';
 
 void main() {
   group('TimeInfo', () {

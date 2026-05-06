@@ -1,57 +1,42 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
-import 'package:get/get.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/core/models/course_color_manager.dart';
+import 'package:ios_club_app/core/services/course_color_manager.dart';
 
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-class ScheduleWidget extends StatefulWidget {
+class ScheduleWidget extends ConsumerStatefulWidget {
   const ScheduleWidget({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ScheduleWidgetState();
+  ConsumerState<ScheduleWidget> createState() => _ScheduleWidgetState();
 }
 
-class _ScheduleWidgetState extends State<ScheduleWidget> {
-  late bool isRemind = false;
-  late ScheduleStore scheduleStore;
-
+class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
   @override
   void initState() {
     super.initState();
-    // 使用 Get.find 获取已经在其他地方初始化的 ScheduleStore 实例
-    scheduleStore = Get.find<ScheduleStore>();
-    _initializeData();
-  }
-
-  Future<void> _initializeData() async {
-    try {
-      if (!mounted) return;
-
-      setState(() {
-        // 使用SettingsStore中的isRemind值
-        isRemind = SettingsStore.to.isRemind;
-      });
-    } catch (e) {
-      AppLogger.debug('初始化失败: $e');
-      // 可添加错误处理逻辑（如显示错误提示）
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final scheduleState = ref.watch(scheduleStoreProvider);
+    final scheduleStore = ref.read(scheduleStoreProvider.notifier);
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -61,51 +46,55 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           padding: const EdgeInsets.all(16.0),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Obx(() => Text(
-                  '${scheduleStore.showTomorrow ? '明' : '今'}日课表',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
+            Text(
+              '${scheduleState.showTomorrow ? '明' : '今'}日课表',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (alertContext) => StatefulBuilder(
-                          // 使用 StatefulBuilder 包装 AlertDialog
-                          builder: (context, setStateDialog) => AlertDialog(
-                              title: const Text('设置'),
-                              content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                        title: const Text('显示明天的课表'),
-                                        trailing: Obx(() => CupertinoSwitch(
-                                            value: scheduleStore.isShowTomorrow,
-                                            onChanged: (value) async {
-                                              await scheduleStore
-                                                  .toggleShowTomorrow();
-                                              _initializeData(); // 重新加载数据
-                                            }))),
-                                    if (PlatformUtils.isIOS ||
-                                        PlatformUtils.isAndroid)
-                                      ListTile(
-                                        title: const Text('课程通知'),
-                                        trailing: Obx(() => CupertinoSwitch(
-                                              value: SettingsStore.to.isRemind,
-                                              onChanged: (bool value) async {
-                                                await SettingsStore.to
-                                                    .setIsRemind(value);
-                                                if (value && context.mounted) {
-                                                  await NotificationService.set(
-                                                      context);
-                                                }
-                                              },
-                                            )),
-                                      )
-                                  ]))));
+                  PlatformDialog.showCustomDialog<void>(
+                    context,
+                    title: '设置',
+                    content: Consumer(builder: (context, ref, child) {
+                      final settings = ref.watch(settingsStoreProvider);
+                      final scheduleStore =
+                          ref.read(scheduleStoreProvider.notifier);
+                      final settingsStore =
+                          ref.read(settingsStoreProvider.notifier);
+
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClubListTile(
+                            title: const Text('显示明天的课表'),
+                            trailing: CupertinoSwitch(
+                              value: settings.isShowTomorrow,
+                              onChanged: (value) async {
+                                await scheduleStore.toggleShowTomorrow();
+                              },
+                            ),
+                          ),
+                          if (PlatformUtils.isIOS || PlatformUtils.isAndroid)
+                            ClubListTile(
+                              title: const Text('课程通知'),
+                              trailing: CupertinoSwitch(
+                                value: settings.isRemind,
+                                onChanged: (bool value) async {
+                                  await settingsStore.setIsRemind(value);
+                                  if (value && context.mounted) {
+                                    await NotificationService.set(context);
+                                  }
+                                },
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
+                  );
                 })
           ]),
         ),
@@ -113,8 +102,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
           child: AnimatedCard(
             child: ClubCard(
-              child: Obx(() {
-                // 使用 Obx 监听 ScheduleStore 中的变化
+              child: Builder(builder: (context) {
                 final todayCourses = scheduleStore.getTodayCourses();
 
                 return todayCourses.isEmpty
@@ -150,7 +138,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                           );
                           return AnimatedListItem(
                             index: index,
-                            child: _buildScheduleItem(item, isTablet),
+                            child: _buildScheduleItem(course, item, isTablet),
                           );
                         }).toList(),
                       );
@@ -162,25 +150,16 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
     );
   }
 
-  Widget _buildScheduleItem(ScheduleItem item, bool isTablet) {
+  Widget _buildScheduleItem(
+      CourseModel course, ScheduleItem item, bool isTablet) {
+    final colors = context.clubColors;
     return Material(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: ClubRadii.card,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
         onTap: () {
-          if (isTablet) {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      content: buildCourse(item, isTablet),
-                    ));
-          } else {
-            showClubModalBottomSheet(
-              context,
-              buildCourse(item, isTablet),
-            );
-          }
+          CourseDetailSheet.show(context, course);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -192,7 +171,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                 height: 52,
                 decoration: BoxDecoration(
                   color: CourseColorManager.generateSoftColor(item.title),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: ClubRadii.xsBorder,
                 ),
               ),
               const SizedBox(width: 20),
@@ -212,10 +191,10 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.access_time,
                           size: 18,
-                          color: Colors.grey,
+                          color: colors.secondaryLabel,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -223,7 +202,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
-                            color: Colors.grey[600],
+                            color: colors.secondaryLabel,
                           ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -232,16 +211,16 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
                     ),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on,
                           size: 18,
-                          color: Colors.grey,
+                          color: colors.secondaryLabel,
                         ),
                         const SizedBox(width: 6),
                         Text(item.location,
                             style: TextStyle(
                               fontSize: 15,
-                              color: Colors.grey[600],
+                              color: colors.secondaryLabel,
                               fontWeight: FontWeight.w400,
                             )),
                       ],
@@ -258,6 +237,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
   }
 
   Widget buildCourse(ScheduleItem course, bool isTablet) {
+    final colors = context.clubColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -267,7 +247,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           style: TextStyle(
             fontSize: isTablet ? 24 : 22,
             fontWeight: FontWeight.w600,
-            color: CupertinoColors.label.resolveFrom(context),
+            color: colors.label,
           ),
         ),
         SizedBox(height: isTablet ? 16 : 14),
@@ -275,7 +255,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           children: [
             Icon(
               CupertinoIcons.placemark_fill,
-              color: CupertinoColors.systemBlue,
+              color: colors.primary,
               size: isTablet ? 22 : 20,
             ),
             SizedBox(width: isTablet ? 12 : 10),
@@ -296,7 +276,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           children: [
             Icon(
               CupertinoIcons.person_2_fill,
-              color: CupertinoColors.systemRed,
+              color: colors.danger,
               size: isTablet ? 22 : 20,
             ),
             SizedBox(width: isTablet ? 12 : 10),
@@ -318,7 +298,7 @@ class _ScheduleWidgetState extends State<ScheduleWidget> {
           children: [
             Icon(
               CupertinoIcons.calendar,
-              color: CupertinoColors.systemGreen,
+              color: colors.success,
               size: isTablet ? 22 : 20,
             ),
             SizedBox(width: isTablet ? 12 : 10),

@@ -5,7 +5,7 @@ import 'edu_http_client.dart';
 
 /// 登录服务
 class LoginService {
-  static final EduHttpClient _client = EduHttpClient();
+  static EduHttpClient _client = EduHttpClient();
   static Future<Map<String, dynamic>> Function(String, String)?
       _loginOverrideForTest;
 
@@ -44,5 +44,14 @@ class LoginService {
   static void setLoginOverrideForTest(
       Future<Map<String, dynamic>> Function(String, String)? handler) {
     _loginOverrideForTest = handler;
+  }
+
+  static void setClientForTest(EduHttpClient client) {
+    _client = client;
+  }
+
+  static void resetClientForTest() {
+    _client.dispose();
+    _client = EduHttpClient();
   }
 }

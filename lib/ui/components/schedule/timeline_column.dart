@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 时间轴列组件
 ///
@@ -20,7 +21,7 @@ class TimelineColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return SizedBox(
       width: 56,
@@ -35,7 +36,7 @@ class TimelineColumn extends StatelessWidget {
                 ? BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        color: colors.separator,
                         width: 0.5,
                       ),
                     ),
@@ -51,7 +52,7 @@ class TimelineColumn extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.grey[300] : Colors.grey[800],
+                      color: colors.label,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -60,7 +61,7 @@ class TimelineColumn extends StatelessWidget {
                     timeInfo.start,
                     style: TextStyle(
                       fontSize: 9,
-                      color: isDark ? Colors.grey[500] : Colors.grey[500],
+                      color: colors.tertiaryLabel,
                     ),
                   ),
                   // 结束时间
@@ -68,7 +69,7 @@ class TimelineColumn extends StatelessWidget {
                     timeInfo.end,
                     style: TextStyle(
                       fontSize: 9,
-                      color: isDark ? Colors.grey[500] : Colors.grey[500],
+                      color: colors.tertiaryLabel,
                     ),
                   ),
                 ],

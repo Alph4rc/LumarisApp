@@ -2,6 +2,26 @@ import WidgetKit
 import SwiftUI
 import Intents
 
+private let widgetGroupId = "group.com.example.iosClubApp.widget"
+
+private enum WidgetStorage {
+    static func sharedDefaults() -> UserDefaults? {
+        UserDefaults(suiteName: widgetGroupId)
+    }
+
+    static func decodeCourses(forKey key: String) -> [Course] {
+        guard
+            let courseString = sharedDefaults()?.string(forKey: key),
+            let courseData = courseString.data(using: .utf8),
+            let rawCourses = try? JSONSerialization.jsonObject(with: courseData) as? [[String: Any]]
+        else {
+            return []
+        }
+
+        return rawCourses.compactMap(Course.fromJson)
+    }
+}
+
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> CourseEntry {
         let today = Date()
@@ -21,36 +41,23 @@ struct Provider: TimelineProvider {
             todayDateString: todayDateString,
             tomorrowDateString: tomorrowDateString,
             todayCourses: [
-                Course(title: "高等数学", time: "第1-2节 08:00-09:30", location: "教学楼A101", teacher: "张教授"),
-                Course(title: "大学英语", time: "第3-4节 10:00-11:30", location: "教学楼B205", teacher: "李老师")
+                Course(title: "高等数学", time: "第1-2节 08:00-09:30", location: "教学楼A101", teacher: "教学楼A101"),
+                Course(title: "大学英语", time: "第3-4节 10:00-11:30", location: "教学楼B205", teacher: "教学楼B205")
             ],
             tomorrowCourses: [
-                Course(title: "计算机科学", time: "第1-2节 08:00-09:30", location: "实验楼C301", teacher: "王博士"),
-                Course(title: "物理学", time: "第3-4节 10:00-11:30", location: "教学楼D405", teacher: "赵教授")
+                Course(title: "计算机科学", time: "第1-2节 08:00-09:30", location: "实验楼C301", teacher: "实验楼C301"),
+                Course(title: "物理学", time: "第3-4节 10:00-11:30", location: "教学楼D405", teacher: "教学楼D405")
             ]
         )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CourseEntry) -> Void) {
-        let data = UserDefaults.init(suiteName: "group.com.example.iosClubApp.widget")
-
         let title = "近日课表"
-        let todayStr = data?.string(forKey: "flutter.tomorrow.date") ?? getCurrentDateString()
-        let tomorrowStr = data?.string(forKey: "flutter.tomorrow.tomorrowDate") ?? getTomorrowDateString()
-
-        var todayCourses: [Course] = []
-        if let coursesData = data?.string(forKey: "flutter.tomorrow.courses"),
-           let coursesData = coursesData.data(using: .utf8),
-           let coursesJson = try? JSONSerialization.jsonObject(with: coursesData) as? [[String: Any]] {
-            todayCourses = coursesJson.compactMap { Course.fromJson($0) }
-        }
-
-        var tomorrowCourses: [Course] = []
-        if let coursesData = data?.string(forKey: "flutter.tomorrow.tomorrowCourses"),
-           let coursesData = coursesData.data(using: .utf8),
-           let coursesJson = try? JSONSerialization.jsonObject(with: coursesData) as? [[String: Any]] {
-            tomorrowCourses = coursesJson.compactMap { Course.fromJson($0) }
-        }
+        let sharedDefaults = WidgetStorage.sharedDefaults()
+        let todayStr = sharedDefaults?.string(forKey: "flutter.tomorrow.date") ?? getCurrentDateString()
+        let tomorrowStr = sharedDefaults?.string(forKey: "flutter.tomorrow.tomorrowDate") ?? getTomorrowDateString()
+        let todayCourses = WidgetStorage.decodeCourses(forKey: "flutter.tomorrow.courses")
+        let tomorrowCourses = WidgetStorage.decodeCourses(forKey: "flutter.tomorrow.tomorrowCourses")
 
         let entry = CourseEntry(date: Date(), title: title, todayDateString: todayStr, tomorrowDateString: tomorrowStr, todayCourses: todayCourses, tomorrowCourses: tomorrowCourses)
         completion(entry)
@@ -58,8 +65,7 @@ struct Provider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         getSnapshot(in: context) { (entry) in
-            // 设置下一次更新时间为1小时后
-        let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: Date()) ?? Date().addingTimeInterval(3600)
+            let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: Date()) ?? Date().addingTimeInterval(1800)
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
             completion(timeline)
         }
@@ -262,14 +268,6 @@ struct CourseRowView: View {
                     }
                     .lineLimit(1)
 
-                    HStack(spacing: 4) {
-                        Image(systemName: "person")
-                            .font(.caption2)
-                            .foregroundColor(Color.gray.opacity(0.6))
-                        Text(course.teacher)
-                            .font(.caption2)
-                    }
-                    .lineLimit(1)
                 }
             }
 

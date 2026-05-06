@@ -44,21 +44,16 @@ class PrefsKeys {
   static const String LAST_REMIND_DATE = 'last_remind_date';
   static const String IS_SHOW_TOMORROW = 'is_show_tomorrow';
 
-  /// 社团相关
-  static const String MEMBER_DATA = 'member_data';
-  static const String MEMBER_JWT = 'member_jwt';
-  static const String CLUB_NAME = 'club_name';
-  static const String CLUB_ID = 'club_id';
-
   /// 待办事项相关
   /// @deprecated 已迁移到 Hive (TodoService)，保留此 Key 仅用于迁移逻辑，禁止新代码写入
   @Deprecated(
       'Migrated to Hive via TodoService. Do not write new data to this key.')
   static const String TODO_DATA = 'todo_data';
-  static const String IS_UPDATE_CLUB = 'is_update_club';
 
   /// 电费相关
   static const String ELECTRICITY_URL = 'electricity_url';
+  static const String ELECTRICITY_SUBSCRIPTION_EMAIL =
+      'electricity_subscription_email';
   static const String TILES = 'tiles';
   static const String TILE_CONFIGURATIONS = 'tile_configurations';
 
@@ -71,9 +66,6 @@ class PrefsKeys {
   /// 页面相关
   static const String PAGE_DATA = 'page_data';
 
-  /// 校车相关
-  static const String USE_NEW_BUS_API = 'use_new_bus_api';
-
   /// 触觉反馈相关
   static const String ENABLE_HAPTIC_FEEDBACK = 'enable_haptic_feedback';
 
@@ -85,9 +77,14 @@ class PrefsKeys {
 
   /// 待办事项提醒相关
   static const String TODO_REMIND_ENABLED = 'todo_remind_enabled';
+  static const String THEME_MODE = 'theme_mode';
   static const String SCHEDULE_BACKGROUND = 'schedule_background';
   static const String CUSTOM_BACKGROUND_IMAGE = 'custom_background_image';
+  static const String CUSTOM_BACKGROUND_IS_DARK = 'custom_background_is_dark';
 
   /// 学校配置相关
   static const String SCHOOL_ID = 'school_id';
+
+  /// 协议相关
+  static const String AGREEMENT_ACCEPTED = 'agreement_accepted';
 }

@@ -1,88 +1,34 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:ios_club_app/features/system/notifications/task_executor.dart';
+import 'package:ios_club_app/core/services/workmanager_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
-/// iOS后台任务回调函数
-@pragma('vm:entry-point')
-void backgroundTask() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // 执行课程提醒检查
-  await TaskExecutor.checkAndSendCourseReminder();
-}
-
 /// iOS后台服务管理类
+/// 使用 [WorkmanagerService]（底层使用 iOS BGTaskScheduler）处理后台任务
 class IOSBackgroundService {
-  static Timer? _timer;
-  static const int _updateInterval = 3600; // 1小时更新一次，单位秒
-
   /// 初始化后台服务
   static Future<void> initializeService() async {
-    // iOS平台不需要特殊的初始化
+    await WorkmanagerService.initialize();
     AppLogger.debug('iOS Background Service 初始化完成');
   }
 
   /// 启动服务
   static Future<void> startService() async {
-    // iOS平台使用不同的后台执行机制
-    // 在iOS上，我们依赖系统提供的后台执行时间
     AppLogger.debug('iOS Background Service 已启动');
 
-    // 启动定时更新
-    _startPeriodicUpdate();
+    // 注册周期性后台任务（iOS 通过 BGTaskScheduler 实现）
+    await WorkmanagerService.startWidgetRefresh();
+    await WorkmanagerService.startReminderCheck();
+
+    // 立即执行一次更新
+    await TaskExecutor.updateWidget();
   }
 
   /// 停止服务
   static Future<void> stopService() async {
-    // iOS平台不需要特殊的停止操作
     AppLogger.debug('iOS Background Service 已停止');
-
-    // 停止定时更新
-    _stopPeriodicUpdate();
-  }
-
-  /// 启动定时更新
-  static void _startPeriodicUpdate() {
-    _stopPeriodicUpdate(); // 先停止现有的定时器
-
-    // 创建新的定时器，定期更新数据
-    _timer = Timer.periodic(
-      const Duration(seconds: _updateInterval),
-      (timer) async {
-        AppLogger.debug('执行定时数据更新任务');
-        await performPeriodicUpdate();
-      },
-    );
-
-    AppLogger.debug('定时数据更新已启动，间隔: $_updateInterval 秒');
-  }
-
-  /// 执行定期更新任务
-  @pragma('vm:entry-point')
-  static Future<void> performPeriodicUpdate() async {
-    try {
-      AppLogger.debug('开始执行定期数据更新任务');
-
-      // 更新今日课程小组件
-      await TaskExecutor.updateWidget();
-
-      // 可以在这里添加其他需要定期更新的任务
-      // 例如：更新用户数据、检查通知等
-
-      AppLogger.debug('定期数据更新任务完成');
-    } catch (e) {
-      AppLogger.debug('定期数据更新任务失败: $e');
-    }
-  }
-
-  /// 停止定时更新
-  static void _stopPeriodicUpdate() {
-    _timer?.cancel();
-    _timer = null;
-    AppLogger.debug('定时数据更新已停止');
   }
 
   /// 手动触发课程提醒检查
@@ -92,7 +38,7 @@ class IOSBackgroundService {
 
   /// 手动触发小组件更新
   static Future<void> updateWidget() async {
-    await TaskExecutor.updateTodayWidget();
+    await TaskExecutor.updateWidget();
   }
 }
 
@@ -110,7 +56,6 @@ class CourseReminderService {
 
   /// 获取服务状态
   static Future<bool> isServiceRunning() async {
-    // iOS上简单返回true表示服务可用
     return true;
   }
 
@@ -130,16 +75,17 @@ class CourseReminderService {
   }
 
   /// 设置是否启用提醒
+  /// 课程通知通过 flutter_local_notifications.zonedSchedule()
+  /// 预先安排的 OS 级别通知来触发，不依赖后台执行
   static Future<void> setReminderEnabled(bool enabled) async {
     final prefs = await PrefsService.getInstanceAsync();
     await prefs.setBool(PrefsKeys.IS_REMIND, enabled);
 
     if (enabled) {
-      // 启用时启动服务
-      await IOSBackgroundService.startService();
+      await TaskExecutor.checkAndSendCourseReminder();
+      AppLogger.debug('iOS 课程提醒已启用，通知已通过 OS 级别调度');
     } else {
-      // 禁用时停止服务
-      await IOSBackgroundService.stopService();
+      AppLogger.debug('iOS 课程提醒已禁用');
     }
   }
 
@@ -147,10 +93,5 @@ class CourseReminderService {
   static Future<bool> isReminderEnabled() async {
     final prefs = await PrefsService.getInstanceAsync();
     return prefs.getBool(PrefsKeys.IS_REMIND) ?? false;
-  }
-
-  /// 手动执行定期更新任务
-  static Future<void> performPeriodicUpdate() async {
-    await IOSBackgroundService.performPeriodicUpdate();
   }
 }

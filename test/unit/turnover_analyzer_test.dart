@@ -1,22 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/services/payment_analyzer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-class _InMemoryPaymentStorage implements PaymentStorage {
-  final Map<String, String?> _memory = <String, String?>{};
-
-  @override
-  Future<String?> read(String key) async => _memory[key];
-
-  @override
-  Future<void> write(String key, String? value) async {
-    if (value == null) {
-      _memory.remove(key);
-      return;
-    }
-    _memory[key] = value;
-  }
-}
+import 'package:ios_club_app/features/education/models/payment_model.dart';
 
 void main() {
   group('PaymentModel', () {
@@ -58,7 +41,7 @@ void main() {
         // 'tranamt' field missing
       };
 
-      expect(() => PaymentModel.fromJson(json), throwsA(isA<TypeError>()));
+      expect(() => PaymentModel.fromJson(json), throwsArgumentError);
     });
 
     test('should handle empty string values in JSON', () {
@@ -265,7 +248,7 @@ void main() {
         // 'total' field missing
       };
 
-      expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
+      expect(() => PaymentData.fromJson(json), throwsArgumentError);
     });
 
     test('should handle non-numeric total in JSON', () {
@@ -281,7 +264,7 @@ void main() {
         'total': 'not_a_number',
       };
 
-      expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
+      expect(() => PaymentData.fromJson(json), throwsA(isA<FormatException>()));
     });
 
     test('should throw when records type is invalid', () {
@@ -312,74 +295,6 @@ void main() {
 
       final paymentData = PaymentData.fromJson(json);
       expect(paymentData.total, -100.0);
-    });
-  });
-
-  group('PaymentAnalyzer', () {
-    setUp(() {
-      TestWidgetsFlutterBinding.ensureInitialized();
-      SharedPreferences.setMockInitialValues({});
-      PaymentAnalyzer.setStorageForTest(_InMemoryPaymentStorage());
-    });
-
-    tearDown(() {
-      PaymentAnalyzer.resetStorage();
-    });
-
-    test('should set and get payment number correctly', () async {
-      const testCardId = '123456789';
-
-      // Set payment number
-      await PaymentAnalyzer.setPayment(testCardId);
-
-      // Get payment number
-      final cardId = await PaymentAnalyzer.getPayment();
-
-      // Verify the payment number was saved and retrieved correctly
-      expect(cardId, testCardId);
-    });
-
-    test('should return empty string for non-existent payment number',
-        () async {
-      // Clear any existing payment number
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('payment_num');
-
-      // Get payment number (should return empty string)
-      final cardId = await PaymentAnalyzer.getPayment();
-
-      // Verify returns empty string
-      expect(cardId, '');
-    });
-
-    test('should handle empty payment number', () async {
-      // Set empty payment number
-      await PaymentAnalyzer.setPayment('');
-
-      // Get payment number
-      final cardId = await PaymentAnalyzer.getPayment();
-
-      // Verify returns empty string
-      expect(cardId, '');
-    });
-
-    test('should handle large payment number', () async {
-      const largeCardId = '12345678901234567890';
-
-      // Set large payment number
-      await PaymentAnalyzer.setPayment(largeCardId);
-
-      // Get payment number
-      final cardId = await PaymentAnalyzer.getPayment();
-
-      // Verify returns the large card id
-      expect(cardId, largeCardId);
-    });
-
-    test('should overwrite payment number correctly', () async {
-      await PaymentAnalyzer.setPayment('first');
-      await PaymentAnalyzer.setPayment('second');
-      expect(await PaymentAnalyzer.getPayment(), 'second');
     });
   });
 }

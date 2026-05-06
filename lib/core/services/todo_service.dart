@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/services/base_http_client.dart';
-import 'package:ios_club_app/core/services/club_service.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -14,14 +11,6 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 ///
 /// 提供本地和云端待办事项的管理功能，包括获取、设置和同步待办事项列表
 class TodoService {
-  static final BaseHttpClient _client = BaseHttpClient(
-    baseUrl: 'https://www.xauat.site/api',
-    enableCache: false,
-  );
-
-  // 保留 _dio 引用以便在需要自定义 Options（如 Authorization header）时使用
-  static Dio get _dio => _client.dio;
-
   /// 获取 Hive Box
   static Future<Box<dynamic>> _getBox() async {
     return await HiveManager.instance.openBox(HiveManager.todoBoxName);
@@ -121,130 +110,5 @@ class TodoService {
       }
     }
     return [];
-  }
-
-  /// 从俱乐部服务器获取待办事项列表
-  ///
-  /// 通过 HTTP 请求从俱乐部服务器获取用户的待办事项列表
-  /// 如果认证失败会尝试重新登录并再次请求
-  static Future<List<TodoItem>> getClubTodoList() async {
-    final prefs = PrefsService.instance;
-    final secureStorage = SecureStorageService.instance;
-    final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
-
-    if (memberDataString == null || memberDataString.isEmpty) {
-      return [];
-    }
-
-    final memberData = jsonDecode(memberDataString);
-
-    var jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
-
-    try {
-      final response = await _dio.get(
-        '/Member/GetTodos',
-        options: Options(headers: {'Authorization': 'Bearer $jwt'}),
-      );
-
-      if (response.statusCode == 200) {
-        final List<TodoItem> list = [];
-        for (var i in response.data) {
-          list.add(fromJsonClub(i));
-        }
-        return list;
-      }
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        if (await ClubService.loginMember(
-            memberData['userName'], memberData['userId'])) {
-          jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
-
-          try {
-            final retryResponse = await _dio.get(
-              '/Member/GetTodos',
-              options: Options(headers: {'Authorization': 'Bearer $jwt'}),
-            );
-
-            if (retryResponse.statusCode == 200) {
-              final List<TodoItem> list = [];
-              for (var i in retryResponse.data) {
-                list.add(fromJsonClub(i));
-              }
-              return list;
-            }
-          } catch (_) {
-            // 重试失败，返回空列表
-          }
-        }
-      }
-    }
-
-    return [];
-  }
-
-  /// 将俱乐部API返回的JSON数据转换为TodoItem对象
-  ///
-  /// [json] 从俱乐部API获取的待办事项JSON数据
-  /// 返回转换后的TodoItem对象
-  static TodoItem fromJsonClub(Map<String, dynamic> json) {
-    // status 字段可能是 bool 或 int（0/1），统一处理
-    final dynamic rawStatus = json['status'];
-    final bool completed = rawStatus == true || rawStatus == 1;
-
-    final item = TodoItem(
-      id: json['id']?.toString(),
-      title: (json['title'] ?? '').toString(),
-      deadline: (json['endTime'] ?? '').toString(),
-      isCompleted: completed,
-    );
-
-    item.description = json['description']?.toString();
-    item.key = json['key']?.toString();
-
-    return item;
-  }
-
-  /// 将本地待办事项同步到俱乐部服务器
-  ///
-  /// 将本地存储的待办事项逐一上传到俱乐部服务器
-  /// 如果全部上传成功，则清除本地待办事项数据
-  static Future<void> nowToUpdate() async {
-    final prefs = PrefsService.instance;
-    final secureStorage = SecureStorageService.instance;
-    final memberDataString = prefs.getString(PrefsKeys.MEMBER_DATA);
-
-    if (memberDataString == null || memberDataString.isEmpty) {
-      return;
-    }
-
-    var jwt = await secureStorage.read(key: PrefsKeys.MEMBER_JWT);
-
-    final list = await getLocalTodoList();
-    var isOK = true;
-    for (var i in list) {
-      try {
-        final response = await _dio.post(
-          '/Member/AddTodo',
-          options: Options(headers: {'Authorization': 'Bearer $jwt'}),
-          data: {
-            'title': i.title,
-            'description': i.description,
-            'endTime': i.deadline,
-            'status': i.isCompleted
-          },
-        );
-
-        if (response.statusCode != 200) {
-          isOK = false;
-        }
-      } catch (_) {
-        isOK = false;
-      }
-    }
-
-    if (isOK) {
-      // 清除 Hive 中的本地数据（数据已成功同步到服务器）
-      await clearLocalData();
-    }
   }
 }

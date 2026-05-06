@@ -34,30 +34,12 @@ class TomorrowCoursesWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        // 处理小部件更新事件
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
-
-            // 获取所有小部件ID
             val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
             if (appWidgetIds != null) {
-                // 检查数据是否真正发生变化
-                val widgetData = HomeWidgetPlugin.getData(context)
-                val currentTodayCourses =
-                    widgetData.getString("flutter.tomorrow.courses", null) ?: "[]"
-                val currentTomorrowCourses =
-                    widgetData.getString("flutter.tomorrow.tomorrowCourses", null) ?: "[]"
-
                 for (appWidgetId in appWidgetIds) {
-                    // 通知数据变更
-                    appWidgetManager.notifyAppWidgetViewDataChanged(
-                        appWidgetId,
-                        R.id.today_courses_list
-                    )
-                    appWidgetManager.notifyAppWidgetViewDataChanged(
-                        appWidgetId,
-                        R.id.tomorrow_courses_list
-                    )
+                    updateAppWidget(context, appWidgetManager, appWidgetId)
                 }
             }
         }
@@ -114,18 +96,20 @@ class TomorrowCoursesWidgetProvider : AppWidgetProvider() {
                 Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widget_title, pendingIntent)
+            views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
         } catch (e: Exception) {
             e.printStackTrace()
             // 发生错误时显示默认状态
-            views.setTextViewText(R.id.widget_title, "课表加载失败")
             views.setViewVisibility(R.id.today_courses_list, android.view.View.GONE)
             views.setViewVisibility(R.id.tomorrow_courses_list, android.view.View.GONE)
             views.setViewVisibility(R.id.today_empty_view, android.view.View.VISIBLE)
+            views.setTextViewText(R.id.today_empty_view, "加载失败")
         }
 
         // 更新小组件
         appWidgetManager.updateAppWidget(appWidgetId, views)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.today_courses_list)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.tomorrow_courses_list)
     }
 
     // 通用的课程列表更新方法，消除重复代码

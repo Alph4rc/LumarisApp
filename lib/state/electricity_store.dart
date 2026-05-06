@@ -1,81 +1,139 @@
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/models/electric_data.dart';
+import 'package:ios_club_app/features/education/services/electricity_service.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
-import 'package:ios_club_app/features/system/tile_edit_controller.dart';
-import 'package:ios_club_app/core/models/electric_data.dart';
+import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/state/tile_edit_notifier.dart';
+import 'package:ios_club_app/state/tile_store_providers.dart';
 
-class ElectricityStore extends GetxController {
-  // 响应式状态变量
-  final RxBool isLoading = true.obs;
-  final RxBool hasData = false.obs;
-  final RxDouble electricity = 0.0.obs;
-  final RxList<String> tiles = <String>[].obs;
-  final RxList<ElectricData> weeklyData = <ElectricData>[].obs;
+typedef ElectricityReader = Future<double?> Function();
+typedef ElectricityWeeklyReader = Future<List<ElectricData>> Function();
+typedef ElectricityTileVisibilityReader = Future<bool> Function(String tileId);
+typedef ElectricityTileMutator = Future<void> Function(String tileId);
+
+final electricityServiceProvider = Provider<ElectricityService>((ref) {
+  return ElectricityService();
+});
+
+final electricityReaderProvider = Provider<ElectricityReader>((ref) {
+  return () => ref.read(electricityServiceProvider).fetchCurrentBalance();
+});
+
+final electricityWeeklyReaderProvider =
+    Provider<ElectricityWeeklyReader>((ref) {
+  return ref.read(electricityServiceProvider).fetchWeeklyData;
+});
+
+final electricityTileVisibilityReaderProvider =
+    Provider<ElectricityTileVisibilityReader>((ref) {
+  return TileService.isTileVisible;
+});
+
+final electricityTileAdderProvider = Provider<ElectricityTileMutator>((ref) {
+  return TileService.addTile;
+});
+
+final electricityTileRemoverProvider = Provider<ElectricityTileMutator>((ref) {
+  return TileService.removeTile;
+});
+
+final electricityStoreProvider =
+    NotifierProvider<ElectricityStore, ElectricityState>(ElectricityStore.new);
+
+class ElectricityStore extends Notifier<ElectricityState> {
+  int _loadCount = 0;
 
   @override
-  void onInit() {
-    super.onInit();
-    loadElectricityData();
+  ElectricityState build() {
+    if (ref.read(tileStoreAutoLoadProvider)) {
+      Future<void>.microtask(loadElectricityData);
+    }
+    return const ElectricityState();
   }
 
+  bool get isLoading => state.isLoading;
+  bool get hasData => state.hasData;
+  double get electricity => state.electricity;
+  List<String> get tiles => List.unmodifiable(state.tiles);
+  List<ElectricData> get weeklyData => List.unmodifiable(state.weeklyData);
+
   Future<void> loadElectricityData() async {
+    final currentLoadId = ++_loadCount;
     try {
-      isLoading.value = true;
+      state = state.copyWith(isLoading: true);
 
-      final value = await TileService.getTextAfterKeyword();
-      final isVisible = await TileService.isTileVisible('电费');
-      final weekly = await TileService.getElectricityWeeklyData();
+      final value = await ref.read(electricityReaderProvider)();
+      final isVisible =
+          await ref.read(electricityTileVisibilityReaderProvider)('电费');
+      final weekly = await ref.read(electricityWeeklyReaderProvider)();
 
-      if (value != null) {
-        electricity.value = value;
-        hasData.value = true;
-      }
+      if (currentLoadId != _loadCount) return;
 
+      final nextTiles = [...state.tiles];
       if (isVisible) {
-        if (!tiles.contains('电费')) tiles.add('电费');
+        if (!nextTiles.contains('电费')) {
+          nextTiles.add('电费');
+        }
       } else {
-        tiles.remove('电费');
+        nextTiles.remove('电费');
       }
-      weeklyData.assignAll(weekly);
-    } catch (e) {
-      // Handle error
+
+      state = state.copyWith(
+        electricity: value ?? state.electricity,
+        hasData: value != null ? true : state.hasData,
+        tiles: nextTiles,
+        weeklyData: weekly,
+      );
+    } catch (_) {
+      // Keep the last known values on transient failures.
     } finally {
-      isLoading.value = false;
+      if (currentLoadId == _loadCount) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 
   Future<void> refreshElectricityData() async {
+    final currentLoadId = ++_loadCount;
     try {
-      isLoading.value = true;
+      state = state.copyWith(isLoading: true);
 
-      final value = await TileService.getTextAfterKeyword();
-      final weekly = await TileService.getElectricityWeeklyData();
+      final value = await ref.read(electricityReaderProvider)();
+      final weekly = await ref.read(electricityWeeklyReaderProvider)();
 
-      if (value != null) {
-        electricity.value = value;
-        hasData.value = true;
-      }
+      if (currentLoadId != _loadCount) return;
 
-      weeklyData.assignAll(weekly);
-    } catch (e) {
-      // Handle error
+      state = state.copyWith(
+        electricity: value ?? state.electricity,
+        hasData: value != null ? true : state.hasData,
+        weeklyData: weekly,
+      );
+    } catch (_) {
+      // Keep the last known values on transient failures.
     } finally {
-      isLoading.value = false;
+      if (currentLoadId == _loadCount) {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 
   Future<void> toggleTile(String tileName, bool value) async {
+    final nextTiles = [...state.tiles];
     if (value) {
-      if (!tiles.contains(tileName)) {
-        tiles.add(tileName);
+      if (!nextTiles.contains(tileName)) {
+        nextTiles.add(tileName);
       }
-      await TileService.addTile(tileName);
+      await ref.read(electricityTileAdderProvider)(tileName);
     } else {
-      tiles.remove(tileName);
-      await TileService.removeTile(tileName);
+      nextTiles.remove(tileName);
+      await ref.read(electricityTileRemoverProvider)(tileName);
     }
 
-    if (Get.isRegistered<TileEditController>()) {
-      await Get.find<TileEditController>().reload();
-    }
+    state = state.copyWith(tiles: nextTiles);
+    await ref.read(tileEditControllerProvider.notifier).reload();
+  }
+
+  Future<void> setElectricityValue(double value) async {
+    state = state.copyWith(electricity: value, hasData: true);
   }
 }

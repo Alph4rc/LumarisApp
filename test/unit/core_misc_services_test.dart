@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
-import 'package:ios_club_app/core/services/auth_state_notifier.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/state/auth_state_notifier.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
@@ -86,7 +86,9 @@ void main() {
   group('AuthStateNotifier', () {
     test('should transition states and auto-reset after delay', () {
       fakeAsync((async) {
-        final notifier = AuthStateNotifier();
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+        final notifier = container.read(authStateNotifierProvider.notifier);
 
         notifier.startRelogging();
         expect(notifier.authState, AuthState.relogging);
@@ -111,7 +113,9 @@ void main() {
     });
 
     test('reset should restore normal state immediately', () {
-      final notifier = AuthStateNotifier();
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(authStateNotifierProvider.notifier);
       notifier.startRelogging();
       notifier.reset();
 
@@ -128,8 +132,6 @@ void main() {
       await PrefsService.init();
       tempDir = await Directory.systemTemp.createTemp('login_service_test_');
       Hive.init(tempDir.path);
-      Get.testMode = true;
-      Get.reset();
     });
 
     tearDownAll(() async {
@@ -137,7 +139,6 @@ void main() {
       if (await tempDir.exists()) {
         await tempDir.delete(recursive: true);
       }
-      Get.reset();
     });
 
     test('should throw NetworkException when login request fails', () async {

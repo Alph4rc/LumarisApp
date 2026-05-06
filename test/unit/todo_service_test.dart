@@ -123,9 +123,45 @@ void main() {
       expect(box.get('u2'), isNotNull);
     });
 
+    test('should_return_empty_list_when_legacy_todo_json_is_corrupt', () async {
+      secureStore[PrefsKeys.USERNAME] = 'u-corrupt';
+      await PrefsService.instance.setString(
+        PrefsKeys.TODO_DATA,
+        '{not-valid-json',
+      );
+
+      final list = await TodoService.getLocalTodoList();
+
+      expect(list, isEmpty);
+    });
+
+    test('should_return_empty_list_when_legacy_user_key_is_absent', () async {
+      secureStore[PrefsKeys.USERNAME] = 'missing-user';
+      await PrefsService.instance.setString(
+        PrefsKeys.TODO_DATA,
+        jsonEncode({
+          'other-user': [
+            {
+              'title': 'legacy',
+              'deadline': '2026-03-01',
+              'isCompleted': false,
+            }
+          ]
+        }),
+      );
+
+      final list = await TodoService.getLocalTodoList();
+
+      expect(list, isEmpty);
+    });
+
     test('should_return_empty_list_when_no_username', () async {
       final list = await TodoService.getLocalTodoList();
       expect(list, isEmpty);
+    });
+
+    test('clearLocalData should complete when username is missing', () async {
+      await expectLater(TodoService.clearLocalData(), completes);
     });
 
     test('clearLocalData should delete user key and swallow errors', () async {
@@ -136,46 +172,6 @@ void main() {
 
       await TodoService.clearLocalData();
       expect(box.containsKey('u3'), isFalse);
-    });
-
-    test('getClubTodoList should return empty when member data missing', () async {
-      final list = await TodoService.getClubTodoList();
-      expect(list, isEmpty);
-    });
-
-    test('nowToUpdate should return directly when member data missing', () async {
-      await TodoService.nowToUpdate();
-      expect(true, isTrue);
-    });
-  });
-
-  group('TodoService fromJsonClub', () {
-    test('should_parse_bool_status_and_optional_fields', () {
-      final item = TodoService.fromJsonClub({
-        'id': 123,
-        'title': 'club-task',
-        'endTime': '2026-04-01',
-        'status': true,
-        'description': 'desc',
-        'key': 'k',
-      });
-
-      expect(item.id, '123');
-      expect(item.title, 'club-task');
-      expect(item.deadline, '2026-04-01');
-      expect(item.isCompleted, isTrue);
-      expect(item.description, 'desc');
-      expect(item.key, 'k');
-    });
-
-    test('should_parse_int_status_and_defaults', () {
-      final item = TodoService.fromJsonClub({
-        'status': 1,
-      });
-
-      expect(item.title, '');
-      expect(item.deadline, '');
-      expect(item.isCompleted, isTrue);
     });
   });
 }

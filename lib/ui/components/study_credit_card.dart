@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/models/info_model.dart';
+import 'package:ios_club_app/features/education/models/info_model.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import 'club_card.dart';
 
@@ -13,7 +15,7 @@ class StudyCreditCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: ClubRadii.card,
       ),
       child: ClubCard(
         child: Padding(
@@ -59,7 +61,7 @@ class StudyCreditCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: ClubRadii.navigation,
           ),
           child: Icon(
             Icons.school_rounded,
@@ -113,7 +115,7 @@ class StudyCreditCard extends StatelessWidget {
                     height: 20,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.error,
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: ClubRadii.indicatorBorder,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -169,7 +171,7 @@ class StudyCreditCard extends StatelessWidget {
           height: 20,
           decoration: BoxDecoration(
             color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: ClubRadii.indicatorBorder,
           ),
         ),
         const SizedBox(width: 12),
@@ -249,7 +251,7 @@ class StudyCreditCard extends StatelessWidget {
       height: 6,
       decoration: BoxDecoration(
         color: theme.colorScheme.outline.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(3),
+        borderRadius: ClubRadii.xsBorder,
       ),
       child: Stack(
         children: [
@@ -259,7 +261,7 @@ class StudyCreditCard extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: theme.colorScheme.outline.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(3),
+              borderRadius: ClubRadii.xsBorder,
             ),
           ),
           AnimatedContainer(
@@ -276,7 +278,7 @@ class StudyCreditCard extends StatelessWidget {
                           .withValues(alpha: 0.8),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: ClubRadii.xsBorder,
                   boxShadow: clampedProgress > 0
                       ? [
                           BoxShadow(
@@ -297,14 +299,18 @@ class StudyCreditCard extends StatelessWidget {
   }
 
   Color _getProgressColor(double progress, ThemeData theme) {
+    final colors = theme.extension<ClubColors>() ??
+        (theme.brightness == Brightness.dark
+            ? ClubColors.dark
+            : ClubColors.light);
     if (progress >= 1.0) {
-      return Colors.green.shade600;
+      return colors.success;
     } else if (progress >= 0.8) {
-      return Colors.blue.shade600;
+      return colors.primary;
     } else if (progress >= 0.5) {
-      return Colors.orange.shade600;
+      return colors.warning;
     } else {
-      return Colors.red.shade600;
+      return colors.danger;
     }
   }
 }

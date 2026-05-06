@@ -1,9 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  late ProviderContainer container;
   late CourseStore courseStore;
 
   setUpAll(() async {
@@ -12,8 +14,12 @@ void main() {
     await PrefsService.init();
   });
 
-  setUp(() {
-    courseStore = CourseStore();
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PrefsService.init();
+    container = ProviderContainer();
+    addTearDown(container.dispose);
+    courseStore = container.read(courseStoreProvider.notifier);
   });
 
   group('CourseStore', () {

@@ -1,11 +1,12 @@
-import 'dart:convert';
+import 'package:ios_club_app/features/education/models/plan_course.dart';
 import '../../../core/services/network_exception.dart';
 import 'edu_http_client_manager.dart';
 
 /// Program相关API
 class ProgramApi {
   /// 获取培养方案
-  static Future<String> getProgram(String studentId, {String? name}) async {
+  static Future<List<PlanCourse>> getProgram(String studentId,
+      {String? name, bool forceRefresh = false}) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Program',
@@ -13,11 +14,14 @@ class ProgramApi {
           'id': studentId,
           'name': name,
         },
+        bypassCache: forceRefresh,
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! List<dynamic>) {
+        throw NetworkException('培养方案返回格式错误', -1);
+      }
+      return response
+          .map((item) => PlanCourse.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -25,16 +29,28 @@ class ProgramApi {
   }
 
   /// 获取培养方案字典
-  static Future<String> getProgramDic(String studentId) async {
+  static Future<Map<String, List<PlanCourse>>> getProgramDic(
+    String studentId, {
+    bool forceRefresh = false,
+  }) async {
     try {
       final response = await EduHttpClientManager.instance.get(
         '/Program/GetDic',
         queryParameters: {'id': studentId},
+        bypassCache: forceRefresh,
       );
-      // 如果response已经是Map或List，使用jsonEncode转换为标准JSON字符串
-      return response is Map || response is List
-          ? jsonEncode(response)
-          : response.toString();
+      if (response is! Map) {
+        throw NetworkException('培养方案字典返回格式错误: ${response.runtimeType}', -1);
+      }
+      // 转换为 Map<String, dynamic> 以确保类型安全
+      final Map<String, dynamic> typedResponse =
+          Map<String, dynamic>.from(response);
+      return typedResponse.map((key, value) {
+        final courses = (value as List<dynamic>)
+            .map((item) => PlanCourse.fromJson(item as Map<String, dynamic>))
+            .toList();
+        return MapEntry(key, courses);
+      });
     } catch (e) {
       _handleError(e);
       rethrow;

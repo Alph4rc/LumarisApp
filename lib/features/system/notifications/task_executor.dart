@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:ui';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/time_info.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
-import 'package:ios_club_app/core/services/data_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:flutter/widgets.dart';
+import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 
 /// 任务执行器 - 实际的业务逻辑
@@ -18,7 +23,7 @@ class TaskExecutor {
 
   /// 缓存的课程数据
   static List<CourseModel>? _cachedCourses;
-  static Map<String, String>? _cachedTime;
+  static TimeInfo? _cachedTime;
   static DateTime? _cacheTimestamp;
 
   /// 缓存有效期（5分钟）
@@ -34,13 +39,6 @@ class TaskExecutor {
     return DateTime.now().difference(_cacheTimestamp!) < _cacheValidDuration;
   }
 
-  /// 清除缓存
-  static void _clearCache() {
-    _cachedCourses = null;
-    _cachedTime = null;
-    _cacheTimestamp = null;
-  }
-
   /// 预加载数据到缓存
   static Future<void> _preloadData() async {
     if (_isCacheValid()) {
@@ -50,8 +48,8 @@ class TaskExecutor {
     try {
       // 并行获取课程和时间数据
       final results = await Future.wait([
-        DataService.getAllCourse(),
-        DataService.getTime(),
+        CourseService.getAllCourse(),
+        EduTimeService.getTime(),
       ]).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
@@ -60,13 +58,12 @@ class TaskExecutor {
       );
 
       _cachedCourses = results[0] as List<CourseModel>;
-      _cachedTime = results[1] as Map<String, String>;
+      _cachedTime = results[1] as TimeInfo;
       _cacheTimestamp = DateTime.now();
       AppLogger.debug('后台任务数据预加载完成');
     } catch (e) {
       AppLogger.debug('预加载数据失败: $e');
-      _clearCache();
-      rethrow;
+      // 不再清空缓存，以便在离线或弱网环境下仍能使用旧缓存更新小组件
     }
   }
 
@@ -79,12 +76,12 @@ class TaskExecutor {
 
     final time = _cachedTime!;
     var now = DateTime.now();
-    if (time["startTime"] == null) {
+    if (time.startTime == null) {
       return (false, <CourseModel>[]);
     }
 
-    var weekNow =
-        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+    final startTime = DateTime.parse(time.startTime!);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
     var filteredCourses = _cachedCourses!.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
@@ -92,16 +89,14 @@ class TaskExecutor {
 
     if (filteredCourses.isEmpty) {
       if (isTomorrow) {
-        var weekDay = now.weekday + 1;
-        if (weekDay == 7) {
-          weekNow++;
-        }
-        if (weekDay > 7) {
-          weekDay = 1;
-        }
+        final tomorrow = now.add(const Duration(days: 1));
+        var weekTomorrow =
+            EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+        var tomorrowWeekday = tomorrow.weekday;
+
         filteredCourses = _cachedCourses!.where((course) {
-          return course.weekIndexes.contains(weekNow) &&
-              course.weekday == weekDay;
+          return course.weekIndexes.contains(weekTomorrow) &&
+              course.weekday == tomorrowWeekday;
         }).toList();
         filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
         return (true, filteredCourses);
@@ -131,12 +126,12 @@ class TaskExecutor {
     final time = _cachedTime!;
     var now = DateTime.now();
 
-    if (time["startTime"] == null) {
+    if (time.startTime == null) {
       return {'today': <CourseModel>[], 'tomorrow': <CourseModel>[]};
     }
 
-    var weekNow =
-        now.difference(DateTime.parse(time["startTime"]!)).inDays ~/ 7 + 1;
+    final startTime = DateTime.parse(time.startTime!);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
 
     // 获取今天的课程
     var todayCourses = _cachedCourses!.where((course) {
@@ -156,15 +151,10 @@ class TaskExecutor {
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
     // 计算明天日期和周数
-    var weekTomorrow = weekNow;
-    var tomorrowWeekday = now.weekday + 1;
-
-    if (tomorrowWeekday >= 7) {
-      weekTomorrow++;
-    }
-    if (tomorrowWeekday > 7) {
-      tomorrowWeekday = 1;
-    }
+    final tomorrow = now.add(const Duration(days: 1));
+    var weekTomorrow =
+        EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var tomorrowWeekday = tomorrow.weekday;
 
     // 获取明天的课程
     var tomorrowCourses = _cachedCourses!.where((course) {
@@ -177,8 +167,20 @@ class TaskExecutor {
     return {'today': todayCourses, 'tomorrow': tomorrowCourses};
   }
 
-  /// 检查并发送课程提醒
+  /// 确保后台环境已初始化（防重复调用）
+  static bool _backgroundInitialized = false;
+
+  static Future<void> _ensureInitialized() async {
+    if (_backgroundInitialized) return;
+    WidgetsFlutterBinding.ensureInitialized();
+    DartPluginRegistrant.ensureInitialized();
+    await HiveManager.init();
+    await PrefsService.init();
+    _backgroundInitialized = true;
+  }
+
   static Future<void> checkAndSendCourseReminder() async {
+    await _ensureInitialized();
     try {
       final prefs = await PrefsService.getInstanceAsync();
 
@@ -189,38 +191,71 @@ class TaskExecutor {
         return;
       }
 
-      // 检查今天是否已经提醒过
       final now = DateTime.now();
-      final lastRemindTimeStr = prefs.getString(PrefsKeys.LAST_REMIND_DATE);
-
-      if (lastRemindTimeStr != null) {
-        try {
-          final lastRemindDate = DateTime.parse(lastRemindTimeStr);
-          if (_isSameDay(now, lastRemindDate)) {
-            AppLogger.debug('今天已经提醒过了');
-            return;
-          }
-        } catch (e) {
-          AppLogger.debug('解析上次提醒时间失败: $e');
-        }
-      }
 
       // 预加载数据
       await _preloadData();
 
-      // 从缓存获取课程数据
-      final result = _getTodayOrTomorrowCourseFromCache(isTomorrow: true);
-
-      if (result.$2.isNotEmpty) {
-        await NotificationService.remindList(result.$2);
-
-        // 记录提醒时间（使用ISO格式字符串）
-        await prefs.setString(
-            PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
-        AppLogger.debug('课程提醒发送成功: ${now.toIso8601String()}');
-      } else {
-        AppLogger.debug('没有需要提醒的课程');
+      // 获取所有课程和时间信息
+      if (_cachedCourses == null ||
+          _cachedTime == null ||
+          _cachedTime!.startTime == null) {
+        AppLogger.debug('没有课程或时间信息，跳过排期');
+        return;
       }
+
+      final startTime = DateTime.parse(_cachedTime!.startTime!);
+
+      // 获取所有已排期的通知，优化去重逻辑
+      final pendingRequests = await NotificationService.instance.notifications
+          .pendingNotificationRequests();
+      
+      // 如果已经接近上限，先清空所有通知（这是一个应急保险）
+      if (pendingRequests.length > 400) {
+        AppLogger.debug('检测到闹钟接近上限 (${pendingRequests.length}), 正在清空并重排...');
+        await NotificationService.instance.cancelAllNotifications();
+      }
+
+      final existingIds = pendingRequests.map((r) => r.id).toSet();
+
+      // 为接下来的 3 天排期 (减少天数以避免 500 闹钟限制)
+      for (int i = 0; i < 3; i++) {
+        final targetDate = now.add(Duration(days: i));
+        final targetWeek =
+            EduTimeService.getWeekIndexByStartTime(targetDate, startTime);
+        final targetWeekday = targetDate.weekday;
+
+        var dailyCourses = _cachedCourses!.where((course) {
+          return course.weekIndexes.contains(targetWeek) &&
+              course.weekday == targetWeekday;
+        }).toList();
+
+        // 如果是今天，过滤掉已经结束的课程
+        if (i == 0) {
+          dailyCourses = dailyCourses.where((course) {
+            final courseTime = TimeService.getStartAndEnd(course);
+            final l = courseTime.end.split(':');
+            var end = DateTime(now.year, now.month, now.day, int.parse(l[0]),
+                int.parse(l[1]), 0);
+            return now.isBefore(end);
+          }).toList();
+        }
+
+        dailyCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+
+        if (dailyCourses.isNotEmpty) {
+          await NotificationService.remindList(
+            dailyCourses,
+            targetDate: targetDate,
+            existingIds: existingIds,
+          );
+        }
+      }
+
+      await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
+      AppLogger.debug(
+        '课程提醒排期完成(3天跨度), 时间=${now.toIso8601String()}',
+      );
     } catch (e) {
       AppLogger.debug('课程提醒检查失败: $e');
     }
@@ -228,6 +263,7 @@ class TaskExecutor {
 
   @pragma('vm:entry-point')
   static Future<void> updateWidget() async {
+    await _ensureInitialized();
     // 防止重复执行
     if (_isExecuting) {
       AppLogger.debug('后台任务正在执行中，跳过本次调用');
@@ -288,6 +324,7 @@ class TaskExecutor {
   /// 更新今日课程小组件（公开方法，用于外部调用）
   @pragma('vm:entry-point')
   static Future<void> updateTodayWidget() async {
+    await _ensureInitialized();
     try {
       await _preloadData();
       await _updateTodayWidgetFromCache();
@@ -299,6 +336,7 @@ class TaskExecutor {
   /// 更新近日课程小组件（公开方法，用于外部调用）
   @pragma('vm:entry-point')
   static Future<void> updateTodayAndTomorrowWidget() async {
+    await _ensureInitialized();
     try {
       await _preloadData();
       await _updateTodayAndTomorrowWidgetFromCache();
@@ -320,7 +358,7 @@ class TaskExecutor {
           time:
               '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
           location: course.room,
-          teacher: course.teachers.join(','),
+          teacher: course.room,
         ));
       } catch (e) {
         AppLogger.debug('转换课程 ${course.courseName} 失败: $e');
@@ -330,12 +368,5 @@ class TaskExecutor {
     }
 
     return items;
-  }
-
-  /// 判断是否同一天
-  static bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
   }
 }

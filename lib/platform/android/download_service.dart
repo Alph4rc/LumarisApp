@@ -2,9 +2,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -159,59 +161,42 @@ class UpdateManager {
     );
 
     // 显示进度对话框
-    showDialog(
-      context: context,
+    PlatformDialog.showCustomDialog<void>(
+      context,
+      title: '正在下载更新 $version',
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return ValueListenableBuilder<DownloadProgress>(
-          valueListenable: progressNotifier,
-          builder: (context, downloadProgress, child) {
-            return AlertDialog(
-              title: Text('正在下载更新 $version'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+      content: ValueListenableBuilder<DownloadProgress>(
+        valueListenable: progressNotifier,
+        builder: (context, downloadProgress, child) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CupertinoActivityIndicator(radius: 14),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // 线性进度条
-                  LinearProgressIndicator(
-                    value: downloadProgress.progress,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // 进度信息
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(downloadProgress.progressText),
-                      Text(downloadProgress.sizeText),
-                    ],
-                  ),
-                  if (downloadProgress.speedText.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      downloadProgress.speedText,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
+                  Text(downloadProgress.progressText),
+                  Text(downloadProgress.sizeText),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('取消'),
+              if (downloadProgress.speedText.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  downloadProgress.speedText,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: context.clubColors.secondaryLabel,
+                  ),
                 ),
               ],
-            );
-          },
-        );
-      },
+            ],
+          );
+        },
+      ),
+      actions: const [
+        PlatformDialogAction<void>(label: '取消'),
+      ],
     );
 
     try {

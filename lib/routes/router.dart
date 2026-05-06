@@ -1,223 +1,174 @@
-import 'package:get/get.dart';
-import 'package:ios_club_app/ui/pages/author_page.dart';
-import 'package:ios_club_app/ui/pages/campus_map_screen.dart';
-import 'package:ios_club_app/ui/pages/easter_egg_page.dart';
-import 'package:ios_club_app/ui/pages/helper_page.dart';
-import 'package:ios_club_app/ui/pages/license_page.dart';
-import 'package:ios_club_app/ui/pages/login_page.dart';
-import 'package:ios_club_app/ui/pages/net_page.dart';
-import 'package:ios_club_app/ui/pages/electricity_page.dart';
-import 'package:ios_club_app/ui/pages/payment_page.dart';
-import 'package:ios_club_app/ui/pages/program_page.dart';
-import 'package:ios_club_app/core/utils/performance_monitor.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import 'package:ios_club_app/ui/pages/setting_page.dart';
-import 'package:ios_club_app/ui/pages/home_page.dart';
-import 'package:ios_club_app/ui/pages/link_page.dart';
-import 'package:ios_club_app/ui/pages/member_page.dart';
-import 'package:ios_club_app/ui/pages/profile_page.dart';
-import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
-import 'package:ios_club_app/ui/pages/schedulePages/schedule_setting_page.dart';
-import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
-import 'package:ios_club_app/ui/pages/school_bus_page.dart';
-import 'package:ios_club_app/ui/pages/score_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/admin_portal_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/article_management_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/category_management_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/data_dashboard_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/logs_monitoring_page.dart';
-import 'package:ios_club_app/ui/pages/memberPages/client_app_management_page.dart';
+import '../under_maintenance_screen.dart';
+import '../ui/pages/agreement_page.dart';
+import '../ui/pages/author_page.dart';
+import '../ui/pages/easter_egg_page.dart';
+import '../ui/pages/electricity_page.dart';
+import '../ui/pages/helper_page.dart';
+import '../ui/pages/home_page.dart';
+import '../ui/pages/license_page.dart';
+import '../ui/pages/link_page.dart';
+import '../ui/pages/login_page.dart';
+import '../ui/pages/net_page.dart';
+import '../ui/pages/payment_page.dart';
+import '../ui/pages/privacy_policy_page.dart';
+import '../ui/pages/profile_page.dart';
+import '../ui/pages/program_page.dart';
+import '../ui/pages/schedulePages/custom_course_manage_page.dart';
+import '../ui/pages/schedulePages/schedule_setting_page.dart';
+import '../ui/pages/schedule_list_page.dart';
+import '../ui/pages/school_bus_page.dart';
+import '../ui/pages/score_page.dart';
+import '../ui/pages/setting_page.dart';
+import '../ui/pages/user_agreement_page.dart';
 
-/// 应用路由配置类
-///
-/// 管理应用中所有页面的路由信息，使用GetX框架进行路由管理。
-/// 包含所有页面的路由名称和对应的页面组件。
-class AppRouter {
-  /// 获取所有页面路由配置
-  ///
-  /// 返回一个包含所有页面路由信息的列表，每个路由包含名称和对应的页面组件。
-  ///
-  /// @return 页面路由配置列表
-  static List<GetPage> get getPages => [
-        /// 首页
-        GetPage(
-          name: '/',
-          page: () =>
-              PageRenderTimeMonitor(pageName: '首页', child: const HomePage()),
-        ),
+class AppRoutes {
+  const AppRoutes._();
 
-        /// 课表页面
-        GetPage(
-          name: '/Schedule',
-          page: () => PageRenderTimeMonitor(
-              pageName: '课表页面', child: const ScheduleListPage()),
-        ),
-
-        /// 成绩页面
-        GetPage(
-          name: '/Score',
-          page: () =>
-              PageRenderTimeMonitor(pageName: '成绩页面', child: const ScorePage()),
-        ),
-
-        /// 个人中心页面
-        GetPage(
-          name: '/Profile',
-          page: () => PageRenderTimeMonitor(
-              pageName: '个人中心页面', child: const ProfilePage()),
-        ),
-
-        /// 登录页面
-        GetPage(
-          name: '/Login',
-          page: () =>
-              PageRenderTimeMonitor(pageName: '登录页面', child: const LoginPage()),
-        ),
-
-        /// 链接页面
-        GetPage(
-          name: '/Link',
-          page: () =>
-              PageRenderTimeMonitor(pageName: '链接页面', child: const LinkPage()),
-        ),
-
-        /// 设置页面
-        GetPage(
-          name: '/About',
-          page: () => PageRenderTimeMonitor(
-              pageName: '设置页面', child: const SettingPage()),
-        ),
-
-        /// 课表设置页面
-        GetPage(
-          name: '/ScheduleSetting',
-          page: () => PageRenderTimeMonitor(
-              pageName: '课表设置页面', child: const ScheduleSettingPage()),
-        ),
-
-        /// 自定义课程管理页面
-        GetPage(
-          name: '/CustomCourseManage',
-          page: () => PageRenderTimeMonitor(
-              pageName: '自定义课程管理页面', child: const CustomCourseManagePage()),
-        ),
-
-        /// 校车页面
-        GetPage(
-          name: '/SchoolBus',
-          page: () => PageRenderTimeMonitor(
-              pageName: '校车页面', child: const SchoolBusPage()),
-        ),
-
-        /// 成员页面
-        GetPage(
-          name: '/iMember',
-          page: () => PageRenderTimeMonitor(
-              pageName: '成员页面', child: const MemberPage()),
-        ),
-
-        /// 培养方案页面
-        GetPage(
-          name: '/Program',
-          page: () => PageRenderTimeMonitor(
-              pageName: '培养方案页面', child: const ProgramPage()),
-        ),
-
-        /// 电费页面
-        GetPage(
-          name: '/Electricity',
-          page: () => PageRenderTimeMonitor(
-              pageName: '电费页面', child: const ElectricityPage()),
-        ),
-
-        /// 饭卡页面
-        GetPage(
-          name: '/Payment',
-          page: () =>
-              PageRenderTimeMonitor(pageName: '饭卡页面', child: PaymentPage()),
-        ),
-
-        /// 网络页面
-        GetPage(
-          name: '/Net',
-          page: () =>
-              PageRenderTimeMonitor(pageName: '网络页面', child: const NetPage()),
-        ),
-
-        /// 帮助页面
-        GetPage(
-            name: '/Helper',
-            page: () =>
-                PageRenderTimeMonitor(pageName: '帮助页面', child: HelperPage())),
-
-        /// 彩蛋页面
-        GetPage(
-          name: '/Egg',
-          page: () => PageRenderTimeMonitor(
-              pageName: '彩蛋页面', child: const EasterEggPage()),
-        ),
-
-        /// 许可证页面
-        GetPage(
-          name: '/License',
-          page: () => PageRenderTimeMonitor(
-              pageName: '许可证页面', child: const LicensePage()),
-        ),
-
-        /// 作者页面
-        GetPage(
-          name: '/Author',
-          page: () => PageRenderTimeMonitor(
-              pageName: '作者页面', child: const AuthorPage()),
-        ),
-
-        /// 社团管理主入口
-        GetPage(
-          name: '/AdminPortal',
-          page: () => PageRenderTimeMonitor(
-              pageName: '社团管理中心', child: const AdminPortalPage()),
-        ),
-
-        /// 文章管理页面
-        GetPage(
-          name: '/ArticleManagement',
-          page: () => PageRenderTimeMonitor(
-              pageName: '文章管理', child: const ArticleManagementPage()),
-        ),
-
-        /// 分类管理页面
-        GetPage(
-          name: '/CategoryManagement',
-          page: () => PageRenderTimeMonitor(
-              pageName: '分类管理', child: const CategoryManagementPage()),
-        ),
-
-        /// 数据统计仪表板
-        GetPage(
-          name: '/DataDashboard',
-          page: () => PageRenderTimeMonitor(
-              pageName: '数据统计', child: const DataDashboardPage()),
-        ),
-
-        /// 日志监控页面
-        GetPage(
-          name: '/LogsMonitoring',
-          page: () => PageRenderTimeMonitor(
-              pageName: '系统监控', child: const LogsMonitoringPage()),
-        ),
-
-        /// 客户端应用管理
-        GetPage(
-          name: '/ClientAppManagement',
-          page: () => PageRenderTimeMonitor(
-              pageName: '客户端应用管理', child: const ClientAppManagementPage()),
-        ),
-
-        /// 课程表管理
-        GetPage(
-          name: '/Map',
-          page: () => PageRenderTimeMonitor(
-              pageName: '地图', child: const CampusMapScreen()),
-        ),
-      ];
+  static const home = '/';
+  static const schedule = '/Schedule';
+  static const score = '/Score';
+  static const profile = '/Profile';
+  static const login = '/Login';
+  static const link = '/Link';
+  static const about = '/About';
+  static const scheduleSetting = '/ScheduleSetting';
+  static const customCourseManage = '/CustomCourseManage';
+  static const schoolBus = '/SchoolBus';
+  static const program = '/Program';
+  static const electricity = '/Electricity';
+  static const payment = '/Payment';
+  static const net = '/Net';
+  static const helper = '/Helper';
+  static const egg = '/Egg';
+  static const license = '/License';
+  static const agreement = '/Agreement';
+  static const privacyPolicy = '/PrivacyPolicy';
+  static const userAgreement = '/UserAgreement';
+  static const author = '/Author';
 }
+
+class AppRouter {
+  const AppRouter._();
+
+  static final GlobalKey<NavigatorState> rootNavigatorKey =
+      GlobalKey<NavigatorState>();
+
+  static final GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: AppRoutes.home,
+    routes: [
+      GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.schedule,
+        builder: (context, state) => const ScheduleListPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.score,
+        builder: (context, state) => const ScorePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfilePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.link,
+        builder: (context, state) => const LinkPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.about,
+        builder: (context, state) => const SettingPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.scheduleSetting,
+        builder: (context, state) => const ScheduleSettingPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.customCourseManage,
+        builder: (context, state) => const CustomCourseManagePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.schoolBus,
+        builder: (context, state) => const SchoolBusPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.program,
+        builder: (context, state) => const ProgramPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.electricity,
+        builder: (context, state) => const ElectricityPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.payment,
+        builder: (context, state) => PaymentPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.net,
+        builder: (context, state) => const NetPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.helper,
+        builder: (context, state) => const HelperPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.egg,
+        builder: (context, state) => const EasterEggPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.license,
+        builder: (context, state) => const LicensePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.agreement,
+        builder: (context, state) => const AgreementPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.privacyPolicy,
+        builder: (context, state) => const PrivacyPolicyPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.userAgreement,
+        builder: (context, state) => const UserAgreementPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.author,
+        builder: (context, state) => const AuthorPage(),
+      ),
+    ],
+    errorBuilder: (context, state) => const UnderMaintenanceScreen(),
+  );
+
+  static String get currentLocation {
+    final uri = router.routerDelegate.currentConfiguration.uri;
+    return uri.path.isEmpty ? AppRoutes.home : uri.path;
+  }
+
+  static void go(String location, {Object? extra}) {
+    router.go(location, extra: extra);
+  }
+
+  static Future<T?> push<T extends Object?>(String location, {Object? extra}) {
+    return router.push<T>(location, extra: extra);
+  }
+
+  static void pop<T extends Object?>([T? result]) {
+    if (router.canPop()) {
+      router.pop<T>(result);
+    }
+  }
+}
+
+final appRouterProvider = Provider<GoRouter>((ref) {
+  return AppRouter.router;
+});

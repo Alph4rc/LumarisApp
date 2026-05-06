@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class UnderMaintenanceScreen extends StatelessWidget {
   const UnderMaintenanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.groupedBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -58,6 +60,7 @@ class ErrorInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.clubColors;
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 400),
@@ -84,8 +87,8 @@ class ErrorInfo extends StatelessWidget {
                   onPressed: press,
                   style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 48),
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
+                      backgroundColor: colors.label,
+                      foregroundColor: colors.inverseLabel,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8)))),
                   child: Text(btnText ?? "返回"),

@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'schedule_item.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class ScheduleItem {
   final String title;
   final String time;
@@ -13,21 +18,8 @@ class ScheduleItem {
     this.description = '',
   });
 
-  factory ScheduleItem.fromJson(Map<String, dynamic> json) {
-    return ScheduleItem(
-      title: json['title'],
-      time: json['time'],
-      location: json['location'],
-      teacher: json['teacher'],
-    );
-  }
+  factory ScheduleItem.fromJson(Map<String, dynamic> json) =>
+      _$ScheduleItemFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'time': time,
-      'location': location,
-      'teacher': teacher,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ScheduleItemToJson(this);
 }

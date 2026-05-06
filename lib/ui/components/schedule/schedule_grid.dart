@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/timeline_column.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-import '../../../core/models/course_color_manager.dart';
+import '../../../core/services/course_color_manager.dart';
 import '../../../core/utils/platform_utils.dart';
 
 /// 课表网格组件
@@ -35,8 +37,6 @@ class ScheduleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -56,7 +56,6 @@ class ScheduleGrid extends StatelessWidget {
                 child: _buildDayColumn(
                   context,
                   weekday,
-                  isDark,
                 ),
               );
             }),
@@ -66,7 +65,8 @@ class ScheduleGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildDayColumn(BuildContext context, int weekday, bool isDark) {
+  Widget _buildDayColumn(BuildContext context, int weekday) {
+    final colors = context.clubColors;
     // 获取当天的课程
     final dayCourses = courses.where((c) => c.weekday == weekday).toList();
     dayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
@@ -87,11 +87,11 @@ class ScheduleGrid extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border(
                       left: BorderSide(
-                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        color: colors.separator,
                         width: 0.5,
                       ),
                       bottom: BorderSide(
-                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        color: colors.separator,
                         width: 0.5,
                       ),
                     ),
@@ -224,11 +224,11 @@ class ScheduleGrid extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: ClubRadii.control,
           color: courseColor,
         ),
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: ClubRadii.control,
           onTap: onConflictCourseTap != null
               ? () => onConflictCourseTap!(courses)
               : (onCourseTap != null
@@ -237,12 +237,12 @@ class ScheduleGrid extends StatelessWidget {
           onLongPress: null,
           child: Padding(
             padding: EdgeInsets.all(isTablet ? 8 : 4),
-            child: const Center(
+            child: Center(
               child: Text(
                 '当前时间存在多个冲突课程',
                 style: TextStyle(
                   fontSize: 10,
-                  color: Colors.white70,
+                  color: context.clubColors.onAccent.withValues(alpha: 0.9),
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({
@@ -24,20 +23,19 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final settingsStore = Get.find<SettingsStore>();
+    final colors = context.clubColors;
 
     // 定义颜色
-    final bgColor = backgroundColor ?? theme.scaffoldBackgroundColor;
+    final bgColor = backgroundColor ?? colors.cardOverlay;
     final selectedColor = selectedItemColor ?? colorScheme.primary;
-    final unselectedColor = unselectedItemColor ??
-        colorScheme.onSurfaceVariant.withValues(alpha: 0.64);
+    final unselectedColor = unselectedItemColor ?? colors.secondaryLabel;
 
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadowColor,
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -55,9 +53,9 @@ class BottomNavigation extends StatelessWidget {
                 destination: destinations[index],
                 isSelected: selectedIndex == index,
                 onTap: () {
-                  if (settingsStore.enableHapticFeedback) {
-                    Feedback.forLongPress(context);
-                  }
+                  // if (settingsStore.enableHapticFeedback) {
+                  //   Feedback.forLongPress(context);
+                  // }
                   onDestinationSelected(index);
                 },
                 selectedColor: selectedColor,

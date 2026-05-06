@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'login_response.g.dart';
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class LoginResponse {
   final String? token;
   final String? userId;
@@ -8,6 +13,7 @@ class LoginResponse {
   final String? className;
   final bool? success;
   final String? message;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Map<String, dynamic>? extra;
 
   LoginResponse({
@@ -24,6 +30,7 @@ class LoginResponse {
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    final generated = _$LoginResponseFromJson(json);
     final Map<String, dynamic> extra = <String, dynamic>{};
     for (final key in json.keys) {
       if (![
@@ -42,31 +49,21 @@ class LoginResponse {
     }
 
     return LoginResponse(
-      token: json['token'] as String?,
-      userId: json['userId'] as String?,
-      studentId: json['studentId'] as String?,
-      username: json['username'] as String?,
-      name: json['name'] as String?,
-      department: json['department'] as String?,
-      className: json['className'] as String?,
-      success: json['success'] as bool?,
-      message: json['message'] as String?,
+      token: generated.token,
+      userId: generated.userId,
+      studentId: generated.studentId,
+      username: generated.username,
+      name: generated.name,
+      department: generated.department,
+      className: generated.className,
+      success: generated.success,
+      message: generated.message,
       extra: extra.isEmpty ? null : extra,
     );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> json = {
-      if (token != null) 'token': token,
-      if (userId != null) 'userId': userId,
-      if (studentId != null) 'studentId': studentId,
-      if (username != null) 'username': username,
-      if (name != null) 'name': name,
-      if (department != null) 'department': department,
-      if (className != null) 'className': className,
-      if (success != null) 'success': success,
-      if (message != null) 'message': message,
-    };
+    final Map<String, dynamic> json = _$LoginResponseToJson(this);
 
     if (extra != null) {
       json.addAll(extra!);

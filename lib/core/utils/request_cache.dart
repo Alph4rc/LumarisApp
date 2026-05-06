@@ -30,17 +30,24 @@ class CachePolicy {
 class CacheEntry {
   final dynamic data;
   final int expiryTime; // millisecondsSinceEpoch
+  final String? requestUrl;
 
-  CacheEntry({required this.data, required this.expiryTime});
+  CacheEntry({
+    required this.data,
+    required this.expiryTime,
+    this.requestUrl,
+  });
 
   Map<String, dynamic> toJson() => {
         'data': data,
         'expiryTime': expiryTime,
+        if (requestUrl != null) 'requestUrl': requestUrl,
       };
 
   factory CacheEntry.fromJson(Map<String, dynamic> json) => CacheEntry(
         data: json['data'],
         expiryTime: json['expiryTime'] as int,
+        requestUrl: json['requestUrl'] as String?,
       );
 
   bool get isExpired => DateTime.now().millisecondsSinceEpoch > expiryTime;
@@ -66,17 +73,23 @@ class RequestCache {
   /// URL模式到缓存策略的映射（按优先级从高到低排列，默认策略通过方法兜底）
   final Map<RegExp, CachePolicy> _urlCachePolicies = {
     // 课程相关API - 中短期缓存
-    RegExp(r'.*/course.*'): CachePolicy.mediumTerm,
+    RegExp(r'.*/course.*', caseSensitive: false): CachePolicy.mediumTerm,
     // 成绩相关API - 长期缓存
-    RegExp(r'.*/score.*'): CachePolicy.longTerm,
+    RegExp(r'.*/score.*', caseSensitive: false): CachePolicy.longTerm,
     // 校巴相关API - 短期缓存
-    RegExp(r'.*/bus.*'): CachePolicy.shortTerm,
+    RegExp(r'.*/bus.*', caseSensitive: false): CachePolicy.shortTerm,
+    // 饭卡相关API - 短期缓存
+    RegExp(r'.*/payment.*', caseSensitive: false): CachePolicy.shortTerm,
+    // 学生信息/时间相关API - 短期缓存
+    RegExp(r'.*/info.*', caseSensitive: false): CachePolicy.shortTerm,
+    // 电费相关API - 短期缓存
+    RegExp(r'.*/electric.*', caseSensitive: false): CachePolicy.shortTerm,
     // 考试相关API - 长期缓存
-    RegExp(r'.*/exam.*'): CachePolicy.longTerm,
+    RegExp(r'.*/exam.*', caseSensitive: false): CachePolicy.longTerm,
     // 培养方案相关API - 超长期缓存
-    RegExp(r'.*/program.*'): CachePolicy.veryLongTerm,
+    RegExp(r'.*/program.*', caseSensitive: false): CachePolicy.veryLongTerm,
     // App信息相关API - 中短期缓存
-    RegExp(r'.*/app.*'): CachePolicy.mediumTerm,
+    RegExp(r'.*/app.*', caseSensitive: false): CachePolicy.mediumTerm,
   };
 
   /// 初始化缓存
@@ -119,20 +132,24 @@ class RequestCache {
 
         if (dataStr != null && expiryStr != null) {
           try {
-            // 解析原始键以获取 URL (假设键格式: request_cache_URL_PARAMS)
-            // 这里为了简单，直接使用原 key 作为 Hive 的 key
-            // 但需要注意原 key 包含了 'request_cache_' 前缀，我们可以保留或去除
-            // 为了兼容现有的 _generateCacheKey 逻辑，我们保持一致的 key 生成方式
-            // 因此，如果 _generateCacheKey 生成的 key 与 prefs 中的 key 一致，我们可以直接迁移
-
             final data = jsonDecode(dataStr);
             final expiryTime = DateTime.parse(expiryStr).millisecondsSinceEpoch;
-
-            // 存入 Hive
-            final entry = CacheEntry(data: data, expiryTime: expiryTime);
-            await _box?.put(key, entry.toJson());
-
-            migratedCount++;
+            final legacyRequest = _parseLegacyCacheKey(key);
+            if (legacyRequest == null) {
+              AppLogger.warning('Failed to parse legacy cache key: $key');
+            } else {
+              final migratedKey = _generateCacheKey(
+                legacyRequest.url,
+                params: legacyRequest.params,
+              );
+              final entry = CacheEntry(
+                data: data,
+                expiryTime: expiryTime,
+                requestUrl: legacyRequest.url,
+              );
+              await _box?.put(migratedKey, entry.toJson());
+              migratedCount++;
+            }
           } catch (e) {
             AppLogger.warning('Failed to migrate cache entry: $key', error: e);
           }
@@ -162,10 +179,122 @@ class RequestCache {
 
   /// 生成缓存键
   String _generateCacheKey(String url, {Map<String, dynamic>? params}) {
+    final requestIdentity = _buildRequestIdentity(url, params: params);
+    return '$_cacheKeyPrefix${_hashRequestIdentity(requestIdentity)}';
+  }
+
+  /// 旧版缓存键生成逻辑，用于兼容读取历史缓存
+  String _generateLegacyCacheKey(String url, {Map<String, dynamic>? params}) {
     // 空 map 与 null 视为等价，统一序列化为空字符串，避免 key 不一致
     final paramsString =
         (params != null && params.isNotEmpty) ? jsonEncode(params) : '';
-    return 'request_cache_${Uri.encodeComponent(url)}_${Uri.encodeComponent(paramsString)}';
+    return '$_cacheKeyPrefix${Uri.encodeComponent(url)}_${Uri.encodeComponent(paramsString)}';
+  }
+
+  static const String _cacheKeyPrefix = 'request_cache_';
+
+  String _buildRequestIdentity(String url, {Map<String, dynamic>? params}) {
+    final paramsString =
+        (params != null && params.isNotEmpty) ? jsonEncode(params) : '';
+    return '$url::$paramsString';
+  }
+
+  String _hashRequestIdentity(String requestIdentity) {
+    const int fnvOffsetBasis = 0xcbf29ce484222325;
+    const int fnvPrime = 0x100000001b3;
+    const int fnv64Mask = 0xFFFFFFFFFFFFFFFF;
+
+    int hash = fnvOffsetBasis;
+    for (final byte in utf8.encode(requestIdentity)) {
+      hash ^= byte;
+      hash = (hash * fnvPrime) & fnv64Mask;
+    }
+
+    return hash.toRadixString(16).padLeft(16, '0');
+  }
+
+  ({String key, dynamic rawData})? _findRawCacheEntry(
+    String url, {
+    Map<String, dynamic>? params,
+  }) {
+    final cacheKey = _generateCacheKey(url, params: params);
+    final rawData = _box?.get(cacheKey);
+    if (rawData != null) {
+      return (key: cacheKey, rawData: rawData);
+    }
+
+    final legacyKey = _generateLegacyCacheKey(url, params: params);
+    final legacyRawData = _box?.get(legacyKey);
+    if (legacyRawData != null) {
+      return (key: legacyKey, rawData: legacyRawData);
+    }
+
+    return null;
+  }
+
+  Future<void> _migrateLegacyEntryIfNeeded(
+    String currentKey,
+    String url,
+    CacheEntry entry, {
+    Map<String, dynamic>? params,
+  }) async {
+    final cacheKey = _generateCacheKey(url, params: params);
+    if (currentKey == cacheKey) return;
+
+    final migratedEntry = CacheEntry(
+      data: entry.data,
+      expiryTime: entry.expiryTime,
+      requestUrl: entry.requestUrl ?? url,
+    );
+
+    await _box?.put(cacheKey, migratedEntry.toJson());
+    await _box?.delete(currentKey);
+  }
+
+  ({String url, Map<String, dynamic>? params})? _parseLegacyCacheKey(
+      String key) {
+    if (!key.startsWith(_cacheKeyPrefix)) return null;
+
+    final rawKey = key.substring(_cacheKeyPrefix.length);
+    final separatorIndexes = <int>[];
+    for (int i = 0; i < rawKey.length; i++) {
+      if (rawKey[i] == '_') {
+        separatorIndexes.add(i);
+      }
+    }
+
+    for (final separatorIndex in separatorIndexes.reversed) {
+      final encodedUrl = rawKey.substring(0, separatorIndex);
+      final encodedParams = rawKey.substring(separatorIndex + 1);
+
+      try {
+        final decodedUrl = Uri.decodeComponent(encodedUrl);
+        if (!decodedUrl.startsWith('http://') &&
+            !decodedUrl.startsWith('https://')) {
+          continue;
+        }
+
+        if (encodedParams.isEmpty) {
+          return (url: decodedUrl, params: null);
+        }
+
+        final decodedParams = Uri.decodeComponent(encodedParams);
+        final parsedParams = jsonDecode(decodedParams);
+        if (parsedParams is Map<String, dynamic>) {
+          return (url: decodedUrl, params: parsedParams);
+        }
+        if (parsedParams is Map) {
+          return (
+            url: decodedUrl,
+            params: Map<String, dynamic>.from(parsedParams),
+          );
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+
+    return null;
   }
 
   /// 获取缓存数据
@@ -173,10 +302,11 @@ class RequestCache {
       {Map<String, dynamic>? params, Duration? maxAge}) async {
     if (!_isInitialized) await initialize();
 
-    final cacheKey = _generateCacheKey(url, params: params);
-    final dynamic rawData = _box?.get(cacheKey);
+    final foundEntry = _findRawCacheEntry(url, params: params);
+    if (foundEntry == null) return null;
 
-    if (rawData == null) return null;
+    final cacheKey = foundEntry.key;
+    final rawData = foundEntry.rawData;
 
     try {
       // Hive 中存储的是 Map (json)
@@ -186,6 +316,8 @@ class RequestCache {
         await _box?.delete(cacheKey);
         return null;
       }
+
+      await _migrateLegacyEntryIfNeeded(cacheKey, url, entry, params: params);
 
       final data = entry.data;
 
@@ -226,7 +358,11 @@ class RequestCache {
         DateTime.now().add(effectiveMaxAge).millisecondsSinceEpoch;
 
     // 存储
-    final entry = CacheEntry(data: data, expiryTime: expiryTime);
+    final entry = CacheEntry(
+      data: data,
+      expiryTime: expiryTime,
+      requestUrl: url,
+    );
     await _box?.put(cacheKey, entry.toJson());
   }
 
@@ -234,7 +370,9 @@ class RequestCache {
   Future<void> delete(String url, {Map<String, dynamic>? params}) async {
     if (!_isInitialized) await initialize();
     final cacheKey = _generateCacheKey(url, params: params);
+    final legacyKey = _generateLegacyCacheKey(url, params: params);
     await _box?.delete(cacheKey);
+    await _box?.delete(legacyKey);
   }
 
   /// 删除匹配URL模式的所有缓存
@@ -243,20 +381,19 @@ class RequestCache {
 
     final keys = _box?.keys.cast<String>() ?? [];
     for (final key in keys) {
-      if (key.startsWith('request_cache_')) {
-        // 提取原始URL
-        final cacheKey = key.replaceFirst('request_cache_', '');
-        final parts = cacheKey.split('_');
-        if (parts.isNotEmpty) {
-          try {
-            final url = Uri.decodeComponent(parts[0]);
-            if (pattern.hasMatch(url)) {
-              await _box?.delete(key);
-            }
-          } catch (e) {
-            AppLogger.debug('解析缓存键失败: $e');
-          }
+      final rawData = _box?.get(key);
+      if (rawData == null) {
+        continue;
+      }
+
+      try {
+        final entry = CacheEntry.fromJson(Map<String, dynamic>.from(rawData));
+        final requestUrl = entry.requestUrl ?? _parseLegacyCacheKey(key)?.url;
+        if (requestUrl != null && pattern.hasMatch(requestUrl)) {
+          await _box?.delete(key);
         }
+      } catch (e) {
+        AppLogger.debug('解析缓存键失败: $e');
       }
     }
   }
@@ -313,12 +450,15 @@ class RequestCache {
 /// 缓存拦截器
 class CacheInterceptor extends Interceptor {
   final RequestCache _cache = RequestCache();
+  static const String bypassCacheKey = 'bypassCache';
 
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
+    final bypassCache = options.extra[bypassCacheKey] == true;
+
     // 只有GET请求才使用缓存
-    if (options.method == 'GET') {
+    if (options.method == 'GET' && !bypassCache) {
       final cachedData = await _cache.get(options.uri.toString(),
           params: options.queryParameters);
       if (cachedData != null) {
@@ -367,7 +507,13 @@ class CacheInterceptor extends Interceptor {
           );
 
           if (!_cache._isInitialized) await _cache.initialize();
-          final rawData = _cache._box?.get(cacheKey);
+          final rawData = _cache._box?.get(cacheKey) ??
+              _cache._box?.get(
+                _cache._generateLegacyCacheKey(
+                  err.requestOptions.uri.toString(),
+                  params: err.requestOptions.queryParameters,
+                ),
+              );
 
           if (rawData != null) {
             try {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 星期标题栏组件
 ///
@@ -22,7 +23,7 @@ class WeekdayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
     final now = DateTime.now();
     int todayWeekday = now.weekday;
     if (todayWeekday == 7) todayWeekday = 0;
@@ -34,7 +35,7 @@ class WeekdayHeader extends StatelessWidget {
           ? BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                  color: colors.separator,
                   width: 0.5,
                 ),
               ),
@@ -50,7 +51,7 @@ class WeekdayHeader extends StatelessWidget {
                 ? BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                        color: colors.separator,
                         width: 0.5,
                       ),
                     ),
@@ -63,7 +64,7 @@ class WeekdayHeader extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                     )
                   : const SizedBox.shrink(),
@@ -83,13 +84,11 @@ class WeekdayHeader extends StatelessWidget {
                     ? BoxDecoration(
                         border: Border(
                           left: BorderSide(
-                            color:
-                                isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                            color: colors.separator,
                             width: 0.5,
                           ),
                           bottom: BorderSide(
-                            color:
-                                isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                            color: colors.separator,
                             width: 0.5,
                           ),
                         ),
@@ -106,7 +105,7 @@ class WeekdayHeader extends StatelessWidget {
                         fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
                         color: isToday
                             ? Theme.of(context).colorScheme.primary
-                            : (isDark ? Colors.grey[300] : Colors.grey[800]),
+                            : colors.label,
                       ),
                     ),
                     if (showDate) ...[
@@ -129,10 +128,8 @@ class WeekdayHeader extends StatelessWidget {
                               fontWeight:
                                   isToday ? FontWeight.w600 : FontWeight.w400,
                               color: isToday
-                                  ? Colors.white
-                                  : (isDark
-                                      ? Colors.grey[400]
-                                      : Colors.grey[600]),
+                                  ? colors.onAccent
+                                  : colors.secondaryLabel,
                             ),
                           ),
                         ),

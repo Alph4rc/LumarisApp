@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart' hide Response;
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -45,18 +44,17 @@ void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     await PrefsService.init();
-    Get.testMode = true;
 
     tempDir = await Directory.systemTemp.createTemp('edu_http_client_test_');
     Hive.init(tempDir.path);
     final box = await Hive.openBox('request_cache');
     await box.clear();
+    await RequestCache.instance.initialize();
   });
 
   setUp(() async {
     secureStore.clear();
     await PrefsService.instance.clear();
-    Get.reset();
     EduHttpClient.resetReloginStateForTest();
     LoginService.setLoginOverrideForTest(null);
     final box = await Hive.openBox('request_cache');
@@ -87,7 +85,6 @@ void main() {
         .setMockMethodCallHandler(channel, null);
     EduHttpClient.resetReloginStateForTest();
     LoginService.setLoginOverrideForTest(null);
-    Get.reset();
   });
 
   tearDownAll(() async {
@@ -141,6 +138,41 @@ void main() {
       client.dispose();
     });
 
+    test('should bypass request cache when force refresh is requested',
+        () async {
+      await RequestCache.instance.set(
+        'http://api.test/ping',
+        <String, dynamic>{'cached': true},
+      );
+
+      var networkHits = 0;
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            networkHits++;
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'cached': false},
+              ),
+            );
+          },
+        ),
+      );
+
+      final cachedData = await client.get('/ping') as Map<String, dynamic>;
+      final refreshedData =
+          await client.get('/ping', bypassCache: true) as Map<String, dynamic>;
+
+      expect(cachedData['cached'], isTrue);
+      expect(refreshedData['cached'], isFalse);
+      expect(networkHits, 1);
+
+      client.dispose();
+    });
+
     test('should return post response data', () async {
       final client = EduHttpClient(baseUrl: 'http://api.test');
       client.dio.interceptors.add(
@@ -167,31 +199,57 @@ void main() {
       client.dispose();
     });
 
-    test('should trigger relog failed state on 401 and throw auth exception',
-        () async {
+    test('should return delete response data', () async {
       final client = EduHttpClient(baseUrl: 'http://api.test');
-
       client.dio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
-            handler.reject(
-              DioException(
+            expect(options.method, 'DELETE');
+            handler.resolve(
+              Response<dynamic>(
                 requestOptions: options,
-                response: Response<dynamic>(
-                  requestOptions: options,
-                  statusCode: 401,
-                ),
-                type: DioExceptionType.badResponse,
+                statusCode: 204,
+                data: null,
               ),
             );
           },
         ),
       );
 
-      expect(
+      final data = await client.delete('/subscriptions/1');
+      expect(data, isNull);
+
+      client.dispose();
+    });
+
+    test('should trigger relog failed state on 401 and throw auth exception',
+        () async {
+      var reloggingCalled = 0;
+      String? failedReason;
+      final client = EduHttpClient(
+        baseUrl: 'http://api.test',
+        authStateCallbacks: AuthStateCallbacks(
+          onRelogging: () => reloggingCalled++,
+          onRelogFailed: (reason) => failedReason = reason,
+        ),
+      );
+
+      client.dio.httpClientAdapter = _QueueAdapter([
+        (_) => ResponseBody.fromString(
+              '{"error":"unauthorized"}',
+              401,
+              headers: <String, List<String>>{
+                Headers.contentTypeHeader: <String>['application/json']
+              },
+            ),
+      ]);
+
+      await expectLater(
         () => client.get('/need-auth'),
         throwsA(isA<AuthenticationException>()),
       );
+      expect(reloggingCalled, 1);
+      expect(failedReason, '账号或密码错误');
 
       client.dispose();
     });
@@ -437,6 +495,33 @@ void main() {
 
       await expectLater(
         () => client.post('/bad-post', data: <String, dynamic>{'k': 'v'}),
+        throwsA(isA<NetworkException>()),
+      );
+
+      client.dispose();
+    });
+
+    test('should map delete dio error into network exception', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                response: Response<dynamic>(
+                  requestOptions: options,
+                  statusCode: 404,
+                ),
+                type: DioExceptionType.badResponse,
+              ),
+            );
+          },
+        ),
+      );
+
+      await expectLater(
+        () => client.delete('/bad-delete'),
         throwsA(isA<NetworkException>()),
       );
 

@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/core/models/course_model.dart';
-import 'package:ios_club_app/core/models/score_model.dart';
-import 'package:ios_club_app/core/models/semester_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/score_model.dart';
+import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 
 /// Hive 数据库管理类
@@ -14,6 +14,8 @@ class HiveManager {
 
   static final HiveManager _instance = HiveManager._();
   static HiveManager get instance => _instance;
+  static bool _initialized = false;
+  static Future<void>? _initializing;
 
   // Box 名称常量
   static const String requestCacheBoxName = 'request_cache';
@@ -25,20 +27,41 @@ class HiveManager {
   ///
   /// 在 main.dart 中调用
   static Future<void> init() async {
+    if (_initialized) return;
+    if (_initializing != null) return _initializing;
+
+    _initializing = _init();
+    await _initializing;
+  }
+
+  static Future<void> _init() async {
     try {
       await Hive.initFlutter();
 
       // 注册 Adapters
-      Hive.registerAdapter(CourseModelAdapter());
-      Hive.registerAdapter(ScoreModelAdapter());
-      Hive.registerAdapter(ScoreListAdapter());
-      Hive.registerAdapter(SemesterModelAdapter());
-      Hive.registerAdapter(TodoItemAdapter());
+      if (!Hive.isAdapterRegistered(0)) {
+        Hive.registerAdapter(CourseModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(ScoreModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(2)) {
+        Hive.registerAdapter(ScoreListAdapter());
+      }
+      if (!Hive.isAdapterRegistered(3)) {
+        Hive.registerAdapter(SemesterModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(4)) {
+        Hive.registerAdapter(TodoItemAdapter());
+      }
 
+      _initialized = true;
       AppLogger.info('Hive initialized successfully with adapters');
     } catch (e, stackTrace) {
       AppLogger.error('Failed to initialize Hive',
           error: e, stackTrace: stackTrace);
+    } finally {
+      _initializing = null;
     }
   }
 

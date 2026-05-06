@@ -1,23 +1,31 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
-import 'package:ios_club_app/core/models/course_model.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 /// 自定义课程管理页面
 ///
 /// 提供自定义课程的增删改查功能
-class CustomCourseManagePage extends StatefulWidget {
+class CustomCourseManagePage extends ConsumerStatefulWidget {
   const CustomCourseManagePage({super.key});
 
   @override
-  State<CustomCourseManagePage> createState() => _CustomCourseManagePageState();
+  ConsumerState<CustomCourseManagePage> createState() =>
+      _CustomCourseManagePageState();
 }
 
-class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
+class _CustomCourseManagePageState
+    extends ConsumerState<CustomCourseManagePage> {
   late List<CourseModel> customCourses;
   bool isLoading = true;
 
@@ -79,7 +87,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: ClubRadii.navigation,
                   ),
                 ),
               );
@@ -113,7 +121,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: ClubRadii.navigation,
                   ),
                 ),
               );
@@ -125,22 +133,21 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
   }
 
   Future<void> _deleteCourse(CourseModel course) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除课程"${course.courseName}"吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+    final confirm = await PlatformDialog.showCustomDialog<bool>(
+      context,
+      title: '确认删除',
+      content: Text('确定要删除课程"${course.courseName}"吗？'),
+      actions: const [
+        PlatformDialogAction<bool>(
+          label: '取消',
+          value: false,
+        ),
+        PlatformDialogAction<bool>(
+          label: '删除',
+          value: true,
+          isDestructiveAction: true,
+        ),
+      ],
     );
 
     if (confirm == true) {
@@ -157,13 +164,13 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
 
   Future<void> _refreshCourseStore() async {
     // 刷新CourseStore以包含最新的自定义课程
-    await CourseStore.to.loadCourses();
+    await ref.read(courseStoreProvider.notifier).loadCourses();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDarkMode ? Colors.grey[900] : Colors.white;
+    final colors = context.clubColors;
+    final cardColor = colors.cardBackground;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
@@ -183,7 +190,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                   '${customCourses.length} 门课程',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: colors.secondaryLabel,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -199,7 +206,10 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
         ),
         body: isLoading
             ? const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: LoadingStateView(
+                  title: '正在读取自定义课程',
+                  subtitle: '正在整理本地保存的课程配置',
+                ),
               )
             : customCourses.isEmpty
                 ? Center(
@@ -210,7 +220,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: primaryColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: ClubRadii.card,
                           ),
                           child: Icon(
                             Icons.event_available,
@@ -231,9 +241,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                           '点击右上角 + 号添加课程',
                           style: TextStyle(
                             fontSize: 15,
-                            color: isDarkMode
-                                ? Colors.grey[400]
-                                : Colors.grey[600],
+                            color: colors.secondaryLabel,
                           ),
                         ),
                       ],
@@ -248,10 +256,10 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: cardColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: ClubRadii.navigation,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
+                              color: colors.shadowColor.withValues(alpha: 0.8),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
@@ -260,7 +268,7 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: ClubRadii.navigation,
                             onTap: () => _showEditCourseDialog(course),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -288,14 +296,12 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                                               course.room.isEmpty
                                                   ? '无地点'
                                                   : course.room,
-                                              Colors.blue,
-                                              isDarkMode,
+                                              colors.primary,
                                             ),
                                             _buildInfoChip(
                                               Icons.schedule_outlined,
                                               _formatCourseTime(course),
-                                              Colors.green,
-                                              isDarkMode,
+                                              colors.success,
                                             ),
                                           ],
                                         ),
@@ -306,29 +312,23 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                                   IconButton(
                                     icon: Icon(
                                       Icons.more_horiz,
-                                      color: isDarkMode
-                                          ? Colors.grey[400]
-                                          : Colors.grey[600],
+                                      color: colors.secondaryLabel,
                                     ),
                                     onPressed: () {
                                       showModalBottomSheet(
                                         context: context,
                                         backgroundColor: cardColor,
                                         shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20),
-                                          ),
+                                          borderRadius: ClubRadii.sheetTop,
                                         ),
                                         builder: (context) => SafeArea(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              ListTile(
+                                              ClubListTile(
                                                 leading: Icon(
                                                   Icons.edit_outlined,
-                                                  color: isDarkMode
-                                                      ? Colors.blue[300]
-                                                      : Colors.blue[600],
+                                                  color: colors.primary,
                                                 ),
                                                 title: const Text('编辑课程'),
                                                 onTap: () {
@@ -336,10 +336,10 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                                                   _showEditCourseDialog(course);
                                                 },
                                               ),
-                                              ListTile(
+                                              ClubListTile(
                                                 leading: Icon(
                                                   Icons.delete_outline,
-                                                  color: Colors.red[600],
+                                                  color: colors.danger,
                                                 ),
                                                 title: const Text('删除课程'),
                                                 onTap: () {
@@ -363,13 +363,12 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
                   ));
   }
 
-  Widget _buildInfoChip(
-      IconData icon, String label, MaterialColor color, bool isDarkMode) {
+  Widget _buildInfoChip(IconData icon, String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: ClubRadii.control,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -377,14 +376,14 @@ class _CustomCourseManagePageState extends State<CustomCourseManagePage> {
           Icon(
             icon,
             size: 14,
-            color: isDarkMode ? color[300] : color[700],
+            color: color,
           ),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 13,
-              color: isDarkMode ? color[300] : color[700],
+              color: color,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -509,8 +508,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDarkMode ? Colors.grey[900] : Colors.white;
+    final colors = context.clubColors;
+    final cardColor = colors.cardBackground;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Dialog(
@@ -522,10 +521,10 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
         ),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: ClubRadii.panel,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: colors.shadowColor.withValues(alpha: 0.9),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -542,7 +541,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                 color: cardColor,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                    color: colors.separator,
                   ),
                 ),
               ),
@@ -616,12 +615,10 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
+                        color: colors.surfaceRaised,
+                        borderRadius: ClubRadii.navigation,
                         border: Border.all(
-                          color: isDarkMode
-                              ? Colors.grey[600]!
-                              : Colors.grey[300]!,
+                          color: colors.borderStrong,
                         ),
                       ),
                       child: DropdownButtonHideUnderline(
@@ -666,14 +663,10 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
                                 decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? Colors.grey[700]!
-                                      : Colors.grey[100]!,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: colors.surfaceRaised,
+                                  borderRadius: ClubRadii.navigation,
                                   border: Border.all(
-                                    color: isDarkMode
-                                        ? Colors.grey[600]!
-                                        : Colors.grey[300]!,
+                                    color: colors.borderStrong,
                                   ),
                                 ),
                                 child: DropdownButtonHideUnderline(
@@ -720,14 +713,10 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
                                 decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? Colors.grey[700]!
-                                      : Colors.grey[100]!,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: colors.surfaceRaised,
+                                  borderRadius: ClubRadii.navigation,
                                   border: Border.all(
-                                    color: isDarkMode
-                                        ? Colors.grey[600]!
-                                        : Colors.grey[300]!,
+                                    color: colors.borderStrong,
                                   ),
                                 ),
                                 child: DropdownButtonHideUnderline(
@@ -791,26 +780,20 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? primaryColor
-                                  : isDarkMode
-                                      ? Colors.grey[700]
-                                      : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(20),
+                                  : colors.surfaceMuted,
+                              borderRadius: ClubRadii.card,
                               border: Border.all(
                                 color: isSelected
                                     ? primaryColor
-                                    : isDarkMode
-                                        ? Colors.grey[600]!
-                                        : Colors.grey[300]!,
+                                    : colors.borderStrong,
                               ),
                             ),
                             child: Text(
                               '$week周',
                               style: TextStyle(
                                 color: isSelected
-                                    ? Colors.white
-                                    : isDarkMode
-                                        ? Colors.grey[300]
-                                        : Colors.grey[700],
+                                    ? colors.onAccent
+                                    : colors.secondaryLabel,
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.w500,
@@ -835,7 +818,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                 color: cardColor,
                 border: Border(
                   top: BorderSide(
-                    color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                    color: colors.separator,
                   ),
                 ),
               ),
@@ -847,7 +830,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                     child: Text(
                       '取消',
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: colors.secondaryLabel,
                       ),
                     ),
                   ),
@@ -856,13 +839,13 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                     onPressed: _save,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: colors.onAccent,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: ClubRadii.control,
                       ),
                       elevation: 0,
                     ),
@@ -887,7 +870,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
     IconData icon, {
     bool required = false,
   }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.clubColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -907,7 +890,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: Colors.red[600],
+                  color: colors.danger,
                 ),
               ),
           ],
@@ -918,25 +901,25 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+              color: colors.tertiaryLabel,
             ),
             prefixIcon: Icon(
               icon,
               size: 20,
-              color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+              color: colors.tertiaryLabel,
             ),
             filled: true,
-            fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+            fillColor: colors.surfaceRaised,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: ClubRadii.control,
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.primary,
                 width: 2,
