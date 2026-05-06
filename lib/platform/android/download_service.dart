@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ios_club_app/features/system/update/app_version.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -19,13 +18,7 @@ Future<void> updateApp(
       onProgress,
 }) async {
   final packageInfo = await PackageInfo.fromPlatform();
-  final releaseVersion = AppVersion.tryParse(name);
-  if (releaseVersion == null) {
-    throw '无法识别版本号: $name';
-  }
-
-  final currentVersion = AppVersion.fromPackageInfo(packageInfo);
-  if (releaseVersion.isNewerThan(currentVersion)) {
+  if (name != packageInfo.version) {
     final Uri uri = Uri.parse(
         'https://gitee.com/luckyfishisdashen/iOSClub.AppMobile/releases/download/$name/app-release.apk');
 

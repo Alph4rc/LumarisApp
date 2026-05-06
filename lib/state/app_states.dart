@@ -27,7 +27,6 @@ class SettingsState with _$SettingsState {
     @Default(0) int pageIndex,
     @Default(false) bool enableHapticFeedback,
     @Default(false) bool updateIgnored,
-    @Default(false) bool updateBetaEnabled,
     @Default('') String fontFamily,
     @Default(false) bool showCourseGrid,
     @Default(false) bool todoRemindEnabled,

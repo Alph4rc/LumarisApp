@@ -1,8 +1,5 @@
 import 'package:ios_club_app/features/education/services/app_service.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/features/system/update/update_channel.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
 
 /// 更新管理类
 ///
@@ -28,7 +25,9 @@ class CheckUpdateManager {
       return false;
     }
 
-    if (UpdateChannel.fromEnvironment() == UpdateChannel.appstore) {
+    const updateChannel =
+        String.fromEnvironment('UPDATE_CHANNEL', defaultValue: 'gitee');
+    if (updateChannel == 'appstore') {
       return false;
     }
 
@@ -41,9 +40,7 @@ class CheckUpdateManager {
   /// 根据环境变量决定返回哪种更新服务
   static Future<(bool, ReleaseModel)> checkForUpdates() async {
     if (shouldCheckForUpdates()) {
-      final includeBeta =
-          PrefsService.instance.getBool(PrefsKeys.UPDATE_BETA_ENABLED) ?? false;
-      return await AppService.isNeedUpdate(includeBeta: includeBeta);
+      return await AppService.isNeedUpdate();
     } else {
       // 返回不需要更新的结果
       return (false, ReleaseModel(name: '0.0.0', body: '0.0.0'));

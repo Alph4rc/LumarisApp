@@ -30,33 +30,19 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
   @override
   void initState() {
     super.initState();
-    _loadVersionAndUpdateState();
-  }
 
-  Future<void> _loadVersionAndUpdateState() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    final versionText = packageInfo.buildNumber.trim().isEmpty
-        ? packageInfo.version
-        : '${packageInfo.version}+${packageInfo.buildNumber}';
-
-    var shouldUpdate = false;
-    ReleaseModel? release;
-    if (PlatformUtils.isAndroid) {
-      final result = await CheckUpdateManager.checkForUpdates();
-      shouldUpdate = result.$1;
-      if (result.$1) {
-        release = result.$2;
-      }
-    }
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      version = versionText;
-      isNeedUpdate = shouldUpdate;
-      latestRelease = release;
+    PackageInfo.fromPlatform().then((packageInfo) {
+      setState(() {
+        version = packageInfo.version;
+        if (PlatformUtils.isAndroid) {
+          CheckUpdateManager.checkForUpdates().then((res) {
+            isNeedUpdate = res.$1;
+            if (res.$1) {
+              latestRelease = res.$2;
+            }
+          });
+        }
+      });
     });
   }
 
@@ -163,30 +149,6 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
               value: settings.updateIgnored,
               onChanged: (bool value) async {
                 await settingsStore.setUpdateIgnored(value);
-                await _loadVersionAndUpdateState();
-              },
-            ),
-          ),
-        if (CheckUpdateManager.shouldCheckForUpdates())
-          ClubListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            leading: Icon(
-              Icons.science_outlined,
-              size: 20,
-              color: colors.primary,
-            ),
-            title: const Text('Beta 计划'),
-            subtitle: const Text('接收 beta 版本推送'),
-            subtitleTextStyle: TextStyle(
-              fontSize: 12,
-              color: colors.secondaryLabel,
-            ),
-            trailing: CupertinoSwitch(
-              value: settings.updateBetaEnabled,
-              onChanged: (bool value) async {
-                await settingsStore.setUpdateBetaEnabled(value);
-                await _loadVersionAndUpdateState();
               },
             ),
           ),

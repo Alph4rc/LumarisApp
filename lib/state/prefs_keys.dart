@@ -62,7 +62,6 @@ class PrefsKeys {
 
   /// 更新相关
   static const String UPDATE_IGNORED = 'update_ignored';
-  static const String UPDATE_BETA_ENABLED = 'update_beta_enabled';
 
   /// 页面相关
   static const String PAGE_DATA = 'page_data';

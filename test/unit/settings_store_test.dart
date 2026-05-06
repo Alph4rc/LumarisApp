@@ -31,7 +31,6 @@ void main() {
       expect(settingsStore.pageIndex, 0);
       expect(settingsStore.enableHapticFeedback, isFalse);
       expect(settingsStore.updateIgnored, isFalse);
-      expect(settingsStore.updateBetaEnabled, isFalse);
       expect(settingsStore.fontFamily, '');
       expect(settingsStore.showCourseGrid, isFalse);
       expect(settingsStore.todoRemindEnabled, isFalse);
@@ -50,7 +49,6 @@ void main() {
       await prefs.setInt(PrefsKeys.PAGE_DATA, 2);
       await prefs.setBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK, true);
       await prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
-      await prefs.setBool(PrefsKeys.UPDATE_BETA_ENABLED, true);
       await prefs.setString(PrefsKeys.FONT_FAMILY, 'PingFang SC');
       await prefs.setBool(PrefsKeys.SHOW_COURSE_GRID, true);
       await prefs.setBool(PrefsKeys.TODO_REMIND_ENABLED, true);
@@ -70,7 +68,6 @@ void main() {
       expect(settingsStore.pageIndex, 2);
       expect(settingsStore.enableHapticFeedback, isTrue);
       expect(settingsStore.updateIgnored, isTrue);
-      expect(settingsStore.updateBetaEnabled, isTrue);
       expect(settingsStore.fontFamily, 'PingFang SC');
       expect(settingsStore.showCourseGrid, isTrue);
       expect(settingsStore.todoRemindEnabled, isTrue);
@@ -89,7 +86,6 @@ void main() {
       await settingsStore.setPageIndex(1);
       await settingsStore.setEnableHapticFeedback(true);
       await settingsStore.setUpdateIgnored(true);
-      await settingsStore.setUpdateBetaEnabled(true);
       await settingsStore.setFontFamily('Source Han Sans');
       await settingsStore.setShowCourseGrid(true);
       await settingsStore.setTodoRemindEnabled(true);
@@ -104,7 +100,6 @@ void main() {
       expect(settingsStore.pageIndex, 1);
       expect(settingsStore.enableHapticFeedback, isTrue);
       expect(settingsStore.updateIgnored, isTrue);
-      expect(settingsStore.updateBetaEnabled, isTrue);
       expect(settingsStore.fontFamily, 'Source Han Sans');
       expect(settingsStore.showCourseGrid, isTrue);
       expect(settingsStore.todoRemindEnabled, isTrue);
@@ -118,7 +113,6 @@ void main() {
       expect(prefs.getInt(PrefsKeys.PAGE_DATA), 1);
       expect(prefs.getBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK), isTrue);
       expect(prefs.getBool(PrefsKeys.UPDATE_IGNORED), isTrue);
-      expect(prefs.getBool(PrefsKeys.UPDATE_BETA_ENABLED), isTrue);
       expect(prefs.getString(PrefsKeys.FONT_FAMILY), 'Source Han Sans');
       expect(prefs.getBool(PrefsKeys.SHOW_COURSE_GRID), isTrue);
       expect(prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED), isTrue);
