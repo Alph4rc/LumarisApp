@@ -173,6 +173,7 @@ mixin _$MapState {
   LatLng? get currentLocation => throw _privateConstructorUsedError;
   bool get isLoadingLocation => throw _privateConstructorUsedError;
   List<CampusPOI> get campusPOIs => throw _privateConstructorUsedError;
+  String get searchQuery => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $MapStateCopyWith<MapState> get copyWith =>
@@ -187,7 +188,8 @@ abstract class $MapStateCopyWith<$Res> {
   $Res call(
       {LatLng? currentLocation,
       bool isLoadingLocation,
-      List<CampusPOI> campusPOIs});
+      List<CampusPOI> campusPOIs,
+      String searchQuery});
 }
 
 /// @nodoc
@@ -206,6 +208,7 @@ class _$MapStateCopyWithImpl<$Res, $Val extends MapState>
     Object? currentLocation = freezed,
     Object? isLoadingLocation = null,
     Object? campusPOIs = null,
+    Object? searchQuery = null,
   }) {
     return _then(_value.copyWith(
       currentLocation: freezed == currentLocation
@@ -220,6 +223,10 @@ class _$MapStateCopyWithImpl<$Res, $Val extends MapState>
           ? _value.campusPOIs
           : campusPOIs // ignore: cast_nullable_to_non_nullable
               as List<CampusPOI>,
+      searchQuery: null == searchQuery
+          ? _value.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -235,7 +242,8 @@ abstract class _$$MapStateImplCopyWith<$Res>
   $Res call(
       {LatLng? currentLocation,
       bool isLoadingLocation,
-      List<CampusPOI> campusPOIs});
+      List<CampusPOI> campusPOIs,
+      String searchQuery});
 }
 
 /// @nodoc
@@ -252,6 +260,7 @@ class __$$MapStateImplCopyWithImpl<$Res>
     Object? currentLocation = freezed,
     Object? isLoadingLocation = null,
     Object? campusPOIs = null,
+    Object? searchQuery = null,
   }) {
     return _then(_$MapStateImpl(
       currentLocation: freezed == currentLocation
@@ -266,6 +275,10 @@ class __$$MapStateImplCopyWithImpl<$Res>
           ? _value._campusPOIs
           : campusPOIs // ignore: cast_nullable_to_non_nullable
               as List<CampusPOI>,
+      searchQuery: null == searchQuery
+          ? _value.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -276,7 +289,8 @@ class _$MapStateImpl implements _MapState {
   const _$MapStateImpl(
       {this.currentLocation,
       this.isLoadingLocation = false,
-      final List<CampusPOI> campusPOIs = const <CampusPOI>[]})
+      final List<CampusPOI> campusPOIs = const <CampusPOI>[],
+      this.searchQuery = ''})
       : _campusPOIs = campusPOIs;
 
   @override
@@ -294,8 +308,12 @@ class _$MapStateImpl implements _MapState {
   }
 
   @override
+  @JsonKey()
+  final String searchQuery;
+
+  @override
   String toString() {
-    return 'MapState(currentLocation: $currentLocation, isLoadingLocation: $isLoadingLocation, campusPOIs: $campusPOIs)';
+    return 'MapState(currentLocation: $currentLocation, isLoadingLocation: $isLoadingLocation, campusPOIs: $campusPOIs, searchQuery: $searchQuery)';
   }
 
   @override
@@ -308,12 +326,18 @@ class _$MapStateImpl implements _MapState {
             (identical(other.isLoadingLocation, isLoadingLocation) ||
                 other.isLoadingLocation == isLoadingLocation) &&
             const DeepCollectionEquality()
-                .equals(other._campusPOIs, _campusPOIs));
+                .equals(other._campusPOIs, _campusPOIs) &&
+            (identical(other.searchQuery, searchQuery) ||
+                other.searchQuery == searchQuery));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, currentLocation,
-      isLoadingLocation, const DeepCollectionEquality().hash(_campusPOIs));
+  int get hashCode => Object.hash(
+      runtimeType,
+      currentLocation,
+      isLoadingLocation,
+      const DeepCollectionEquality().hash(_campusPOIs),
+      searchQuery);
 
   @JsonKey(ignore: true)
   @override
@@ -326,7 +350,8 @@ abstract class _MapState implements MapState {
   const factory _MapState(
       {final LatLng? currentLocation,
       final bool isLoadingLocation,
-      final List<CampusPOI> campusPOIs}) = _$MapStateImpl;
+      final List<CampusPOI> campusPOIs,
+      final String searchQuery}) = _$MapStateImpl;
 
   @override
   LatLng? get currentLocation;
@@ -334,6 +359,8 @@ abstract class _MapState implements MapState {
   bool get isLoadingLocation;
   @override
   List<CampusPOI> get campusPOIs;
+  @override
+  String get searchQuery;
   @override
   @JsonKey(ignore: true)
   _$$MapStateImplCopyWith<_$MapStateImpl> get copyWith =>

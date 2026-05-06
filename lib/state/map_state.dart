@@ -18,5 +18,6 @@ class MapState with _$MapState {
     LatLng? currentLocation,
     @Default(false) bool isLoadingLocation,
     @Default(<CampusPOI>[]) List<CampusPOI> campusPOIs,
+    @Default('') String searchQuery,
   }) = _MapState;
 }

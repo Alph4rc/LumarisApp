@@ -18,6 +18,7 @@ class CampusMapPage extends ConsumerStatefulWidget {
 
 class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   late final MapController _mapController;
+  late final TextEditingController _searchController;
   CampusPOI? _selectedPOI;
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
@@ -27,6 +28,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   void initState() {
     super.initState();
     _mapController = MapController();
+    _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(mapNotifierProvider.notifier).checkLocationPermission();
     });
@@ -35,6 +37,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   @override
   void dispose() {
     _mapController.dispose();
+    _searchController.dispose();
     _sheetController.dispose();
     super.dispose();
   }
@@ -68,6 +71,18 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final mapState = ref.watch(mapNotifierProvider);
     final clubColors = context.clubColors;
     final padding = MediaQuery.of(context).padding;
+
+    final filteredPOIs = mapState.searchQuery.isEmpty
+        ? mapState.campusPOIs
+        : mapState.campusPOIs
+            .where((poi) =>
+                poi.name
+                    .toLowerCase()
+                    .contains(mapState.searchQuery.toLowerCase()) ||
+                poi.description
+                    .toLowerCase()
+                    .contains(mapState.searchQuery.toLowerCase()))
+            .toList();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -105,7 +120,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   ),
                   MarkerLayer(
                     markers: [
-                      ...mapState.campusPOIs.map((poi) => Marker(
+                      ...filteredPOIs.map((poi) => Marker(
                             point: poi.position,
                             width: 120,
                             height: 60,
@@ -133,7 +148,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   top: padding.top + 12,
                   left: 16,
                   right: 16,
-                  child: _buildFloatingTopPanel(mapState, clubColors),
+                  child: _buildFloatingTopPanel(
+                      mapState, clubColors, filteredPOIs),
                 ),
 
               // 3. Wide Screen Sidebar (Animated Floating)
@@ -145,7 +161,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   left: effectiveSidebarOpen ? 20 : -320,
                   bottom: 20,
                   width: 320,
-                  child: _buildSidebar(mapState, clubColors),
+                  child: _buildSidebar(mapState, clubColors, filteredPOIs),
                 ),
 
               // 4. Sidebar Toggle Button (Wide Screen Only - Adjust position based on sidebar)
@@ -284,7 +300,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildFloatingTopPanel(MapState mapState, ClubColors colors) {
+  Widget _buildFloatingTopPanel(
+      MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
     return Column(
       children: [
         ClipRRect(
@@ -307,11 +324,41 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   Icon(Icons.search_rounded, color: colors.secondaryLabel),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      '搜索地点或建筑...',
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        ref
+                            .read(mapNotifierProvider.notifier)
+                            .updateSearchQuery(value);
+                      },
                       style: TextStyle(
-                        color: colors.secondaryLabel,
+                        color: colors.label,
                         fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: '搜索地点或建筑...',
+                        hintStyle: TextStyle(
+                          color: colors.secondaryLabel,
+                          fontSize: 16,
+                        ),
+                        border: InputBorder.none,
+                        isDense: true,
+                        suffixIcon: mapState.searchQuery.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  _searchController.clear();
+                                  ref
+                                      .read(mapNotifierProvider.notifier)
+                                      .updateSearchQuery('');
+                                },
+                                child: Icon(Icons.clear_rounded,
+                                    color: colors.secondaryLabel, size: 18),
+                              )
+                            : null,
+                        suffixIconConstraints: const BoxConstraints(
+                          minWidth: 24,
+                          minHeight: 24,
+                        ),
                       ),
                     ),
                   ),
@@ -334,7 +381,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: Row(
-            children: mapState.campusPOIs.map((poi) {
+            children: filteredPOIs.map((poi) {
               final isSelected = _selectedPOI == poi;
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
@@ -479,7 +526,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildSidebar(MapState mapState, ClubColors colors) {
+  Widget _buildSidebar(
+      MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
     return ClipRRect(
       borderRadius: ClubRadii.card,
       child: BackdropFilter(
@@ -502,7 +550,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '建大地图',
+                      '校园地图',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
@@ -510,13 +558,61 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         color: colors.label,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '草堂校区 / 雁塔校区',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: colors.secondaryLabel,
+                    const SizedBox(height: 16),
+                    Container(
+                      height: 44,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search_rounded,
+                              color: colors.secondaryLabel, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) {
+                                ref
+                                    .read(mapNotifierProvider.notifier)
+                                    .updateSearchQuery(value);
+                              },
+                              style: TextStyle(
+                                color: colors.label,
+                                fontSize: 15,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: '搜索...',
+                                hintStyle: TextStyle(
+                                  color: colors.secondaryLabel,
+                                  fontSize: 15,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                suffixIcon: mapState.searchQuery.isNotEmpty
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          _searchController.clear();
+                                          ref
+                                              .read(
+                                                  mapNotifierProvider.notifier)
+                                              .updateSearchQuery('');
+                                        },
+                                        child: Icon(Icons.clear_rounded,
+                                            color: colors.secondaryLabel,
+                                            size: 18),
+                                      )
+                                    : null,
+                                suffixIconConstraints: const BoxConstraints(
+                                  minWidth: 24,
+                                  minHeight: 24,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -530,7 +626,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               Expanded(
                 child: ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  itemCount: mapState.campusPOIs.length,
+                  itemCount: filteredPOIs.length,
                   separatorBuilder: (_, __) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Divider(
@@ -538,7 +634,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         color: colors.separator.withValues(alpha: 0.1)),
                   ),
                   itemBuilder: (context, index) {
-                    final poi = mapState.campusPOIs[index];
+                    final poi = filteredPOIs[index];
                     final isSelected = _selectedPOI == poi;
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(

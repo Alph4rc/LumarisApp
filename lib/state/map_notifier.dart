@@ -29,6 +29,10 @@ class MapNotifier extends Notifier<MapState> {
     );
   }
 
+  void updateSearchQuery(String query) {
+    state = state.copyWith(searchQuery: query);
+  }
+
   Future<void> checkLocationPermission() async {
     state = state.copyWith(isLoadingLocation: true);
 
@@ -42,7 +46,8 @@ class MapNotifier extends Notifier<MapState> {
             accuracy: LocationAccuracy.bestForNavigation,
           ),
         );
-        final gcj02Location = _wgs84ToGcj02(position.latitude, position.longitude);
+        final gcj02Location =
+            _wgs84ToGcj02(position.latitude, position.longitude);
         state = state.copyWith(
           currentLocation: gcj02Location,
           isLoadingLocation: false,
@@ -126,4 +131,5 @@ class MapNotifier extends Notifier<MapState> {
   }
 }
 
-final mapNotifierProvider = NotifierProvider<MapNotifier, MapState>(MapNotifier.new);
+final mapNotifierProvider =
+    NotifierProvider<MapNotifier, MapState>(MapNotifier.new);
