@@ -52,11 +52,13 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
       _selectedPOI = poi;
     });
     _moveToLocation(poi.position);
-    _sheetController.animateTo(
-      0.35,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
-    );
+    if (_sheetController.isAttached) {
+      _sheetController.animateTo(
+        0.35,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+    }
   }
 
   void _toggleSidebar() {
@@ -329,7 +331,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search_rounded, color: colors.secondaryLabel),
+                  Icon(Icons.search_rounded, color: Colors.black45),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
@@ -346,7 +348,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       decoration: InputDecoration(
                         hintText: '搜索地点或建筑...',
                         hintStyle: TextStyle(
-                          color: colors.secondaryLabel,
+                          color: Colors.black45,
                           fontSize: 16,
                         ),
                         border: InputBorder.none,
@@ -526,7 +528,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
           height: 44,
           child: Icon(
             icon,
-            color: iconColor ?? colors.label,
+            color: iconColor ?? Colors.black45,
             size: 22,
           ),
         ),
@@ -557,16 +559,6 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '校园地图',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                        color: colors.label,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
                     Container(
                       height: 44,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -733,26 +725,13 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _selectedPOI!.name,
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: colors.label,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '西安建筑科技大学',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: colors.secondaryLabel,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      _selectedPOI!.name,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: colors.label,
+                      ),
                     ),
                   ),
                   Container(

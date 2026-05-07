@@ -64,20 +64,31 @@ class MapNotifier extends Notifier<MapState> {
         return;
       }
 
-      // 3. Get position
-      AppLogger.debug('MapNotifier: Attempting to get last known position...');
-      Position? position = await Geolocator.getLastKnownPosition();
-
-      if (position != null) {
-        AppLogger.debug('MapNotifier: Using last known position');
-      } else {
-        AppLogger.debug('MapNotifier: Last known position unavailable, requesting current position...');
+      // 3. Get position - try current position first, fallback to last known
+      AppLogger.debug('MapNotifier: Attempting to get current position...');
+      Position? position;
+      
+      try {
+        // Try to get current position (most accurate)
         position = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.medium, // Use medium accuracy for faster results
             timeLimit: Duration(seconds: 8), 
           ),
         );
+        AppLogger.debug('MapNotifier: Current position obtained successfully');
+      } catch (e) {
+        // If current position fails (timeout, no signal, etc.), use last known position
+        AppLogger.debug('MapNotifier: Failed to get current position ($e), falling back to last known position...');
+        position = await Geolocator.getLastKnownPosition();
+        
+        if (position != null) {
+          AppLogger.debug('MapNotifier: Using last known position as fallback');
+        }
+      }
+      
+      if (position == null) {
+        throw Exception('Unable to get any location data');
       }
 
       AppLogger.debug('MapNotifier: Position received: ${position.latitude}, ${position.longitude}');
