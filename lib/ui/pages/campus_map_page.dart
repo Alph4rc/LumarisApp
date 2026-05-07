@@ -73,6 +73,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final mapState = ref.watch(mapNotifierProvider);
     final clubColors = context.clubColors;
     final padding = MediaQuery.of(context).padding;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     // Listen for location changes to auto-center once
     ref.listen(mapNotifierProvider.select((s) => s.currentLocation),
@@ -127,6 +128,25 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
                     subdomains: const ['1', '2', '3', '4'],
                     maxZoom: 19,
+                    tileBuilder: isDarkMode
+                        ? (context, tileWidget, tile) {
+                            return ColorFiltered(
+                              colorFilter: const ColorFilter.matrix(<double>[
+                                -1, 0, 0, 0, 255, // R
+                                0, -1, 0, 0, 255, // G
+                                0, 0, -1, 0, 255, // B
+                                0, 0, 0, 1, 0, // A
+                              ]),
+                              child: ColorFiltered(
+                                colorFilter: ColorFilter.mode(
+                                  clubColors.primary.withValues(alpha: 0.05),
+                                  BlendMode.colorBurn,
+                                ),
+                                child: tileWidget,
+                              ),
+                            );
+                          }
+                        : null,
                   ),
                   MarkerLayer(
                     markers: [
@@ -249,7 +269,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ],
               border: Border.all(
                 color: isSelected
-                    ? Colors.white
+                    ? colors.onAccent
                     : colors.separator.withValues(alpha: 0.2),
                 width: 1.5,
               ),
@@ -259,7 +279,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : colors.label,
+                color: isSelected ? colors.onAccent : colors.label,
               ),
             ),
           ),
@@ -291,8 +311,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
         Container(
           width: 14,
           height: 14,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: colors.onAccent,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -331,7 +351,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search_rounded, color: Colors.black45),
+                  Icon(Icons.search_rounded, color: colors.secondaryLabel),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
@@ -348,7 +368,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       decoration: InputDecoration(
                         hintText: '搜索地点或建筑...',
                         hintStyle: TextStyle(
-                          color: Colors.black45,
+                          color: colors.tertiaryLabel,
                           fontSize: 16,
                         ),
                         border: InputBorder.none,
@@ -528,7 +548,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
           height: 44,
           child: Icon(
             icon,
-            color: iconColor ?? Colors.black45,
+            color: iconColor ?? colors.secondaryLabel,
             size: 22,
           ),
         ),
@@ -538,13 +558,16 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
 
   Widget _buildSidebar(
       MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return ClipRRect(
       borderRadius: ClubRadii.card,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
-            color: colors.cardOverlay.withValues(alpha: 0.7),
+            color: isDarkMode
+                ? colors.cardBackground.withValues(alpha: 0.8)
+                : colors.cardOverlay.withValues(alpha: 0.7),
             borderRadius: ClubRadii.card,
             border: Border.all(
               color: colors.separator.withValues(alpha: 0.15),
@@ -649,7 +672,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         ),
                         child: Icon(
                           Icons.location_on_rounded,
-                          color: isSelected ? Colors.white : colors.primary,
+                          color: isSelected ? colors.onAccent : colors.primary,
                           size: 20,
                         ),
                       ),
@@ -740,8 +763,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       color: colors.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.directions_rounded,
-                        color: Colors.white),
+                    child: Icon(Icons.directions_rounded,
+                        color: colors.onAccent),
                   ),
                 ],
               ),
