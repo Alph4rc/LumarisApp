@@ -288,20 +288,7 @@ class NotificationService {
     final targetDate =
         a.$1 ? DateTime.now().add(const Duration(days: 1)) : DateTime.now();
 
-    for (var course in a.$2) {
-      final target = CourseReminderHelper.buildTarget(
-        course: course,
-        courseDate: targetDate,
-      );
-      if (target == null) continue;
-
-      await NotificationService.instance.scheduleCourseReminder(
-        id: target.notificationId,
-        title: '课程提醒',
-        body: course.courseName,
-        courseTime: target.courseTime,
-      );
-    }
+    await remindList(a.$2, targetDate: targetDate);
   }
 
   static Future<void> remindList(

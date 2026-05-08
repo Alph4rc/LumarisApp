@@ -179,8 +179,16 @@ class TaskExecutor {
     _backgroundInitialized = true;
   }
 
-  static Future<void> checkAndSendCourseReminder() async {
+  static Future<void> checkAndSendCourseReminder({bool force = false}) async {
     await _ensureInitialized();
+
+    // 防止重复执行（force 模式除外）
+    if (!force && _isExecuting) {
+      AppLogger.debug('课程提醒正在执行中，跳过本次调用');
+      return;
+    }
+    _isExecuting = true;
+
     try {
       final prefs = await PrefsService.getInstanceAsync();
 
@@ -192,6 +200,24 @@ class TaskExecutor {
       }
 
       final now = DateTime.now();
+
+      // 一天只提醒一次（force 模式除外，如用户主动启用提醒时）
+      if (!force) {
+        final lastRemindStr = prefs.getString(PrefsKeys.LAST_REMIND_DATE);
+        if (lastRemindStr != null) {
+          try {
+            final lastRemindDate = DateTime.parse(lastRemindStr);
+            if (lastRemindDate.year >= now.year &&
+                lastRemindDate.month >= now.month &&
+                lastRemindDate.day >= now.day) {
+              AppLogger.debug('今日已执行课程提醒，跳过');
+              return;
+            }
+          } catch (_) {
+            // 解析失败则继续执行
+          }
+        }
+      }
 
       // 预加载数据
       await _preloadData();
@@ -209,7 +235,7 @@ class TaskExecutor {
       // 获取所有已排期的通知，优化去重逻辑
       final pendingRequests = await NotificationService.instance.notifications
           .pendingNotificationRequests();
-      
+
       // 如果已经接近上限，先清空所有通知（这是一个应急保险）
       if (pendingRequests.length > 400) {
         AppLogger.debug('检测到闹钟接近上限 (${pendingRequests.length}), 正在清空并重排...');
@@ -218,8 +244,9 @@ class TaskExecutor {
 
       final existingIds = pendingRequests.map((r) => r.id).toSet();
 
-      // 为接下来的 3 天排期 (减少天数以避免 500 闹钟限制)
-      for (int i = 0; i < 3; i++) {
+      // 只排期一天的课程，优先今天，今天没课则排明天
+      DateTime? scheduledDate;
+      for (int i = 0; i < 2; i++) {
         final targetDate = now.add(Duration(days: i));
         final targetWeek =
             EduTimeService.getWeekIndexByStartTime(targetDate, startTime);
@@ -249,15 +276,24 @@ class TaskExecutor {
             targetDate: targetDate,
             existingIds: existingIds,
           );
+          scheduledDate = targetDate;
+          break; // 一天有课即停止，不再排后续天数
         }
       }
 
-      await prefs.setString(PrefsKeys.LAST_REMIND_DATE, now.toIso8601String());
+      // LAST_REMIND_DATE 设为实际排期的目标日期，而非今天
+      // 这样如果排的是明天的课，明天就不会重复排期
+      await prefs.setString(
+        PrefsKeys.LAST_REMIND_DATE,
+        (scheduledDate ?? now).toIso8601String(),
+      );
       AppLogger.debug(
-        '课程提醒排期完成(3天跨度), 时间=${now.toIso8601String()}',
+        '课程提醒排期完成, 目标日期=${(scheduledDate ?? now).toIso8601String()}',
       );
     } catch (e) {
       AppLogger.debug('课程提醒检查失败: $e');
+    } finally {
+      _isExecuting = false;
     }
   }
 

@@ -38,9 +38,9 @@ class CourseReminderService {
     await prefs.setBool(PrefsKeys.IS_REMIND, enabled);
 
     if (enabled) {
-      // 启用时立即安排一次课程通知
+      // 启用时立即安排一次课程通知（强制模式，跳过每日一次限制）
       AppLogger.debug('课程提醒已启用，正在安排通知...');
-      await TaskExecutor.checkAndSendCourseReminder();
+      await TaskExecutor.checkAndSendCourseReminder(force: true);
       // 启动平台相关的后台服务（用于小组件更新）
       if (PlatformUtils.isAndroid) {
         // Android 使用 AlarmManager 定期更新小组件
