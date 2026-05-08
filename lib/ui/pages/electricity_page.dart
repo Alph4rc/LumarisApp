@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
@@ -54,26 +55,27 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   @override
   Widget build(BuildContext context) {
     final electricityState = ref.watch(electricityStoreProvider);
+    final l10n = context.l10n;
     if (electricityState.hasData &&
         !_hasLoadedSubscriptions &&
         !_isSubscriptionLoading) {
       Future<void>.microtask(_loadSubscriptions);
     }
     if (kIsWeb) {
-      return const Scaffold(
+      return Scaffold(
         appBar: ClubAppBar(
-          title: '电费管理',
+          title: l10n.electricityManagement,
         ),
         body: EmptyWidget(
-          title: '暂不支持Web版',
-          subtitle: '请使用其他版本',
+          title: l10n.webNotSupported,
+          subtitle: l10n.webNotSupportedSubtitle,
           icon: Icons.error,
         ),
       );
     }
     return Scaffold(
         appBar: ClubAppBar(
-          title: '电费管理',
+          title: l10n.electricityManagement,
           actions: [
             CupertinoButton(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -142,6 +144,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget _buildCurrentElectricityHeader() {
     final electricityState = ref.watch(electricityStoreProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final statusColor = electricityState.electricity <= 10
         ? colorScheme.error
         : _successColor(context);
@@ -153,7 +156,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         children: [
           const SizedBox(height: 16),
           Text(
-            '当前余额',
+            l10n.currentBalance,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -191,7 +194,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             )
           else
             Text(
-              '暂无数据',
+              l10n.electricityNoData,
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.w700,
@@ -210,8 +213,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             ),
             child: Text(
               electricityState.hasData
-                  ? (electricityState.electricity <= 10 ? '余额不足，请及时充值' : '余额充足')
-                  : '点击右上角添加电费数据',
+                  ? (electricityState.electricity <= 10 ? l10n.electricityLowBalance : l10n.electricitySufficient)
+                  : l10n.electricityAddTip,
               style: TextStyle(
                 fontSize: 13,
                 color: electricityState.hasData
@@ -229,6 +232,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget _buildChartCard() {
     final electricityState = ref.watch(electricityStoreProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return AnimatedCard(
       delay: const Duration(milliseconds: 150),
       child: ClubCard(
@@ -236,12 +240,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           padding: const EdgeInsets.all(24),
           child: Builder(builder: (context) {
             if (electricityState.isLoading) {
-              return const SizedBox(
+              return SizedBox(
                 height: 240,
                 child: Center(
                   child: LoadingStateView(
-                    title: '正在刷新用电趋势',
-                    subtitle: '正在读取最新电费记录',
+                    title: l10n.electricityLoading,
+                    subtitle: l10n.electricityLoadingSubtitle,
                     compact: true,
                     showCard: false,
                     padding: EdgeInsets.zero,
@@ -252,12 +256,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
             final data = electricityState.weeklyData;
             if (data.isEmpty) {
-              return const SizedBox(
+              return SizedBox(
                 height: 220,
                 child: Center(
                   child: EmptyWidget(
-                    title: '没有用电明细',
-                    subtitle: '刷新后会在这里展示每小时花费',
+                    title: l10n.noUsageDetails,
+                    subtitle: l10n.noUsageDetailsSubtitle,
                     icon: CupertinoIcons.chart_bar_alt_fill,
                   ),
                 ),
@@ -289,8 +293,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      '用电花费',
+                    Text(
+                      l10n.electricityCost,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -304,7 +308,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        '近${dailySummaries.length}天',
+                        l10n.lastNDays(dailySummaries.length),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -338,13 +342,14 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     required ElectricData peakData,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildMinimalMetric(
-                label: '总计花费',
+                label: l10n.totalCost,
                 value: '¥${totalCost.toStringAsFixed(2)}',
               ),
             ),
@@ -354,7 +359,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
             Expanded(
               child: _buildMinimalMetric(
-                label: '今日花费',
+                label: l10n.todayCost,
                 value: '¥${todayCost.toStringAsFixed(2)}',
               ),
             ),
@@ -365,7 +370,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           children: [
             Expanded(
               child: _buildMinimalMetric(
-                label: '日均花费',
+                label: l10n.avgDailyCost,
                 value: '¥${averageDailyCost.toStringAsFixed(2)}',
               ),
             ),
@@ -375,7 +380,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
             Expanded(
               child: _buildMinimalMetric(
-                label: '峰值时段',
+                label: l10n.peakHours,
                 value: _formatHourCost(peakData),
               ),
             ),
@@ -417,12 +422,13 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget _buildHourlyCostScroller(List<ElectricData> data) {
     final recentData = data.length > 24 ? data.sublist(data.length - 24) : data;
     final maxValue = recentData.map((item) => item.value).reduce(max);
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '每小时明细',
+        Text(
+          l10n.hourlyDetails,
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
@@ -542,6 +548,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final electricityState = ref.watch(electricityStoreProvider);
     final controller = ref.read(electricityStoreProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return AnimatedCard(
       delay: const Duration(milliseconds: 300),
@@ -551,9 +558,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             ClubListTile(
               leading: Icon(CupertinoIcons.square_grid_2x2,
                   color: colorScheme.primary),
-              title: const Text('添加到首页',
-                  style: TextStyle(fontWeight: FontWeight.w500)),
-              subtitle: const Text('在首页显示电费磁贴'),
+              title: Text(l10n.addToHome,
+                  style: const TextStyle(fontWeight: FontWeight.w500)),
+              subtitle: Text(l10n.showElectricityTile),
               trailing: CupertinoSwitch(
                 value: electricityState.tiles.contains('电费'),
                 onChanged: (value) async {
@@ -564,9 +571,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             ClubListTile(
               leading: Icon(CupertinoIcons.money_yen_circle,
                   color: colorScheme.primary),
-              title: const Text('电费充值',
-                  style: TextStyle(fontWeight: FontWeight.w500)),
-              subtitle: const Text('跳转至微信进行电费充值'),
+              title: Text(l10n.electricityRecharge,
+                  style: const TextStyle(fontWeight: FontWeight.w500)),
+              subtitle: Text(l10n.electricityRechargeSubtitle),
               trailing: Icon(CupertinoIcons.chevron_right,
                   size: 16, color: colorScheme.onSurfaceVariant),
               onTap: () async {
@@ -581,6 +588,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
   Widget _buildSubscriptionSection({required bool hasElectricityData}) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return AnimatedCard(
       delay: const Duration(milliseconds: 360),
@@ -596,8 +604,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '低余额订阅',
+                        Text(
+                          l10n.lowBalanceSub,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -606,8 +614,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                         const SizedBox(height: 4),
                         Text(
                           hasElectricityData
-                              ? '当余额低于阈值时，通过邮箱提醒你及时充值'
-                              : '先添加电费页面后，再开启低余额邮件提醒',
+                              ? l10n.lowBalanceSubDesc
+                              : l10n.addElectricityFirst,
                           style: TextStyle(
                             fontSize: 13,
                             color: colorScheme.onSurfaceVariant,
@@ -637,8 +645,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             if (!hasElectricityData)
               _buildSubscriptionEmptyState(
                 icon: CupertinoIcons.link,
-                title: '还没有电费数据',
-                subtitle: '先在本页绑定宿舍电费链接，订阅会自动使用当前房间信息。',
+                title: l10n.noElectricityData,
+                subtitle: l10n.noElectricityDataSubtitle,
               )
             else ...[
               ClubListTile(
@@ -649,8 +657,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                   color: colorScheme.primary,
                 ),
                 title: Text(
-                  _hasActiveSubscription ? '已开启低余额提醒' : '添加低余额提醒',
-                  style: TextStyle(fontWeight: FontWeight.w500),
+                  _hasActiveSubscription ? l10n.lowBalanceEnabled : l10n.addLowBalanceAlert,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(
                   _buildSubscriptionSummary(),
@@ -674,12 +682,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                     CupertinoIcons.delete,
                     color: colorScheme.error,
                   ),
-                  title: const Text(
-                    '删除订阅',
-                    style: TextStyle(fontWeight: FontWeight.w500),
+                  title: Text(
+                    l10n.deleteSubscription,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
-                  subtitle: const Text(
-                    '取消当前邮箱的低余额提醒，之后可重新创建',
+                  subtitle: Text(
+                    l10n.deleteSubDesc,
                   ),
                   trailing: Icon(
                     CupertinoIcons.chevron_right,
@@ -755,11 +763,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   void _showRefreshDialog() {
+    final l10n = context.l10n;
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        title: const Text('电费管理'),
-        message: const Text('选择要执行的操作'),
+        title: Text(l10n.electricityManagement),
+        message: Text(l10n.chooseAction),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () async {
@@ -769,37 +778,38 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                   .refreshElectricityData();
               await _loadSubscriptions(force: true);
             },
-            child: const Text('刷新数据'),
+            child: Text(l10n.refreshData),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
               _showInputDialog();
             },
-            child: const Text('更换房间'),
+            child: Text(l10n.changeRoom),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDestructiveAction: true,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(l10n.cancel),
         ),
       ),
     );
   }
 
   void _showInputDialog() {
+    final l10n = context.l10n;
     PlatformDialog.showCustomDialog<void>(
       context,
-      title: '获取电费',
+      title: l10n.getElectricity,
       content: Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              '请打开建大财务处电费详情页面，复制页面URL并粘贴到下方输入框',
-              style: TextStyle(fontSize: 13),
+            Text(
+              l10n.electricityUrlPrompt,
+              style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 16),
             Card(
@@ -807,7 +817,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               elevation: 0,
               child: CupertinoTextField(
                 controller: _urlController,
-                placeholder: '请输入URL',
+                placeholder: l10n.urlPlaceholder,
                 padding: const EdgeInsets.all(12),
                 clearButtonMode: OverlayVisibilityMode.editing,
                 style: const TextStyle(fontSize: 14),
@@ -818,12 +828,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       ),
       actions: [
         PlatformDialogAction<void>(
-          label: '取消',
+          label: l10n.cancel,
           isDestructiveAction: true,
           onPressed: _urlController.clear,
         ),
         PlatformDialogAction<void>(
-          label: '确定',
+          label: l10n.confirm,
           isDefaultAction: true,
           onPressed: () async {
             final value =
@@ -903,7 +913,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text('加载电费订阅失败: $e'));
+      final l10n = context.l10n;
+      showClubSnackBar(context, Text('${l10n.electricitySubLoadFailed}: $e'));
       setState(() {
         _hasLoadedSubscriptions = true;
       });
@@ -917,6 +928,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   void _showCreateSubscriptionDialog() {
+    final l10n = context.l10n;
     _subscriptionEmailController.text = _subscriptionEmail;
     if (_subscriptionThresholdController.text.trim().isEmpty) {
       _subscriptionThresholdController.text = '10';
@@ -924,15 +936,15 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
     PlatformDialog.showCustomDialog<void>(
       context,
-      title: '添加低余额提醒',
+      title: l10n.createLowBalanceAlert,
       content: Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              '系统会使用当前绑定的宿舍电费页面，在余额低于设定阈值时发送邮件提醒。',
-              style: TextStyle(fontSize: 13),
+            Text(
+              l10n.lowBalanceAlertDesc,
+              style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 16),
             Card(
@@ -940,7 +952,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               elevation: 0,
               child: CupertinoTextField(
                 controller: _subscriptionEmailController,
-                placeholder: '提醒邮箱',
+                placeholder: l10n.remindEmailPlaceholder,
                 keyboardType: TextInputType.emailAddress,
                 padding: const EdgeInsets.all(12),
                 clearButtonMode: OverlayVisibilityMode.editing,
@@ -953,7 +965,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               elevation: 0,
               child: CupertinoTextField(
                 controller: _subscriptionThresholdController,
-                placeholder: '提醒阈值，例如 10',
+                placeholder: l10n.remindThresholdPlaceholder,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 padding: const EdgeInsets.all(12),
@@ -965,12 +977,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         ),
       ),
       actions: [
-        const PlatformDialogAction<void>(
-          label: '取消',
+        PlatformDialogAction<void>(
+          label: l10n.cancel,
           isDestructiveAction: true,
         ),
         PlatformDialogAction<void>(
-          label: '创建',
+          label: l10n.create,
           isDefaultAction: true,
           onPressed: _createSubscription,
         ),
@@ -983,16 +995,17 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final thresholdText = _subscriptionThresholdController.text.trim();
     final threshold = double.tryParse(thresholdText);
 
+    final l10nSB = context.l10n;
     if (email.isEmpty) {
-      showClubSnackBar(context, const Text('请输入提醒邮箱'));
+      showClubSnackBar(context, Text(l10nSB.pleaseEnterEmail));
       return;
     }
     if (!_isValidEmail(email)) {
-      showClubSnackBar(context, const Text('请输入有效的邮箱地址'));
+      showClubSnackBar(context, Text(l10nSB.pleaseEnterValidEmail));
       return;
     }
     if (threshold == null || threshold <= 0) {
-      showClubSnackBar(context, const Text('请输入大于 0 的提醒阈值'));
+      showClubSnackBar(context, Text(l10nSB.pleaseEnterThreshold));
       return;
     }
 
@@ -1021,12 +1034,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, const Text('低余额提醒已创建'));
+      showClubSnackBar(context, Text(l10nSB.lowBalanceAlertCreated));
     } catch (e) {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text('创建电费订阅失败: $e'));
+      showClubSnackBar(context, Text('${l10nSB.createSubFailed}: $e'));
       setState(() {
         _isSubscriptionLoading = false;
       });
@@ -1034,36 +1047,38 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   String _buildSubscriptionSummary() {
+    final l10n = context.l10n;
     if (_hasActiveSubscription && _subscriptionEmail.isNotEmpty) {
-      return '当前邮箱 $_subscriptionEmail，低于 ${_formatThreshold(_subscriptionThreshold)} 元时提醒';
+      return l10n.currentSubInfo(_subscriptionEmail, _formatThreshold(_subscriptionThreshold));
     }
-    return '设置阈值后，余额低于该金额时将通过邮箱提醒';
+    return l10n.subSetupHint;
   }
 
   void _showSubscriptionDetailDialog() {
+    final l10n = context.l10n;
     PlatformDialog.showCustomDialog<void>(
       context,
-      title: '订阅内容',
+      title: l10n.lowBalanceSub,
       content: Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildSubscriptionDetailLine(
-              label: '提醒邮箱',
-              value: _subscriptionEmail.isEmpty ? '未设置' : _subscriptionEmail,
+              label: l10n.remindEmailLabel,
+              value: _subscriptionEmail.isEmpty ? l10n.notSet : _subscriptionEmail,
             ),
             const SizedBox(height: 10),
             _buildSubscriptionDetailLine(
-              label: '提醒阈值',
+              label: l10n.remindThresholdLabel,
               value: '${_formatThreshold(_subscriptionThreshold)} 元',
             ),
           ],
         ),
       ),
-      actions: const [
+      actions: [
         PlatformDialogAction<void>(
-          label: '知道了',
+          label: l10n.gotIt,
           isDefaultAction: true,
         ),
       ],
@@ -1104,19 +1119,18 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   Future<void> _showDeleteSubscriptionDialog() async {
+    final l10n = context.l10n;
     if (_subscriptionId.isEmpty) {
-      showClubSnackBar(context, const Text('当前没有可删除的订阅'));
+      showClubSnackBar(context, Text(l10n.noSubToDelete));
       return;
     }
 
     final confirmed = await PlatformDialog.showConfirmDialog(
       context,
-      title: '删除订阅',
-      content: _subscriptionEmail.isEmpty
-          ? '确定要删除当前低余额提醒吗？'
-          : '确定要删除 $_subscriptionEmail 的低余额提醒吗？',
-      confirmText: '删除',
-      cancelText: '取消',
+      title: l10n.deleteSubTitle,
+      content: l10n.deleteSubConfirmContent,
+      confirmText: l10n.delete,
+      cancelText: l10n.cancel,
     );
 
     if (confirmed == true) {
@@ -1125,8 +1139,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   Future<void> _deleteSubscription() async {
+    final l10n = context.l10n;
     if (_subscriptionId.isEmpty) {
-      showClubSnackBar(context, const Text('当前没有可删除的订阅'));
+      showClubSnackBar(context, Text(l10n.noSubToDelete));
       return;
     }
 
@@ -1154,12 +1169,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, const Text('低余额提醒已删除'));
+      showClubSnackBar(context, Text(l10n.lowBalanceAlertDeleted));
     } catch (e) {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text('删除电费订阅失败: $e'));
+      showClubSnackBar(context, Text('${l10n.deleteSubFailed}: $e'));
       setState(() {
         _isSubscriptionLoading = false;
       });

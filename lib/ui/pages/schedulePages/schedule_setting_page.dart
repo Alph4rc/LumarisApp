@@ -14,6 +14,7 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
@@ -104,13 +105,14 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final l10n = context.l10n;
     final isDesktop = PlatformUtils.isDesktop;
 
     final colors = context.clubColors;
 
     return Scaffold(
         appBar: ClubAppBar(
-          title: '课表设置',
+          title: l10n.scheduleSettingsTitle,
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -118,20 +120,20 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!isDesktop) ...[
-                _buildSectionTitle('日历订阅'),
+                _buildSectionTitle(l10n.calendarSubscription),
                 const SizedBox(height: 12),
                 _buildCalendarSection(context, colors),
                 const SizedBox(height: 24),
               ],
-              _buildSectionTitle('课表管理'),
+              _buildSectionTitle(l10n.scheduleManagement),
               const SizedBox(height: 12),
               _buildManagementSection(context, colors),
               const SizedBox(height: 24),
-              _buildSectionTitle('课表背景'),
+              _buildSectionTitle(l10n.scheduleBackground),
               const SizedBox(height: 12),
               _buildBackgroundSection(context, colors),
               const SizedBox(height: 24),
-              _buildSectionTitle('忽略课程'),
+              _buildSectionTitle(l10n.ignoreCourses),
               const SizedBox(height: 12),
               _buildIgnoreCourseSection(context, colors),
             ],
@@ -151,6 +153,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   }
 
   Widget _buildCalendarSection(BuildContext context, ClubColors colors) {
+    final l10n = context.l10n;
     return ClubCard(
       child: Column(
         children: [
@@ -159,9 +162,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
               Icons.calendar_today_outlined,
               color: colors.primary,
             ),
-            title: const Text(
-              '导入到日历',
-              style: TextStyle(
+            title: Text(
+              l10n.scheduleWidgetTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -177,7 +180,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '订阅链接',
+                  l10n.subscriptionLink,
                   style: TextStyle(
                     fontSize: 13,
                     color: colors.secondaryLabel,
@@ -210,7 +213,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: 'webcal$url'));
                           if (context.mounted) {
-                            showClubSnackBar(context, const Text('复制成功!'));
+                            showClubSnackBar(context, Text(l10n.copiedSuccess));
                           }
                         },
                         padding: EdgeInsets.zero,
@@ -223,7 +226,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                 TextButton.icon(
                   onPressed: () => showCalendarGuidanceDialog(context),
                   icon: const Icon(Icons.help_outline, size: 18),
-                  label: const Text('不会导入？'),
+                  label: Text(l10n.howToImport),
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                   ),
@@ -237,6 +240,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   }
 
   Widget _buildManagementSection(BuildContext context, ClubColors colors) {
+    final l10n = context.l10n;
     return ClubCard(
       child: Column(
         children: [
@@ -259,9 +263,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                                 color: colors.secondaryLabel,
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                '自定义课程管理',
-                                style: TextStyle(fontSize: 16),
+                              Text(
+                                l10n.customCourseManage,
+                                style: const TextStyle(fontSize: 16),
                               ),
                             ],
                           ),
@@ -288,9 +292,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                         color: colors.secondaryLabel,
                       ),
                       const SizedBox(width: 12),
-                      const Text(
-                        '显示课表网格线',
-                        style: TextStyle(fontSize: 16),
+                      Text(
+                        l10n.showCourseGrid,
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
@@ -315,11 +319,12 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   }
 
   Widget _buildBackgroundSection(BuildContext context, ClubColors colors) {
+    final l10n = context.l10n;
     return ClubCard(
       child: Column(
         children: [
-          _buildBackgroundOption(context, '无背景', ''),
-          _buildBackgroundOption(context, '自定义图片', 'custom'),
+          _buildBackgroundOption(context, l10n.noBackground, ''),
+          _buildBackgroundOption(context, l10n.customImage, 'custom'),
           if (settingsStore.scheduleBackground == 'custom') ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(56, 12, 16, 12),
@@ -328,7 +333,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                   Expanded(
                     child: Text(
                       settingsStore.customBackgroundImage.isEmpty
-                          ? '未选择图片'
+                          ? l10n.noImageSelected
                           : settingsStore.customBackgroundImage,
                       style: TextStyle(
                         fontSize: 14,
@@ -430,7 +435,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         if (context.mounted) {
           showClubSnackBar(
             context,
-            const Text('没有找到日历应用，请手动导入'),
+            Text(context.l10n.noCalendarApp),
           );
         }
       }
@@ -445,7 +450,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
       if (context.mounted) {
         showClubSnackBar(
           context,
-          const Text('无法打开日历应用'),
+          Text(context.l10n.cannotOpenCalendar),
         );
       }
     }
@@ -470,7 +475,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         if (mounted) {
           showClubSnackBar(
             context,
-            const Text('背景图片设置成功'),
+            Text(context.l10n.bgImageSetSuccess),
           );
         }
       }
@@ -478,7 +483,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
       if (mounted) {
         showClubSnackBar(
           context,
-          const Text('选择图片失败'),
+          Text(context.l10n.selectImageFailed),
         );
       }
       AppLogger.debug('选择背景图片失败: $e');
@@ -501,21 +506,22 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
   void showCalendarGuidanceDialog(BuildContext context) {
     final httpsUrl = 'webcal$url';
+    final l10n = context.l10n;
 
     PlatformDialog.showCustomDialog<void>(
       context,
-      title: '添加日历订阅',
+      title: l10n.addCalendarSub,
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('您的设备似乎没有应用可以直接处理日历订阅。请按照以下步骤手动添加:'),
+            Text(l10n.calendarGuidanceIntro),
             const SizedBox(height: 16),
-            const Text('1. 打开您的日历应用'),
-            const Text('2. 找到"添加日历"或"订阅"选项'),
-            const Text('3. 选择"通过URL添加"或类似选项'),
-            const Text('4. 粘贴以下链接:'),
+            Text(l10n.calendarGuidanceStep1),
+            Text(l10n.calendarGuidanceStep2),
+            Text(l10n.calendarGuidanceStep3),
+            Text(l10n.calendarGuidanceStep4),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(8),
@@ -538,7 +544,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                       if (context.mounted) {
                         showClubSnackBar(
                           context,
-                          const Text('链接已复制到剪贴板'),
+                          Text(l10n.linkCopiedToClipboard),
                         );
                       }
                     },
@@ -547,13 +553,13 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
               ),
             ),
             const SizedBox(height: 16),
-            const Text('注意: 不同的日历应用可能有不同的添加步骤。如果您遇到困难，请查阅您的日历应用帮助文档。'),
+            Text(l10n.calendarGuidanceNote),
           ],
         ),
       ),
-      actions: const [
+      actions: [
         PlatformDialogAction<void>(
-          label: '明白了',
+          label: l10n.understand,
           isDefaultAction: true,
         ),
       ],

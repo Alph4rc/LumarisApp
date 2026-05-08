@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,7 +52,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       showClubSnackBar(
         context,
-        const Text('用户名和密码不能为空'),
+        Text(context.l10n.emptyCredentials),
       );
       return;
     }
@@ -70,7 +71,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         onTimeout: () {
           AppLogger.warning('[LoginPage] 教务系统登录超时');
           if (mounted) {
-            showClubSnackBar(context, const Text('教务系统登录超时，请检查网络连接'));
+            showClubSnackBar(context, Text(context.l10n.loginTimeoutEdu));
           }
           return false;
         },
@@ -87,7 +88,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (!saveLoginInfoSuccess && mounted) {
         showClubSnackBar(
           context,
-          const Text('登录成功，但安全存储不可用，下次启动后可能需要重新输入账号密码'),
+          Text(context.l10n.loginSecurityStorageUnavailable),
         );
       }
 
@@ -100,12 +101,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } on TimeoutException catch (e) {
       AppLogger.warning('[LoginPage] 登录超时: $e');
       if (mounted) {
-        showClubSnackBar(context, const Text('登录超时，请检查网络连接后重试'));
+        showClubSnackBar(context, Text(context.l10n.loginTimeout));
       }
     } catch (e, stackTrace) {
       AppLogger.error('[LoginPage] 登录失败', error: e, stackTrace: stackTrace);
       if (mounted) {
-        showClubSnackBar(context, Text('登录失败: ${e.toString()}'));
+        showClubSnackBar(context, Text('${context.l10n.loginFailed}: ${e.toString()}'));
       }
     } finally {
       if (mounted) {
@@ -127,7 +128,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!result && mounted) {
       showClubSnackBar(
         context,
-        const Text('登录失败，请检查用户名和密码'),
+        Text(context.l10n.loginFailed),
       );
     }
 
@@ -165,29 +166,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final groupBackgroundColor = colors.cardBackground;
 
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
           child: LoadingStateView(
-            title: '正在登录教务系统',
-            subtitle: '正在验证账号并同步课程、成绩等基础数据，首次登录可能需要几秒',
+            title: l10n.loggingIn,
+            subtitle: l10n.loggingInSubtitle,
           ),
         ),
       );
     }
 
     return Scaffold(
-      // 简约风格通常使用系统背景色，Material 3 默认背景色已足够适配
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => AppRouter.pop(),
           icon: Icon(
-            Icons.arrow_back_ios_new, // 更现代的返回图标
+            Icons.arrow_back_ios_new,
             color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
         ),
@@ -226,7 +227,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 const SizedBox(height: 24),
                 // Title
                 Text(
-                  '登录教务系统',
+                  l10n.loginTitle,
                   style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -235,7 +236,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '请使用您的账号继续',
+                  l10n.loginSubtitle,
                   style: TextStyle(
                     fontSize: 16,
                     color: Theme.of(context)
@@ -258,17 +259,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       _buildCupertinoLikeTextField(
                         context,
                         controller: _usernameController,
-                        hintText: '学号',
+                        hintText: l10n.studentId,
                         icon: Icons.person_outline,
                         isFirst: true,
                         isLast: false,
                       ),
                       const Divider(height: 1, indent: 48),
-                      // Indent to align with text
                       _buildCupertinoLikeTextField(
                         context,
                         controller: _passwordController,
-                        hintText: '统一身份认证密码',
+                        hintText: l10n.password,
                         icon: Icons.lock_outline,
                         obscureText: _obscureText,
                         isPassword: true,
@@ -296,7 +296,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           );
                         }
                       },
-                      child: const Text('忘记密码?'),
+                      child: Text(l10n.forgotPassword),
                     )
                   ],
                 ),
@@ -309,9 +309,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   height: 52,
                   child: CupertinoButton.filled(
                     onPressed: _login,
-                    child: const Text(
-                      '登录',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.loginTitle,
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                       ),
@@ -319,7 +319,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
 
-                // Footer info or extra spacing
                 const SizedBox(height: 40),
               ],
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
@@ -7,12 +8,13 @@ class PrivacyPolicyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final textColor = colors.label;
     final titleColor = colors.label;
 
     return Scaffold(
-      appBar: const ClubAppBar(title: '隐私协议'),
+      appBar: ClubAppBar(title: l10n.privacyPolicy),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

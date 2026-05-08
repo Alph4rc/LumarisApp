@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -22,8 +23,8 @@ class TodoRemindSetting extends ConsumerWidget {
         size: 20,
         color: colors.secondaryLabel,
       ),
-      title: const Text('待办事务提醒'),
-      subtitle: const Text('在待办事务截止前进行提醒'),
+      title: Text(context.l10n.todoReminder),
+      subtitle: Text(context.l10n.todoReminderSubtitle),
       trailing: CupertinoSwitch(
         value: settings.todoRemindEnabled,
         onChanged: (bool value) async {

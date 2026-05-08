@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
 import 'package:ios_club_app/state/app_states.dart';
@@ -30,12 +31,12 @@ class SchoolBusPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: busController.refreshData,
-            tooltip: '刷新',
+            tooltip: context.l10n.refreshData,
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => _showSettingsModalBottomSheet(context),
-            tooltip: '设置',
+            tooltip: context.l10n.settings,
           ),
           const SizedBox(width: 4),
         ],
@@ -148,9 +149,9 @@ class SchoolBusPage extends ConsumerWidget {
     if (busState.isLoading) {
       return _buildRefreshPlaceholder(
         onRefresh: busController.refreshData,
-        child: const LoadingStateView(
-          title: '正在获取校车班次',
-          subtitle: '正在按日期整理两校区往返班车信息',
+        child: LoadingStateView(
+          title: context.l10n.busLoading,
+          subtitle: context.l10n.busLoadingSubtitle,
           showCard: false,
         ),
       );
@@ -177,7 +178,7 @@ class SchoolBusPage extends ConsumerWidget {
               CupertinoButton.filled(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 onPressed: busController.refreshData,
-                child: const Text('重试'),
+                child: Text(context.l10n.retry),
               ),
             ],
           ),
@@ -188,9 +189,9 @@ class SchoolBusPage extends ConsumerWidget {
     if (!hasBusData) {
       return _buildRefreshPlaceholder(
         onRefresh: busController.refreshData,
-        child: const EmptyWidget(
-          title: '今天没有车了',
-          subtitle: '明天再来吧',
+        child: EmptyWidget(
+          title: context.l10n.noBusToday,
+          subtitle: context.l10n.noBusTodaySubtitle,
           icon: Icons.directions_bus_filled_rounded,
         ),
       );
@@ -269,15 +270,15 @@ class SchoolBusPage extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '页面设置',
+                context.l10n.pageSettings,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 20),
               ClubListTile(
-                title: const Text('显示校车磁贴'),
-                subtitle: const Text('在首页显示最近的班车信息'),
+                title: Text(context.l10n.showBusTile),
+                subtitle: Text(context.l10n.showBusTileSubtitle),
                 trailing: CupertinoSwitch(
                   value: busState.isShowBus,
                   onChanged: busController.toggleShowBus,
@@ -302,28 +303,28 @@ class SchoolBusPage extends ConsumerWidget {
         _buildInfoRow(
           context: context,
           icon: Icons.access_time_filled_rounded,
-          label: '出发时间',
+          label: context.l10n.departureTime,
           content: bus.runTime,
           color: colors.primary,
         ),
         _buildInfoRow(
           context: context,
           icon: Icons.location_on_rounded,
-          label: '终点站',
+          label: context.l10n.destination,
           content: bus.arrivalStation,
           color: colors.danger,
         ),
         _buildInfoRow(
           context: context,
           icon: Icons.schedule_rounded,
-          label: '预计到达',
+          label: context.l10n.estimatedArrival,
           content: bus.arrivalTime,
           color: colors.success,
         ),
         _buildInfoRow(
           context: context,
           icon: Icons.info_outline_rounded,
-          label: '班次信息',
+          label: context.l10n.busInfo,
           content: bus.description,
           color: colors.warning,
           maxLines: 5,
@@ -414,7 +415,7 @@ class BusTimelineTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _buildTimeDisplay(bus.runTime, '出发', colors),
+                  _buildTimeDisplay(bus.runTime, context.l10n.departure, colors),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Icon(
@@ -423,7 +424,7 @@ class BusTimelineTile extends StatelessWidget {
                       color: colors.tertiaryLabel,
                     ),
                   ),
-                  _buildTimeDisplay(bus.arrivalTime, '到达', colors),
+                  _buildTimeDisplay(bus.arrivalTime, context.l10n.arrival, colors),
                   const Spacer(),
                   Container(
                     padding:

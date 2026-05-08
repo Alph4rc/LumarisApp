@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
@@ -239,7 +240,7 @@ class ScheduleGrid extends StatelessWidget {
             padding: EdgeInsets.all(isTablet ? 8 : 4),
             child: Center(
               child: Text(
-                '当前时间存在多个冲突课程',
+                context.l10n.courseConflict,
                 style: TextStyle(
                   fontSize: 10,
                   color: context.clubColors.onAccent.withValues(alpha: 0.9),

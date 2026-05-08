@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
 class PlatformDialogAction<T> {
   const PlatformDialogAction({
@@ -42,11 +43,11 @@ class PlatformDialog {
       content: Text(content),
       actions: [
         PlatformDialogAction<bool>(
-          label: cancelText ?? '取消',
+          label: cancelText ?? context.l10n.cancel,
           value: false,
         ),
         PlatformDialogAction<bool>(
-          label: confirmText ?? '确认',
+          label: confirmText ?? context.l10n.confirm,
           value: true,
           isDefaultAction: true,
         ),
@@ -196,11 +197,11 @@ class PlatformDialog {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(cancelText ?? '取消'),
+              child: Text(cancelText ?? context.l10n.cancel),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text(confirmText ?? '确认'),
+              child: Text(confirmText ?? context.l10n.confirm),
               onPressed: () => Navigator.of(context).pop(controller.text),
             ),
           ],
@@ -243,11 +244,11 @@ class PlatformDialog {
           ),
           actions: <Widget>[
             CupertinoDialogAction(
-              child: Text(cancelText ?? '取消'),
+              child: Text(cancelText ?? context.l10n.cancel),
               onPressed: () => Navigator.of(context).pop(),
             ),
             CupertinoDialogAction(
-              child: Text(confirmText ?? '确认'),
+              child: Text(confirmText ?? context.l10n.confirm),
               onPressed: () => Navigator.of(context).pop(controller.text),
             ),
           ],

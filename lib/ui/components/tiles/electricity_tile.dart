@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -13,6 +14,7 @@ class ElectricityTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final electricity = ref.watch(electricityStoreProvider);
     final colors = context.clubColors;
 
@@ -27,9 +29,9 @@ class ElectricityTile extends ConsumerWidget {
             child: Builder(builder: (context) {
               // Loading state
               if (electricity.isLoading) {
-                return const Center(
+                return Center(
                   child: LoadingStateView(
-                    title: '正在读取电费',
+                    title: l10n.electricityLoading,
                     subtitle: '',
                     compact: true,
                     padding: EdgeInsets.zero,
@@ -71,7 +73,7 @@ class ElectricityTile extends ConsumerWidget {
                               borderRadius: ClubRadii.navigation,
                             ),
                             child: Text(
-                              '余额不足',
+                              l10n.electricityLowBalance,
                               style: TextStyle(
                                 fontSize: 10,
                                 color: colors.danger,
@@ -83,7 +85,7 @@ class ElectricityTile extends ConsumerWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '当前电费',
+                      l10n.electricityBalance,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -124,7 +126,7 @@ class ElectricityTile extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '电费查询',
+                    l10n.electricity,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,

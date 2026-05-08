@@ -25,10 +25,8 @@ class WeekdayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.clubColors;
     final now = DateTime.now();
-    int todayWeekday = now.weekday;
-    if (todayWeekday == 7) todayWeekday = 0;
 
-    final weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    final monthStr = DateFormat.MMM().format(weekStartDate);
 
     return Container(
       decoration: showGrid
@@ -60,7 +58,7 @@ class WeekdayHeader extends StatelessWidget {
             child: Center(
               child: showDate && currentWeek != null
                   ? Text(
-                      '${weekStartDate.month}月',
+                      monthStr,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -99,7 +97,7 @@ class WeekdayHeader extends StatelessWidget {
                   children: [
                     // 星期几
                     Text(
-                      weekdays[index],
+                      DateFormat.E().format(date),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,

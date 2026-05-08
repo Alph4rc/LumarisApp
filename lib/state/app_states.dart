@@ -8,6 +8,7 @@ import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/core/services/app_locale_service.dart';
 
 part 'app_states.freezed.dart';
 
@@ -31,6 +32,7 @@ class SettingsState with _$SettingsState {
     @Default(false) bool showCourseGrid,
     @Default(false) bool todoRemindEnabled,
     @Default(ThemeMode.system) ThemeMode themeMode,
+    @Default(AppLocaleCode.system) AppLocaleCode localeCode,
     @Default('') String scheduleBackground,
     @Default('') String customBackgroundImage,
     bool? customBackgroundIsDark,

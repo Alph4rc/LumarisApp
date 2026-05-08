@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 export 'package:permission_handler/permission_handler.dart'
@@ -131,10 +132,10 @@ class PermissionService {
   }) async {
     final result = await PlatformDialog.showConfirmDialog(
       context,
-      title: title ?? '需要权限',
-      content: content ?? '该功能需要您授予相应权限才能正常使用',
-      confirmText: confirmText ?? '去授权',
-      cancelText: cancelText ?? '取消',
+      title: title ?? context.l10n.permissionRequired,
+      content: content ?? context.l10n.permissionRequiredContent,
+      confirmText: confirmText ?? context.l10n.goAuthorize,
+      cancelText: cancelText ?? context.l10n.cancel,
     );
     return result ?? false;
   }
@@ -148,10 +149,10 @@ class PermissionService {
   }) async {
     final result = await PlatformDialog.showConfirmDialog(
       context,
-      title: title ?? '权限已拒绝',
-      content: content ?? '该权限已被永久拒绝，请前往系统设置手动开启',
-      confirmText: settingsText ?? '去设置',
-      cancelText: cancelText ?? '取消',
+      title: title ?? context.l10n.permissionDenied,
+      content: content ?? context.l10n.permissionDeniedContent,
+      confirmText: settingsText ?? context.l10n.goToSettings,
+      cancelText: cancelText ?? context.l10n.cancel,
     );
     if (result == true) {
       await openAppSettings();

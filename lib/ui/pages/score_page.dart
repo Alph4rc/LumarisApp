@@ -21,6 +21,7 @@ import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
 class ScorePage extends ConsumerStatefulWidget {
   const ScorePage({super.key});
@@ -34,26 +35,14 @@ class _ScorePageState extends ConsumerState<ScorePage>
   final List<ScoreList> _scoreList = [];
   bool _isLoading = true;
   bool _isFool = false;
-  String _loadingText = '正在获取数据...';
+  String _loadingText = '';
   final List<ScoreList> _yearList = [];
   bool _isYear = false;
+  bool _isRefreshing = false;
 
   late PageController pageController = PageController();
   late int _currentIndex = 0;
   final List<String> _selectorList = [];
-
-  static const yearStringList = [
-    '一',
-    '二',
-    '三',
-    '四',
-    '五',
-    '六',
-    '七',
-    '八',
-    '九',
-    '十'
-  ];
 
   @override
   void initState() {
@@ -61,7 +50,14 @@ class _ScorePageState extends ConsumerState<ScorePage>
     refresh();
   }
 
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
   Future<void> refresh({bool isRefresh = false}) async {
+    if (_isRefreshing) return;
     if (isRefresh || _isFool) {
       await _loadScores(policy: FetchPolicy.refresh);
       return;
@@ -88,37 +84,40 @@ class _ScorePageState extends ConsumerState<ScorePage>
     bool showStaleMessage = true,
   }) async {
     if (!mounted) return;
+    _isRefreshing = true;
+    final l10n = context.l10n;
 
     setState(() {
       _isLoading = !keepCurrentDataWhileLoading;
-      _loadingText = '正在获取成绩数据...';
+      _loadingText = l10n.fetchingScores;
     });
 
     try {
       final snapshot = await ScoreService.getScores(policy: policy).timeout(
         const Duration(seconds: 15),
         onTimeout: () {
-          throw TimeoutException('获取成绩数据超时');
+          throw TimeoutException(l10n.fetchTimeout);
         },
       );
 
       _applyScoreData(snapshot.data, isLoading: false);
       if (!mounted) return;
       if (snapshot.isStale && snapshot.data.isNotEmpty && showStaleMessage) {
-        showClubSnackBar(context, const Text('刷新失败，已回退到本地数据'));
+        showClubSnackBar(context, Text(l10n.refreshFailedFallback));
       }
     } on TimeoutException catch (e) {
       if (mounted) {
-        showClubSnackBar(context, const Text('获取数据超时，请检查网络连接后重试'));
+        showClubSnackBar(context, Text(l10n.fetchTimeout));
       }
       AppLogger.warning('[ScorePage] 获取数据超时: $e');
     } catch (e, stackTrace) {
       if (mounted) {
-        showClubSnackBar(context, Text('获取数据失败: ${e.toString()}'));
+        showClubSnackBar(context, Text('${l10n.fetchFailed}: ${e.toString()}'));
       }
       AppLogger.error('[ScorePage] 获取数据失败', error: e, stackTrace: stackTrace);
     } finally {
       _isFool = false;
+      _isRefreshing = false;
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -133,19 +132,43 @@ class _ScorePageState extends ConsumerState<ScorePage>
       _scoreList
         ..clear()
         ..addAll(scores);
+      _yearList.clear();
       _isLoading = isLoading;
       _selectorList
         ..clear()
         ..addAll(_buildSelectorList(scores.length));
+      if (_currentIndex >= _selectorList.length) {
+        _currentIndex = _selectorList.isNotEmpty ? _selectorList.length - 1 : 0;
+      }
+      if (_selectorList.isNotEmpty && pageController.hasClients) {
+        pageController.jumpToPage(_currentIndex);
+      }
     });
+  }
+
+  String _yearLabel(int index) {
+    final l10n = context.l10n;
+    return switch (index) {
+      0 => l10n.year1,
+      1 => l10n.year2,
+      2 => l10n.year3,
+      3 => l10n.year4,
+      4 => l10n.year5,
+      5 => l10n.year6,
+      6 => l10n.year7,
+      7 => l10n.year8,
+      8 => l10n.year9,
+      9 => l10n.year10,
+      _ => '${index + 1}',
+    };
   }
 
   List<String> _buildSelectorList(int count) {
     final selectorList = <String>[];
     for (var i = 0; i < count; i++) {
       final y = count - i + 1;
-      selectorList
-          .add('大${yearStringList[y ~/ 2 - 1]}${y % 2 == 1 ? '下' : '上'}');
+      selectorList.add(
+        '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
     }
     return selectorList;
   }
@@ -160,6 +183,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
           item2.gpa = '5';
         }
       }
+      _yearList.clear();
     });
 
     showClubSnackBar(
@@ -167,7 +191,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('是的，在下绩点5.0'),
+          Text(context.l10n.foolishModeMessage),
           Icon(Icons.mood, color: colors.quaternaryLabel),
         ],
       ),
@@ -191,7 +215,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
               ),
               SizedBox(height: 16),
               Text(
-                '未登录',
+                context.l10n.notLoggedIn,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -199,7 +223,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
               ),
               SizedBox(height: 8),
               Text(
-                '请先去登录即可查看成绩',
+                context.l10n.pleaseLoginFirst,
                 style: TextStyle(
                   fontSize: 16,
                   color: colors.secondaryLabel,
@@ -208,10 +232,9 @@ class _ScorePageState extends ConsumerState<ScorePage>
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  // 导航到个人页面进行登录
                   AppRouter.go(AppRoutes.profile);
                 },
-                child: Text('前往登录'),
+                child: Text(context.l10n.goToLogin),
               ),
             ],
           ),
@@ -224,7 +247,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
         body: Center(
           child: LoadingStateView(
             title: _loadingText,
-            subtitle: '正在读取缓存并同步教务成绩，网络较慢时可能需要几秒',
+            subtitle: context.l10n.readingScoresSubtitle,
           ),
         ),
       );
@@ -250,8 +273,8 @@ class _ScorePageState extends ConsumerState<ScorePage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              '成绩与绩点',
+            Text(
+              context.l10n.scoresAndGpa,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -301,24 +324,25 @@ class _ScorePageState extends ConsumerState<ScorePage>
       }
 
       if (_scoreList.isNotEmpty) {
+        _selectorList.clear();
         if (_isYear) {
-          _selectorList.clear();
           for (var i = 0; i < _yearList.length; i++) {
-            _selectorList.add('大${yearStringList[i]}');
+            _selectorList.add(_yearLabel(i));
           }
         } else {
-          _selectorList.clear();
           for (var i = 0; i < _scoreList.length; i++) {
             var y = _scoreList.length - i + 1;
-            _selectorList
-                .add('大${yearStringList[y ~/ 2 - 1]}${y % 2 == 1 ? '下' : '上'}');
+            _selectorList.add(
+              '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
           }
         }
 
         if (_currentIndex >= _selectorList.length) {
-          _currentIndex = _selectorList.length - 1;
+          _currentIndex = _selectorList.isNotEmpty ? _selectorList.length - 1 : 0;
         }
-        pageController.jumpToPage(_currentIndex);
+        if (_selectorList.isNotEmpty && pageController.hasClients) {
+          pageController.jumpToPage(_currentIndex);
+        }
       }
     });
   }
@@ -354,7 +378,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
             value: scoreList == null
                 ? ScoreList.getTotalCourse(_scoreList).toString()
                 : scoreList.totalCourse.toString(),
-            label: '通过课程',
+          label: context.l10n.passedCourses,
           ),
           InkWell(
             onTap: _showCreditInfoDialog,
@@ -363,7 +387,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
               value: scoreList == null
                   ? ScoreList.getTotalCredit(_scoreList).toStringAsFixed(1)
                   : scoreList.totalCredit.toStringAsFixed(1),
-              label: '总学分',
+              label: context.l10n.totalCredits,
               withInfo: true,
             ),
           )
@@ -418,11 +442,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
   void _showCreditInfoDialog() {
     PlatformDialog.showCustomDialog<void>(
       context,
-      title: '说明',
-      content: const Text('这里的学分是按照成绩算出来的，只要没有挂科就OK。教务系统给的一般来说要小于等于这个数'),
-      actions: const [
+      title: context.l10n.creditInfoTitle,
+      content: Text(context.l10n.creditInfoContent),
+      actions: [
         PlatformDialogAction<void>(
-          label: '确定',
+          label: context.l10n.ok,
           isDefaultAction: true,
         ),
       ],
@@ -443,11 +467,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
         onValueChanged: (int? value) async {
           if (value != null && value < _selectorList.length) {
             setState(() {
-              pageController.jumpToPage(value);
-              setState(() {
-                _currentIndex = value;
-              });
+              _currentIndex = value;
             });
+            if (pageController.hasClients) {
+              pageController.jumpToPage(value);
+            }
           }
         },
         children: _selectorList
@@ -500,13 +524,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildYearCard(ScoreList score, int index) {
-    const yearStringList = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
     return ClubCard(
         margin: const EdgeInsets.all(16),
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Column(children: [
-              Text('大${yearStringList[index]}',
+              Text(_yearLabel(index),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -530,14 +553,14 @@ class _ScorePageState extends ConsumerState<ScorePage>
       child: Column(
         children: [
           EmptyWidget(
-            title: '没有成绩',
-            subtitle: '建议刷新或退出重进',
+            title: context.l10n.noScores,
+            subtitle: context.l10n.noScoresSubtitle,
             icon: Icons.school,
           ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => refresh(isRefresh: true),
-            child: const Text('刷新数据'),
+            child: Text(context.l10n.refreshDataBtn),
           ),
         ],
       ),
@@ -545,7 +568,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildSemesterCard(ScoreList score) {
-    final semesterNames = score.semester.name.split('-');
+    final semesterParts = score.semester.semester.isNotEmpty
+        ? score.semester.semester.split('-')
+        : score.semester.name.split('-');
+    final semesterLabel = semesterParts.length >= 3
+        ? context.l10n.semesterRange(semesterParts[1], semesterParts[2], semesterParts[0])
+        : score.semester.name;
     return AnimatedCard(
       child: ClubCard(
         margin: const EdgeInsets.all(16),
@@ -554,7 +582,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
           child: Column(
             children: [
               Text(
-                '${semesterNames[0]}至${semesterNames[1]}年 第${semesterNames[2]}学期',
+                semesterLabel,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -608,7 +636,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${item.name}${item.isMinor ? ' (辅修)' : ''}',
+                                '${item.name}${item.isMinor ? ' (${context.l10n.minorCourse})' : ''}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -647,7 +675,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
           children: [
             Icon(CupertinoIcons.time, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('${item.credit}学分',
+            Text(context.l10n.creditUnit(item.credit),
                 style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
@@ -657,7 +685,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
             Icon(CupertinoIcons.location,
                 size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('成绩 ${item.grade}',
+            Text(context.l10n.gradeLabel(item.grade),
                 style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
@@ -666,7 +694,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
           children: [
             Icon(CupertinoIcons.star, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text('绩点 ${item.gpa}',
+            Text(context.l10n.gpaLabel(item.gpa),
                 style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
@@ -698,32 +726,32 @@ class _ScorePageState extends ConsumerState<ScorePage>
         children: [
           ModalHeader(
             title: score.name,
-            subtitle: score.isMinor ? '辅修课程' : null,
+            subtitle: score.isMinor ? context.l10n.minorCourse : null,
           ),
           ModalInfoRow(
             icon: CupertinoIcons.star_fill,
-            label: '课程学分',
-            content: '${score.credit} 学分',
+            label: context.l10n.courseCreditLabel,
+            content: context.l10n.creditUnit(score.credit),
             color: colors.yellow,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.chart_bar_fill,
-            label: '课程成绩',
+            label: context.l10n.courseScoreLabel,
             content: score.grade,
             color: colors.danger,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.star_circle_fill,
-            label: '课程绩点',
+            label: context.l10n.courseGpaLabel,
             content: score.gpa,
             color: colors.success,
           ),
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.doc_text_fill,
-            label: '成绩详情',
+            label: context.l10n.scoreDetail,
             content: score.gradeDetail,
             color: colors.primary,
             maxLines: 5,

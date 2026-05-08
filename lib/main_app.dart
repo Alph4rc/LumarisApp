@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/features/education/services/app_service.dart';
@@ -166,7 +167,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
 
     PlatformDialog.showCustomDialog<void>(
       navigatorContext,
-      title: '有新版本了！',
+      title: navigatorContext.l10n.updateAvailable,
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -180,16 +181,18 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
         ),
       ),
       actions: [
-        const PlatformDialogAction<void>(label: '忽略本次更新'),
         PlatformDialogAction<void>(
-          label: '忽略所有更新',
+          label: navigatorContext.l10n.ignoreThisUpdate,
+        ),
+        PlatformDialogAction<void>(
+          label: navigatorContext.l10n.ignoreAllUpdates,
           onPressed: () async {
             final prefs = PrefsService.instance;
             prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
           },
         ),
         PlatformDialogAction<void>(
-          label: '前往浏览器更新',
+          label: navigatorContext.l10n.goToBrowserUpdate,
           isDefaultAction: true,
           onPressed: () async {
             try {
@@ -202,7 +205,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
               }
               showClubSnackBar(
                 currentNavigatorContext,
-                const Text('已打开浏览器，请在浏览器中下载安装更新'),
+                Text(currentNavigatorContext.l10n.updateOpened),
               );
             } catch (e) {
               final currentNavigatorContext = _currentNavigatorContext();
@@ -213,7 +216,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
               }
               showClubSnackBar(
                 currentNavigatorContext,
-                Text('打开更新链接失败: $e'),
+                Text('${currentNavigatorContext.l10n.openUpdateFailed}: $e'),
               );
             }
           },
@@ -222,48 +225,52 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     );
   }
 
-  final List<SidebarDestination> _destinations = const [
-    SidebarDestination(
-      icon: (CupertinoIcons.house),
-      selectedIcon: (CupertinoIcons.house_fill),
-      label: '首页',
-    ),
-    SidebarDestination(
-      icon: (Icons.schedule_outlined),
-      selectedIcon: (Icons.schedule),
-      label: '课表',
-    ),
-    SidebarDestination(
-      icon: (CupertinoIcons.creditcard),
-      selectedIcon: (CupertinoIcons.creditcard_fill),
-      label: '成绩',
-    ),
-    SidebarDestination(
-      icon: (CupertinoIcons.person_alt_circle),
-      selectedIcon: (CupertinoIcons.person_crop_circle_fill),
-      label: '我的',
-    ),
-    SidebarDestination(
-      icon: (CupertinoIcons.bolt),
-      selectedIcon: (CupertinoIcons.bolt_fill),
-      label: '电费',
-    ),
-    SidebarDestination(
-      icon: (Icons.directions_bus_outlined),
-      selectedIcon: (Icons.directions_bus_rounded),
-      label: '校车',
-    ),
-    SidebarDestination(
-      icon: (CupertinoIcons.money_dollar),
-      selectedIcon: (CupertinoIcons.money_dollar_circle_fill),
-      label: '饭卡',
-    ),
-    SidebarDestination(
-      icon: (CupertinoIcons.map),
-      selectedIcon: (CupertinoIcons.map_fill),
-      label: '地图',
-    ),
-  ];
+  List<SidebarDestination> _buildDestinations(BuildContext context) {
+    final l10n = context.l10n;
+
+    return [
+      SidebarDestination(
+        icon: CupertinoIcons.house,
+        selectedIcon: CupertinoIcons.house_fill,
+        label: l10n.home,
+      ),
+      SidebarDestination(
+        icon: Icons.schedule_outlined,
+        selectedIcon: Icons.schedule,
+        label: l10n.schedule,
+      ),
+      SidebarDestination(
+        icon: CupertinoIcons.creditcard,
+        selectedIcon: CupertinoIcons.creditcard_fill,
+        label: l10n.score,
+      ),
+      SidebarDestination(
+        icon: CupertinoIcons.person_alt_circle,
+        selectedIcon: CupertinoIcons.person_crop_circle_fill,
+        label: l10n.profile,
+      ),
+      SidebarDestination(
+        icon: CupertinoIcons.bolt,
+        selectedIcon: CupertinoIcons.bolt_fill,
+        label: l10n.electricity,
+      ),
+      SidebarDestination(
+        icon: Icons.directions_bus_outlined,
+        selectedIcon: Icons.directions_bus_rounded,
+        label: l10n.schoolBus,
+      ),
+      SidebarDestination(
+        icon: CupertinoIcons.money_dollar,
+        selectedIcon: CupertinoIcons.money_dollar_circle_fill,
+        label: l10n.payment,
+      ),
+      SidebarDestination(
+        icon: CupertinoIcons.map,
+        selectedIcon: CupertinoIcons.map_fill,
+        label: l10n.map,
+      ),
+    ];
+  }
 
   static const Map<int, String> _routeMap = {
     0: AppRoutes.home,
@@ -315,6 +322,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsStoreProvider);
     final routedChild = widget.child;
+    final destinations = _buildDestinations(context);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -339,14 +347,14 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     if (isMacOS) {
       shell = MacosWindow(
         sidebar: macosUISidebar(
-          items: _destinations,
+          items: destinations,
           selectedIndex: _currentIndex,
           onItemSelected: (int index) {
             _navigateToMainRoute(index);
           },
         ),
         titleBar: TitleBar(
-          title: const Text('光序'),
+          title: Text(context.l10n.appName),
           decoration: BoxDecoration(
             color: MacosTheme.of(context).canvasColor,
           ),
@@ -360,7 +368,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
           child: Row(
             children: [
               WindowsSidebar(
-                items: _destinations,
+                items: destinations,
                 selectedIndex: _currentIndex,
                 onItemSelected: (int index) {
                   _navigateToMainRoute(index);
@@ -376,7 +384,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     } else if (isTabletLandscape) {
       // 平板横屏 - 使用 NavigationRail
       shell = TabletNavigation(
-        items: _destinations,
+        items: destinations,
         selectedIndex: _currentIndex,
         onItemSelected: (int index) {
           _navigateToMainRoute(index);
@@ -386,7 +394,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     } else if (isTabletPortrait) {
       // 平板竖屏 - 使用 Drawer
       shell = TabletDrawerNavigation(
-        items: _destinations,
+        items: destinations,
         selectedIndex: _currentIndex,
         onItemSelected: (int index) {
           _navigateToMainRoute(index);
@@ -399,7 +407,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
         body: SafeArea(child: routedChild),
         bottomNavigationBar: _showBottomNav
             ? BottomNavigation(
-                destinations: _destinations.sublist(0, 4).map((destination) {
+                destinations: destinations.sublist(0, 4).map((destination) {
                   return NavigationDestination(
                     icon: Icon(destination.icon),
                     selectedIcon: Icon(destination.selectedIcon),

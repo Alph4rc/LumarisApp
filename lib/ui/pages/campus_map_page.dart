@@ -8,6 +8,7 @@ import 'package:ios_club_app/state/map_notifier.dart';
 import 'package:ios_club_app/state/map_state.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
 class CampusMapPage extends ConsumerStatefulWidget {
   const CampusMapPage({super.key});
@@ -332,6 +333,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
 
   Widget _buildFloatingTopPanel(
       MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
+    final l10n = context.l10n;
     return Column(
       children: [
         ClipRRect(
@@ -366,7 +368,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         fontSize: 16,
                       ),
                       decoration: InputDecoration(
-                        hintText: '搜索地点或建筑...',
+                        hintText: l10n.searchLocation,
                         hintStyle: TextStyle(
                           color: colors.tertiaryLabel,
                           fontSize: 16,
@@ -558,6 +560,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
 
   Widget _buildSidebar(
       MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
+    final l10n = context.l10n;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return ClipRRect(
       borderRadius: ClubRadii.card,
@@ -607,7 +610,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                                 fontSize: 15,
                               ),
                               decoration: InputDecoration(
-                                hintText: '搜索...',
+                                hintText: l10n.search,
                                 hintStyle: TextStyle(
                                   color: colors.secondaryLabel,
                                   fontSize: 15,
@@ -708,6 +711,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   Widget _buildPOIBottomSheet(ClubColors colors) {
+    final l10n = context.l10n;
     return DraggableScrollableSheet(
       controller: _sheetController,
       initialChildSize: 0,
@@ -770,14 +774,14 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ),
               const SizedBox(height: 24),
               _buildInfoSection(
-                title: '建筑介绍',
+                title: l10n.buildingIntro,
                 content: _selectedPOI!.description,
                 icon: Icons.info_outline_rounded,
                 colors: colors,
               ),
               const SizedBox(height: 16),
               _buildInfoSection(
-                title: '具体位置',
+                title: l10n.specificLocation,
                 content:
                     '${_selectedPOI!.position.latitude.toStringAsFixed(6)}, ${_selectedPOI!.position.longitude.toStringAsFixed(6)}',
                 icon: Icons.map_outlined,

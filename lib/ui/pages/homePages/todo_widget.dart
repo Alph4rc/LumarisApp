@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/models/todo_item.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 
@@ -54,6 +55,7 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       children: [
         Padding(
@@ -61,11 +63,11 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '待办事务',
-                    style: TextStyle(
+                    l10n.todoListLabel,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -97,24 +99,25 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
           child: FutureBuilder<List<TodoItem>>(
             future: _todosFuture,
             builder: (context, snapshot) {
+              final innerL10n = context.l10n;
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const ClubCard(
+                return ClubCard(
                   child: LoadingStateView(
-                    title: '正在读取待办事务',
-                    subtitle: '正在加载本地待办列表与提醒状态',
+                    title: innerL10n.readingTodos,
+                    subtitle: innerL10n.readingTodosSubtitle,
                     compact: true,
                     showCard: false,
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                   ),
                 );
               } else if (snapshot.hasError) {
-                return const ClubCard(
+                return ClubCard(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: EmptyWidget(
-                      title: '加载失败',
+                      title: innerL10n.loadFailed,
                       icon: Icons.error,
-                      subtitle: '无法加载待办事项',
+                      subtitle: innerL10n.todoLoadFailedSubtitle,
                     ),
                   ),
                 );
@@ -122,12 +125,12 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
                 final todos = snapshot.data!;
                 return ClubCard(
                     child: todos.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.all(16.0),
+                        ? Padding(
+                            padding: const EdgeInsets.all(16.0),
                             child: EmptyWidget(
-                              title: '当前没有待办事务',
+                              title: innerL10n.noTodos,
                               icon: Icons.done_all,
-                              subtitle: '点击右上角添加待办事项',
+                              subtitle: innerL10n.noTodosSubtitle,
                             ),
                           )
                         : ListView.builder(
@@ -196,7 +199,7 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                      '截止日期: ${deadline == null ? '无' : DateFormat('yyyy-MM-dd HH:mm').format(deadline)}',
+                                      '${innerL10n.deadline}: ${deadline == null ? innerL10n.noData : DateFormat('yyyy-MM-dd HH:mm').format(deadline)}',
                                       style: TextStyle(
                                         decoration: isBefore
                                             ? TextDecoration.lineThrough
@@ -247,13 +250,13 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
                             },
                           ));
               } else {
-                return const ClubCard(
+                return ClubCard(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: EmptyWidget(
-                      title: '当前没有待办事务',
+                      title: innerL10n.noTodos,
                       icon: Icons.done_all,
-                      subtitle: '点击右上角添加待办事项',
+                      subtitle: innerL10n.noTodosSubtitle,
                     ),
                   ),
                 );
@@ -267,6 +270,7 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
 
   Future<TodoItem?> showAddTodoDialog(BuildContext context,
       {TodoItem? todo}) async {
+    final l10n = context.l10n;
     final formKey = GlobalKey<FormState>();
     final titleController = TextEditingController();
     final deadlineController = TextEditingController();
@@ -276,7 +280,7 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
 
     final result = await PlatformDialog.showCustomDialog<TodoItem?>(
       context,
-      title: '添加待办',
+      title: l10n.addTodo,
       content: Form(
         key: formKey,
         child: Column(
@@ -284,13 +288,13 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
           children: [
             TextFormField(
               controller: titleController,
-              decoration: const InputDecoration(
-                labelText: '标题',
-                labelStyle: TextStyle(fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                labelText: l10n.todoTitle,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return '标题是必须项';
+                  return l10n.titleRequired;
                 }
                 return null;
               },
@@ -299,7 +303,7 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
             TextFormField(
               controller: deadlineController,
               decoration: InputDecoration(
-                labelText: '截止日期',
+                labelText: l10n.deadline,
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.calendar_today),
@@ -332,7 +336,7 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return '截至日期是必须项';
+                  return l10n.deadlineRequired;
                 }
                 return null;
               },
@@ -341,12 +345,12 @@ class _TodoWidgetState extends ConsumerState<TodoWidget> {
         ),
       ),
       actions: [
-        const PlatformDialogAction<TodoItem?>(
-          label: '取消',
+        PlatformDialogAction<TodoItem?>(
+          label: l10n.cancel,
           value: null,
         ),
         PlatformDialogAction<TodoItem?>(
-          label: todo == null ? '添加' : '更改',
+          label: todo == null ? l10n.addTodo : l10n.change,
           isDefaultAction: true,
           autoPop: false,
           onPressed: () {

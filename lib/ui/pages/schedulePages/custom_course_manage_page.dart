@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
@@ -83,7 +84,7 @@ class _CustomCourseManagePageState
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('课程添加成功'),
+                  content: Text(context.l10n.courseAdded),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
@@ -117,7 +118,7 @@ class _CustomCourseManagePageState
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('课程修改成功'),
+                  content: Text(context.l10n.courseModified),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
@@ -135,15 +136,15 @@ class _CustomCourseManagePageState
   Future<void> _deleteCourse(CourseModel course) async {
     final confirm = await PlatformDialog.showCustomDialog<bool>(
       context,
-      title: '确认删除',
-      content: Text('确定要删除课程"${course.courseName}"吗？'),
-      actions: const [
+      title: context.l10n.confirmDelete,
+      content: Text(context.l10n.confirmDeleteCourseContent(course.courseName)),
+      actions: [
         PlatformDialogAction<bool>(
-          label: '取消',
+          label: context.l10n.cancel,
           value: false,
         ),
         PlatformDialogAction<bool>(
-          label: '删除',
+          label: context.l10n.delete,
           value: true,
           isDestructiveAction: true,
         ),
@@ -157,7 +158,7 @@ class _CustomCourseManagePageState
       await _saveCustomCourses();
       await _refreshCourseStore();
       if (mounted) {
-        showClubSnackBar(context, const Text('课程删除成功'));
+        showClubSnackBar(context, Text(context.l10n.courseDeleted));
       }
     }
   }
@@ -169,6 +170,7 @@ class _CustomCourseManagePageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final cardColor = colors.cardBackground;
     final primaryColor = Theme.of(context).colorScheme.primary;
@@ -179,7 +181,7 @@ class _CustomCourseManagePageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '自定义课程',
+                l10n.customCourses,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -187,7 +189,7 @@ class _CustomCourseManagePageState
               ),
               if (customCourses.isNotEmpty)
                 Text(
-                  '${customCourses.length} 门课程',
+                  l10n.customCoursesCount(customCourses.length),
                   style: TextStyle(
                     fontSize: 13,
                     color: colors.secondaryLabel,
@@ -200,15 +202,15 @@ class _CustomCourseManagePageState
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: _showAddCourseDialog,
-              tooltip: '添加课程',
+              tooltip: l10n.addCourse,
             ),
           ],
         ),
         body: isLoading
-            ? const Center(
+            ? Center(
                 child: LoadingStateView(
-                  title: '正在读取自定义课程',
-                  subtitle: '正在整理本地保存的课程配置',
+                  title: l10n.readingCustomCourses,
+                  subtitle: l10n.readingCustomCoursesSubtitle,
                 ),
               )
             : customCourses.isEmpty
@@ -229,16 +231,16 @@ class _CustomCourseManagePageState
                           ),
                         ),
                         const SizedBox(height: 24),
-                        const Text(
-                          '暂无自定义课程',
-                          style: TextStyle(
+                        Text(
+                          l10n.noCustomCourses,
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '点击右上角 + 号添加课程',
+                          l10n.noCustomCoursesSubtitle,
                           style: TextStyle(
                             fontSize: 15,
                             color: colors.secondaryLabel,
@@ -294,7 +296,7 @@ class _CustomCourseManagePageState
                                             _buildInfoChip(
                                               Icons.location_on_outlined,
                                               course.room.isEmpty
-                                                  ? '无地点'
+                                                  ? l10n.noLocation
                                                   : course.room,
                                               colors.primary,
                                             ),
@@ -330,7 +332,7 @@ class _CustomCourseManagePageState
                                                   Icons.edit_outlined,
                                                   color: colors.primary,
                                                 ),
-                                                title: const Text('编辑课程'),
+                                                title: Text(l10n.editCourse),
                                                 onTap: () {
                                                   Navigator.pop(context);
                                                   _showEditCourseDialog(course);
@@ -341,7 +343,7 @@ class _CustomCourseManagePageState
                                                   Icons.delete_outline,
                                                   color: colors.danger,
                                                 ),
-                                                title: const Text('删除课程'),
+                                                title: Text(l10n.deleteCourse),
                                                 onTap: () {
                                                   Navigator.pop(context);
                                                   _deleteCourse(course);
@@ -393,9 +395,22 @@ class _CustomCourseManagePageState
   }
 
   String _formatCourseTime(CourseModel course) {
-    final weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return '${weekdays[course.weekday]} 第${course.startUnit}-${course.endUnit}节';
+    final l10n = context.l10n;
+    final weekdays = _getWeekdayNames(l10n);
+    return '${weekdays[course.weekday]} ${l10n.periodRange(course.startUnit, course.endUnit)}';
   }
+}
+
+List<String> _getWeekdayNames(dynamic l10n) {
+  return [
+    l10n.sunday,
+    l10n.monday,
+    l10n.tuesday,
+    l10n.wednesday,
+    l10n.thursday,
+    l10n.friday,
+    l10n.saturday,
+  ];
 }
 
 /// 添加/编辑课程对话框
@@ -423,7 +438,6 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
   late int _endUnit;
   late List<int> _selectedWeeks;
 
-  final List<String> _weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
   final List<int> _availableWeeks = List.generate(20, (index) => index + 1);
 
   @override
@@ -477,7 +491,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
 
   void _save() {
     if (_courseNameController.text.trim().isEmpty) {
-      showClubSnackBar(context, const Text('请输入课程名称'));
+      showClubSnackBar(context, Text(context.l10n.courseName));
       return;
     }
 
@@ -508,6 +522,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final weekdays = _getWeekdayNames(l10n);
     final colors = context.clubColors;
     final cardColor = colors.cardBackground;
     final primaryColor = Theme.of(context).colorScheme.primary;
@@ -549,7 +565,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.course == null ? '添加课程' : '编辑课程',
+                    widget.course == null ? l10n.addCourse : l10n.editCourse,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -572,38 +588,38 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTextField(
-                      '课程名称',
+                      l10n.courseName,
                       _courseNameController,
-                      '请输入课程名称',
+                      l10n.courseName,
                       Icons.book_outlined,
                       required: true,
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(
-                      '上课地点',
+                      l10n.courseRoom,
                       _roomController,
-                      '请输入上课地点',
+                      l10n.courseRoom,
                       Icons.location_on_outlined,
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(
-                      '授课教师',
+                      l10n.courseTeacher,
                       _teacherController,
-                      '多个教师用逗号分隔',
+                      l10n.courseTeacher,
                       Icons.person_outline,
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(
-                      '学分',
+                      l10n.courseCredits,
                       _creditsController,
-                      '请输入学分',
+                      l10n.courseCredits,
                       Icons.school_outlined,
                     ),
                     const SizedBox(height: 20),
 
                     // Weekday selector
                     Text(
-                      '星期几',
+                      l10n.courseWeekday,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -628,7 +644,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                           items: List.generate(7, (index) {
                             return DropdownMenuItem(
                               value: index,
-                              child: Text(_weekdays[index]),
+                              child: Text(weekdays[index]),
                             );
                           }),
                           onChanged: (value) {
@@ -651,7 +667,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '开始节次',
+                                l10n.courseStartUnit,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -676,7 +692,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                     items: List.generate(12, (index) {
                                       return DropdownMenuItem(
                                         value: index + 1,
-                                        child: Text('第${index + 1}节'),
+                                        child: Text(l10n.periodUnit(index + 1)),
                                       );
                                     }),
                                     onChanged: (value) {
@@ -701,7 +717,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '结束节次',
+                                l10n.courseEndUnit,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -726,7 +742,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                     items: List.generate(12, (index) {
                                       return DropdownMenuItem(
                                         value: index + 1,
-                                        child: Text('第${index + 1}节'),
+                                        child: Text(l10n.periodUnit(index + 1)),
                                       );
                                     }),
                                     onChanged: (value) {
@@ -749,7 +765,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
 
                     // Week selector
                     Text(
-                      '上课周次',
+                      l10n.courseWeeks,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -789,7 +805,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                               ),
                             ),
                             child: Text(
-                              '$week周',
+                              l10n.weekUnit(week),
                               style: TextStyle(
                                 color: isSelected
                                     ? colors.onAccent
@@ -828,7 +844,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
-                      '取消',
+                      l10n.cancel,
                       style: TextStyle(
                         color: colors.secondaryLabel,
                       ),
@@ -849,9 +865,9 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      '保存',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    child: Text(
+                      l10n.save,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],

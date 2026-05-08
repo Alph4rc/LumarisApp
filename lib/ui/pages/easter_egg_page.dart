@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
@@ -8,10 +9,11 @@ class EasterEggPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     return Scaffold(
       appBar: ClubAppBar(
-        title: '🎉 彩蛋',
+        title: l10n.easterEggTitle,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -25,20 +27,18 @@ class EasterEggPage extends StatelessWidget {
                 color: colors.warning,
               ),
               const SizedBox(height: 20),
-              const Text(
-                '恭喜你发现了隐藏彩蛋！',
-                style: TextStyle(
+              Text(
+                l10n.easterEggFound,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              const Text(
-                '你是少数知道这个秘密的人之一！\n\n'
-                '感谢你对光序的喜爱与支持。\n\n'
-                '继续探索，也许还有更多惊喜等着你...',
-                style: TextStyle(
+              Text(
+                l10n.easterEggContent,
+                style: const TextStyle(
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -48,7 +48,7 @@ class EasterEggPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('返回'),
+                child: Text(l10n.back),
               ),
             ],
           ),

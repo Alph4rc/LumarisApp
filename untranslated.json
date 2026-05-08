@@ -1,0 +1,39 @@
+{
+  "ja": [
+    "todoListLabel",
+    "readingTodos",
+    "readingTodosSubtitle",
+    "noTodos",
+    "noTodosSubtitle",
+    "todoLoadFailedSubtitle",
+    "deadlineLabel",
+    "noDeadline",
+    "titleRequired",
+    "deadlineRequired",
+    "add",
+    "upcomingExams",
+    "loadingExams",
+    "loadingExamsSubtitle",
+    "noExams",
+    "noExamsSubtitle",
+    "examTime",
+    "examLocation",
+    "seatNumber",
+    "seatNumberLabel",
+    "electricitySubLoadFailed",
+    "subscriptionDetail",
+    "create",
+    "webNotSupported",
+    "webNotSupportedSubtitle",
+    "reorderFailed"
+  ],
+
+  "ru": [
+    "electricitySubLoadFailed",
+    "subscriptionDetail",
+    "create",
+    "webNotSupported",
+    "webNotSupportedSubtitle",
+    "reorderFailed"
+  ]
+}

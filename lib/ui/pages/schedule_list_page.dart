@@ -24,6 +24,7 @@ import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
 // 条件导入 dart:io，仅在非 Web 环境中使用
@@ -107,10 +108,10 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
             Expanded(
               child: Builder(builder: (context) {
                 if (scheduleState.isLoading) {
-                  return const Center(
+                  return Center(
                     child: LoadingStateView(
-                      title: '正在加载课表',
-                      subtitle: '正在读取课程、偏好设置和背景配置',
+                      title: context.l10n.loadingSchedule,
+                      subtitle: context.l10n.loadingScheduleSubtitle,
                     ),
                   );
                 }
@@ -173,10 +174,11 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   Widget _buildWeekInfo(BuildContext context, bool isDark) {
     final scheduleState = ref.watch(scheduleStoreProvider);
     final colors = context.clubColors;
+    final l10n = context.l10n;
     return Builder(builder: (context) {
       final weekText = scheduleState.currentWeek <= 0
-          ? '距离开学还有${-scheduleState.currentWeek + 1}周'
-          : '当前为第${scheduleState.currentWeek}周';
+          ? l10n.weeksUntilStart(-scheduleState.currentWeek + 1)
+          : l10n.currentWeek(scheduleState.currentWeek);
 
       return InkWell(
         onTap: () => _jumpToPage(scheduleState.currentWeek),
@@ -188,8 +190,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
             children: [
               Text(
                 scheduleState.currentPage <= 0
-                    ? '全部课表'
-                    : '第 ${scheduleState.currentPage} 周',
+                    ? l10n.allSchedules
+                    : l10n.weekUnit(scheduleState.currentPage),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -214,19 +216,20 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Widget _buildDesktopWeekNav(BuildContext context) {
     final scheduleState = ref.watch(scheduleStoreProvider);
+    final l10n = context.l10n;
     return Row(
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left),
           onPressed: () => _jumpToPage((scheduleState.currentPage - 1).ceil()),
-          tooltip: '上一周',
+          tooltip: l10n.previousWeek,
         ),
         const SizedBox(width: 8),
         Text(
           scheduleState.currentPage <= 0
-              ? '全部课表'
-              : '第 ${scheduleState.currentPage} 周'
-                  '${scheduleState.currentPage == scheduleState.currentWeek ? " (本周)" : ""}',
+              ? l10n.allSchedules
+              : '${l10n.weekUnit(scheduleState.currentPage)}'
+                  '${scheduleState.currentPage == scheduleState.currentWeek ? " (${l10n.currentWeekLabel})" : ""}',
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -236,13 +239,14 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
         IconButton(
           icon: const Icon(Icons.chevron_right),
           onPressed: () => _jumpToPage((_pageController.page! + 1).ceil()),
-          tooltip: '下一周',
+          tooltip: l10n.nextWeek,
         ),
       ],
     );
   }
 
   Widget _buildActionButtons(BuildContext context, bool isDark) {
+    final l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -254,25 +258,26 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
               _showStyleSelector = !_showStyleSelector;
             });
           },
-          tooltip: '切换样式',
+          tooltip: l10n.switchStyle,
         ),
         // 刷新
         IconButton(
           icon: const Icon(Icons.refresh),
           onPressed: _handleRefresh,
-          tooltip: '刷新课表',
+          tooltip: l10n.refreshSchedule,
         ),
         // 设置
         IconButton(
           icon: const Icon(Icons.settings_outlined),
           onPressed: () => AppRouter.push(AppRoutes.scheduleSetting),
-          tooltip: '课表设置',
+          tooltip: l10n.scheduleSettingsTitle,
         ),
       ],
     );
   }
 
   Widget _buildStyleSelector() {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -298,18 +303,18 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                 .setCourseHeight(height);
           }
         },
-        children: const {
+        children: {
           CourseCardStyle.small: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text('紧凑'),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(l10n.compact),
           ),
           CourseCardStyle.normal: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text('标准'),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(l10n.standard),
           ),
           CourseCardStyle.large: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text('宽松'),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(l10n.relaxed),
           ),
         },
       ),
@@ -397,24 +402,25 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   Future<void> _handleRefresh() async {
-    showClubSnackBar(context, const Text('正在更新课表...'));
+    final l10n = context.l10n;
+    showClubSnackBar(context, Text(l10n.updatingSchedule));
     try {
       await ref.read(scheduleStoreProvider.notifier).refreshCourses();
       if (mounted) {
-        showClubSnackBar(context, const Text('更新完成'));
+        showClubSnackBar(context, Text(l10n.updateComplete));
       }
     } on TimeoutException {
       if (mounted) {
         showClubSnackBar(
           context,
-          const Text('更新超时，请检查网络连接后重试'),
+          Text(l10n.updateTimeout),
         );
       }
     } catch (e) {
       if (mounted) {
         showClubSnackBar(
           context,
-          Text('更新失败: ${e.toString()}'),
+          Text(l10n.updateFailed(e.toString())),
         );
       }
     }
@@ -431,15 +437,16 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   /// 显示冲突课程选择列表
   void _showConflictCourseSelector(List<CourseModel> courses) {
+    final l10n = context.l10n;
     showClubModalBottomSheet(
       context,
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '选择要查看的课程',
-            style: TextStyle(
+          Text(
+            l10n.selectCourse,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -462,7 +469,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                   ),
                 ),
                 subtitle: Text(
-                  '${course.room} · 第${course.startUnit}-${course.endUnit}节',
+                  '${course.room} · ${l10n.periodRange(course.startUnit, course.endUnit)}',
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -477,6 +484,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   void _showCourseActions(CourseModel course) {
     final colors = context.clubColors;
+    final l10n = context.l10n;
 
     showModalBottomSheet(
       context: context,
@@ -485,7 +493,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
         children: [
           ClubListTile(
             leading: const Icon(Icons.edit),
-            title: const Text('编辑课程'),
+            title: Text(l10n.editCourse),
             onTap: () {
               Navigator.pop(context);
               _editCustomCourse(course);
@@ -493,7 +501,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           ),
           ClubListTile(
             leading: Icon(Icons.delete, color: colors.danger),
-            title: Text('删除课程', style: TextStyle(color: colors.danger)),
+            title: Text(l10n.deleteCourse, style: TextStyle(color: colors.danger)),
             onTap: () {
               Navigator.pop(context);
               _deleteCustomCourse(course);
@@ -512,7 +520,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
         onSave: (updatedCourse) async {
           await _saveUpdatedCustomCourse(updatedCourse);
           if (mounted && context.mounted) {
-            showClubSnackBar(context, const Text('课程修改成功'));
+            showClubSnackBar(context, Text(context.l10n.courseModified));
           }
         },
       ),
@@ -520,17 +528,18 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   Future<void> _deleteCustomCourse(CourseModel course) async {
+    final l10n = context.l10n;
     final confirm = await PlatformDialog.showCustomDialog<bool>(
       context,
-      title: '确认删除',
-      content: Text('确定要删除课程"${course.courseName}"吗？'),
-      actions: const [
+      title: l10n.confirmDelete,
+      content: Text(l10n.confirmDeleteCourseContent(course.courseName)),
+      actions: [
         PlatformDialogAction<bool>(
-          label: '取消',
+          label: l10n.cancel,
           value: false,
         ),
         PlatformDialogAction<bool>(
-          label: '删除',
+          label: l10n.delete,
           value: true,
           isDestructiveAction: true,
         ),
@@ -555,11 +564,11 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           await ref.read(scheduleStoreProvider.notifier).refreshCourses();
 
           if (mounted) {
-            showClubSnackBar(context, const Text('课程删除成功'));
+            showClubSnackBar(context, Text(l10n.courseDeleted));
           }
         } catch (e) {
           if (mounted) {
-            showClubSnackBar(context, const Text('删除失败'));
+            showClubSnackBar(context, Text(l10n.deleteFailed));
           }
         }
       }

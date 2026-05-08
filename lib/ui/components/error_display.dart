@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 统一的错误显示组件
@@ -76,7 +77,7 @@ class ErrorBanner extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
-              child: const Text('重试'),
+              child: Text(context.l10n.retry),
             ),
           ],
         ],
@@ -143,7 +144,7 @@ class RetryableErrorWidget extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              '出错了',
+              context.l10n.errorOccurred,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -164,7 +165,7 @@ class RetryableErrorWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('重试'),
+                label: Text(context.l10n.retry),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
@@ -25,8 +26,8 @@ class _TodoListSettingState extends State<TodoListSetting> {
         size: 20,
         color: colors.secondaryLabel,
       ),
-      title: const Text('是否将待办保存至云端'),
-      subtitle: const Text('该服务已暂停'),
+      title: Text(context.l10n.cloudSyncTodo),
+      subtitle: Text(context.l10n.servicePaused),
       trailing: const CupertinoSwitch(
         value: false,
         onChanged: null,

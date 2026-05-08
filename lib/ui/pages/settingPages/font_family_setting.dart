@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 // 添加字体设置组件
@@ -27,6 +28,7 @@ class FontFamilySetting extends ConsumerWidget {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
     final colors = context.clubColors;
+    final l10n = context.l10n;
 
     return ClubListTile(
       leading: Icon(
@@ -34,13 +36,13 @@ class FontFamilySetting extends ConsumerWidget {
         size: 20,
         color: colors.primary,
       ),
-      title: const Text('字体设置'),
-      subtitle: const Text('为桌面平台选择字体(下次打开时才会应用)'),
+      title: Text(l10n.fontSetting),
+      subtitle: Text(l10n.fontSettingSubtitle),
       trailing: Text(_fontOptions.contains(settings.fontFamily)
           ? settings.fontFamily.isEmpty
-              ? '系统默认'
+              ? l10n.systemDefault
               : settings.fontFamily
-          : '自定义'),
+          : l10n.customFont),
       onTap: () => showClubModalBottomSheet(
         context,
         SizedBox(
@@ -59,7 +61,7 @@ class FontFamilySetting extends ConsumerWidget {
             children: List.generate(_fontOptions.length, (int index) {
               return Center(
                   child: Text(_fontOptions[index].isEmpty
-                      ? '系统默认'
+                      ? l10n.systemDefault
                       : _fontOptions[index]));
             }),
           ),

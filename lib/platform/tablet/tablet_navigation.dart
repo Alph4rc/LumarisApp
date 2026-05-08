@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -91,7 +92,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                         _isExtended = !_isExtended;
                       });
                     },
-                    tooltip: _isExtended ? '收起侧边栏' : '展开侧边栏',
+                    tooltip: _isExtended ? context.l10n.collapseSidebar : context.l10n.expandSidebar,
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -171,7 +172,7 @@ class TabletDrawerNavigation extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('光序'),
+        title: Text(context.l10n.appName),
         centerTitle: false,
         elevation: 0,
         backgroundColor: colors.cardBackground,
@@ -203,7 +204,7 @@ class TabletDrawerNavigation extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    '光序',
+                    context.l10n.appName,
                     style: TextStyle(
                       color: colors.onAccent,
                       fontSize: 20,

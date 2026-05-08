@@ -3,23 +3,29 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class LoadingStateView extends StatelessWidget {
-  final String title;
-  final String subtitle;
+  final String? title;
+  final String? subtitle;
   final bool compact;
   final bool showCard;
   final EdgeInsetsGeometry padding;
 
   const LoadingStateView({
     super.key,
-    this.title = '正在同步数据',
-    this.subtitle = '网络较慢时可能需要几秒，请稍等一下',
+    this.title,
+    this.subtitle,
     this.compact = false,
     this.showCard = false,
     this.padding = const EdgeInsets.all(24),
   });
+
+  String _resolveTitle(BuildContext context) =>
+      title ?? context.l10n.loadingDefaultTitle;
+  String _resolveSubtitle(BuildContext context) =>
+      subtitle ?? context.l10n.loadingDefaultSubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +64,7 @@ class LoadingStateView extends StatelessWidget {
         const CupertinoActivityIndicator(radius: 16),
         const SizedBox(height: 24),
         Text(
-          title,
+          _resolveTitle(context),
           textAlign: TextAlign.center,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
@@ -66,10 +72,10 @@ class LoadingStateView extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        if (subtitle.isNotEmpty) ...[
+        if (_resolveSubtitle(context).isNotEmpty) ...[
           const SizedBox(height: 8),
           Text(
-            subtitle,
+            _resolveSubtitle(context),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurface.withValues(alpha: 0.6), // 提升文字对比度
@@ -98,17 +104,17 @@ class LoadingStateView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
+                _resolveTitle(context),
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,
                   letterSpacing: -0.3,
                 ),
               ),
-              if (subtitle.isNotEmpty) ...[
+              if (_resolveSubtitle(context).isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
-                  subtitle,
+                  _resolveSubtitle(context),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(

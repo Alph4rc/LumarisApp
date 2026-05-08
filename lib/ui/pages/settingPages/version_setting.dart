@@ -12,6 +12,7 @@ import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
 class VersionSetting extends ConsumerStatefulWidget {
   const VersionSetting({super.key});
@@ -72,6 +73,7 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
     final colors = context.clubColors;
+    final l10n = context.l10n;
 
     return Column(
       children: [
@@ -87,7 +89,7 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
                   ),
                 )
               : Icon(Icons.verified, size: 20, color: colors.success),
-          title: const Text('版本'),
+          title: Text(l10n.version),
           subtitle: Text(version),
           subtitleTextStyle: TextStyle(
             fontSize: 13,
@@ -99,10 +101,10 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
             if (isNeedUpdate) {
               final result = await PlatformDialog.showConfirmDialog(
                 context,
-                title: '是否更新最新版本: ${latestRelease?.name ?? ''}',
-                content: '发现新版本可用，将在浏览器中打开下载链接，是否继续？',
-                confirmText: '前往浏览器',
-                cancelText: '不要',
+                title: l10n.confirmUpdateTitle(latestRelease?.name ?? ''),
+                content: l10n.confirmUpdateContent,
+                confirmText: l10n.goToBrowser,
+                cancelText: l10n.dontUpdate,
               );
 
               if (result == true) {
@@ -115,14 +117,14 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
                   if (context.mounted) {
                     showClubSnackBar(
                       context,
-                      const Text('已打开浏览器，请在浏览器中下载安装更新'),
+                      Text(l10n.updateOpened),
                     );
                   }
                 } catch (e) {
                   if (context.mounted) {
                     showClubSnackBar(
                       context,
-                      Text('打开更新链接失败: $e'),
+                      Text('${l10n.openUpdateFailed}: $e'),
                     );
                   }
                 }
@@ -139,8 +141,8 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
               size: 20,
               color: colors.warning,
             ),
-            title: const Text('更新日志'),
-            subtitle: const Text('忽略版本更新'),
+            title: Text(l10n.updateLog),
+            subtitle: Text(l10n.ignoreVersionUpdate),
             subtitleTextStyle: TextStyle(
               fontSize: 12,
               color: colors.secondaryLabel,

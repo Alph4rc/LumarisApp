@@ -4,9 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
 class AgreementPage extends ConsumerWidget {
   const AgreementPage({super.key});
@@ -21,16 +23,16 @@ class AgreementPage extends ConsumerWidget {
     exit(0);
   }
 
-  void _viewPrivacyPolicy(BuildContext context) {
-    Navigator.of(context).push(
+  void _viewPrivacyPolicy() {
+    AppRouter.rootNavigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => const _PrivacyPolicyContentPage(),
       ),
     );
   }
 
-  void _viewUserAgreement(BuildContext context) {
-    Navigator.of(context).push(
+  void _viewUserAgreement() {
+    AppRouter.rootNavigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => const _UserAgreementContentPage(),
       ),
@@ -71,7 +73,7 @@ class AgreementPage extends ConsumerWidget {
                       const SizedBox(height: 24),
                       // 标题
                       Text(
-                        '光序',
+                        context.l10n.appName,
                         style: TextStyle(
                           fontSize: isWide ? 30 : 26,
                           fontWeight: FontWeight.bold,
@@ -80,7 +82,7 @@ class AgreementPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '欢迎使用 光序',
+                        context.l10n.agreementWelcomeTitle,
                         style: TextStyle(
                           fontSize: isWide ? 17 : 16,
                           color: colors.secondaryLabel,
@@ -92,7 +94,7 @@ class AgreementPage extends ConsumerWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: Text(
-                          '在使用本应用前，请仔细阅读并同意以下协议。我们将严格遵守相关法律法规，保护您的个人信息安全。',
+                          context.l10n.agreementDescription,
                           style: TextStyle(
                             fontSize: isWide ? 16 : 15,
                             color: colors.label,
@@ -110,9 +112,9 @@ class AgreementPage extends ConsumerWidget {
                           isWide: isWide,
                           icon: CupertinoIcons.shield_fill,
                           iconColor: colors.primary,
-                          title: '隐私协议',
-                          description: '了解我们如何收集、使用和保护你的个人信息',
-                          onTap: () => _viewPrivacyPolicy(context),
+                          title: context.l10n.privacyPolicy,
+                          description: context.l10n.agreementPrivacyDescription,
+                          onTap: _viewPrivacyPolicy,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -124,9 +126,9 @@ class AgreementPage extends ConsumerWidget {
                           isWide: isWide,
                           icon: CupertinoIcons.doc_text_fill,
                           iconColor: colors.purple,
-                          title: '用户协议',
-                          description: '了解使用本应用的权利、义务和免责条款',
-                          onTap: () => _viewUserAgreement(context),
+                          title: context.l10n.userAgreement,
+                          description: context.l10n.agreementUserDescription,
+                          onTap: _viewUserAgreement,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -135,7 +137,7 @@ class AgreementPage extends ConsumerWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: Text(
-                          '点击上方卡片可查看协议全文。继续使用即表示你已阅读并同意以上协议。',
+                          context.l10n.agreementReadTip,
                           style: TextStyle(
                             fontSize: isWide ? 14 : 13,
                             color: colors.secondaryLabel,
@@ -206,7 +208,7 @@ class AgreementPage extends ConsumerWidget {
           child: CupertinoButton.filled(
             onPressed: () => _onAgree(context, ref),
             child: Text(
-              '同意并继续',
+              context.l10n.agreeAndContinue,
               style: TextStyle(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w600,
@@ -222,7 +224,7 @@ class AgreementPage extends ConsumerWidget {
             onPressed: _onDisagree,
             color: colors.surfaceRaised,
             child: Text(
-              '不同意',
+              context.l10n.disagree,
               style: TextStyle(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w500,

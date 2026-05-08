@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -18,21 +20,22 @@ class PaymentPage extends ConsumerWidget {
     final payment = ref.watch(paymentStoreProvider);
     final controller = ref.read(paymentStoreProvider.notifier);
     final colors = context.clubColors;
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: ClubAppBar(
-        title: '饭卡',
+        title: l10n.payment,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: controller.loadData,
-            tooltip: '刷新',
+            tooltip: l10n.refreshData,
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: controller.loadData,
-        child: _buildContent(context, payment, controller, colors),
+        child: _buildContent(context, payment, controller, colors, l10n),
       ),
     );
   }
@@ -42,6 +45,7 @@ class PaymentPage extends ConsumerWidget {
     PaymentState payment,
     PaymentStore controller,
     ClubColors colors,
+    AppLocalizations l10n,
   ) {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -49,27 +53,27 @@ class PaymentPage extends ConsumerWidget {
         parent: BouncingScrollPhysics(),
       ),
       children: [
-        _buildBalanceCard(payment, colors),
+        _buildBalanceCard(payment, colors, l10n),
         const SizedBox(height: 24),
         if (payment.isLoading)
-          const LoadingStateView(
-            title: '正在同步饭卡余额',
-            subtitle: '正在获取最新流水，请稍候...',
+          LoadingStateView(
+            title: l10n.paymentLoading,
+            subtitle: l10n.paymentLoadingSubtitle,
             showCard: true,
           )
         else if (payment.errorMessage.isNotEmpty)
-          _buildLoginPrompt(colors)
+          _buildLoginPrompt(colors, l10n)
         else ...[
-          _buildRecentTransactionsSection(payment, colors),
+          _buildRecentTransactionsSection(payment, colors, l10n),
           const SizedBox(height: 24),
-          _buildSettingsSection(payment, controller, colors),
+          _buildSettingsSection(payment, controller, colors, l10n),
         ],
         const SizedBox(height: 32),
       ],
     );
   }
 
-  Widget _buildBalanceCard(PaymentState payment, ClubColors colors) {
+  Widget _buildBalanceCard(PaymentState payment, ClubColors colors, AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -98,7 +102,7 @@ class PaymentPage extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '校园一卡通',
+                l10n.campusCard,
                 style: TextStyle(
                   color: colors.onAccent.withValues(alpha: 0.7),
                   fontSize: 14,
@@ -114,7 +118,7 @@ class PaymentPage extends ConsumerWidget {
           ),
           const SizedBox(height: 32),
           Text(
-            '当前余额',
+            l10n.currentBalance,
             style: TextStyle(
               color: colors.onAccent,
               fontSize: 16,
@@ -140,7 +144,7 @@ class PaymentPage extends ConsumerWidget {
   }
 
   Widget _buildRecentTransactionsSection(
-      PaymentState payment, ClubColors colors) {
+      PaymentState payment, ClubColors colors, AppLocalizations l10n) {
     final recentRecords = payment.records
         .where((r) =>
             r.turnoverType.contains('支付') ||
@@ -158,7 +162,7 @@ class PaymentPage extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
-            '最近交易',
+            l10n.recentTransactions,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -215,7 +219,7 @@ class PaymentPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoginPrompt(ClubColors colors) {
+  Widget _buildLoginPrompt(ClubColors colors, AppLocalizations l10n) {
     return ClubCard(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
       child: Column(
@@ -233,16 +237,16 @@ class PaymentPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            '无饭卡数据',
-            style: TextStyle(
+          Text(
+            l10n.noCardData,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '请登录教务处账号以查看余额和交易流水',
+            l10n.noCardDataSubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -258,6 +262,7 @@ class PaymentPage extends ConsumerWidget {
     PaymentState payment,
     PaymentStore controller,
     ClubColors colors,
+    AppLocalizations l10n,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,7 +270,7 @@ class PaymentPage extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
-            '设置',
+            l10n.settings,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -277,8 +282,8 @@ class PaymentPage extends ConsumerWidget {
         ClubCard(
           child: ClubListTile(
             leading: Icon(Icons.apps_rounded, color: colors.primary),
-            title: const Text('显示饭卡磁贴'),
-            subtitle: const Text('在首页显示余额概览'),
+            title: Text(l10n.showPaymentTile),
+            subtitle: Text(l10n.showPaymentTileSubtitle),
             trailing: CupertinoSwitch(
               value: payment.isShowTile,
               onChanged: (value) => controller.toggleTileShow(value),

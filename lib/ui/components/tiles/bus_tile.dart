@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -12,6 +13,7 @@ class BusTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final busStore = ref.watch(busTileStoreProvider);
     final colors = context.clubColors;
 
@@ -25,9 +27,9 @@ class BusTile extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0),
             child: Builder(builder: (context) {
               if (busStore.isLoading) {
-                return const Center(
+                return Center(
                   child: LoadingStateView(
-                    title: '正在获取校车',
+                    title: l10n.busLoading,
                     subtitle: '',
                     compact: true,
                     padding: EdgeInsets.zero,
@@ -66,7 +68,7 @@ class BusTile extends ConsumerWidget {
                             borderRadius: ClubRadii.navigation,
                           ),
                           child: Text(
-                            '$busData班次',
+                            '$busData${l10n.busInfo}',
                             style: TextStyle(
                               fontSize: 10,
                               color: primaryColor,
@@ -78,7 +80,7 @@ class BusTile extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '今日校车',
+                    l10n.schoolBus,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -87,7 +89,7 @@ class BusTile extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    busData > 0 ? '$busData' : '无班次',
+                    busData > 0 ? '$busData' : l10n.noBusToday,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

@@ -49,7 +49,7 @@ class ClubAppBar extends StatelessWidget implements PreferredSizeWidget {
               icon: const Icon(Icons.arrow_back),
               onPressed:
                   onBackPressed ?? () => Navigator.of(context).maybePop(),
-              tooltip: 'Back',
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             )
           : null,
       backgroundColor: backgroundColor,

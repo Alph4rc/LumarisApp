@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -15,6 +16,7 @@ class RemindSetting extends ConsumerWidget {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
     final colors = context.clubColors;
+    final l10n = context.l10n;
 
     return Column(
       children: [
@@ -26,8 +28,8 @@ class RemindSetting extends ConsumerWidget {
             size: 20,
             color: colors.success,
           ),
-          title: const Text('课程通知'),
-          subtitle: const Text('上课前进行提醒'),
+          title: Text(l10n.courseReminder),
+          subtitle: Text(l10n.courseReminderSubtitle),
           trailing: CupertinoSwitch(
             value: settings.isRemind,
             onChanged: (bool value) async {
@@ -43,8 +45,8 @@ class RemindSetting extends ConsumerWidget {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 leading: const SizedBox(width: 24),
-                title: const Text('提前几分钟提醒'),
-                trailing: Text('${settings.remindTime}分钟'),
+                title: Text(l10n.remindMinutesBefore),
+                trailing: Text(l10n.remindMinutes(settings.remindTime)),
                 onTap: () {
                   _show(context, ref);
                 },

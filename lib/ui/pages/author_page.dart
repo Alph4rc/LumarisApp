@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -11,6 +12,7 @@ class AuthorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
 
     return Scaffold(
@@ -20,7 +22,7 @@ class AuthorPage extends StatelessWidget {
         slivers: [
           SliverAppBar.large(
             title: Text(
-              '关于作者',
+              l10n.aboutAuthor,
               style: TextStyle(
                 color: colors.label,
                 fontWeight: FontWeight.bold,
@@ -42,13 +44,13 @@ class AuthorPage extends StatelessWidget {
                     children: [
                       _buildHeader(context),
                       const SizedBox(height: 32),
-                      _buildSectionHeader(context, '核心团队'),
+                      _buildSectionHeader(context, l10n.coreTeam),
                       _buildTeamSection(context),
                       const SizedBox(height: 32),
-                      _buildSectionHeader(context, '特别致谢'),
+                      _buildSectionHeader(context, l10n.specialThanks),
                       _buildThanksSection(context),
                       const SizedBox(height: 32),
-                      _buildSectionHeader(context, '联系我们'),
+                      _buildSectionHeader(context, l10n.contactUs),
                       _buildContactSection(context),
                       const SizedBox(height: 48),
                       _buildFooter(context),
@@ -64,6 +66,7 @@ class AuthorPage extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     return Column(
       children: [
@@ -102,7 +105,7 @@ class AuthorPage extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          '致力于为建大学子提供更好的服务',
+          l10n.tagline,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
@@ -204,6 +207,7 @@ class AuthorPage extends StatelessWidget {
   }
 
   Widget _buildThanksSection(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     return ClubCard(
       padding: const EdgeInsets.all(20),
@@ -219,7 +223,7 @@ class AuthorPage extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '致谢',
+                l10n.thanksTitle,
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -230,7 +234,7 @@ class AuthorPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            '感谢所有为本项目贡献代码、提出建议和报告问题的开发者和用户。你们的支持是我们前进的动力。特别感谢所有测试人员在开发阶段的辛勤付出。',
+            l10n.thanksContent,
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
@@ -243,16 +247,17 @@ class AuthorPage extends StatelessWidget {
   }
 
   Widget _buildContactSection(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final items = [
       {
-        'title': 'GitHub 仓库',
+        'title': l10n.githubRepository,
         'icon': CupertinoIcons.doc_text_fill,
         'color': colors.secondaryLabel,
         'url': 'https://github.com/iOS-Club-XAUAT/ios_club_app'
       },
       {
-        'title': '加入我们',
+        'title': l10n.joinUs,
         'icon': CupertinoIcons.person_2_fill,
         'color': colors.primary,
         'url': 'https://iosclub.org'
@@ -309,6 +314,7 @@ class AuthorPage extends StatelessWidget {
   }
 
   Widget _buildFooter(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     return Column(
       children: [
@@ -321,7 +327,7 @@ class AuthorPage extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Made with ❤️ in Xi\'an',
+          l10n.madeWithLove,
           style: TextStyle(
             fontSize: 12,
             color: colors.quaternaryLabel,

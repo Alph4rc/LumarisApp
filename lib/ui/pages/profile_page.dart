@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
@@ -86,12 +87,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
           child: LoadingStateView(
-            title: '正在读取账号信息',
-            subtitle: '正在同步本地登录状态和个人资料入口，请稍等一下',
+            title: l10n.profileReading,
+            subtitle: l10n.profileReadingSubtitle,
           ),
         ),
       );
@@ -102,30 +104,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  List<ProfileButtonItem> get profileButtonItems {
+  List<ProfileButtonItem> getProfileButtonItems(BuildContext context) {
+    final l10n = context.l10n;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     return [
       ProfileButtonItem(
           icon: CupertinoIcons.link_circle,
-          title: '校园导航',
+          title: l10n.campusNavigation,
           route: AppRoutes.link),
       ProfileButtonItem(
-          icon: Icons.settings, title: '设置/关于', route: AppRoutes.about),
+          icon: Icons.settings, title: l10n.settingsAbout, route: AppRoutes.about),
       ProfileButtonItem(
-          title: '校车',
+          title: l10n.schoolBus,
           icon: Icons.directions_bus_rounded,
           route: AppRoutes.schoolBus),
       if (!kIsWeb)
         ProfileButtonItem(
             icon: CupertinoIcons.bolt_fill,
-            title: '电费',
+            title: l10n.electricity,
             route: AppRoutes.electricity),
       if (isLogin)
         ProfileButtonItem(
-            icon: Icons.toc, title: '培养方案', route: AppRoutes.program),
+            icon: Icons.toc, title: l10n.programLabel, route: AppRoutes.program),
       ProfileButtonItem(
           icon: Icons.monetization_on_outlined,
-          title: '饭卡',
+          title: l10n.payment,
           route: AppRoutes.payment),
       // if (!kIsWeb)
       //   ProfileButtonItem(
@@ -133,18 +136,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       if (!isLogin)
         ProfileButtonItem(
             icon: Icons.login,
-            title: '登录教务系统',
+            title: l10n.loginEduSystem,
             onPressed: () {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
       ProfileButtonItem(
-          icon: CupertinoIcons.map, title: '校园地图', route: AppRoutes.campusMap),
+          icon: CupertinoIcons.map, title: l10n.campusMap, route: AppRoutes.campusMap),
       ProfileButtonItem(
-          icon: Icons.help_outline, title: '帮助', route: AppRoutes.helper),
+          icon: Icons.help_outline, title: l10n.help, route: AppRoutes.helper),
     ];
   }
 
   Widget _buildProfileContent() {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isLogin = ref.watch(userStoreProvider).isLogin;
@@ -172,7 +176,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _username.isNotEmpty ? _username : '未登录',
+                          _username.isNotEmpty ? _username : l10n.notLoggedIn,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -181,7 +185,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           maxLines: 1,
                         ),
                         Text(
-                          isLogin ? '教务系统账号' : '游客',
+                          isLogin ? l10n.academicAccount : l10n.guest,
                           style: TextStyle(
                             fontSize: 14,
                             color: colors.secondaryLabel,
@@ -209,11 +213,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       return AnimatedCard(
                         delay: Duration(milliseconds: 50 * index),
                         child: Center(
-                          child: profileButtonItems[index].build(context),
+                          child: getProfileButtonItems(context)[index].build(context),
                         ),
                       );
                     },
-                    itemCount: profileButtonItems.length,
+                    itemCount: getProfileButtonItems(context).length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                   )),
@@ -233,11 +237,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: LoadingStateView(
-                        title: '正在同步学业信息',
-                        subtitle: '正在读取学分与个人信息卡片',
+                        title: l10n.syncingAcademic,
+                        subtitle: l10n.syncingAcademicSubtitle,
                         compact: true,
                         showCard: true,
                       ),
@@ -248,7 +252,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Text('加载失败: ${snapshot.error}'),
+                        child: Text('${l10n.loadFailed}: ${snapshot.error}'),
                       ),
                     );
                   }

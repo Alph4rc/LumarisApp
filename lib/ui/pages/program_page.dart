@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ProgramPage extends ConsumerStatefulWidget {
@@ -59,14 +60,15 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final programState = ref.watch(programControllerProvider);
     final controller = ref.read(programControllerProvider.notifier);
     _ensureTabController(programState.programs.length);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '培养方案',
+        title: Text(
+          l10n.programLabel,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,
@@ -109,10 +111,10 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
         final colors = context.clubColors;
 
         if (programState.isLoading) {
-          return const Center(
+          return Center(
             child: LoadingStateView(
-              title: '正在加载培养方案',
-              subtitle: '正在整理学期课程结构和课程类别，请稍等一下',
+              title: l10n.programLoading,
+              subtitle: l10n.programLoadingSubtitle,
             ),
           );
         }
@@ -131,7 +133,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '加载失败',
+                    l10n.loadFailed,
                     style: TextStyle(
                       fontSize: 17,
                       color: colors.secondaryLabel,
@@ -157,7 +159,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '暂无数据',
+                    l10n.noData,
                     style: TextStyle(
                       fontSize: 17,
                       color: colors.secondaryLabel,
@@ -202,7 +204,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            '刷新失败，当前展示的是上次同步的培养方案',
+                            l10n.programRefreshFailed,
                             style: TextStyle(
                               fontSize: 13,
                               color: colors.secondaryLabel,
@@ -270,7 +272,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                           borderRadius: ClubRadii.control,
                         ),
                         child: Text(
-                          '${course.credits} 学分',
+                          l10n.creditUnit(course.credits),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

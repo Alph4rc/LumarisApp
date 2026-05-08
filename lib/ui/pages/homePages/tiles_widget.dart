@@ -6,6 +6,7 @@ import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
 import 'package:ios_club_app/ui/components/tiles/editable_tile_wrapper.dart';
 
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
@@ -105,9 +106,10 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
             );
           } catch (e) {
             if (mounted) {
+              final l10n = context.l10n;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('重新排序失败: $e'),
+                  content: Text('${l10n.reorderFailed}: $e'),
                   duration: const Duration(seconds: 2),
                 ),
               );

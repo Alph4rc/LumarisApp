@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程详情弹窗组件
@@ -63,7 +64,7 @@ class CourseDetailSheet extends StatelessWidget {
           _buildInfoRow(
             context,
             icon: CupertinoIcons.location_solid,
-            label: '上课地点',
+            label: context.l10n.classroom,
             content: course.room,
             color: colors.primary,
           ),
@@ -74,7 +75,7 @@ class CourseDetailSheet extends StatelessWidget {
             icon: course.teachers.length > 1
                 ? CupertinoIcons.person_2_fill
                 : CupertinoIcons.person_fill,
-            label: '授课教师',
+            label: context.l10n.teacherLabel,
             content: course.teachers.join(', '),
             color: colors.danger,
           ),
@@ -83,8 +84,8 @@ class CourseDetailSheet extends StatelessWidget {
           _buildInfoRow(
             context,
             icon: CupertinoIcons.calendar,
-            label: '上课时间',
-            content: _formatScheduleInfo(),
+            label: context.l10n.classTime,
+            content: _formatScheduleInfo(context),
             color: colors.success,
           ),
 
@@ -93,7 +94,7 @@ class CourseDetailSheet extends StatelessWidget {
             _buildInfoRow(
               context,
               icon: CupertinoIcons.building_2_fill,
-              label: '上课校区',
+              label: context.l10n.classCampus,
               content: course.campus,
               color: colors.warning,
             ),
@@ -104,7 +105,7 @@ class CourseDetailSheet extends StatelessWidget {
             _buildInfoRow(
               context,
               icon: CupertinoIcons.star_fill,
-              label: '课程学分',
+              label: context.l10n.courseCredits,
               content: course.credits,
               color: colors.yellow,
             ),
@@ -127,11 +128,11 @@ class CourseDetailSheet extends StatelessWidget {
         if (onEdit != null)
           PopupMenuItem(
             value: 'edit',
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.edit, size: 20),
-                SizedBox(width: 12),
-                Text('编辑课程'),
+                const Icon(Icons.edit, size: 20),
+                const SizedBox(width: 12),
+                Text(context.l10n.editCourse),
               ],
             ),
           ),
@@ -142,7 +143,7 @@ class CourseDetailSheet extends StatelessWidget {
               children: [
                 Icon(Icons.delete, size: 20, color: colors.danger),
                 const SizedBox(width: 12),
-                Text('删除课程', style: TextStyle(color: colors.danger)),
+                Text(context.l10n.deleteCourse, style: TextStyle(color: colors.danger)),
               ],
             ),
           ),
@@ -213,11 +214,27 @@ class CourseDetailSheet extends StatelessWidget {
     );
   }
 
-  String _formatScheduleInfo() {
-    final weekdayName = ['日', '一', '二', '三', '四', '五', '六', '日'];
-    return '${CourseModel.formatWeekRanges(course.weekIndexes)}周 '
-        '每周${weekdayName[course.weekday]} '
-        '第${course.startUnit}-${course.endUnit}节';
+  String _formatScheduleInfo(BuildContext context) {
+    final weekdayNames = _getWeekdayNames(context);
+    return context.l10n.scheduleCourseTime(
+      CourseModel.formatWeekRanges(course.weekIndexes),
+      weekdayNames[course.weekday],
+      course.startUnit,
+      course.endUnit,
+    );
+  }
+
+  List<String> _getWeekdayNames(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      l10n.sunday,
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+    ];
   }
 
   /// 显示课程详情弹窗

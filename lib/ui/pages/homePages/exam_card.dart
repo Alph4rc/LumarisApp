@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/exam_result.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
@@ -70,6 +71,7 @@ class _ExamCardState extends State<ExamCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -78,7 +80,7 @@ class _ExamCardState extends State<ExamCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '近期考试',
+                  l10n.upcomingExams,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -172,14 +174,15 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Widget examCard() {
+    final l10n = context.l10n;
     if (isLoading) {
-      return const AnimatedCard(
+      return AnimatedCard(
         child: ClubCard(
           child: LoadingStateView(
-            title: '正在加载考试信息',
+            title: l10n.fetchingScores,
             subtitle: '正在同步近期考试安排、考场和座位信息',
             compact: true,
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
           ),
         ),
       );
@@ -191,7 +194,7 @@ class _ExamCardState extends State<ExamCard> {
         child: ClubCard(
           padding: const EdgeInsets.all(20),
           child: EmptyWidget(
-            title: isNetworkError ? '网络连接失败' : '加载失败',
+            title: isNetworkError ? l10n.networkError : l10n.loadFailed,
             subtitle: errorMessage!,
             icon: isNetworkError
                 ? CupertinoIcons.wifi_slash
@@ -207,10 +210,10 @@ class _ExamCardState extends State<ExamCard> {
 
     return examItems.isEmpty
         ? AnimatedCard(
-            child: const ClubCard(
-              padding: EdgeInsets.all(20),
+            child: ClubCard(
+              padding: const EdgeInsets.all(20),
               child: EmptyWidget(
-                title: '最近没有考试',
+                title: l10n.empty,
                 subtitle: '说不定刷新一下就有了',
                 icon: CupertinoIcons.hourglass,
               ),
@@ -291,6 +294,7 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Widget _buildExamTip(ExamData exam) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +303,7 @@ class _ExamCardState extends State<ExamCard> {
         ModalHeader(title: exam.title),
         ModalInfoRow(
           icon: CupertinoIcons.clock,
-          label: '考试时间',
+          label: l10n.classTime,
           content: exam.time,
           color: colors.success,
         ),
@@ -307,7 +311,7 @@ class _ExamCardState extends State<ExamCard> {
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.placemark,
-            label: '考试地点',
+            label: l10n.classroom,
             content: exam.location,
             color: colors.warning,
           ),

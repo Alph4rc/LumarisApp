@@ -28,6 +28,10 @@ import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/services/app_locale_service.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 
 import 'main_app.dart';
 
@@ -166,6 +170,7 @@ class _AppLauncher extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsStore = ref.watch(settingsStoreProvider);
     final router = ref.watch(appRouterProvider);
+    final locale = AppLocaleService.localeOf(settingsStore.localeCode);
     // 直接从 settingsStore 获取需要的字体信息
     final fontFamily = settingsStore.fontFamily.isEmpty
         ? PlatformUtils.getWindowsFontFamily()
@@ -175,6 +180,14 @@ class _AppLauncher extends ConsumerWidget {
       return MacosApp.router(
         title: '光序',
         debugShowCheckedModeBanner: false,
+        locale: locale,
+        supportedLocales: AppLocaleService.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
         theme: ClubTheme.macosLightTheme(),
         darkTheme: ClubTheme.macosDarkTheme(),
         themeMode: settingsStore.themeMode,
@@ -189,6 +202,14 @@ class _AppLauncher extends ConsumerWidget {
     return MaterialApp.router(
       title: '光序',
       debugShowCheckedModeBanner: false,
+      locale: locale,
+      supportedLocales: AppLocaleService.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       theme: ClubTheme.lightTheme(fontFamily: fontFamily),
       darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
       themeMode: settingsStore.themeMode,
@@ -264,21 +285,22 @@ class _WindowPageState extends State<WindowPage>
   @override
   void onWindowClose() async {
     if (_isPreventClose && mounted) {
+      final l10n = context.l10n;
       // 显示退出选项
       PlatformDialog.showCustomDialog<void>(
         context,
-        title: '关闭窗口',
-        content: const Text('选择您要执行的操作'),
+        title: l10n.closeWindow,
+        content: Text(l10n.closeWindowChoice),
         actions: [
-          const PlatformDialogAction<void>(label: '取消'),
+          PlatformDialogAction<void>(label: l10n.cancel),
           PlatformDialogAction<void>(
-            label: '最小化到任务栏',
+            label: l10n.minimizeToTray,
             onPressed: () async {
               await windowManager.hide();
             },
           ),
           PlatformDialogAction<void>(
-            label: '退出程序',
+            label: l10n.quitApp,
             isDestructiveAction: true,
             onPressed: _exitApp,
           ),

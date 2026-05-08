@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 
@@ -20,8 +21,8 @@ class HapticFeedbackSetting extends ConsumerWidget {
         size: 20,
         color: Colors.deepPurple,
       ),
-      title: const Text('触觉反馈'),
-      subtitle: const Text('底部导航栏点击时震动'),
+      title: Text(context.l10n.hapticFeedback),
+      subtitle: Text(context.l10n.hapticFeedbackSubtitle),
       trailing: CupertinoSwitch(
         value: settings.enableHapticFeedback,
         onChanged: (bool value) async {

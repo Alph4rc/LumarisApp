@@ -67,16 +67,20 @@ class ScoreList {
 
   ScoreList({required this.semester, required this.list});
 
+  static double? _tryParse(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return double.tryParse(value);
+  }
+
   /// 总学分
   double get totalCredit {
     double credit = 0;
     for (var item in list) {
-      if (item.gpa == '' || item.credit == '0') continue;
-      final a = double.parse(item.gpa);
-      if (a == 0) {
-        continue;
-      }
-      credit += double.parse(item.credit);
+      final gpa = _tryParse(item.gpa);
+      final cred = _tryParse(item.credit);
+      if (gpa == null || cred == null || cred == 0) continue;
+      if (gpa == 0) continue;
+      credit += cred;
     }
     return credit;
   }
@@ -86,23 +90,29 @@ class ScoreList {
     double total = 0;
     double credit = 0;
     for (var item in list) {
-      if (item.gpa == '' || item.credit == '0' || item.isMinor) continue;
-      total += double.parse(item.credit);
-      credit += double.parse(item.credit) * double.parse(item.gpa);
+      if (item.isMinor) continue;
+      final gpaVal = _tryParse(item.gpa);
+      final credVal = _tryParse(item.credit);
+      if (gpaVal == null || credVal == null || credVal == 0) continue;
+      total += credVal;
+      credit += credVal * gpaVal;
     }
-    return credit / total;
+    return total > 0 ? credit / total : 0.0;
   }
 
   /// 总课程数
   int get totalCourse {
     return list.where((x) {
-      if (x.gpa == '' || x.credit == '0') return false;
-      final a = double.parse(x.gpa);
-      return a != 0;
+      final gpa = _tryParse(x.gpa);
+      if (gpa == null) return false;
+      if (gpa == 0) return false;
+      if (_tryParse(x.credit) == null || _tryParse(x.credit) == 0) return false;
+      return true;
     }).length;
   }
 
   static double getTotalGpa(List<ScoreList> scoreList) {
+    if (scoreList.isEmpty) return 0.0;
     double total = 0;
     for (var item in scoreList) {
       total += item.totalGpa;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -124,7 +125,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
           const SizedBox(width: 12),
           // App 名称
           Text(
-            '光序',
+            context.l10n.appName,
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,

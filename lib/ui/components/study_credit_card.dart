@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -55,6 +56,7 @@ class StudyCreditCard extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Row(
       children: [
         Container(
@@ -83,7 +85,7 @@ class StudyCreditCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '学分概览',
+                l10n.creditOverview,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -151,7 +153,7 @@ class StudyCreditCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 16),
             child: Text(
-              '完成度: ${(progress * 100).toStringAsFixed(1)}%',
+              '${context.l10n.completionRate}: ${(progress * 100).toStringAsFixed(1)}%',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -163,6 +165,7 @@ class StudyCreditCard extends StatelessWidget {
   }
 
   Widget _buildSubtitle(BuildContext context) {
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     return Row(
       children: [
@@ -176,7 +179,7 @@ class StudyCreditCard extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Text(
-          "分项学分",
+          l10n.itemizedCredits,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.onSurface,

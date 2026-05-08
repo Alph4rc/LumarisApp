@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -20,8 +21,8 @@ class ShowTomorrowSetting extends ConsumerWidget {
         size: 20,
         color: colors.purple,
       ),
-      title: const Text('显示明日课程'),
-      subtitle: const Text('当今日无课时显示明日课程'),
+      title: Text(context.l10n.showTomorrowCourses),
+      subtitle: Text(context.l10n.showTomorrowCoursesSubtitle),
       trailing: CupertinoSwitch(
         value: settings.isShowTomorrow,
         onChanged: (bool value) async {

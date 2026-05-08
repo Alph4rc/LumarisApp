@@ -4,6 +4,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:ios_club_app/core/services/app_locale_service.dart';
 
 import '../core/config/api_config.dart';
 import '../features/education/services/edu_http_client_manager.dart';
@@ -35,6 +36,8 @@ class SettingsStore extends Notifier<SettingsState> {
   bool? get customBackgroundIsDark => state.customBackgroundIsDark;
   String get schoolId => state.schoolId;
   bool get hasAcceptedAgreement => state.hasAcceptedAgreement;
+  AppLocaleCode get localeCode => state.localeCode;
+  Locale? get locale => AppLocaleService.localeOf(state.localeCode);
 
   SchoolConfig get currentSchool {
     return ApiConfig.getSchoolById(state.schoolId) ??
@@ -57,6 +60,9 @@ class SettingsStore extends Notifier<SettingsState> {
       todoRemindEnabled: prefs.getBool(PrefsKeys.TODO_REMIND_ENABLED) ?? false,
       themeMode: ClubThemeModeCodec.fromPreference(
         prefs.getString(PrefsKeys.THEME_MODE),
+      ),
+      localeCode: AppLocaleService.fromPreference(
+        prefs.getString(PrefsKeys.LOCALE_CODE),
       ),
       scheduleBackground: prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND) ?? '',
       customBackgroundImage:
@@ -134,6 +140,14 @@ class SettingsStore extends Notifier<SettingsState> {
     await PrefsService.instance.setString(
       PrefsKeys.THEME_MODE,
       ClubThemeModeCodec.toPreference(value),
+    );
+  }
+
+  Future<void> setLocaleCode(AppLocaleCode value) async {
+    state = state.copyWith(localeCode: value);
+    await PrefsService.instance.setString(
+      PrefsKeys.LOCALE_CODE,
+      AppLocaleService.toPreference(value),
     );
   }
 

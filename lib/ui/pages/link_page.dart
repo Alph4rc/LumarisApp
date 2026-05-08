@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/services/link_api.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
@@ -35,15 +36,16 @@ class _LinkPageState extends State<LinkPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     return Scaffold(
       appBar: ClubAppBar(
-        title: '校园导航',
+        title: l10n.campusNavigation,
         actions: [
           IconButton(
             onPressed: _refreshLinks,
             icon: const Icon(Icons.refresh),
-            tooltip: '刷新',
+            tooltip: l10n.refreshData,
           ),
         ],
       ),
@@ -62,7 +64,7 @@ class _LinkPageState extends State<LinkPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      "加载失败",
+                      l10n.loadFailed,
                       style: TextStyle(
                         fontSize: 16,
                         color: colors.secondaryLabel,
@@ -80,8 +82,8 @@ class _LinkPageState extends State<LinkPage> {
               );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return EmptyWidget(
-                  title: '暂无导航数据',
-                  subtitle: '请重新进入此页，或检查当前网络',
+                  title: l10n.linkNoData,
+                  subtitle: l10n.linkNoDataSubtitle,
                   icon: Icons.link);
             } else {
               return ListView.builder(
@@ -102,10 +104,10 @@ class _LinkPageState extends State<LinkPage> {
               );
             }
           } else {
-            return const Center(
+            return Center(
               child: LoadingStateView(
-                title: '正在加载导航链接',
-                subtitle: '正在整理常用站点与分类入口',
+                title: l10n.linkLoading,
+                subtitle: l10n.linkLoadingSubtitle,
               ),
             );
           }

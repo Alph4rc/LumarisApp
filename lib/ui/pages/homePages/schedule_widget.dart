@@ -17,6 +17,7 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ScheduleWidget extends ConsumerStatefulWidget {
@@ -37,8 +38,8 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
     final screenWidth = MediaQuery.of(context).size.width;
     final scheduleState = ref.watch(scheduleStoreProvider);
     final scheduleStore = ref.read(scheduleStoreProvider.notifier);
-    // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
+    final l10n = context.l10n;
 
     return Column(
       children: [
@@ -47,7 +48,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(
-              '${scheduleState.showTomorrow ? '明' : '今'}日课表',
+              scheduleState.showTomorrow ? l10n.tomorrowSchedule : l10n.todayScheduleLabel,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -58,7 +59,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                 onPressed: () {
                   PlatformDialog.showCustomDialog<void>(
                     context,
-                    title: '设置',
+                    title: l10n.settings,
                     content: Consumer(builder: (context, ref, child) {
                       final settings = ref.watch(settingsStoreProvider);
                       final scheduleStore =
@@ -70,7 +71,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ClubListTile(
-                            title: const Text('显示明天的课表'),
+                            title: Text(l10n.showTomorrowSchedule),
                             trailing: CupertinoSwitch(
                               value: settings.isShowTomorrow,
                               onChanged: (value) async {
@@ -80,7 +81,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                           ),
                           if (PlatformUtils.isIOS || PlatformUtils.isAndroid)
                             ClubListTile(
-                              title: const Text('课程通知'),
+                              title: Text(l10n.courseReminder),
                               trailing: CupertinoSwitch(
                                 value: settings.isRemind,
                                 onChanged: (bool value) async {
@@ -106,35 +107,26 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                 final todayCourses = scheduleStore.getTodayCourses();
 
                 return todayCourses.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.all(16.0),
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
                         child: EmptyWidget(
-                            title: '今天没有课了',
+                            title: l10n.noCourseToday,
                             icon: Icons.school,
-                            subtitle: '好好休息会儿吧，学一天累死个人'))
+                            subtitle: l10n.noCourseTodaySubtitle))
                     : Column(
                         children: todayCourses.asMap().entries.map((entry) {
                           final index = entry.key;
                           final course = entry.value;
-                          final weekdayName = [
-                            '日',
-                            '一',
-                            '二',
-                            '三',
-                            '四',
-                            '五',
-                            '六',
-                            '日'
-                          ];
+                          final weekdayNames = _getWeekdayNames(context);
                           final time = TimeService.getStartAndEnd(course);
                           final item = ScheduleItem(
                             title: course.courseName,
                             time:
-                                '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
+                                '${l10n.periodRange(course.startUnit, course.endUnit)} ${time.start}-${time.end}',
                             location: course.room,
                             teacher: course.teachers.join(','),
                             description:
-                                '${CourseModel.formatWeekRanges(course.weekIndexes)}周 每周${weekdayName[course.weekday]} 第${course.startUnit}-${course.endUnit}节',
+                                l10n.scheduleCourseTime(CourseModel.formatWeekRanges(course.weekIndexes), weekdayNames[course.weekday], course.startUnit, course.endUnit),
                           );
                           return AnimatedListItem(
                             index: index,
@@ -317,4 +309,17 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
       ],
     );
   }
+}
+
+List<String> _getWeekdayNames(BuildContext context) {
+  final l10n = context.l10n;
+  return [
+    l10n.sunday,
+    l10n.monday,
+    l10n.tuesday,
+    l10n.wednesday,
+    l10n.thursday,
+    l10n.friday,
+    l10n.saturday,
+  ];
 }
