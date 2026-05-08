@@ -36,7 +36,7 @@ class EasterEggPage extends StatelessWidget {
               const SizedBox(height: 20),
               const Text(
                 '你是少数知道这个秘密的人之一！\n\n'
-                '感谢你对 iOS Club App 的喜爱与支持。\n\n'
+                '感谢你对光序的喜爱与支持。\n\n'
                 '继续探索，也许还有更多惊喜等着你...',
                 style: TextStyle(
                   fontSize: 16,

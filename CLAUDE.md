@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-iOS Club App is a cross-platform Flutter application for students at Xi'an University of Architecture and Technology. It provides course management, scheduling, exam information, grades, campus bus schedules, and more.
+光序 is a cross-platform Flutter application for students at Xi'an University of Architecture and Technology. It provides course management, scheduling, exam information, grades, campus bus schedules, and more.
 
 ## Common Commands
 

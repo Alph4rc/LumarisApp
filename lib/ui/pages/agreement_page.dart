@@ -71,7 +71,7 @@ class AgreementPage extends ConsumerWidget {
                       const SizedBox(height: 24),
                       // 标题
                       Text(
-                        'iOS Club App',
+                        '光序',
                         style: TextStyle(
                           fontSize: isWide ? 30 : 26,
                           fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class AgreementPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '欢迎使用 iOS Club App',
+                        '欢迎使用 光序',
                         style: TextStyle(
                           fontSize: isWide ? 17 : 16,
                           color: colors.secondaryLabel,
@@ -323,14 +323,14 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitle('iOS Club App 隐私协议', titleColor),
+            _buildTitle('光序 隐私协议', titleColor),
             const SizedBox(height: 8),
             _buildSubtitle(context, '更新日期：2025年1月1日'),
             const SizedBox(height: 8),
             _buildSubtitle(context, '生效日期：2025年1月1日'),
             const SizedBox(height: 20),
             _buildBodyText(
-              '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team（以下简称"我们"）开发和运营。'
+              '欢迎使用 光序（以下简称"本应用"）。本应用由 Lumaris Team（以下简称"我们"）开发和运营。'
               '我们深知个人信息对您的重要性，将严格遵守法律法规，遵循合法、正当、必要和诚信原则，'
               '保护您的个人信息安全。本隐私协议旨在向您说明我们如何收集、使用、存储和保护您的个人信息，'
               '以及您享有的相关权利。请您在使用本应用前仔细阅读本隐私协议。',
@@ -381,7 +381,7 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
             _buildSectionTitle('六、联系我们', titleColor),
             const SizedBox(height: 12),
             _buildBodyText(
-                '开发团队：iOS Club App Team\n所属组织：西安建筑科技大学 iOS Club\n代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
+                '开发团队：Lumaris Team \n代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
                 textColor),
             const SizedBox(height: 40),
           ],
@@ -430,14 +430,14 @@ class _UserAgreementContentPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitle('iOS Club App 用户协议', titleColor),
+            _buildTitle('光序 用户协议', titleColor),
             const SizedBox(height: 8),
             _buildSubtitle(context, '更新日期：2025年1月1日'),
             const SizedBox(height: 8),
             _buildSubtitle(context, '生效日期：2025年1月1日'),
             const SizedBox(height: 20),
             _buildBodyText(
-              '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team'
+              '欢迎使用 光序（以下简称"本应用"）。本应用由 Lumaris'
               '（以下简称"我们"）开发和运营。请您在使用本应用前仔细阅读本用户协议'
               '（以下简称"本协议"）。您使用本应用即表示您已阅读、理解并同意接受本协议的全部内容。',
               textColor,
@@ -458,7 +458,7 @@ class _UserAgreementContentPage extends StatelessWidget {
             _buildSectionTitle('三、知识产权', titleColor),
             const SizedBox(height: 12),
             _buildBodyText(
-                '3.1 本应用的源代码基于 MIT 许可证开源发布。\n3.2 本应用的名称、图标、UI 设计等归 iOS Club App Team 所有。\n3.3 本应用中涉及的学校名称、标识等归西安建筑科技大学所有。',
+                '3.1 本应用的源代码基于 MIT 许可证开源发布。\n3.2 本应用的名称、图标、UI 设计等归 Lumaris 所有。\n3.3 本应用中涉及的学校名称、标识等归西安建筑科技大学所有。',
                 textColor),
             const SizedBox(height: 24),
             _buildSectionTitle('四、免责声明', titleColor),
@@ -476,7 +476,7 @@ class _UserAgreementContentPage extends StatelessWidget {
             _buildSectionTitle('六、联系我们', titleColor),
             const SizedBox(height: 12),
             _buildBodyText(
-                '开发团队：iOS Club App Team\n所属组织：西安建筑科技大学 iOS Club\n代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
+                '开发团队：Lumaris\n所属组织：西安建筑科技大学 iOS Club\n代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
                 textColor),
             const SizedBox(height: 40),
           ],

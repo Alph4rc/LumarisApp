@@ -346,7 +346,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
           },
         ),
         titleBar: TitleBar(
-          title: const Text('iOS Club App'),
+          title: const Text('光序'),
           decoration: BoxDecoration(
             color: MacosTheme.of(context).canvasColor,
           ),

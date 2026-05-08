@@ -2,7 +2,7 @@
 //  TodayCoursesWidget.swift
 //  TodayCoursesWidget
 //
-//  Created by iOS Club App team.
+//  Created by Lumaris.
 //
 
 import SwiftUI

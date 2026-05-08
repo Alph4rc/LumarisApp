@@ -171,7 +171,7 @@ class TabletDrawerNavigation extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('iOS Club App'),
+        title: const Text('光序'),
         centerTitle: false,
         elevation: 0,
         backgroundColor: colors.cardBackground,
@@ -203,7 +203,7 @@ class TabletDrawerNavigation extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'iOS Club App',
+                    '光序',
                     style: TextStyle(
                       color: colors.onAccent,
                       fontSize: 20,
