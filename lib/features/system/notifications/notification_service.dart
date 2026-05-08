@@ -48,7 +48,7 @@ class NotificationService {
 
     final WindowsInitializationSettings initializationSettingsWindows =
         WindowsInitializationSettings(
-      appName: 'iOS Club App',
+      appName: '光序',
       appUserModelId: 'DA45F98E-38F0-F574-4192-36EB8C8DA0CA',
       guid: 'DA45F98E-38F0-F574-4192-36EB8C8DA0CA',
     );
@@ -126,9 +126,11 @@ class NotificationService {
 
     try {
       // 增加安全检查：如果待处理通知接近 500 个，停止安排
-      final pendingCount = (await notifications.pendingNotificationRequests()).length;
+      final pendingCount =
+          (await notifications.pendingNotificationRequests()).length;
       if (pendingCount >= 450) {
-        AppLogger.debug('Warning: Approaching 500 alarm limit ($pendingCount). Skipping schedule.');
+        AppLogger.debug(
+            'Warning: Approaching 500 alarm limit ($pendingCount). Skipping schedule.');
         return;
       }
 

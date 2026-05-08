@@ -34,7 +34,7 @@ import 'main_app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  AppLogger.info('iOS Club App 启动中...');
+  AppLogger.info('光序 启动中...');
 
   // Hive 和 SharedPreferences 互相独立，并行初始化
   await Future.wait([
@@ -76,7 +76,7 @@ void main() async {
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.hidden,
-        title: 'iOS Club App',
+        title: '光序',
       );
 
       windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -173,7 +173,7 @@ class _AppLauncher extends ConsumerWidget {
 
     if (PlatformUtils.isMacOS) {
       return MacosApp.router(
-        title: 'iOS Club App',
+        title: '光序',
         debugShowCheckedModeBanner: false,
         theme: ClubTheme.macosLightTheme(),
         darkTheme: ClubTheme.macosDarkTheme(),
@@ -187,7 +187,7 @@ class _AppLauncher extends ConsumerWidget {
     }
 
     return MaterialApp.router(
-      title: 'iOS Club App',
+      title: '光序',
       debugShowCheckedModeBanner: false,
       theme: ClubTheme.lightTheme(fontFamily: fontFamily),
       darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),

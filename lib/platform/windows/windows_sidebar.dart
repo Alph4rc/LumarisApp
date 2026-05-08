@@ -124,7 +124,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
           const SizedBox(width: 12),
           // App 名称
           Text(
-            'iOS Club',
+            '光序',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,

@@ -1,11 +1,11 @@
 {
-    "name": "iOS Club App",
-    "short_name": "iOS Club",
+    "name": "光序",
+    "short_name": "光序",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#0175C2",
-    "description": "iOS Club App - 试着把建大囊括其中",
+    "description": "光序 - 试着把建大囊括其中",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

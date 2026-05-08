@@ -12,7 +12,7 @@
 ### 1. 添加小组件目标
 
 1. 打开 `ios/Runner.xcworkspace`（不是`Runner.xcodeproj`）
-2. 在项目导航器中右键点击项目根节点（iOS Club App）
+2. 在项目导航器中右键点击项目根节点（光序）
 3. 选择 `New Target...`
 4. 在弹出的窗口中搜索 "Widget"
 5. 选择 `Widget Extension` 并点击 `Next`

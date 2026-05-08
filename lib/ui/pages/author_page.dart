@@ -92,7 +92,7 @@ class AuthorPage extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Text(
-          'iOS Club App Team',
+          'Lumaris Team',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -313,7 +313,7 @@ class AuthorPage extends StatelessWidget {
     return Column(
       children: [
         Text(
-          '© 2026 iOS Club',
+          '© 2026 Lumaris Team',
           style: TextStyle(
             fontSize: 13,
             color: colors.tertiaryLabel,

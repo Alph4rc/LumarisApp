@@ -1,4 +1,4 @@
-# iOS Club App
+# 光序
 
 ## Project Overview
 This is a cross-platform Flutter application for students at Xi'an University of Architecture and Technology. It provides course management, scheduling, grades, campus bus info, electricity tracking, and more.

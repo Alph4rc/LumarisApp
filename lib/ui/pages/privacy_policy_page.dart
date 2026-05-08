@@ -18,14 +18,14 @@ class PrivacyPolicyPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitle('iOS Club App 隐私协议', titleColor),
+            _buildTitle('光序 隐私协议', titleColor),
             const SizedBox(height: 8),
             _buildSubtitle(context, '更新日期：2026年5月5日'),
             const SizedBox(height: 8),
             _buildSubtitle(context, '生效日期：2026年5月5日'),
             const SizedBox(height: 20),
             _buildBodyText(
-              '欢迎使用 iOS Club App（以下简称"本应用"）。本应用由 iOS Club App Team（以下简称"我们"）开发和运营。'
+              '欢迎使用 光序（以下简称"本应用"）。本应用由 Lumaris Team（以下简称"我们"）开发和运营。'
               '我们深知个人信息对您的重要性，将严格遵守法律法规，遵循合法、正当、必要和诚信原则，'
               '保护您的个人信息安全。本隐私协议旨在向您说明我们如何收集、使用、存储和保护您的个人信息，'
               '以及您享有的相关权利。请您在使用本应用前仔细阅读本隐私协议。',
@@ -200,8 +200,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _buildBodyText(
-              '开发团队：iOS Club App Team\n'
-              '所属组织：西安建筑科技大学 iOS Club\n'
+              '开发团队：Lumaris Team\n'
               '代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
               textColor,
             ),

@@ -179,7 +179,7 @@ class SettingPage extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'iOS Club App',
+          '光序',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -287,7 +287,7 @@ class SettingPage extends ConsumerWidget {
         color: context.clubColors.warning,
       ),
       title: const Text('制作团队'),
-      subtitle: const Text('iOS Club App 开发组'),
+      subtitle: const Text('Lumaris Team'),
       onTap: () {
         AppRouter.push(AppRoutes.author);
       },
@@ -477,7 +477,7 @@ class SettingPage extends ConsumerWidget {
           _buildInstructionStep(
             context,
             '3',
-            '找到"iOS Club App"并选择合适的小组件',
+            '找到"光序"并选择合适的小组件',
           ),
           const SizedBox(height: 8),
           _buildInstructionStep(

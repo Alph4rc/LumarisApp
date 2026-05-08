@@ -5,7 +5,7 @@
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="iOS Club App"
+        android:label="光序"
         android:requestLegacyExternalStorage="true"
         tools:replace="android:label">
         <activity
