@@ -88,7 +88,7 @@ class AuthorPage extends StatelessWidget {
           child: ClipRRect(
             borderRadius: ClubRadii.tile,
             child: Image.asset(
-              'assets/iOS_Club_Logo.webp',
+              'assets/icon.webp',
               fit: BoxFit.cover,
             ),
           ),

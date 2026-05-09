@@ -86,9 +86,6 @@ flutter:
   assets:
     - assets/icon.ico
     - assets/icon.webp
-    - assets/iOS_Club_Logo.webp
-    - assets/女生.webp
-    - assets/男生.webp
     - assets/iconfont/iconfont.json
     - assets/iconfont/iconfont.ttf
     - LICENSE
