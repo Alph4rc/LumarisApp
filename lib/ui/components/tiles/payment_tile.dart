@@ -63,24 +63,6 @@ class PaymentTile extends ConsumerWidget {
                             size: 24,
                           ),
                         ),
-                        const Spacer(),
-                        if (isLow)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: colors.dangerSoft,
-                              borderRadius: ClubRadii.navigation,
-                            ),
-                            child: Text(
-                              l10n.lowBalance,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: colors.danger,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                     const Spacer(),

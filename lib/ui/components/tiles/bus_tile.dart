@@ -58,24 +58,6 @@ class BusTile extends ConsumerWidget {
                           size: 24,
                         ),
                       ),
-                      const Spacer(),
-                      if (busData > 0)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.12),
-                            borderRadius: ClubRadii.navigation,
-                          ),
-                          child: Text(
-                            '$busData${l10n.busInfo}',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                   const Spacer(),
