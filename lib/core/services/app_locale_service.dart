@@ -9,6 +9,7 @@ enum AppLocaleCode {
   ru,
   fr,
   de,
+  ko,
 }
 
 class AppLocaleOption {
@@ -33,6 +34,7 @@ class AppLocaleService {
   static const String ruPreferenceValue = 'ru';
   static const String frPreferenceValue = 'fr';
   static const String dePreferenceValue = 'de';
+  static const String koPreferenceValue = 'ko';
 
   static const List<Locale> supportedLocales = [
     Locale('zh'),
@@ -41,6 +43,7 @@ class AppLocaleService {
     Locale('ru'),
     Locale('fr'),
     Locale('de'),
+    Locale('ko'),
   ];
 
   static final List<AppLocaleOption> options = [
@@ -79,6 +82,11 @@ class AppLocaleService {
       locale: const Locale('de'),
       labelBuilder: (l10n) => l10n.german,
     ),
+    AppLocaleOption(
+      code: AppLocaleCode.ko,
+      locale: const Locale('ko'),
+      labelBuilder: (l10n) => l10n.korean,
+    ),
   ];
 
   static String toPreference(AppLocaleCode code) {
@@ -97,6 +105,8 @@ class AppLocaleService {
         return frPreferenceValue;
       case AppLocaleCode.de:
         return dePreferenceValue;
+      case AppLocaleCode.ko:
+        return koPreferenceValue;
     }
   }
 
@@ -114,6 +124,8 @@ class AppLocaleService {
         return AppLocaleCode.fr;
       case dePreferenceValue:
         return AppLocaleCode.de;
+      case koPreferenceValue:
+        return AppLocaleCode.ko;
       case systemPreferenceValue:
       default:
         return AppLocaleCode.system;
@@ -136,6 +148,8 @@ class AppLocaleService {
         return const Locale('fr');
       case AppLocaleCode.de:
         return const Locale('de');
+      case AppLocaleCode.ko:
+        return const Locale('ko');
     }
   }
 

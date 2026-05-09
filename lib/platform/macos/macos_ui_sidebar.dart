@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -105,17 +106,17 @@ Sidebar macosUISidebar({
                     maxLines: 1,
                   );
                 }
-                return const Text(
-                  '未登录',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              },
-            ),
-            subtitle: Text(
-              userState.isLogin ? '教务系统' : '点击登录',
+                return Text(
+                  context.l10n.notLoggedIn,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              );
+            },
+          ),
+          subtitle: Text(
+              userState.isLogin ? context.l10n.eduSystem : context.l10n.clickToLogin,
               style: TextStyle(
                 fontSize: 11,
                 color: colors.secondaryLabel,
@@ -133,7 +134,7 @@ Sidebar macosUISidebar({
 Future<String> _getUsername(bool isLogin) async {
   final prefs = PrefsService.instance;
   final secureStorage = SecureStorageService.instance;
-  var name = '未登录';
+  var name = '';
 
   if (isLogin) {
     final iosName = await secureStorage.read(key: PrefsKeys.USERNAME) ??

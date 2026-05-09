@@ -108,6 +108,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
+  String get korean => '한국어';
+
+  @override
   String get team => '制作团队';
 
   @override
@@ -756,6 +759,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get saturdayShort => '六';
 
   @override
+  String get janShort => '1月';
+
+  @override
+  String get febShort => '2月';
+
+  @override
+  String get marShort => '3月';
+
+  @override
+  String get aprShort => '4月';
+
+  @override
+  String get mayShort => '5月';
+
+  @override
+  String get junShort => '6月';
+
+  @override
+  String get julShort => '7月';
+
+  @override
+  String get augShort => '8月';
+
+  @override
+  String get sepShort => '9月';
+
+  @override
+  String get octShort => '10月';
+
+  @override
+  String get novShort => '11月';
+
+  @override
+  String get decShort => '12月';
+
+  @override
   String weekUnit(Object n) {
     return '$n周';
   }
@@ -1221,6 +1260,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String seatNumberLabel(Object seat) {
     return '座位号 $seat';
   }
+
+  @override
+  String get examNotLoggedIn => '未登录，请先登录';
+
+  @override
+  String get examAuthFailed => '认证失败，请重新登录';
+
+  @override
+  String get examFetchFailed => '获取考试信息失败，轻点重试';
 
   @override
   String get quickFeatures => '快捷功能';
@@ -1709,4 +1757,204 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get licenseLoadFailed => '无法加载许可证文件';
+
+  @override
+  String get helpFeaturesTab => '功能介绍';
+
+  @override
+  String get helpInstructionsTab => '使用说明';
+
+  @override
+  String get helpNotesTab => '注意事项';
+
+  @override
+  String get helpAboutTab => '关于应用';
+
+  @override
+  String get helpFeatureHome => '首页';
+
+  @override
+  String get helpFeatureHomeDesc => '信息中心，展示个人信息、课程、待办事项和考试安排';
+
+  @override
+  String get helpFeatureSchedule => '课程表';
+
+  @override
+  String get helpFeatureScheduleDesc => '管理周课程安排，支持切换校区和设置提醒';
+
+  @override
+  String get helpFeatureScore => '成绩查询';
+
+  @override
+  String get helpFeatureScoreDesc => '查看学期成绩单、绩点计算和分析';
+
+  @override
+  String get helpFeatureProfile => '个人资料';
+
+  @override
+  String get helpFeatureProfileDesc => '展示学号、姓名、学院等个人信息';
+
+  @override
+  String get helpFeatureBus => '校园巴士';
+
+  @override
+  String get helpFeatureBusDesc => '查看校区间班车时刻表和路线信息';
+
+  @override
+  String get helpFeatureProgram => '培养方案';
+
+  @override
+  String get helpFeatureProgramDesc => '显示专业培养计划和学分要求';
+
+  @override
+  String get helpFeatureElectricity => '电费查询';
+
+  @override
+  String get helpFeatureElectricityDesc => '查看宿舍电量和用电历史记录';
+
+  @override
+  String get helpFeaturePayment => '饭卡消费';
+
+  @override
+  String get helpFeaturePaymentDesc => '查看饭卡余额和消费明细';
+
+  @override
+  String get helpFeatureNet => '校园网';
+
+  @override
+  String get helpFeatureNetDesc => '查看网络流量使用情况和统计';
+
+  @override
+  String get helpFeatureLinks => '常用链接';
+
+  @override
+  String get helpFeatureLinksDesc => '收集教务系统等常用工具链接';
+
+  @override
+  String get helpInstructionLogin => '登录与账户';
+
+  @override
+  String get helpInstructionLoginDesc => '首次使用需登录教务系统账户';
+
+  @override
+  String get helpInstructionCourse => '课程管理';
+
+  @override
+  String get helpInstructionCourseDesc => '进入课程表查看当周课程，左右滑动切换周次，点击课程查看详情';
+
+  @override
+  String get helpInstructionReminder => '日程提醒';
+
+  @override
+  String get helpInstructionReminderDesc => '在设置中开启课程提醒，应用会在上课前发送通知提醒';
+
+  @override
+  String get helpInstructionSync => '数据同步';
+
+  @override
+  String get helpInstructionSyncDesc => '应用自动同步教务系统数据，需要网络连接。下拉刷新可手动更新';
+
+  @override
+  String get helpInstructionWidget => '桌面小组件';
+
+  @override
+  String get helpInstructionWidgetDesc => '在桌面长按添加应用小组件，快速查看课程信息';
+
+  @override
+  String get helpNoteNetwork => '部分功能需要连接校园网才能正常使用';
+
+  @override
+  String get helpNoteUpdate => '请保持应用更新以获得最新功能和修复';
+
+  @override
+  String get helpNoteData => '数据不准确时，请检查是否正确登录教务系统';
+
+  @override
+  String get helpNoteFeedback => '遇到问题可通过设置页面进行反馈';
+
+  @override
+  String get helpNotePrivacy => '应用不会收集或上传您的个人隐私信息';
+
+  @override
+  String get helpAboutPlatform => '平台支持';
+
+  @override
+  String get helpAboutPlatformDesc => '跨平台应用，支持以下平台：';
+
+  @override
+  String get helpAboutOpenSource => '开源项目';
+
+  @override
+  String get helpAboutOpenSourceDesc => '本应用基于 MIT 许可证开源';
+
+  @override
+  String get helpAboutRepoLabel => '仓库地址：';
+
+  @override
+  String get underMaintenanceTitle => '正在维护！';
+
+  @override
+  String get underMaintenanceDescription => '我们目前正在进行定期维护。请稍后再查看。感谢您的耐心等待。';
+
+  @override
+  String get readingPaymentCard => '正在读取饭卡';
+
+  @override
+  String get lowBalance => '余额不足';
+
+  @override
+  String get campusCardBalance => '饭卡余额';
+
+  @override
+  String get tapToView => '点击查看';
+
+  @override
+  String get tapToSubscribe => '点击订阅';
+
+  @override
+  String get campusCaoTang => '草堂';
+
+  @override
+  String get campusYanTa => '雁塔';
+
+  @override
+  String get busRefreshStale => '刷新完成，已保留上次校车数据';
+
+  @override
+  String get poiMainLibrary => '主图书馆';
+
+  @override
+  String get poiMainLibraryDesc => '24小时开放自习室';
+
+  @override
+  String get poiCaoTangNorthGate => '草堂校区北门';
+
+  @override
+  String get poiCaoTangNorthGateDesc => '学校主入口';
+
+  @override
+  String get poiYanTaEastGate => '雁塔校区东门';
+
+  @override
+  String get poiYanTaEastGateDesc => '历史悠久的老校区入口';
+
+  @override
+  String durationDHMS(Object d, Object h, Object m, Object s) {
+    return '$d天$h小时$m分$s秒';
+  }
+
+  @override
+  String get shortcuts => '快捷功能';
+
+  @override
+  String get moreFunctions => '更多功能';
+
+  @override
+  String get noShortcuts => '暂无快捷功能';
+
+  @override
+  String get addInEditMode => '请在编辑模式中添加';
+
+  @override
+  String get eduSystem => '教务系统';
 }

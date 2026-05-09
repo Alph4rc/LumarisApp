@@ -102,7 +102,7 @@ class BusPageNotifier extends Notifier<BusPageState> {
         return;
       }
       state = state.copyWith(
-        errorMessage: '刷新失败，已保留上次校车数据',
+        errorMessage: 'stale_data',
         todayBusData: previousTodayBusData,
         busData: previousBusData,
       );

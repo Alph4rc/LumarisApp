@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
 import 'show_club_snack_bar.dart';
 
@@ -56,10 +57,10 @@ class TextWithCopyButtons extends StatelessWidget {
             Clipboard.setData(ClipboardData(text: text));
             showClubSnackBar(
               context,
-              Text('已复制: $text'),
+              Text(context.l10n.copiedToClipboard),
             );
           },
-          tooltip: '复制文本',
+          tooltip: context.l10n.copyTooltip,
           constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
           padding: const EdgeInsets.all(8),
           splashRadius: 20,

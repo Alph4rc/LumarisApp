@@ -299,22 +299,32 @@ class ClubColors extends ThemeExtension<ClubColors> {
   }
 }
 
+/// Whether the given locale typically produces longer text strings
+/// (e.g. German, Russian) and benefits from a slightly smaller font size.
+bool _isLongTextLocale(Locale? locale) {
+  if (locale == null) return false;
+  final lang = locale.languageCode;
+  return lang == 'de' || lang == 'ru';
+}
+
 class ClubTheme {
   ClubTheme._();
 
-  static ThemeData lightTheme({String? fontFamily}) {
+  static ThemeData lightTheme({String? fontFamily, Locale? locale}) {
     return _buildTheme(
       brightness: Brightness.light,
       fontFamily: fontFamily,
       colors: ClubColors.light,
+      locale: locale,
     );
   }
 
-  static ThemeData darkTheme({String? fontFamily}) {
+  static ThemeData darkTheme({String? fontFamily, Locale? locale}) {
     return _buildTheme(
       brightness: Brightness.dark,
       fontFamily: fontFamily,
       colors: ClubColors.dark,
+      locale: locale,
     );
   }
 
@@ -352,7 +362,9 @@ class ClubTheme {
     required Brightness brightness,
     required ClubColors colors,
     String? fontFamily,
+    Locale? locale,
   }) {
+    final shrink = _isLongTextLocale(locale);
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: colors.primary,
@@ -385,7 +397,7 @@ class ClubTheme {
         backgroundColor: colors.cardBackground,
         contentTextStyle: TextStyle(
           color: colors.label,
-          fontSize: 14,
+          fontSize: shrink ? 13 : 14,
         ),
         actionTextColor: colors.primary,
         behavior: SnackBarBehavior.floating,
@@ -419,23 +431,23 @@ class ClubTheme {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
           color: colors.label,
-          fontSize: 18,
+          fontSize: shrink ? 16 : 18,
           fontWeight: FontWeight.w600,
         ),
         contentTextStyle: TextStyle(
           color: colors.secondaryLabel,
-          fontSize: 14,
+          fontSize: shrink ? 13 : 14,
         ),
       ),
       tabBarTheme: TabBarThemeData(
         labelColor: colors.primary,
         unselectedLabelColor: colors.secondaryLabel,
-        labelStyle: const TextStyle(
-          fontSize: 15,
+        labelStyle: TextStyle(
+          fontSize: shrink ? 14 : 15,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 15,
+        unselectedLabelStyle: TextStyle(
+          fontSize: shrink ? 14 : 15,
           fontWeight: FontWeight.w500,
         ),
         indicatorColor: colors.primary,
@@ -459,10 +471,7 @@ class ClubTheme {
     );
 
     return baseTheme.copyWith(
-      textTheme: baseTheme.textTheme.apply(
-        bodyColor: colors.label,
-        displayColor: colors.label,
-      ),
+      textTheme: _buildTextTheme(baseTheme.textTheme, colors.label, shrink),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colors.primary,
@@ -476,6 +485,42 @@ class ClubTheme {
         textColor: colors.label,
       ),
     );
+  }
+
+  /// Safely builds a TextTheme by only applying fontSizeFactor to styles
+  /// with explicit font sizes, avoiding the assertion when [TextStyle.apply]
+  /// receives a null fontSize with a non-1.0 factor.
+  static TextTheme _buildTextTheme(
+    TextTheme base,
+    Color color,
+    bool shrink,
+  ) {
+    final applied = base.apply(bodyColor: color, displayColor: color);
+    if (!shrink) return applied;
+
+    const double factor = 0.92;
+    return TextTheme(
+      displayLarge: _scaleStyle(applied.displayLarge, factor),
+      displayMedium: _scaleStyle(applied.displayMedium, factor),
+      displaySmall: _scaleStyle(applied.displaySmall, factor),
+      headlineLarge: _scaleStyle(applied.headlineLarge, factor),
+      headlineMedium: _scaleStyle(applied.headlineMedium, factor),
+      headlineSmall: _scaleStyle(applied.headlineSmall, factor),
+      titleLarge: _scaleStyle(applied.titleLarge, factor),
+      titleMedium: _scaleStyle(applied.titleMedium, factor),
+      titleSmall: _scaleStyle(applied.titleSmall, factor),
+      bodyLarge: _scaleStyle(applied.bodyLarge, factor),
+      bodyMedium: _scaleStyle(applied.bodyMedium, factor),
+      bodySmall: _scaleStyle(applied.bodySmall, factor),
+      labelLarge: _scaleStyle(applied.labelLarge, factor),
+      labelMedium: _scaleStyle(applied.labelMedium, factor),
+      labelSmall: _scaleStyle(applied.labelSmall, factor),
+    );
+  }
+
+  static TextStyle? _scaleStyle(TextStyle? style, double factor) {
+    if (style == null || style.fontSize == null) return style;
+    return style.copyWith(fontSize: style.fontSize! * factor);
   }
 }
 
@@ -520,17 +565,19 @@ class ClubMaterialThemeBridge extends StatelessWidget {
     super.key,
     required this.child,
     this.fontFamily,
+    this.locale,
   });
 
   final Widget child;
   final String? fontFamily;
+  final Locale? locale;
 
   @override
   Widget build(BuildContext context) {
     final brightness = MacosTheme.brightnessOf(context);
     final materialTheme = brightness == Brightness.dark
-        ? ClubTheme.darkTheme(fontFamily: fontFamily)
-        : ClubTheme.lightTheme(fontFamily: fontFamily);
+        ? ClubTheme.darkTheme(fontFamily: fontFamily, locale: locale)
+        : ClubTheme.lightTheme(fontFamily: fontFamily, locale: locale);
     final cupertinoTheme =
         MaterialBasedCupertinoThemeData(materialTheme: materialTheme);
 

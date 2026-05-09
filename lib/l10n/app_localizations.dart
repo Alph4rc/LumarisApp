@@ -9,6 +9,7 @@ import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_fr.dart';
 import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
 import 'app_localizations_ru.dart';
 import 'app_localizations_zh.dart';
 
@@ -102,6 +103,7 @@ abstract class AppLocalizations {
     Locale('en'),
     Locale('fr'),
     Locale('ja'),
+    Locale('ko'),
     Locale('ru'),
     Locale('zh')
   ];
@@ -303,6 +305,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'Deutsch'**
   String get german;
+
+  /// No description provided for @korean.
+  ///
+  /// In zh, this message translates to:
+  /// **'한국어'**
+  String get korean;
 
   /// No description provided for @team.
   ///
@@ -1498,6 +1506,78 @@ abstract class AppLocalizations {
   /// **'六'**
   String get saturdayShort;
 
+  /// No description provided for @janShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'1月'**
+  String get janShort;
+
+  /// No description provided for @febShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'2月'**
+  String get febShort;
+
+  /// No description provided for @marShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'3月'**
+  String get marShort;
+
+  /// No description provided for @aprShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'4月'**
+  String get aprShort;
+
+  /// No description provided for @mayShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'5月'**
+  String get mayShort;
+
+  /// No description provided for @junShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'6月'**
+  String get junShort;
+
+  /// No description provided for @julShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'7月'**
+  String get julShort;
+
+  /// No description provided for @augShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'8月'**
+  String get augShort;
+
+  /// No description provided for @sepShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'9月'**
+  String get sepShort;
+
+  /// No description provided for @octShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'10月'**
+  String get octShort;
+
+  /// No description provided for @novShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'11月'**
+  String get novShort;
+
+  /// No description provided for @decShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'12月'**
+  String get decShort;
+
   /// No description provided for @weekUnit.
   ///
   /// In zh, this message translates to:
@@ -2368,6 +2448,24 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'座位号 {seat}'**
   String seatNumberLabel(Object seat);
+
+  /// No description provided for @examNotLoggedIn.
+  ///
+  /// In zh, this message translates to:
+  /// **'未登录，请先登录'**
+  String get examNotLoggedIn;
+
+  /// No description provided for @examAuthFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'认证失败，请重新登录'**
+  String get examAuthFailed;
+
+  /// No description provided for @examFetchFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'获取考试信息失败，轻点重试'**
+  String get examFetchFailed;
 
   /// No description provided for @quickFeatures.
   ///
@@ -3322,6 +3420,402 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'无法加载许可证文件'**
   String get licenseLoadFailed;
+
+  /// No description provided for @helpFeaturesTab.
+  ///
+  /// In zh, this message translates to:
+  /// **'功能介绍'**
+  String get helpFeaturesTab;
+
+  /// No description provided for @helpInstructionsTab.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用说明'**
+  String get helpInstructionsTab;
+
+  /// No description provided for @helpNotesTab.
+  ///
+  /// In zh, this message translates to:
+  /// **'注意事项'**
+  String get helpNotesTab;
+
+  /// No description provided for @helpAboutTab.
+  ///
+  /// In zh, this message translates to:
+  /// **'关于应用'**
+  String get helpAboutTab;
+
+  /// No description provided for @helpFeatureHome.
+  ///
+  /// In zh, this message translates to:
+  /// **'首页'**
+  String get helpFeatureHome;
+
+  /// No description provided for @helpFeatureHomeDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'信息中心，展示个人信息、课程、待办事项和考试安排'**
+  String get helpFeatureHomeDesc;
+
+  /// No description provided for @helpFeatureSchedule.
+  ///
+  /// In zh, this message translates to:
+  /// **'课程表'**
+  String get helpFeatureSchedule;
+
+  /// No description provided for @helpFeatureScheduleDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理周课程安排，支持切换校区和设置提醒'**
+  String get helpFeatureScheduleDesc;
+
+  /// No description provided for @helpFeatureScore.
+  ///
+  /// In zh, this message translates to:
+  /// **'成绩查询'**
+  String get helpFeatureScore;
+
+  /// No description provided for @helpFeatureScoreDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看学期成绩单、绩点计算和分析'**
+  String get helpFeatureScoreDesc;
+
+  /// No description provided for @helpFeatureProfile.
+  ///
+  /// In zh, this message translates to:
+  /// **'个人资料'**
+  String get helpFeatureProfile;
+
+  /// No description provided for @helpFeatureProfileDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'展示学号、姓名、学院等个人信息'**
+  String get helpFeatureProfileDesc;
+
+  /// No description provided for @helpFeatureBus.
+  ///
+  /// In zh, this message translates to:
+  /// **'校园巴士'**
+  String get helpFeatureBus;
+
+  /// No description provided for @helpFeatureBusDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看校区间班车时刻表和路线信息'**
+  String get helpFeatureBusDesc;
+
+  /// No description provided for @helpFeatureProgram.
+  ///
+  /// In zh, this message translates to:
+  /// **'培养方案'**
+  String get helpFeatureProgram;
+
+  /// No description provided for @helpFeatureProgramDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示专业培养计划和学分要求'**
+  String get helpFeatureProgramDesc;
+
+  /// No description provided for @helpFeatureElectricity.
+  ///
+  /// In zh, this message translates to:
+  /// **'电费查询'**
+  String get helpFeatureElectricity;
+
+  /// No description provided for @helpFeatureElectricityDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看宿舍电量和用电历史记录'**
+  String get helpFeatureElectricityDesc;
+
+  /// No description provided for @helpFeaturePayment.
+  ///
+  /// In zh, this message translates to:
+  /// **'饭卡消费'**
+  String get helpFeaturePayment;
+
+  /// No description provided for @helpFeaturePaymentDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看饭卡余额和消费明细'**
+  String get helpFeaturePaymentDesc;
+
+  /// No description provided for @helpFeatureNet.
+  ///
+  /// In zh, this message translates to:
+  /// **'校园网'**
+  String get helpFeatureNet;
+
+  /// No description provided for @helpFeatureNetDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看网络流量使用情况和统计'**
+  String get helpFeatureNetDesc;
+
+  /// No description provided for @helpFeatureLinks.
+  ///
+  /// In zh, this message translates to:
+  /// **'常用链接'**
+  String get helpFeatureLinks;
+
+  /// No description provided for @helpFeatureLinksDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'收集教务系统等常用工具链接'**
+  String get helpFeatureLinksDesc;
+
+  /// No description provided for @helpInstructionLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录与账户'**
+  String get helpInstructionLogin;
+
+  /// No description provided for @helpInstructionLoginDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'首次使用需登录教务系统账户'**
+  String get helpInstructionLoginDesc;
+
+  /// No description provided for @helpInstructionCourse.
+  ///
+  /// In zh, this message translates to:
+  /// **'课程管理'**
+  String get helpInstructionCourse;
+
+  /// No description provided for @helpInstructionCourseDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'进入课程表查看当周课程，左右滑动切换周次，点击课程查看详情'**
+  String get helpInstructionCourseDesc;
+
+  /// No description provided for @helpInstructionReminder.
+  ///
+  /// In zh, this message translates to:
+  /// **'日程提醒'**
+  String get helpInstructionReminder;
+
+  /// No description provided for @helpInstructionReminderDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'在设置中开启课程提醒，应用会在上课前发送通知提醒'**
+  String get helpInstructionReminderDesc;
+
+  /// No description provided for @helpInstructionSync.
+  ///
+  /// In zh, this message translates to:
+  /// **'数据同步'**
+  String get helpInstructionSync;
+
+  /// No description provided for @helpInstructionSyncDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用自动同步教务系统数据，需要网络连接。下拉刷新可手动更新'**
+  String get helpInstructionSyncDesc;
+
+  /// No description provided for @helpInstructionWidget.
+  ///
+  /// In zh, this message translates to:
+  /// **'桌面小组件'**
+  String get helpInstructionWidget;
+
+  /// No description provided for @helpInstructionWidgetDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'在桌面长按添加应用小组件，快速查看课程信息'**
+  String get helpInstructionWidgetDesc;
+
+  /// No description provided for @helpNoteNetwork.
+  ///
+  /// In zh, this message translates to:
+  /// **'部分功能需要连接校园网才能正常使用'**
+  String get helpNoteNetwork;
+
+  /// No description provided for @helpNoteUpdate.
+  ///
+  /// In zh, this message translates to:
+  /// **'请保持应用更新以获得最新功能和修复'**
+  String get helpNoteUpdate;
+
+  /// No description provided for @helpNoteData.
+  ///
+  /// In zh, this message translates to:
+  /// **'数据不准确时，请检查是否正确登录教务系统'**
+  String get helpNoteData;
+
+  /// No description provided for @helpNoteFeedback.
+  ///
+  /// In zh, this message translates to:
+  /// **'遇到问题可通过设置页面进行反馈'**
+  String get helpNoteFeedback;
+
+  /// No description provided for @helpNotePrivacy.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用不会收集或上传您的个人隐私信息'**
+  String get helpNotePrivacy;
+
+  /// No description provided for @helpAboutPlatform.
+  ///
+  /// In zh, this message translates to:
+  /// **'平台支持'**
+  String get helpAboutPlatform;
+
+  /// No description provided for @helpAboutPlatformDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨平台应用，支持以下平台：'**
+  String get helpAboutPlatformDesc;
+
+  /// No description provided for @helpAboutOpenSource.
+  ///
+  /// In zh, this message translates to:
+  /// **'开源项目'**
+  String get helpAboutOpenSource;
+
+  /// No description provided for @helpAboutOpenSourceDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'本应用基于 MIT 许可证开源'**
+  String get helpAboutOpenSourceDesc;
+
+  /// No description provided for @helpAboutRepoLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'仓库地址：'**
+  String get helpAboutRepoLabel;
+
+  /// No description provided for @underMaintenanceTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在维护！'**
+  String get underMaintenanceTitle;
+
+  /// No description provided for @underMaintenanceDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'我们目前正在进行定期维护。请稍后再查看。感谢您的耐心等待。'**
+  String get underMaintenanceDescription;
+
+  /// No description provided for @readingPaymentCard.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在读取饭卡'**
+  String get readingPaymentCard;
+
+  /// No description provided for @lowBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'余额不足'**
+  String get lowBalance;
+
+  /// No description provided for @campusCardBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'饭卡余额'**
+  String get campusCardBalance;
+
+  /// No description provided for @tapToView.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击查看'**
+  String get tapToView;
+
+  /// No description provided for @tapToSubscribe.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击订阅'**
+  String get tapToSubscribe;
+
+  /// No description provided for @campusCaoTang.
+  ///
+  /// In zh, this message translates to:
+  /// **'草堂'**
+  String get campusCaoTang;
+
+  /// No description provided for @campusYanTa.
+  ///
+  /// In zh, this message translates to:
+  /// **'雁塔'**
+  String get campusYanTa;
+
+  /// No description provided for @busRefreshStale.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新完成，已保留上次校车数据'**
+  String get busRefreshStale;
+
+  /// No description provided for @poiMainLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'主图书馆'**
+  String get poiMainLibrary;
+
+  /// No description provided for @poiMainLibraryDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'24小时开放自习室'**
+  String get poiMainLibraryDesc;
+
+  /// No description provided for @poiCaoTangNorthGate.
+  ///
+  /// In zh, this message translates to:
+  /// **'草堂校区北门'**
+  String get poiCaoTangNorthGate;
+
+  /// No description provided for @poiCaoTangNorthGateDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'学校主入口'**
+  String get poiCaoTangNorthGateDesc;
+
+  /// No description provided for @poiYanTaEastGate.
+  ///
+  /// In zh, this message translates to:
+  /// **'雁塔校区东门'**
+  String get poiYanTaEastGate;
+
+  /// No description provided for @poiYanTaEastGateDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'历史悠久的老校区入口'**
+  String get poiYanTaEastGateDesc;
+
+  /// No description provided for @durationDHMS.
+  ///
+  /// In zh, this message translates to:
+  /// **'{d}天{h}小时{m}分{s}秒'**
+  String durationDHMS(Object d, Object h, Object m, Object s);
+
+  /// No description provided for @shortcuts.
+  ///
+  /// In zh, this message translates to:
+  /// **'快捷功能'**
+  String get shortcuts;
+
+  /// No description provided for @moreFunctions.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多功能'**
+  String get moreFunctions;
+
+  /// No description provided for @noShortcuts.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无快捷功能'**
+  String get noShortcuts;
+
+  /// No description provided for @addInEditMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'请在编辑模式中添加'**
+  String get addInEditMode;
+
+  /// No description provided for @eduSystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'教务系统'**
+  String get eduSystem;
 }
 
 class _AppLocalizationsDelegate
@@ -3339,6 +3833,7 @@ class _AppLocalizationsDelegate
         'en',
         'fr',
         'ja',
+        'ko',
         'ru',
         'zh'
       ].contains(locale.languageCode);
@@ -3358,6 +3853,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsFr();
     case 'ja':
       return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
     case 'ru':
       return AppLocalizationsRu();
     case 'zh':

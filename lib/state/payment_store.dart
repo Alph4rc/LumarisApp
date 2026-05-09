@@ -74,7 +74,7 @@ class PaymentStore extends Notifier<PaymentState> {
 
       if (studentId == null || studentId.isEmpty) {
         if (currentLoadId != _loadCount) return;
-        state = state.copyWith(errorMessage: '请先登录教务处账号');
+        state = state.copyWith(errorMessage: 'auth_required');
         return;
       }
 
@@ -92,7 +92,7 @@ class PaymentStore extends Notifier<PaymentState> {
       );
     } catch (e) {
       if (currentLoadId != _loadCount) return;
-      state = state.copyWith(errorMessage: '加载失败，点击重试');
+      state = state.copyWith(errorMessage: 'load_failed');
     } finally {
       if (currentLoadId == _loadCount) {
         state = state.copyWith(isLoading: false);

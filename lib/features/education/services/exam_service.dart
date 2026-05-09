@@ -49,7 +49,7 @@ class ExamService {
 
     final cookieData = await AuthService.getUserData();
     if (cookieData == null) {
-      return ExamResult.error('未登录，请先登录');
+      return ExamResult.error('exam_auth_required');
     }
 
     final result = await _fetchExamData(
@@ -107,13 +107,13 @@ class ExamService {
       return (true, mergedData, ExamResult.empty());
     } on AuthenticationException catch (e) {
       AppLogger.debug('认证失败: $e');
-      return (false, null, ExamResult.error('认证失败，请重新登录'));
+      return (false, null, ExamResult.error('auth_failed'));
     } on NetworkException catch (e) {
       AppLogger.debug('网络错误: $e');
       return (false, null, ExamResult.networkError(e.message));
     } catch (e) {
       AppLogger.debug('获取考试数据失败: $e');
-      return (false, null, ExamResult.error('获取考试信息失败: $e'));
+      return (false, null, ExamResult.error('fetch_failed'));
     }
   }
 

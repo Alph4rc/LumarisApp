@@ -133,6 +133,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
         ..clear()
         ..addAll(scores);
       _yearList.clear();
+      _isYear = false;
       _isLoading = isLoading;
       _selectorList
         ..clear()
@@ -184,6 +185,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
         }
       }
       _yearList.clear();
+      _isYear = false;
     });
 
     showClubSnackBar(
@@ -454,7 +456,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildSelector() {
-    if (_selectorList.isEmpty) {
+    if (_selectorList.length < 2) {
       return Container();
     }
 

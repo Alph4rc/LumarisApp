@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class UnderMaintenanceScreen extends StatelessWidget {
@@ -28,10 +29,10 @@ class UnderMaintenanceScreen extends StatelessWidget {
               ),
               const Spacer(flex: 2),
               ErrorInfo(
-                title: "正在维护！",
-                description: "我们目前正在进行定期维护。请稍后再查看。感谢您的耐心等待。",
+                title: context.l10n.underMaintenanceTitle,
+                description: context.l10n.underMaintenanceDescription,
                 // button: you can pass your custom button,
-                btnText: "返回",
+                btnText: context.l10n.back,
                 press: () {},
               ),
             ],
@@ -91,7 +92,7 @@ class ErrorInfo extends StatelessWidget {
                       foregroundColor: colors.inverseLabel,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8)))),
-                  child: Text(btnText ?? "返回"),
+                  child: Text(btnText ?? "Back"),
                 ),
             const SizedBox(height: 16),
           ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -12,6 +14,7 @@ class PaymentTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final payment = ref.watch(paymentStoreProvider);
     final colors = context.clubColors;
 
@@ -26,9 +29,9 @@ class PaymentTile extends ConsumerWidget {
             child: Builder(builder: (context) {
               // Loading state
               if (payment.isLoading) {
-                return const Center(
+                return Center(
                   child: LoadingStateView(
-                    title: '正在读取饭卡',
+                    title: l10n.readingPaymentCard,
                     subtitle: '',
                     compact: true,
                     padding: EdgeInsets.zero,
@@ -70,7 +73,7 @@ class PaymentTile extends ConsumerWidget {
                               borderRadius: ClubRadii.navigation,
                             ),
                             child: Text(
-                              '余额不足',
+                              l10n.lowBalance,
                               style: TextStyle(
                                 fontSize: 10,
                                 color: colors.danger,
@@ -82,7 +85,7 @@ class PaymentTile extends ConsumerWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '当前余额',
+                      l10n.currentBalance,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -123,7 +126,7 @@ class PaymentTile extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '饭卡余额',
+                    l10n.campusCardBalance,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -133,8 +136,8 @@ class PaymentTile extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     payment.errorMessage.isNotEmpty
-                        ? payment.errorMessage
-                        : '点击查看',
+                        ? resolveErrorMessage(payment.errorMessage, l10n)
+                        : l10n.tapToView,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

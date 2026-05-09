@@ -194,6 +194,7 @@ class _AppLauncher extends ConsumerWidget {
         routerConfig: router,
         builder: (context, child) => ClubMaterialThemeBridge(
           fontFamily: fontFamily,
+          locale: locale,
           child: _buildAppShell(child ?? const SizedBox.shrink()),
         ),
       );
@@ -210,8 +211,8 @@ class _AppLauncher extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      theme: ClubTheme.lightTheme(fontFamily: fontFamily),
-      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily),
+      theme: ClubTheme.lightTheme(fontFamily: fontFamily, locale: locale),
+      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily, locale: locale),
       themeMode: settingsStore.themeMode,
       routerConfig: router,
       builder: (context, child) =>

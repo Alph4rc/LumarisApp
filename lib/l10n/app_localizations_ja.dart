@@ -108,6 +108,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
+  String get korean => '韓国語';
+
+  @override
   String get team => 'チーム';
 
   @override
@@ -724,6 +727,42 @@ class AppLocalizationsJa extends AppLocalizations {
   String get saturdayShort => '土';
 
   @override
+  String get janShort => '1月';
+
+  @override
+  String get febShort => '2月';
+
+  @override
+  String get marShort => '3月';
+
+  @override
+  String get aprShort => '4月';
+
+  @override
+  String get mayShort => '5月';
+
+  @override
+  String get junShort => '6月';
+
+  @override
+  String get julShort => '7月';
+
+  @override
+  String get augShort => '8月';
+
+  @override
+  String get sepShort => '9月';
+
+  @override
+  String get octShort => '10月';
+
+  @override
+  String get novShort => '11月';
+
+  @override
+  String get decShort => '12月';
+
+  @override
   String weekUnit(Object n) {
     return '第$n週';
   }
@@ -1189,6 +1228,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String seatNumberLabel(Object seat) {
     return '座位号 $seat';
   }
+
+  @override
+  String get examNotLoggedIn => 'ログインしてください';
+
+  @override
+  String get examAuthFailed => '認証に失敗しました。再ログインしてください';
+
+  @override
+  String get examFetchFailed => '試験情報の取得に失敗しました。タップして再試行';
 
   @override
   String get quickFeatures => 'クイック機能';
@@ -1679,4 +1727,204 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get licenseLoadFailed => 'ライセンスファイルの読み込みに失敗しました';
+
+  @override
+  String get helpFeaturesTab => '機能紹介';
+
+  @override
+  String get helpInstructionsTab => '使用方法';
+
+  @override
+  String get helpNotesTab => '注意事項';
+
+  @override
+  String get helpAboutTab => 'アプリについて';
+
+  @override
+  String get helpFeatureHome => 'ホーム';
+
+  @override
+  String get helpFeatureHomeDesc => '個人情報、授業、予定、試験を表示する情報センター';
+
+  @override
+  String get helpFeatureSchedule => '時間割';
+
+  @override
+  String get helpFeatureScheduleDesc => '週間授業を管理、キャンパス切替と通知設定';
+
+  @override
+  String get helpFeatureScore => '成績';
+
+  @override
+  String get helpFeatureScoreDesc => '学期成績、GPA計算と分析を表示';
+
+  @override
+  String get helpFeatureProfile => 'プロフィール';
+
+  @override
+  String get helpFeatureProfileDesc => '学籍番号、氏名、学部などの個人情報を表示';
+
+  @override
+  String get helpFeatureBus => 'キャンパスバス';
+
+  @override
+  String get helpFeatureBusDesc => 'キャンパス間バスの時刻表と経路情報';
+
+  @override
+  String get helpFeatureProgram => '履修計画';
+
+  @override
+  String get helpFeatureProgramDesc => '専攻の履修計画と単位要件を表示';
+
+  @override
+  String get helpFeatureElectricity => '電気料金';
+
+  @override
+  String get helpFeatureElectricityDesc => '寮の電力使用量と履歴を表示';
+
+  @override
+  String get helpFeaturePayment => '学生証';
+
+  @override
+  String get helpFeaturePaymentDesc => '残高と取引履歴を表示';
+
+  @override
+  String get helpFeatureNet => 'キャンパスネットワーク';
+
+  @override
+  String get helpFeatureNetDesc => 'ネットワーク使用量と統計を表示';
+
+  @override
+  String get helpFeatureLinks => '便利リンク';
+
+  @override
+  String get helpFeatureLinksDesc => '教務システムなどの便利なリンク集';
+
+  @override
+  String get helpInstructionLogin => 'ログインとアカウント';
+
+  @override
+  String get helpInstructionLoginDesc => '初回利用時に教務システムアカウントでログイン';
+
+  @override
+  String get helpInstructionCourse => '授業管理';
+
+  @override
+  String get helpInstructionCourseDesc => '時間割で週間授業を確認、スワイプで週切替、授業をタップで詳細';
+
+  @override
+  String get helpInstructionReminder => '授業リマインダー';
+
+  @override
+  String get helpInstructionReminderDesc => '設定で授業通知を有効にすると、授業前に通知';
+
+  @override
+  String get helpInstructionSync => 'データ同期';
+
+  @override
+  String get helpInstructionSyncDesc => 'アプリが自動で教務データを同期。プルダウンで手動更新';
+
+  @override
+  String get helpInstructionWidget => 'ウィジェット';
+
+  @override
+  String get helpInstructionWidgetDesc => 'ホーム画面を長押ししてウィジェットを追加';
+
+  @override
+  String get helpNoteNetwork => '一部の機能はキャンパスネットワークが必要';
+
+  @override
+  String get helpNoteUpdate => '最新機能と修正のためアプリを更新してください';
+
+  @override
+  String get helpNoteData => 'データが不正確な場合は教務システムログインを確認';
+
+  @override
+  String get helpNoteFeedback => '問題は設定ページから報告してください';
+
+  @override
+  String get helpNotePrivacy => 'このアプリは個人情報を収集・アップロードしません';
+
+  @override
+  String get helpAboutPlatform => '対応プラットフォーム';
+
+  @override
+  String get helpAboutPlatformDesc => 'クロスプラットフォーム対応：';
+
+  @override
+  String get helpAboutOpenSource => 'オープンソース';
+
+  @override
+  String get helpAboutOpenSourceDesc => 'このアプリはMITライセンスでオープンソース';
+
+  @override
+  String get helpAboutRepoLabel => 'リポジトリ：';
+
+  @override
+  String get underMaintenanceTitle => 'メンテナンス中！';
+
+  @override
+  String get underMaintenanceDescription => '定期メンテナンス中です。しばらくしてから再度ご確認ください。';
+
+  @override
+  String get readingPaymentCard => 'カード情報読み込み中';
+
+  @override
+  String get lowBalance => '残高不足';
+
+  @override
+  String get campusCardBalance => 'カード残高';
+
+  @override
+  String get tapToView => 'タップして表示';
+
+  @override
+  String get tapToSubscribe => 'タップして購読';
+
+  @override
+  String get campusCaoTang => '草堂';
+
+  @override
+  String get campusYanTa => '雁塔';
+
+  @override
+  String get busRefreshStale => '更新完了、最後のデータを保持';
+
+  @override
+  String get poiMainLibrary => '中央図書館';
+
+  @override
+  String get poiMainLibraryDesc => '24時間開放の自習室';
+
+  @override
+  String get poiCaoTangNorthGate => '草堂キャンパス北門';
+
+  @override
+  String get poiCaoTangNorthGateDesc => 'メインエントランス';
+
+  @override
+  String get poiYanTaEastGate => '雁塔キャンパス東門';
+
+  @override
+  String get poiYanTaEastGateDesc => '歴史あるキャンパスの入り口';
+
+  @override
+  String durationDHMS(Object d, Object h, Object m, Object s) {
+    return '$d日$h時間$m分$s秒';
+  }
+
+  @override
+  String get shortcuts => 'ショートカット';
+
+  @override
+  String get moreFunctions => 'その他の機能';
+
+  @override
+  String get noShortcuts => 'ショートカットなし';
+
+  @override
+  String get addInEditMode => '編集モードで追加';
+
+  @override
+  String get eduSystem => '教育システム';
 }

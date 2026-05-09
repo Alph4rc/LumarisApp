@@ -109,6 +109,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
+  String get korean => 'Koreanisch';
+
+  @override
   String get team => 'Team';
 
   @override
@@ -781,6 +784,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String get saturdayShort => 'Sa';
 
   @override
+  String get janShort => 'Jan.';
+
+  @override
+  String get febShort => 'Feb.';
+
+  @override
+  String get marShort => 'März';
+
+  @override
+  String get aprShort => 'Apr.';
+
+  @override
+  String get mayShort => 'Mai';
+
+  @override
+  String get junShort => 'Juni';
+
+  @override
+  String get julShort => 'Juli';
+
+  @override
+  String get augShort => 'Aug.';
+
+  @override
+  String get sepShort => 'Sep.';
+
+  @override
+  String get octShort => 'Okt.';
+
+  @override
+  String get novShort => 'Nov.';
+
+  @override
+  String get decShort => 'Dez.';
+
+  @override
   String weekUnit(Object n) {
     return 'Woche $n';
   }
@@ -1266,6 +1305,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String seatNumberLabel(Object seat) {
     return 'Sitzplatz $seat';
   }
+
+  @override
+  String get examNotLoggedIn => 'Bitte zuerst anmelden';
+
+  @override
+  String get examAuthFailed =>
+      'Authentifizierung fehlgeschlagen, bitte erneut anmelden';
+
+  @override
+  String get examFetchFailed =>
+      'Prüfungsdaten konnten nicht geladen werden, zum Wiederholen tippen';
 
   @override
   String get quickFeatures => 'Schnellfunktionen';
@@ -1785,4 +1835,226 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get licenseLoadFailed => 'Lizenzdatei konnte nicht geladen werden';
+
+  @override
+  String get helpFeaturesTab => 'Funktionen';
+
+  @override
+  String get helpInstructionsTab => 'Anleitung';
+
+  @override
+  String get helpNotesTab => 'Hinweise';
+
+  @override
+  String get helpAboutTab => 'Über';
+
+  @override
+  String get helpFeatureHome => 'Startseite';
+
+  @override
+  String get helpFeatureHomeDesc =>
+      'Informationszentrum mit persönlichen Daten, Kursen, Aufgaben und Prüfungen';
+
+  @override
+  String get helpFeatureSchedule => 'Stundenplan';
+
+  @override
+  String get helpFeatureScheduleDesc =>
+      'Wochenplan verwalten, Campus wechseln und Erinnerungen einstellen';
+
+  @override
+  String get helpFeatureScore => 'Noten';
+
+  @override
+  String get helpFeatureScoreDesc =>
+      'Semesternoten, GPA-Berechnung und Analyse anzeigen';
+
+  @override
+  String get helpFeatureProfile => 'Profil';
+
+  @override
+  String get helpFeatureProfileDesc =>
+      'Matrikelnummer, Name, Fakultät und andere Informationen anzeigen';
+
+  @override
+  String get helpFeatureBus => 'Campus-Bus';
+
+  @override
+  String get helpFeatureBusDesc =>
+      'Busfahrpläne und Routen zwischen Campus anzeigen';
+
+  @override
+  String get helpFeatureProgram => 'Studienplan';
+
+  @override
+  String get helpFeatureProgramDesc =>
+      'Studienplan und Leistungspunkt-Anforderungen anzeigen';
+
+  @override
+  String get helpFeatureElectricity => 'Strom';
+
+  @override
+  String get helpFeatureElectricityDesc =>
+      'Stromverbrauch und Verlauf des Wohnheims anzeigen';
+
+  @override
+  String get helpFeaturePayment => 'Campus-Karte';
+
+  @override
+  String get helpFeaturePaymentDesc =>
+      'Kartenguthaben und Transaktionsverlauf anzeigen';
+
+  @override
+  String get helpFeatureNet => 'Campus-Netzwerk';
+
+  @override
+  String get helpFeatureNetDesc => 'Netzwerkverbrauch und Statistiken anzeigen';
+
+  @override
+  String get helpFeatureLinks => 'Nützliche Links';
+
+  @override
+  String get helpFeatureLinksDesc =>
+      'Sammlung nützlicher Links für akademische Systeme';
+
+  @override
+  String get helpInstructionLogin => 'Anmeldung & Konto';
+
+  @override
+  String get helpInstructionLoginDesc =>
+      'Bei erstmaliger Nutzung mit dem Hochschulkonto anmelden';
+
+  @override
+  String get helpInstructionCourse => 'Kursverwaltung';
+
+  @override
+  String get helpInstructionCourseDesc =>
+      'Wochenkurse im Plan anzeigen, wischen zum Wechseln der Woche, antippen für Details';
+
+  @override
+  String get helpInstructionReminder => 'Kurserinnerungen';
+
+  @override
+  String get helpInstructionReminderDesc =>
+      'Erinnerungen in den Einstellungen aktivieren, um vor Kursen benachrichtigt zu werden';
+
+  @override
+  String get helpInstructionSync => 'Datensynchronisation';
+
+  @override
+  String get helpInstructionSyncDesc =>
+      'Die App synchronisiert automatisch. Zum Aktualisieren nach unten ziehen';
+
+  @override
+  String get helpInstructionWidget => 'Widgets';
+
+  @override
+  String get helpInstructionWidgetDesc =>
+      'Startbildschirm lange drücken, um App-Widget hinzuzufügen';
+
+  @override
+  String get helpNoteNetwork =>
+      'Einige Funktionen erfordern Campus-Netzwerkzugang';
+
+  @override
+  String get helpNoteUpdate =>
+      'App aktuell halten für neueste Funktionen und Fehlerbehebungen';
+
+  @override
+  String get helpNoteData =>
+      'Bei ungenauen Daten die Hochschulanmeldung überprüfen';
+
+  @override
+  String get helpNoteFeedback => 'Probleme über die Einstellungsseite melden';
+
+  @override
+  String get helpNotePrivacy =>
+      'Diese App sammelt keine persönlichen Informationen';
+
+  @override
+  String get helpAboutPlatform => 'Plattform-Unterstützung';
+
+  @override
+  String get helpAboutPlatformDesc =>
+      'Plattformübergreifende App, unterstützt:';
+
+  @override
+  String get helpAboutOpenSource => 'Open Source';
+
+  @override
+  String get helpAboutOpenSourceDesc =>
+      'Diese App ist Open Source unter der MIT-Lizenz';
+
+  @override
+  String get helpAboutRepoLabel => 'Repository:';
+
+  @override
+  String get underMaintenanceTitle => 'Wartungsarbeiten!';
+
+  @override
+  String get underMaintenanceDescription =>
+      'Wir führen derzeit planmäßige Wartungsarbeiten durch. Bitte versuchen Sie es später erneut. Vielen Dank für Ihre Geduld.';
+
+  @override
+  String get readingPaymentCard => 'Karteninfo wird geladen';
+
+  @override
+  String get lowBalance => 'Geringes Guthaben';
+
+  @override
+  String get campusCardBalance => 'Kartenguthaben';
+
+  @override
+  String get tapToView => 'Zum Anzeigen tippen';
+
+  @override
+  String get tapToSubscribe => 'Zum Abonnieren tippen';
+
+  @override
+  String get campusCaoTang => 'Caotang';
+
+  @override
+  String get campusYanTa => 'Yanta';
+
+  @override
+  String get busRefreshStale =>
+      'Aktualisierung abgeschlossen, letzte Daten beibehalten';
+
+  @override
+  String get poiMainLibrary => 'Hauptbibliothek';
+
+  @override
+  String get poiMainLibraryDesc => '24-Stunden-Lernraum';
+
+  @override
+  String get poiCaoTangNorthGate => 'Caotang Nordtor';
+
+  @override
+  String get poiCaoTangNorthGateDesc => 'Haupteingang des Campus';
+
+  @override
+  String get poiYanTaEastGate => 'Yanta Osttor';
+
+  @override
+  String get poiYanTaEastGateDesc => 'Historischer Campus-Eingang';
+
+  @override
+  String durationDHMS(Object d, Object h, Object m, Object s) {
+    return '${d}T ${h}Std ${m}Min ${s}Sek';
+  }
+
+  @override
+  String get shortcuts => 'Verknüpfungen';
+
+  @override
+  String get moreFunctions => 'Weitere Funktionen';
+
+  @override
+  String get noShortcuts => 'Keine Verknüpfungen';
+
+  @override
+  String get addInEditMode => 'Im Bearbeitungsmodus hinzufügen';
+
+  @override
+  String get eduSystem => 'Bildungssystem';
 }

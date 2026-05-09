@@ -309,13 +309,14 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final textColor = colors.label;
     final titleColor = colors.label;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('隐私协议'),
+        title: Text(l10n.privacyPolicyTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -325,66 +326,75 @@ class _PrivacyPolicyContentPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitle('光序 隐私协议', titleColor),
+            _buildTitle(l10n.privacyPolicyTitle, titleColor),
             const SizedBox(height: 8),
-            _buildSubtitle(context, '更新日期：2025年1月1日'),
+            _buildSubtitle(context, l10n.privacyPolicyUpdatedAt),
             const SizedBox(height: 8),
-            _buildSubtitle(context, '生效日期：2025年1月1日'),
+            _buildSubtitle(context, l10n.privacyPolicyEffectiveAt),
             const SizedBox(height: 20),
-            _buildBodyText(
-              '欢迎使用 光序（以下简称"本应用"）。本应用由 Lumaris Team（以下简称"我们"）开发和运营。'
-              '我们深知个人信息对您的重要性，将严格遵守法律法规，遵循合法、正当、必要和诚信原则，'
-              '保护您的个人信息安全。本隐私协议旨在向您说明我们如何收集、使用、存储和保护您的个人信息，'
-              '以及您享有的相关权利。请您在使用本应用前仔细阅读本隐私协议。',
-              textColor,
-            ),
+            _buildBodyText(l10n.privacySection1_1, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('一、我们收集的信息', titleColor),
+            _buildSectionTitle(l10n.privacySection1Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '1.1 账号信息：当您使用教务系统登录功能时，我们需要收集您的学号和密码，用于验证您的身份并获取教务系统数据。这些信息仅存储在您的设备本地。',
-                textColor),
+            _buildBodyText(l10n.privacySection1_1, textColor),
             const SizedBox(height: 8),
-            _buildBodyText(
-                '1.2 课程与成绩信息：在您授权登录后，本应用会从学校教务系统获取您的课程表、考试成绩、培养方案等教育相关数据，并在您的设备本地进行存储和展示。',
-                textColor),
+            _buildBodyText(l10n.privacySection1_2, textColor),
             const SizedBox(height: 8),
-            _buildBodyText(
-                '1.3 校园生活信息：在您使用相关功能时，本应用会从学校相关系统获取您的电费余额、饭卡消费记录、校园网流量使用情况等信息。',
-                textColor),
+            _buildBodyText(l10n.privacySection1_3, textColor),
             const SizedBox(height: 8),
-            _buildBodyText(
-                '1.4 设备信息：为提供更好的服务体验，本应用可能收集您的设备型号、操作系统版本等，用于统计分析和问题排查。',
-                textColor),
+            _buildBodyText(l10n.privacySection1_4, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection1_5, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('二、我们如何使用信息', titleColor),
+            _buildSectionTitle(l10n.privacySection2Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '2.1 为您提供核心服务：我们使用您的学号和密码向学校教务系统进行身份认证，以获取并展示您的课程、成绩等信息。\n2.2 改善服务质量：我们可能使用设备信息和应用使用统计数据来分析和优化应用性能。\n2.3 桌面小组件：如果您使用桌面小组件功能，本应用会在设备本地存储必要的课程数据。\n2.4 通知提醒：如果您开启了课程提醒功能，本应用会在您的设备上设置本地通知。',
-                textColor),
+            _buildBodyText(l10n.privacySection2_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection2_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection2_3, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection2_4, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('三、信息的存储与安全', titleColor),
+            _buildSectionTitle(l10n.privacySection3Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '3.1 本地存储：您的个人信息均存储在您的设备本地，我们不会将这些信息上传至我们的服务器。\n3.2 传输安全：本应用与学校服务器之间的数据传输采用加密通信。\n3.3 数据清除：您可以随时在设置中清除缓存数据，或通过退出登录来清除账号相关数据。',
-                textColor),
+            _buildBodyText(l10n.privacySection3_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection3_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection3_3, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('四、第三方服务', titleColor),
+            _buildSectionTitle(l10n.privacySection4Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '4.1 学校教务系统：本应用需要与西安建筑科技大学教务系统进行数据交互。\n4.2 应用更新服务：本应用通过 Gitee 平台检查版本更新信息。\n4.3 本应用不会将您的个人信息分享、出售或出租给任何第三方。',
-                textColor),
+            _buildBodyText(l10n.privacySection4_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection4_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection4_3, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('五、您的权利', titleColor),
+            _buildSectionTitle(l10n.privacySection5Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '您可以在应用内查看、更正、删除您的个人信息，也可以通过退出登录或卸载应用撤回同意。', textColor),
+            _buildBodyText(l10n.privacySection5_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection5_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection5_3, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('六、联系我们', titleColor),
+            _buildSectionTitle(l10n.privacySection6Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '开发团队：Lumaris Team \n代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
-                textColor),
+            _buildBodyText(l10n.privacySection6_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection6_2, textColor),
+            const SizedBox(height: 24),
+            _buildSectionTitle(l10n.privacySection7Title, titleColor),
+            const SizedBox(height: 12),
+            _buildBodyText(l10n.privacySection7_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.privacySection7_2, textColor),
+            const SizedBox(height: 24),
+            _buildSectionTitle(l10n.privacySection8Title, titleColor),
+            const SizedBox(height: 12),
+            _buildBodyText(l10n.privacySection8_1, textColor),
             const SizedBox(height: 40),
           ],
         ),
@@ -416,13 +426,14 @@ class _UserAgreementContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
     final textColor = colors.label;
     final titleColor = colors.label;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('用户协议'),
+        title: Text(l10n.userAgreementTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -432,54 +443,77 @@ class _UserAgreementContentPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitle('光序 用户协议', titleColor),
+            _buildTitle(l10n.userAgreementTitle, titleColor),
             const SizedBox(height: 8),
-            _buildSubtitle(context, '更新日期：2025年1月1日'),
+            _buildSubtitle(context, l10n.userAgreementUpdatedAt),
             const SizedBox(height: 8),
-            _buildSubtitle(context, '生效日期：2025年1月1日'),
+            _buildSubtitle(context, l10n.userAgreementEffectiveAt),
             const SizedBox(height: 20),
-            _buildBodyText(
-              '欢迎使用 光序（以下简称"本应用"）。本应用由 Lumaris'
-              '（以下简称"我们"）开发和运营。请您在使用本应用前仔细阅读本用户协议'
-              '（以下简称"本协议"）。您使用本应用即表示您已阅读、理解并同意接受本协议的全部内容。',
-              textColor,
-            ),
+            _buildBodyText(l10n.userAgreementIntro, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('一、服务说明', titleColor),
+            _buildSectionTitle(l10n.userAgreementSection1Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '1.1 本应用是西安建筑科技大学 iOS Club 开发的校园助手应用，旨在为在校学生提供便捷的校园信息服务，包括课程管理、成绩查询、校车时刻、电费查询、饭卡消费记录、校园网流量查询、培养方案查看等功能。\n1.2 本应用的部分功能需要连接学校内部网络才能正常使用。\n1.3 本应用显示的课程、成绩等信息来源于学校教务系统，仅供参考。如有差异，以学校官方系统数据为准。',
-                textColor),
+            _buildBodyText(l10n.userAgreementSection1_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection1_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection1_3, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('二、用户账号与安全', titleColor),
+            _buildSectionTitle(l10n.userAgreementSection2Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '2.1 您需要使用学校教务系统账号登录本应用的教务相关功能。\n2.2 您的登录凭据仅存储在您的设备本地，我们不会收集或上传您的密码。\n2.3 如您发现账号存在安全风险，应及时修改密码。',
-                textColor),
+            _buildBodyText(l10n.userAgreementSection2_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection2_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection2_3, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('三、知识产权', titleColor),
+            _buildSectionTitle(l10n.userAgreementSection3Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '3.1 本应用的源代码基于 MIT 许可证开源发布。\n3.2 本应用的名称、图标、UI 设计等归 Lumaris 所有。\n3.3 本应用中涉及的学校名称、标识等归西安建筑科技大学所有。',
-                textColor),
+            _buildBodyText(l10n.userAgreementSection3_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection3_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection3_3, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection3_4, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('四、免责声明', titleColor),
+            _buildSectionTitle(l10n.userAgreementSection4Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '4.1 本应用按"现状"提供，我们不对本应用的准确性、可靠性做任何保证。\n4.2 由于网络故障、学校服务器问题或其他不可抗力因素导致的服务中断，我们不承担责任。\n4.3 本应用中的课程、成绩等信息仅供参考，以学校官方系统数据为准。',
-                textColor),
+            _buildBodyText(l10n.userAgreementSection4_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection4_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection4_3, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('五、协议的修改与终止', titleColor),
+            _buildSectionTitle(l10n.userAgreementSection5Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '5.1 我们保留随时修改本协议的权利。修改后的协议将在应用内发布。\n5.2 如您在协议修改后继续使用本应用，即视为您同意修改后的协议。',
-                textColor),
+            _buildBodyText(l10n.userAgreementSection5_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection5_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection5_3, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection5_4, textColor),
             const SizedBox(height: 24),
-            _buildSectionTitle('六、联系我们', titleColor),
+            _buildSectionTitle(l10n.userAgreementSection6Title, titleColor),
             const SizedBox(height: 12),
-            _buildBodyText(
-                '开发团队：Lumaris\n所属组织：西安建筑科技大学 iOS Club\n代码仓库：https://gitee.com/luckyfishisdashen/iOSClub.AppMobile',
-                textColor),
+            _buildBodyText(l10n.userAgreementSection6_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection6_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection6_3, textColor),
+            const SizedBox(height: 24),
+            _buildSectionTitle(l10n.userAgreementSection7Title, titleColor),
+            const SizedBox(height: 12),
+            _buildBodyText(l10n.userAgreementSection7_1, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection7_2, textColor),
+            const SizedBox(height: 8),
+            _buildBodyText(l10n.userAgreementSection7_3, textColor),
+            const SizedBox(height: 24),
+            _buildSectionTitle(l10n.userAgreementSection8Title, titleColor),
+            const SizedBox(height: 12),
+            _buildBodyText(l10n.userAgreementSection8_1, textColor),
             const SizedBox(height: 40),
           ],
         ),

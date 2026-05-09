@@ -108,6 +108,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
+  String get korean => 'Корейский';
+
+  @override
   String get team => 'Команда';
 
   @override
@@ -777,6 +780,42 @@ class AppLocalizationsRu extends AppLocalizations {
   String get saturdayShort => 'Сб';
 
   @override
+  String get janShort => 'янв.';
+
+  @override
+  String get febShort => 'февр.';
+
+  @override
+  String get marShort => 'марта';
+
+  @override
+  String get aprShort => 'апр.';
+
+  @override
+  String get mayShort => 'мая';
+
+  @override
+  String get junShort => 'июня';
+
+  @override
+  String get julShort => 'июля';
+
+  @override
+  String get augShort => 'авг.';
+
+  @override
+  String get sepShort => 'сент.';
+
+  @override
+  String get octShort => 'окт.';
+
+  @override
+  String get novShort => 'нояб.';
+
+  @override
+  String get decShort => 'дек.';
+
+  @override
   String weekUnit(Object n) {
     return '$n неделя';
   }
@@ -1251,6 +1290,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String seatNumberLabel(Object seat) {
     return 'Место $seat';
   }
+
+  @override
+  String get examNotLoggedIn => 'Пожалуйста, сначала войдите';
+
+  @override
+  String get examAuthFailed => 'Ошибка аутентификации, войдите снова';
+
+  @override
+  String get examFetchFailed =>
+      'Не удалось загрузить данные экзаменов, нажмите для повтора';
 
   @override
   String get quickFeatures => 'Быстрые функции';
@@ -1756,4 +1805,227 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get licenseLoadFailed => 'Не удалось загрузить файл лицензий';
+
+  @override
+  String get helpFeaturesTab => 'Функции';
+
+  @override
+  String get helpInstructionsTab => 'Инструкции';
+
+  @override
+  String get helpNotesTab => 'Примечания';
+
+  @override
+  String get helpAboutTab => 'О приложении';
+
+  @override
+  String get helpFeatureHome => 'Главная';
+
+  @override
+  String get helpFeatureHomeDesc =>
+      'Информационный центр с личными данными, курсами, задачами и экзаменами';
+
+  @override
+  String get helpFeatureSchedule => 'Расписание';
+
+  @override
+  String get helpFeatureScheduleDesc =>
+      'Управление недельным расписанием с переключением кампуса и напоминаниями';
+
+  @override
+  String get helpFeatureScore => 'Оценки';
+
+  @override
+  String get helpFeatureScoreDesc =>
+      'Просмотр оценок по семестрам, расчёт GPA и анализ';
+
+  @override
+  String get helpFeatureProfile => 'Профиль';
+
+  @override
+  String get helpFeatureProfileDesc =>
+      'Отображение номера студента, имени, факультета и другой информации';
+
+  @override
+  String get helpFeatureBus => 'Автобус кампуса';
+
+  @override
+  String get helpFeatureBusDesc =>
+      'Просмотр расписания и маршрутов автобусов между кампусами';
+
+  @override
+  String get helpFeatureProgram => 'Учебный план';
+
+  @override
+  String get helpFeatureProgramDesc =>
+      'Отображение учебного плана и требований к кредитам';
+
+  @override
+  String get helpFeatureElectricity => 'Электричество';
+
+  @override
+  String get helpFeatureElectricityDesc =>
+      'Просмотр расхода и истории электричества в общежитии';
+
+  @override
+  String get helpFeaturePayment => 'Карта кампуса';
+
+  @override
+  String get helpFeaturePaymentDesc =>
+      'Просмотр баланса карты и истории транзакций';
+
+  @override
+  String get helpFeatureNet => 'Сеть кампуса';
+
+  @override
+  String get helpFeatureNetDesc => 'Просмотр использования и статистики сети';
+
+  @override
+  String get helpFeatureLinks => 'Полезные ссылки';
+
+  @override
+  String get helpFeatureLinksDesc =>
+      'Коллекция полезных ссылок для академических систем';
+
+  @override
+  String get helpInstructionLogin => 'Вход и аккаунт';
+
+  @override
+  String get helpInstructionLoginDesc =>
+      'Войдите с учётной записью академической системы при первом использовании';
+
+  @override
+  String get helpInstructionCourse => 'Управление курсами';
+
+  @override
+  String get helpInstructionCourseDesc =>
+      'Просмотр недельных курсов в расписании, смахивание для смены недели, нажмите для деталей';
+
+  @override
+  String get helpInstructionReminder => 'Напоминания о курсах';
+
+  @override
+  String get helpInstructionReminderDesc =>
+      'Включите напоминания в настройках для уведомлений перед занятиями';
+
+  @override
+  String get helpInstructionSync => 'Синхронизация данных';
+
+  @override
+  String get helpInstructionSyncDesc =>
+      'Приложение автоматически синхронизируется. Потяните вниз для обновления вручную';
+
+  @override
+  String get helpInstructionWidget => 'Виджеты';
+
+  @override
+  String get helpInstructionWidgetDesc =>
+      'Долгое нажатие на главном экране для добавления виджета';
+
+  @override
+  String get helpNoteNetwork =>
+      'Некоторые функции требуют доступа к сети кампуса';
+
+  @override
+  String get helpNoteUpdate =>
+      'Обновляйте приложение для последних функций и исправлений';
+
+  @override
+  String get helpNoteData =>
+      'Если данные неточные, проверьте вход в академическую систему';
+
+  @override
+  String get helpNoteFeedback =>
+      'Сообщайте о проблемах через страницу настроек';
+
+  @override
+  String get helpNotePrivacy =>
+      'Это приложение не собирает вашу личную информацию';
+
+  @override
+  String get helpAboutPlatform => 'Поддержка платформ';
+
+  @override
+  String get helpAboutPlatformDesc =>
+      'Кроссплатформенное приложение, поддерживает:';
+
+  @override
+  String get helpAboutOpenSource => 'Открытый исходный код';
+
+  @override
+  String get helpAboutOpenSourceDesc =>
+      'Приложение с открытым исходным кодом по лицензии MIT';
+
+  @override
+  String get helpAboutRepoLabel => 'Репозиторий:';
+
+  @override
+  String get underMaintenanceTitle => 'Техническое обслуживание!';
+
+  @override
+  String get underMaintenanceDescription =>
+      'В настоящее время проводится плановое техническое обслуживание. Пожалуйста, зайдите позже. Спасибо за терпение.';
+
+  @override
+  String get readingPaymentCard => 'Загрузка данных карты';
+
+  @override
+  String get lowBalance => 'Низкий баланс';
+
+  @override
+  String get campusCardBalance => 'Баланс карты';
+
+  @override
+  String get tapToView => 'Нажмите для просмотра';
+
+  @override
+  String get tapToSubscribe => 'Нажмите для подписки';
+
+  @override
+  String get campusCaoTang => 'Цаотан';
+
+  @override
+  String get campusYanTa => 'Яньта';
+
+  @override
+  String get busRefreshStale =>
+      'Обновление завершено, сохранены последние данные';
+
+  @override
+  String get poiMainLibrary => 'Главная библиотека';
+
+  @override
+  String get poiMainLibraryDesc => 'Круглосуточный читальный зал';
+
+  @override
+  String get poiCaoTangNorthGate => 'Северные ворота Цаотан';
+
+  @override
+  String get poiCaoTangNorthGateDesc => 'Главный вход в кампус';
+
+  @override
+  String get poiYanTaEastGate => 'Восточные ворота Яньта';
+
+  @override
+  String get poiYanTaEastGateDesc => 'Вход в исторический кампус';
+
+  @override
+  String durationDHMS(Object d, Object h, Object m, Object s) {
+    return '$dд $hч $mм $sс';
+  }
+
+  @override
+  String get shortcuts => 'Ярлыки';
+
+  @override
+  String get moreFunctions => 'Другие функции';
+
+  @override
+  String get noShortcuts => 'Нет ярлыков';
+
+  @override
+  String get addInEditMode => 'Добавить в режиме редактирования';
+
+  @override
+  String get eduSystem => 'Образовательная система';
 }

@@ -1,6 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+
+List<String> _getWeekdayShortNames(AppLocalizations l10n) => [
+      l10n.sundayShort,
+      l10n.mondayShort,
+      l10n.tuesdayShort,
+      l10n.wednesdayShort,
+      l10n.thursdayShort,
+      l10n.fridayShort,
+      l10n.saturdayShort,
+    ];
+
+List<String> _getMonthShortNames(AppLocalizations l10n) => [
+      l10n.janShort,
+      l10n.febShort,
+      l10n.marShort,
+      l10n.aprShort,
+      l10n.mayShort,
+      l10n.junShort,
+      l10n.julShort,
+      l10n.augShort,
+      l10n.sepShort,
+      l10n.octShort,
+      l10n.novShort,
+      l10n.decShort,
+    ];
 
 /// 星期标题栏组件
 ///
@@ -26,7 +52,7 @@ class WeekdayHeader extends StatelessWidget {
     final colors = context.clubColors;
     final now = DateTime.now();
 
-    final monthStr = DateFormat.MMM().format(weekStartDate);
+    final monthStr = _getMonthShortNames(context.l10n)[weekStartDate.month - 1];
 
     return Container(
       decoration: showGrid
@@ -97,7 +123,7 @@ class WeekdayHeader extends StatelessWidget {
                   children: [
                     // 星期几
                     Text(
-                      DateFormat.E().format(date),
+                      _getWeekdayShortNames(context.l10n)[date.weekday % 7],
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
@@ -120,7 +146,7 @@ class WeekdayHeader extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            DateFormat('d').format(date),
+                            date.day.toString(),
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight:

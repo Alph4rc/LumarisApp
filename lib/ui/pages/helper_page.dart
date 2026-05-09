@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -16,17 +17,17 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
 
-  final List<String> _tabs = [
-    '功能介绍',
-    '使用说明',
-    '注意事项',
-    '关于应用',
+  List<String> _getTabs(BuildContext context) => [
+    context.l10n.helpFeaturesTab,
+    context.l10n.helpInstructionsTab,
+    context.l10n.helpNotesTab,
+    context.l10n.helpAboutTab,
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _pageController = PageController();
 
     // 监听 TabController 变化
@@ -62,9 +63,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '帮助',
-          style: TextStyle(
+        title: Text(
+          context.l10n.help,
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,
           ),
@@ -77,7 +78,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             controller: _tabController,
             isScrollable: true,
             tabAlignment: TabAlignment.center,
-            tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+            tabs: _getTabs(context).map((tab) => Tab(text: tab)).toList(),
           ),
         ),
       ),
@@ -113,32 +114,32 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
               children: [
                 _buildFeatureItem(
                   icon: CupertinoIcons.home,
-                  title: '首页',
-                  description: '信息中心，展示个人信息、课程、待办事项和考试安排',
+                  title: context.l10n.helpFeatureHome,
+                  description: context.l10n.helpFeatureHomeDesc,
                   color: colors.primary,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.calendar,
-                  title: '课程表',
-                  description: '管理周课程安排，支持切换校区和设置提醒',
+                  title: context.l10n.helpFeatureSchedule,
+                  description: context.l10n.helpFeatureScheduleDesc,
                   color: colors.success,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.chart_bar,
-                  title: '成绩查询',
-                  description: '查看学期成绩单、绩点计算和分析',
+                  title: context.l10n.helpFeatureScore,
+                  description: context.l10n.helpFeatureScoreDesc,
                   color: colors.warning,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.person,
-                  title: '个人资料',
-                  description: '展示学号、姓名、学院等个人信息',
+                  title: context.l10n.helpFeatureProfile,
+                  description: context.l10n.helpFeatureProfileDesc,
                   color: colors.indigo,
                   isTablet: isTablet,
                 ),
@@ -152,16 +153,16 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
               children: [
                 _buildFeatureItem(
                   icon: CupertinoIcons.bus,
-                  title: '校园巴士',
-                  description: '查看校区间班车时刻表和路线信息',
+                  title: context.l10n.helpFeatureBus,
+                  description: context.l10n.helpFeatureBusDesc,
                   color: colors.danger,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.book,
-                  title: '培养方案',
-                  description: '显示专业培养计划和学分要求',
+                  title: context.l10n.helpFeatureProgram,
+                  description: context.l10n.helpFeatureProgramDesc,
                   color: colors.purple,
                   isTablet: isTablet,
                 ),
@@ -175,32 +176,32 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
               children: [
                 _buildFeatureItem(
                   icon: CupertinoIcons.bolt,
-                  title: '电费查询',
-                  description: '查看宿舍电量和用电历史记录',
+                  title: context.l10n.helpFeatureElectricity,
+                  description: context.l10n.helpFeatureElectricityDesc,
                   color: colors.yellow,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.creditcard,
-                  title: '饭卡消费',
-                  description: '查看饭卡余额和消费明细',
+                  title: context.l10n.helpFeaturePayment,
+                  description: context.l10n.helpFeaturePaymentDesc,
                   color: colors.pink,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.wifi,
-                  title: '校园网',
-                  description: '查看网络流量使用情况和统计',
+                  title: context.l10n.helpFeatureNet,
+                  description: context.l10n.helpFeatureNetDesc,
                   color: colors.cyan,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildFeatureItem(
                   icon: CupertinoIcons.link,
-                  title: '常用链接',
-                  description: '收集教务系统等常用工具链接',
+                  title: context.l10n.helpFeatureLinks,
+                  description: context.l10n.helpFeatureLinksDesc,
                   color: colors.primary,
                   isTablet: isTablet,
                 ),
@@ -229,40 +230,40 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
               children: [
                 _buildInstructionItem(
                   icon: CupertinoIcons.person_circle,
-                  title: '登录与账户',
-                  description: '首次使用需登录教务系统账户',
+                  title: context.l10n.helpInstructionLogin,
+                  description: context.l10n.helpInstructionLoginDesc,
                   color: colors.primary,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildInstructionItem(
                   icon: CupertinoIcons.calendar_badge_plus,
-                  title: '课程管理',
-                  description: '进入课程表查看当周课程，左右滑动切换周次，点击课程查看详情',
+                  title: context.l10n.helpInstructionCourse,
+                  description: context.l10n.helpInstructionCourseDesc,
                   color: colors.success,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildInstructionItem(
                   icon: CupertinoIcons.bell,
-                  title: '日程提醒',
-                  description: '在设置中开启课程提醒，应用会在上课前发送通知提醒',
+                  title: context.l10n.helpInstructionReminder,
+                  description: context.l10n.helpInstructionReminderDesc,
                   color: colors.warning,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildInstructionItem(
                   icon: CupertinoIcons.arrow_2_circlepath,
-                  title: '数据同步',
-                  description: '应用自动同步教务系统数据，需要网络连接。下拉刷新可手动更新',
+                  title: context.l10n.helpInstructionSync,
+                  description: context.l10n.helpInstructionSyncDesc,
                   color: colors.cyan,
                   isTablet: isTablet,
                 ),
                 _buildDivider(),
                 _buildInstructionItem(
                   icon: CupertinoIcons.square_grid_2x2,
-                  title: '桌面小组件',
-                  description: '在桌面长按添加应用小组件，快速查看课程信息（支持 iOS/Android）',
+                  title: context.l10n.helpInstructionWidget,
+                  description: context.l10n.helpInstructionWidgetDesc,
                   color: colors.purple,
                   isTablet: isTablet,
                 ),
@@ -289,31 +290,31 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
               children: [
                 _buildNoteItem(
                   icon: CupertinoIcons.wifi,
-                  text: '部分功能需要连接校园网才能正常使用',
+                  text: context.l10n.helpNoteNetwork,
                   color: colors.cyan,
                 ),
                 const SizedBox(height: 16),
                 _buildNoteItem(
                   icon: CupertinoIcons.arrow_clockwise,
-                  text: '请保持应用更新以获得最新功能和修复',
+                  text: context.l10n.helpNoteUpdate,
                   color: colors.success,
                 ),
                 const SizedBox(height: 16),
                 _buildNoteItem(
                   icon: CupertinoIcons.exclamationmark_triangle,
-                  text: '数据不准确时，请检查是否正确登录教务系统',
+                  text: context.l10n.helpNoteData,
                   color: colors.warning,
                 ),
                 const SizedBox(height: 16),
                 _buildNoteItem(
                   icon: CupertinoIcons.chat_bubble_text,
-                  text: '遇到问题可通过设置页面进行反馈',
+                  text: context.l10n.helpNoteFeedback,
                   color: colors.primary,
                 ),
                 const SizedBox(height: 16),
                 _buildNoteItem(
                   icon: CupertinoIcons.lock_shield,
-                  text: '应用不会收集或上传您的个人隐私信息',
+                  text: context.l10n.helpNotePrivacy,
                   color: colors.indigo,
                 ),
               ],
@@ -358,7 +359,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '平台支持',
+                      context.l10n.helpAboutPlatform,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -369,7 +370,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '跨平台应用，支持以下平台：',
+                  context.l10n.helpAboutPlatformDesc,
                   style: TextStyle(
                     fontSize: 14,
                     color: colors.secondaryLabel,
@@ -431,7 +432,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '开源项目',
+                      context.l10n.helpAboutOpenSource,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -442,7 +443,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '本应用基于 MIT 许可证开源',
+                  context.l10n.helpAboutOpenSourceDesc,
                   style: TextStyle(
                     fontSize: 14,
                     color: colors.secondaryLabel,
@@ -450,7 +451,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '仓库地址：',
+                  context.l10n.helpAboutRepoLabel,
                   style: TextStyle(
                     fontSize: 14,
                     color: colors.secondaryLabel,

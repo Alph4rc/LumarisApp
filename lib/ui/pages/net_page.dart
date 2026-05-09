@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/net_service.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -42,7 +43,7 @@ class _NetPageState extends State<NetPage> {
       if (_data != null) {
         showClubSnackBar(
           context,
-          const Text('刷新失败，已保留当前校园网数据'),
+          Text(context.l10n.netRefreshFailed),
         );
       } else {
         setState(() {
@@ -117,7 +118,7 @@ class _DataContent extends StatelessWidget {
     }
   }
 
-  String timeFormat(int s) {
+  String timeFormat(BuildContext context, int s) {
     int m = s ~/ 60;
     int sRemainder = s % 60;
 
@@ -127,11 +128,12 @@ class _DataContent extends StatelessWidget {
     int d = h ~/ 24;
     int hRemainder = h % 24;
 
-    return "$d天$hRemainder小时$mRemainder分$sRemainder秒";
+    return context.l10n.durationDHMS(d.toString(), hRemainder.toString(), mRemainder.toString(), sRemainder.toString());
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     final colors = context.clubColors;
 
@@ -145,7 +147,7 @@ class _DataContent extends StatelessWidget {
           const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       slivers: [
         SliverAppBar.large(
-          title: const Text('校园网数据'),
+          title: Text(l10n.netData),
           centerTitle: false,
           backgroundColor: theme.scaffoldBackgroundColor,
           surfaceTintColor: Colors.transparent,
@@ -197,7 +199,7 @@ class _DataContent extends StatelessWidget {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                '已用流量',
+                                l10n.usedTraffic,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: secondaryTextColor,
@@ -226,7 +228,7 @@ class _DataContent extends StatelessWidget {
                                   borderRadius: ClubRadii.card,
                                 ),
                                 child: Text(
-                                  "在线时长: ${timeFormat(data['sum_seconds'])}",
+                                  l10n.onlineDuration(timeFormat(context, (data['sum_seconds'] as num).toInt())),
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: theme.primaryColor,
@@ -272,16 +274,16 @@ class _DataContent extends StatelessWidget {
                               _DetailRow(
                                 icon: Icons.person_rounded,
                                 iconColor: colors.primary,
-                                title: '用户名',
-                                value: data['user_name'] ?? '未知',
+                                title: l10n.username,
+                                value: data['user_name'] ?? l10n.unknown,
                                 isFirst: true,
                               ),
                               const _Divider(),
                               _DetailRow(
                                 icon: Icons.wifi_rounded,
                                 iconColor: colors.success,
-                                title: 'IP 地址',
-                                value: data['online_ip'] ?? '未知',
+                                title: l10n.ipAddress,
+                                value: data['online_ip'] ?? l10n.unknown,
                                 onTap: () => _copyToClipboard(
                                     context, data['online_ip']),
                                 showArrow: true,
@@ -290,8 +292,8 @@ class _DataContent extends StatelessWidget {
                               _DetailRow(
                                 icon: Icons.shopping_bag_rounded,
                                 iconColor: colors.warning,
-                                title: '产品套餐',
-                                value: data['products_name'] ?? '未知',
+                                title: l10n.productPackage,
+                                value: data['products_name'] ?? l10n.unknown,
                                 isLast: true,
                               ),
                             ],
@@ -314,7 +316,7 @@ class _DataContent extends StatelessWidget {
   void _copyToClipboard(BuildContext context, String? text) {
     if (text == null) return;
     Clipboard.setData(ClipboardData(text: text));
-    showClubSnackBar(context, const Text('已复制到剪贴板'));
+    showClubSnackBar(context, Text(context.l10n.copiedToClipboard));
   }
 }
 
@@ -419,10 +421,11 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final l10n = context.l10n;
+    return Center(
       child: LoadingStateView(
-        title: '正在读取校园网数据',
-        subtitle: '正在同步流量、在线时长和账号信息',
+        title: l10n.netLoading,
+        subtitle: l10n.netLoadingSubtitle,
       ),
     );
   }
@@ -447,7 +450,7 @@ class _ErrorView extends StatelessWidget {
           Icon(Icons.error_outline_rounded, size: 48, color: colors.danger),
           const SizedBox(height: 16),
           Text(
-            '加载失败',
+            context.l10n.loadFailed,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
@@ -463,7 +466,7 @@ class _ErrorView extends StatelessWidget {
           FilledButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
-            label: const Text('重试'),
+            label: Text(context.l10n.retry),
           ),
         ],
       ),
@@ -484,7 +487,7 @@ class _EmptyView extends StatelessWidget {
           Icon(Icons.inbox_rounded, size: 64, color: colors.secondaryLabel),
           const SizedBox(height: 16),
           Text(
-            '暂无数据',
+            context.l10n.noData,
             style: TextStyle(color: colors.secondaryLabel, fontSize: 16),
           ),
         ],

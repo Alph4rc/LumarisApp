@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'dart:async' show Future;
@@ -30,7 +31,7 @@ class _LicensePageState extends State<LicensePage> {
       });
     } catch (e) {
       setState(() {
-        _licenseText = '无法加载许可证文件';
+        _licenseText = context.l10n.licenseLoadFailed;
         _loading = false;
       });
     }
@@ -39,12 +40,12 @@ class _LicensePageState extends State<LicensePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClubAppBar(title: '开源许可证'),
+      appBar: ClubAppBar(title: context.l10n.openSourceLicense),
       body: _loading
-          ? const Center(
+          ? Center(
               child: LoadingStateView(
-                title: '正在读取许可证',
-                subtitle: '正在加载应用附带的开源协议文本',
+                title: context.l10n.licenseLoading,
+                subtitle: context.l10n.licenseLoadingSubtitle,
               ),
             )
           : SingleChildScrollView(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
@@ -206,11 +207,11 @@ class ModalActionMenu extends StatelessWidget {
         if (onEdit != null)
           PopupMenuItem(
             value: 'edit',
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.edit, size: 20),
-                SizedBox(width: 12),
-                Text('编辑'),
+                const Icon(Icons.edit, size: 20),
+                const SizedBox(width: 12),
+                Text(context.l10n.edit),
               ],
             ),
           ),
@@ -221,7 +222,7 @@ class ModalActionMenu extends StatelessWidget {
               children: [
                 Icon(Icons.delete, size: 20, color: colors.danger),
                 const SizedBox(width: 12),
-                Text('删除', style: TextStyle(color: colors.danger)),
+                Text(context.l10n.delete, style: TextStyle(color: colors.danger)),
               ],
             ),
           ),

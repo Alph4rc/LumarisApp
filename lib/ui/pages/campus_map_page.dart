@@ -9,6 +9,35 @@ import 'package:ios_club_app/state/map_state.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
+
+/// Maps POI display names to their localized translations.
+String _resolvePoiName(String name, AppLocalizations l10n) {
+  switch (name) {
+    case '主图书馆':
+      return l10n.poiMainLibrary;
+    case '草堂校区北门':
+      return l10n.poiCaoTangNorthGate;
+    case '雁塔校区东门':
+      return l10n.poiYanTaEastGate;
+    default:
+      return name;
+  }
+}
+
+/// Maps POI descriptions to their localized translations.
+String _resolvePoiDesc(String description, AppLocalizations l10n) {
+  switch (description) {
+    case '24小时开放自习室':
+      return l10n.poiMainLibraryDesc;
+    case '学校主入口':
+      return l10n.poiCaoTangNorthGateDesc;
+    case '历史悠久的老校区入口':
+      return l10n.poiYanTaEastGateDesc;
+    default:
+      return description;
+  }
+}
 
 class CampusMapPage extends ConsumerStatefulWidget {
   const CampusMapPage({super.key});
@@ -276,7 +305,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               ),
             ),
             child: Text(
-              poi.name,
+              _resolvePoiName(poi.name, context.l10n),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
@@ -418,7 +447,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: FilterChip(
-                  label: Text(poi.name),
+                  label: Text(_resolvePoiName(poi.name, l10n)),
                   selected: isSelected,
                   onSelected: (_) => _onPOITap(poi),
                   backgroundColor: colors.cardOverlay,
@@ -680,7 +709,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         ),
                       ),
                       title: Text(
-                        poi.name,
+                        _resolvePoiName(poi.name, l10n),
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight:
@@ -691,7 +720,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
-                          poi.description,
+                          _resolvePoiDesc(poi.description, l10n),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -753,7 +782,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      _selectedPOI!.name,
+                      _resolvePoiName(_selectedPOI!.name, l10n),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -775,7 +804,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               const SizedBox(height: 24),
               _buildInfoSection(
                 title: l10n.buildingIntro,
-                content: _selectedPOI!.description,
+                content: _resolvePoiDesc(_selectedPOI!.description, l10n),
                 icon: Icons.info_outline_rounded,
                 colors: colors,
               ),

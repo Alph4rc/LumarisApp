@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
 import 'package:ios_club_app/state/app_states.dart';
@@ -25,7 +26,7 @@ class SchoolBusPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: _buildCampusSwitcher(busState, busController, colors),
+        title: _buildCampusSwitcher(context, busState, busController, colors),
         centerTitle: true,
         actions: [
           IconButton(
@@ -53,6 +54,7 @@ class SchoolBusPage extends ConsumerWidget {
   }
 
   Widget _buildCampusSwitcher(
+    BuildContext context,
     BusPageState busState,
     BusPageNotifier busController,
     ClubColors colors,
@@ -63,7 +65,7 @@ class SchoolBusPage extends ConsumerWidget {
         true: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            '草堂',
+            context.l10n.campusCaoTang,
             style: TextStyle(
               fontSize: 14,
               fontWeight: busState.isCaoTang ? FontWeight.w600 : null,
@@ -73,7 +75,7 @@ class SchoolBusPage extends ConsumerWidget {
         false: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            '雁塔',
+            context.l10n.campusYanTa,
             style: TextStyle(
               fontSize: 14,
               fontWeight: !busState.isCaoTang ? FontWeight.w600 : null,
@@ -170,7 +172,7 @@ class SchoolBusPage extends ConsumerWidget {
               Icon(Icons.error_outline_rounded, size: 48, color: colors.danger),
               const SizedBox(height: 16),
               Text(
-                busState.errorMessage,
+                resolveErrorMessage(busState.errorMessage, context.l10n),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: colors.label, fontSize: 16),
               ),
@@ -218,7 +220,7 @@ class SchoolBusPage extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      busState.errorMessage,
+                      resolveErrorMessage(busState.errorMessage, context.l10n),
                       style: TextStyle(color: colors.secondaryLabel),
                     ),
                   ),

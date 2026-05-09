@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/exam_result.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
@@ -104,6 +105,7 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Widget examWrap(ExamData exam) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
 
     return Wrap(
@@ -160,7 +162,7 @@ class _ExamCardState extends State<ExamCard> {
               ),
               const SizedBox(width: 6),
               Text(
-                '座位号 ${exam.seat}',
+                l10n.seatNumberLabel(exam.seat),
                 style: TextStyle(
                   fontSize: 14,
                   color: colors.secondaryLabel,
@@ -180,7 +182,7 @@ class _ExamCardState extends State<ExamCard> {
         child: ClubCard(
           child: LoadingStateView(
             title: l10n.fetchingScores,
-            subtitle: '正在同步近期考试安排、考场和座位信息',
+            subtitle: l10n.loadingExamsSubtitle,
             compact: true,
             padding: const EdgeInsets.all(20),
           ),
@@ -195,7 +197,7 @@ class _ExamCardState extends State<ExamCard> {
           padding: const EdgeInsets.all(20),
           child: EmptyWidget(
             title: isNetworkError ? l10n.networkError : l10n.loadFailed,
-            subtitle: errorMessage!,
+            subtitle: resolveErrorMessage(errorMessage!, l10n),
             icon: isNetworkError
                 ? CupertinoIcons.wifi_slash
                 : CupertinoIcons.exclamationmark_triangle,
@@ -214,7 +216,7 @@ class _ExamCardState extends State<ExamCard> {
               padding: const EdgeInsets.all(20),
               child: EmptyWidget(
                 title: l10n.empty,
-                subtitle: '说不定刷新一下就有了',
+                subtitle: l10n.noExamsSubtitle,
                 icon: CupertinoIcons.hourglass,
               ),
             ),
@@ -320,7 +322,7 @@ class _ExamCardState extends State<ExamCard> {
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.calendar,
-            label: '座位号',
+            label: l10n.seatNumber,
             content: exam.seat,
             color: colors.danger,
           ),

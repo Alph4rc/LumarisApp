@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+
+/// Maps tile identifiers to their localized display names.
+String _tileDisplayName(String tileId, AppLocalizations l10n) {
+  switch (tileId) {
+    case '电费':
+      return l10n.electricity;
+    case '校车':
+      return l10n.schoolBus;
+    case '饭卡':
+      return l10n.payment;
+    default:
+      return tileId;
+  }
+}
 
 /// Controls for entering and exiting tile edit mode
 class TileEditControls extends ConsumerWidget {
@@ -13,6 +29,7 @@ class TileEditControls extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final isEditMode = ref.watch(
       tileEditControllerProvider.select((value) => value.isEditMode),
     );
@@ -24,8 +41,8 @@ class TileEditControls extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Title
-          const Text(
-            '快捷功能',
+          Text(
+            l10n.shortcuts,
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -47,13 +64,14 @@ class TileEditControls extends ConsumerWidget {
 
   /// Build edit button
   Widget _buildEditButton(BuildContext context, TileEditNotifier controller) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
 
     return TextButton.icon(
       key: const ValueKey('edit_button'),
       onPressed: () => controller.toggleEditMode(),
       icon: const Icon(Icons.edit_outlined, size: 18),
-      label: const Text('编辑'),
+      label: Text(l10n.edit),
       style: TextButton.styleFrom(
         foregroundColor: colors.primary,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -63,13 +81,14 @@ class TileEditControls extends ConsumerWidget {
 
   /// Build done button
   Widget _buildDoneButton(BuildContext context, TileEditNotifier controller) {
+    final l10n = context.l10n;
     final colors = context.clubColors;
 
     return ElevatedButton.icon(
       key: const ValueKey('done_button'),
       onPressed: () => controller.toggleEditMode(),
       icon: const Icon(Icons.check, size: 18),
-      label: const Text('完成'),
+      label: Text(l10n.done),
       style: ElevatedButton.styleFrom(
         backgroundColor: colors.primary,
         foregroundColor: colors.onAccent,
@@ -118,10 +137,11 @@ class EmptyTilesMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return ClubCard(
       margin: const EdgeInsets.all(16),
       child: EmptyWidget(
-          title: '暂无快捷功能', icon: Icons.widgets_outlined, subtitle: '请在编辑模式中添加'),
+          title: l10n.noShortcuts, icon: Icons.widgets_outlined, subtitle: l10n.addInEditMode),
     );
   }
 }
@@ -147,10 +167,10 @@ class AvailableTilesList extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0, bottom: 8.0, top: 16.0),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, bottom: 8.0, top: 16.0),
             child: Text(
-              '更多功能',
+              context.l10n.moreFunctions,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -177,7 +197,7 @@ class AvailableTilesList extends ConsumerWidget {
                     ),
                   ),
                   title: Text(
-                    tileId,
+                    _tileDisplayName(tileId, context.l10n),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,

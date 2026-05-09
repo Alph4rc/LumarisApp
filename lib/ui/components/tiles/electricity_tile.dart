@@ -135,7 +135,7 @@ class ElectricityTile extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '点击订阅',
+                    l10n.tapToSubscribe,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
