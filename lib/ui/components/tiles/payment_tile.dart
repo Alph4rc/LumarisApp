@@ -146,7 +146,7 @@ class PaymentTile extends ConsumerWidget {
                           ? colors.danger
                           : colors.secondaryLabel,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

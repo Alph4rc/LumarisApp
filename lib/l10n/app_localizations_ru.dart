@@ -39,7 +39,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get payment => 'Карта';
 
   @override
-  String get map => 'Карта';
+  String get map => 'Схема';
 
   @override
   String get settings => 'Настройки';
@@ -90,7 +90,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get systemLanguage => 'Системный';
 
   @override
-  String get simplifiedChinese => 'Упрощённый китайский';
+  String get simplifiedChinese => '简体中文';
 
   @override
   String get english => 'English';
@@ -108,7 +108,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
-  String get korean => 'Корейский';
+  String get korean => '한국어';
+
+  @override
+  String get traditionalChinese => '繁體中文';
 
   @override
   String get team => 'Команда';
@@ -164,9 +167,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get logout => 'Выйти';
-
-  @override
-  String get showCourseGrid => 'Показать сетку';
 
   @override
   String get agreementAuthDebug => 'Статус соглашения [Debug]';
@@ -538,7 +538,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get userAgreementSection2_3 =>
-      '2.3 Немедленно смените пароль при риске для учётной записи.';
+      '2.3 Немедленно смените пароль при угрозе безопасности учётной записи.';
 
   @override
   String get userAgreementSection3Title => '3. Поведение пользователя';
@@ -583,7 +583,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get userAgreementSection5_2 =>
-      '5.2 Мы не несём ответственности за перебои из-за сети или проблем сервера.';
+      '5.2 Мы не несём ответственности за перебои из-за проблем с сетью или сервером.';
 
   @override
   String get userAgreementSection5_3 =>
@@ -1329,6 +1329,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get customCourseManage => 'Управление своими курсами';
 
   @override
+  String get showCourseGrid => 'Показать сетку';
+
+  @override
   String get noBackground => 'Без фона';
 
   @override
@@ -1437,7 +1440,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get programLabel => 'Учебный план';
 
   @override
-  String get campusMap => 'Карта кампуса';
+  String get campusMap => 'Схема кампуса';
 
   @override
   String get help => 'Помощь';
@@ -1729,7 +1732,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String currentSubInfo(Object email, Object threshold) {
-    return 'Email $email оповещать при балансе ниже ¥$threshold';
+    return 'Оповещение на $email при балансе ниже ¥$threshold';
   }
 
   @override
@@ -1765,22 +1768,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteSubFailed => 'Не удалось удалить подписку';
 
   @override
-  String get electricitySubLoadFailed => '加载电费订阅失败';
+  String get electricitySubLoadFailed =>
+      'Не удалось загрузить подписку на электричество';
 
   @override
-  String get subscriptionDetail => '订阅内容';
+  String get subscriptionDetail => 'Детали подписки';
 
   @override
-  String get create => '创建';
+  String get create => 'Создать';
 
   @override
-  String get webNotSupported => '暂不支持Web版';
+  String get webNotSupported => 'Не поддерживается в веб-версии';
 
   @override
-  String get webNotSupportedSubtitle => '请使用其他版本';
+  String get webNotSupportedSubtitle => 'Пожалуйста, используйте другую версию';
 
   @override
-  String get reorderFailed => '重新排序失败';
+  String get reorderFailed => 'Не удалось изменить порядок';
 
   @override
   String get searchLocation => 'Поиск мест или зданий...';

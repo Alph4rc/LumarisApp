@@ -12,7 +12,7 @@
   "electricity": "Strom",
   "schoolBus": "Bus",
   "payment": "Karte",
-  "map": "Karte",
+  "map": "Plan",
 
   "settings": "Einstellungen",
   "basicSettings": "Allgemein",
@@ -33,14 +33,14 @@
 
   "language": "Sprache",
   "systemLanguage": "System",
-  "simplifiedChinese": "Vereinfachtes Chinesisch",
+  "simplifiedChinese": "简体中文",
   "english": "English",
   "japanese": "日本語",
   "russian": "Русский",
   "french": "Français",
   "german": "Deutsch",
-  "korean": "Koreanisch",
-
+  "korean": "한국어",
+  "traditionalChinese": "繁體中文",
   "team": "Team",
   "teamName": "Lumaris Team",
   "openSourceLicense": "Open-Source-Lizenz",
@@ -51,7 +51,7 @@
   "userAgreementSubtitle": "Durch die Nutzung stimmen Sie diesen Bedingungen zu",
 
   "clearCache": "Cache leeren",
-  "clearingCache": "Cache wird geleert...",
+  "clearingCache": "Cache leeren...",
   "cacheCleared": "Cache geleert",
   "confirmClearCacheTitle": "Cache leeren?",
   "confirmClearCacheContent": "Alle zwischengespeicherten Daten werden gelöscht und beim nächsten Start neu geladen",
@@ -289,7 +289,7 @@
   "decShort": "Dez.",
 
   "weekUnit": "Woche {n}",
-  "currentWeek": "Aktuell Woche {n}",
+  "currentWeek": "Aktuelle Woche {n}",
   "weeksUntilStart": "Noch {n} Woche(n) bis zum Semesterbeginn",
   "periodRange": "Stunde {start}-{end}",
   "allSchedules": "Alle Stundenpläne",
@@ -388,9 +388,6 @@
   "classTime": "Zeit",
   "classCampus": "Campus",
 
-  "todaySchedule": "{prefix}Stundenplan",
-  "todayTomorrow": "Heute",
-  "tomorrowShort": "Morgen",
   "noCourseToday": "Keine Kurse heute",
   "noCourseTodaySubtitle": "Machen Sie eine Pause, Sie haben sie verdient",
   "showTomorrowSchedule": "Morgige Kurse anzeigen",
@@ -469,7 +466,7 @@
   "campusNavigation": "Campus-Navigation",
   "settingsAbout": "Einstellungen / Über",
   "programLabel": "Studienplan",
-  "campusMap": "Campus-Karte",
+  "campusMap": "Campus-Plan",
   "help": "Hilfe",
   "academicAccount": "Hochschulkonto",
   "guest": "Gast",
@@ -685,11 +682,9 @@
   "poiYanTaEastGate": "Yanta Osttor",
   "poiYanTaEastGateDesc": "Historischer Campus-Eingang",
 
-  "help": "Hilfe",
   "shortcuts": "Verknüpfungen",
   "moreFunctions": "Weitere Funktionen",
   "noShortcuts": "Keine Verknüpfungen",
   "addInEditMode": "Im Bearbeitungsmodus hinzufügen",
-  "delete": "Löschen",
   "eduSystem": "Bildungssystem"
 }

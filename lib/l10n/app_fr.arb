@@ -12,7 +12,7 @@
   "electricity": "Électricité",
   "schoolBus": "Bus",
   "payment": "Carte",
-  "map": "Carte",
+  "map": "Plan",
 
   "settings": "Paramètres",
   "basicSettings": "Général",
@@ -33,14 +33,14 @@
 
   "language": "Langue",
   "systemLanguage": "Système",
-  "simplifiedChinese": "Chinois simplifié",
+  "simplifiedChinese": "简体中文",
   "english": "English",
   "japanese": "日本語",
   "russian": "Русский",
   "french": "Français",
   "german": "Deutsch",
-  "korean": "Coréen",
-
+  "korean": "한국어",
+  "traditionalChinese": "繁體中文",
   "team": "Équipe",
   "teamName": "Lumaris Team",
   "openSourceLicense": "Licence open source",
@@ -289,7 +289,7 @@
   "decShort": "déc.",
 
   "weekUnit": "Semaine {n}",
-  "currentWeek": "Actuellement Semaine {n}",
+  "currentWeek": "Semaine {n} en cours",
   "weeksUntilStart": "{n} semaine(s) avant la rentrée",
   "periodRange": "Période {start}-{end}",
   "allSchedules": "Tous les cours",
@@ -388,9 +388,6 @@
   "classTime": "Horaire",
   "classCampus": "Campus",
 
-  "todaySchedule": "{prefix}Emploi du temps",
-  "todayTomorrow": "Aujourd'hui",
-  "tomorrowShort": "Demain",
   "noCourseToday": "Pas de cours aujourd'hui",
   "noCourseTodaySubtitle": "Reposez-vous, vous le méritez",
   "showTomorrowSchedule": "Afficher les cours de demain",
@@ -469,7 +466,7 @@
   "campusNavigation": "Navigation du campus",
   "settingsAbout": "Paramètres / À propos",
   "programLabel": "Programme",
-  "campusMap": "Carte du campus",
+  "campusMap": "Plan du campus",
   "help": "Aide",
   "academicAccount": "Compte académique",
   "guest": "Invité",
@@ -685,11 +682,9 @@
   "poiYanTaEastGate": "Porte est de Yanta",
   "poiYanTaEastGateDesc": "Entrée du campus historique",
 
-  "help": "Aide",
   "shortcuts": "Raccourcis",
   "moreFunctions": "Plus de fonctions",
   "noShortcuts": "Aucun raccourci",
   "addInEditMode": "Ajouter en mode édition",
-  "delete": "Supprimer",
   "eduSystem": "Système éducatif"
 }

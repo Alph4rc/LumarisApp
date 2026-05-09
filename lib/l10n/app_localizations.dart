@@ -105,7 +105,8 @@ abstract class AppLocalizations {
     Locale('ja'),
     Locale('ko'),
     Locale('ru'),
-    Locale('zh')
+    Locale('zh'),
+    Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')
   ];
 
   /// No description provided for @appName.
@@ -312,6 +313,12 @@ abstract class AppLocalizations {
   /// **'한국어'**
   String get korean;
 
+  /// No description provided for @traditionalChinese.
+  ///
+  /// In zh, this message translates to:
+  /// **'繁體中文'**
+  String get traditionalChinese;
+
   /// No description provided for @team.
   ///
   /// In zh, this message translates to:
@@ -413,12 +420,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'退出登录'**
   String get logout;
-
-  /// No description provided for @showCourseGrid.
-  ///
-  /// In zh, this message translates to:
-  /// **'显示课表网格线'**
-  String get showCourseGrid;
 
   /// No description provided for @agreementAuthDebug.
   ///
@@ -2521,6 +2522,12 @@ abstract class AppLocalizations {
   /// **'自定义课程管理'**
   String get customCourseManage;
 
+  /// No description provided for @showCourseGrid.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示课表网格线'**
+  String get showCourseGrid;
+
   /// No description provided for @noBackground.
   ///
   /// In zh, this message translates to:
@@ -3843,6 +3850,18 @@ class _AppLocalizationsDelegate
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'zh':
+      {
+        switch (locale.scriptCode) {
+          case 'Hant':
+            return AppLocalizationsZhHant();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'de':

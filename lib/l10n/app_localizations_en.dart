@@ -33,7 +33,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get electricity => 'Electricity';
 
   @override
-  String get schoolBus => 'School Bus';
+  String get schoolBus => 'Bus';
 
   @override
   String get payment => 'Card';
@@ -90,25 +90,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemLanguage => 'System';
 
   @override
-  String get simplifiedChinese => 'Simplified Chinese';
+  String get simplifiedChinese => '简体中文';
 
   @override
   String get english => 'English';
 
   @override
-  String get japanese => 'Japanese';
+  String get japanese => '日本語';
 
   @override
-  String get russian => 'Russian';
+  String get russian => 'Русский';
 
   @override
-  String get french => 'French';
+  String get french => 'Français';
 
   @override
-  String get german => 'German';
+  String get german => 'Deutsch';
 
   @override
-  String get korean => 'Korean';
+  String get korean => '한국어';
+
+  @override
+  String get traditionalChinese => '繁體中文';
 
   @override
   String get team => 'Team';
@@ -163,9 +166,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logout => 'Log out';
-
-  @override
-  String get showCourseGrid => 'Show course grid';
 
   @override
   String get agreementAuthDebug => 'Agreement authorization [Debug]';
@@ -822,7 +822,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String currentWeek(Object n) {
-    return 'Currently Week $n';
+    return 'Current Week: $n';
   }
 
   @override
@@ -1106,7 +1106,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyCredentials => 'Username and password cannot be empty';
 
   @override
-  String get loginTimeoutEdu => 'Login timed out, please check your network';
+  String get loginTimeoutEdu =>
+      'Academic system login timed out. Please check your network.';
 
   @override
   String get loginFailed => 'Login failed, please check your credentials';
@@ -1326,6 +1327,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customCourseManage => 'Custom Course Management';
+
+  @override
+  String get showCourseGrid => 'Show course grid';
 
   @override
   String get noBackground => 'No Background';

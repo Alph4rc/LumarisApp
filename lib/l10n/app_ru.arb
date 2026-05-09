@@ -12,7 +12,7 @@
   "electricity": "Электричество",
   "schoolBus": "Автобус",
   "payment": "Карта",
-  "map": "Карта",
+  "map": "Схема",
 
   "settings": "Настройки",
   "basicSettings": "Основные",
@@ -33,14 +33,14 @@
 
   "language": "Язык",
   "systemLanguage": "Системный",
-  "simplifiedChinese": "Упрощённый китайский",
+  "simplifiedChinese": "简体中文",
   "english": "English",
   "japanese": "日本語",
   "russian": "Русский",
   "french": "Français",
   "german": "Deutsch",
-  "korean": "Корейский",
-
+  "korean": "한국어",
+  "traditionalChinese": "繁體中文",
   "team": "Команда",
   "teamName": "Lumaris Team",
   "openSourceLicense": "Лицензия",
@@ -192,7 +192,7 @@
   "userAgreementSection2Title": "2. Учётная запись и безопасность",
   "userAgreementSection2_1": "2.1 Требуется вход с учётной записью учебной системы.",
   "userAgreementSection2_2": "2.2 Учётные данные хранятся только на вашем устройстве.",
-  "userAgreementSection2_3": "2.3 Немедленно смените пароль при риске для учётной записи.",
+  "userAgreementSection2_3": "2.3 Немедленно смените пароль при угрозе безопасности учётной записи.",
 
   "userAgreementSection3Title": "3. Поведение пользователя",
   "userAgreementSection3_1": "3.1 Необходимо соблюдать действующее законодательство.",
@@ -207,7 +207,7 @@
 
   "userAgreementSection5Title": "5. Отказ от ответственности",
   "userAgreementSection5_1": "5.1 Приложение предоставляется «как есть».",
-  "userAgreementSection5_2": "5.2 Мы не несём ответственности за перебои из-за сети или проблем сервера.",
+  "userAgreementSection5_2": "5.2 Мы не несём ответственности за перебои из-за проблем с сетью или сервером.",
   "userAgreementSection5_3": "5.3 Учебная информация предоставляется только для справки.",
   "userAgreementSection5_4": "5.4 Мы не несём ответственности за ущерб устройству или потерю данных, кроме случаев, предусмотренных законом.",
 
@@ -388,9 +388,6 @@
   "classTime": "Время",
   "classCampus": "Кампус",
 
-  "todaySchedule": "Расписание на {prefix}",
-  "todayTomorrow": "Сегодня",
-  "tomorrowShort": "Завтра",
   "noCourseToday": "Сегодня занятий нет",
   "noCourseTodaySubtitle": "Отдохните, вы это заслужили",
   "showTomorrowSchedule": "Показать расписание на завтра",
@@ -467,7 +464,7 @@
   "campusNavigation": "Навигация по кампусу",
   "settingsAbout": "Настройки / О приложении",
   "programLabel": "Учебный план",
-  "campusMap": "Карта кампуса",
+  "campusMap": "Схема кампуса",
   "help": "Помощь",
   "academicAccount": "Учебная учётная запись",
   "guest": "Гость",
@@ -565,7 +562,7 @@
   "pleaseEnterThreshold": "Введите порог больше 0",
   "lowBalanceAlertCreated": "Оповещение о низком балансе создано",
   "createSubFailed": "Не удалось создать подписку",
-  "currentSubInfo": "Email {email} оповещать при балансе ниже ¥{threshold}",
+  "currentSubInfo": "Оповещение на {email} при балансе ниже ¥{threshold}",
   "subSetupHint": "После установки порога вы будете получать письма при низком балансе",
   "remindEmailLabel": "Email для оповещения",
   "notSet": "Не задано",
@@ -576,6 +573,12 @@
   "deleteSubConfirmContent": "Вы уверены, что хотите удалить текущее оповещение о низком балансе?",
   "lowBalanceAlertDeleted": "Оповещение о низком балансе удалено",
   "deleteSubFailed": "Не удалось удалить подписку",
+  "electricitySubLoadFailed": "Не удалось загрузить подписку на электричество",
+  "subscriptionDetail": "Детали подписки",
+  "create": "Создать",
+  "webNotSupported": "Не поддерживается в веб-версии",
+  "webNotSupportedSubtitle": "Пожалуйста, используйте другую версию",
+  "reorderFailed": "Не удалось изменить порядок",
 
   "searchLocation": "Поиск мест или зданий...",
   "search": "Поиск...",
@@ -677,11 +680,9 @@
   "poiYanTaEastGate": "Восточные ворота Яньта",
   "poiYanTaEastGateDesc": "Вход в исторический кампус",
 
-  "help": "Помощь",
   "shortcuts": "Ярлыки",
   "moreFunctions": "Другие функции",
   "noShortcuts": "Нет ярлыков",
   "addInEditMode": "Добавить в режиме редактирования",
-  "delete": "Удалить",
   "eduSystem": "Образовательная система"
 }

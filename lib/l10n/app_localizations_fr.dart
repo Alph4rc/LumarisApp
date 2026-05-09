@@ -40,7 +40,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get payment => 'Carte';
 
   @override
-  String get map => 'Carte';
+  String get map => 'Plan';
 
   @override
   String get settings => 'Paramètres';
@@ -91,7 +91,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get systemLanguage => 'Système';
 
   @override
-  String get simplifiedChinese => 'Chinois simplifié';
+  String get simplifiedChinese => '简体中文';
 
   @override
   String get english => 'English';
@@ -109,7 +109,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
-  String get korean => 'Coréen';
+  String get korean => '한국어';
+
+  @override
+  String get traditionalChinese => '繁體中文';
 
   @override
   String get team => 'Équipe';
@@ -165,9 +168,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logout => 'Déconnexion';
-
-  @override
-  String get showCourseGrid => 'Afficher la grille';
 
   @override
   String get agreementAuthDebug => 'État de l\'accord [Debug]';
@@ -829,7 +829,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String currentWeek(Object n) {
-    return 'Actuellement Semaine $n';
+    return 'Semaine $n en cours';
   }
 
   @override
@@ -1341,6 +1341,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get customCourseManage => 'Gestion des cours personnalisés';
 
   @override
+  String get showCourseGrid => 'Afficher la grille';
+
+  @override
   String get noBackground => 'Aucun arrière-plan';
 
   @override
@@ -1450,7 +1453,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get programLabel => 'Programme';
 
   @override
-  String get campusMap => 'Carte du campus';
+  String get campusMap => 'Plan du campus';
 
   @override
   String get help => 'Aide';

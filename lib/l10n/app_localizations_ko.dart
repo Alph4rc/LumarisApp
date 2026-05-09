@@ -9,7 +9,7 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get appName => '광서';
+  String get appName => 'Lumaris';
 
   @override
   String get appSlogan => '대학 생활을 하나의 앱에 담다';
@@ -90,7 +90,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get systemLanguage => '시스템 언어에 따름';
 
   @override
-  String get simplifiedChinese => '중국어 간체';
+  String get simplifiedChinese => '简体中文';
 
   @override
   String get english => 'English';
@@ -109,6 +109,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get korean => '한국어';
+
+  @override
+  String get traditionalChinese => '繁體中文';
 
   @override
   String get team => '제작팀';
@@ -163,9 +166,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get logout => '로그아웃';
 
   @override
-  String get showCourseGrid => '시간표 그리드 표시';
-
-  @override
   String get agreementAuthDebug => '약관 동의 상태 [디버그]';
 
   @override
@@ -187,7 +187,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get widgetSetupStep2 => '\"위젯\" 또는 \"Widgets\" 옵션 선택';
 
   @override
-  String get widgetSetupStep3 => '\"광서\"를 찾아 적합한 위젯 선택';
+  String get widgetSetupStep3 => '\"Lumaris\"를 찾아 적합한 위젯 선택';
 
   @override
   String get widgetSetupStep4 => '위젯을 바탕화면의 원하는 위치로 드래그';
@@ -320,7 +320,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get itemizedCredits => '항목별 학점';
 
   @override
-  String get courseConflict => '현재 시간에 여러 강의가 충돌합니다';
+  String get courseConflict => '현재 시간에 여러 수업이 충돌합니다';
 
   @override
   String get networkError => '네트워크 연결 실패, 네트워크 설정을 확인해 주세요';
@@ -335,7 +335,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get unknownError => '알 수 없는 오류, 다시 시도해 주세요';
 
   @override
-  String get agreementWelcomeTitle => '광서에 오신 것을 환영합니다';
+  String get agreementWelcomeTitle => 'Lumaris에 오신 것을 환영합니다';
 
   @override
   String get agreementDescription =>
@@ -358,7 +358,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get disagree => '동의하지 않음';
 
   @override
-  String get privacyPolicyTitle => '광서 개인정보 처리방침';
+  String get privacyPolicyTitle => 'Lumaris 개인정보 처리방침';
 
   @override
   String get privacyPolicyUpdatedAt => '갱신일: 2026년 5월 5일';
@@ -368,7 +368,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacyPolicyIntro =>
-      '광서(이하 \"본 앱\")를 이용해 주셔서 감사합니다. 본 앱은 Lumaris Team(이하 \"당사\")이 개발 및 운영합니다. 당사는 개인정보의 중요성을 잘 알고 있으며, 관련 법률과 규정을 준수하여 합법적이고 정당하며 필요 최소한의 신의성실 원칙에 따라 귀하의 개인정보를 보호합니다. 본 개인정보 처리방침은 당사가 귀하의 개인정보를 수집, 이용, 저장 및 보호하는 방법과 귀하가 가지는 권리에 대해 설명하는 것을 목적으로 합니다. 본 앱을 사용하기 전에 본 개인정보 처리방침을 주의 깊게 읽어 주시기 바랍니다.';
+      'Lumaris(이하 \"본 앱\")를 이용해 주셔서 감사합니다. 본 앱은 Lumaris Team(이하 \"당사\")이 개발 및 운영합니다. 당사는 개인정보의 중요성을 잘 알고 있으며, 관련 법률과 규정을 준수하여 합법적이고 정당하며 필요 최소한의 신의성실 원칙에 따라 귀하의 개인정보를 보호합니다. 본 개인정보 처리방침은 당사가 귀하의 개인정보를 수집, 이용, 저장 및 보호하는 방법과 귀하가 가지는 권리에 대해 설명하는 것을 목적으로 합니다. 본 앱을 사용하기 전에 본 개인정보 처리방침을 주의 깊게 읽어 주시기 바랍니다.';
 
   @override
   String get privacySection1Title => '제1조 수집하는 정보';
@@ -491,7 +491,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '개발팀: Lumaris Team\n코드 저장소: https://gitee.com/luckyfishisdashen/iOSClub.AppMobile';
 
   @override
-  String get userAgreementTitle => '광서 이용약관';
+  String get userAgreementTitle => 'Lumaris 이용약관';
 
   @override
   String get userAgreementUpdatedAt => '갱신일: 2026년 5월 5일';
@@ -501,7 +501,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get userAgreementIntro =>
-      '광서(이하 \"본 앱\")를 이용해 주셔서 감사합니다. 본 앱은 Lumaris Team(이하 \"당사\")이 개발 및 운영합니다. 본 앱을 사용하기 전에 본 이용약관(이하 \"본 약관\")을 주의 깊게 읽어 주시기 바랍니다. 본 앱을 사용하면 본 약관의 모든 내용을 읽고 이해하였으며 이에 동의하는 것으로 간주됩니다. 본 약관의 어떤 조항에도 동의하지 않으시는 경우, 본 앱의 사용을 중단해 주시기 바랍니다.';
+      'Lumaris(이하 \"본 앱\")를 이용해 주셔서 감사합니다. 본 앱은 Lumaris Team(이하 \"당사\")이 개발 및 운영합니다. 본 앱을 사용하기 전에 본 이용약관(이하 \"본 약관\")을 주의 깊게 읽어 주시기 바랍니다. 본 앱을 사용하면 본 약관의 모든 내용을 읽고 이해하였으며 이에 동의하는 것으로 간주됩니다. 본 약관의 어떤 조항에도 동의하지 않으시는 경우, 본 앱의 사용을 중단해 주시기 바랍니다.';
 
   @override
   String get userAgreementSection1Title => '제1조 서비스 설명';
@@ -653,7 +653,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get joinUs => '함께하기';
 
   @override
-  String get madeWithLove => 'Made with ❤️ in Xi\'an';
+  String get madeWithLove => '시안에서 ❤️를 담아 만들었습니다';
 
   @override
   String get easterEggTitle => '🎉 이스터에그';
@@ -663,7 +663,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get easterEggContent =>
-      '당신은 이 비밀을 아는 몇 안 되는 사람 중 하나입니다!\n\n광서에 대한 애정과 지지에 감사드립니다.\n\n계속 탐험하세요, 더 많은 놀라움이 기다리고 있을지도 모릅니다...';
+      '당신은 이 비밀을 아는 몇 안 되는 사람 중 하나입니다!\n\nLumaris에 대한 애정과 지지에 감사드립니다.\n\n계속 탐험하세요, 더 많은 놀라움이 기다리고 있을지도 모릅니다...';
 
   @override
   String get fontSetting => '글꼴 설정';
@@ -1034,10 +1034,10 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get semesterAutumnShort => '1';
+  String get semesterAutumnShort => '2학기';
 
   @override
-  String get semesterSpringShort => '2';
+  String get semesterSpringShort => '1학기';
 
   @override
   String get year1 => '1학년';
@@ -1311,6 +1311,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get customCourseManage => '사용자 지정 수업 관리';
+
+  @override
+  String get showCourseGrid => '시간표 그리드 표시';
 
   @override
   String get noBackground => '배경 없음';

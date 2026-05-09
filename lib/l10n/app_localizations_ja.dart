@@ -90,7 +90,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get systemLanguage => 'システム';
 
   @override
-  String get simplifiedChinese => '簡体字中国語';
+  String get simplifiedChinese => '简体中文';
 
   @override
   String get english => 'English';
@@ -108,7 +108,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
-  String get korean => '韓国語';
+  String get korean => '한국어';
+
+  @override
+  String get traditionalChinese => '繁體中文';
 
   @override
   String get team => 'チーム';
@@ -160,9 +163,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get logout => 'ログアウト';
-
-  @override
-  String get showCourseGrid => '時間割のグリッド線を表示';
 
   @override
   String get agreementAuthDebug => '同意認証状態 [Debug]';
@@ -610,7 +610,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get joinUs => '参加する';
 
   @override
-  String get madeWithLove => 'Made with ❤️ in Xi\'an';
+  String get madeWithLove => '西安で❤️を込めて作られました';
 
   @override
   String get easterEggTitle => '🎉 イースターエッグ';
@@ -885,19 +885,19 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get noCustomCourses => 'カスタムコースはありません';
+  String get noCustomCourses => 'カスタム授業はありません';
 
   @override
-  String get noCustomCoursesSubtitle => '右上の+をタップしてコースを追加';
+  String get noCustomCoursesSubtitle => '右上の+をタップして授業を追加';
 
   @override
-  String get readingCustomCourses => 'カスタムコースを読み込み中';
+  String get readingCustomCourses => 'カスタム授業を読み込み中';
 
   @override
-  String get readingCustomCoursesSubtitle => 'ローカルに保存されたコース設定を整理中';
+  String get readingCustomCoursesSubtitle => 'ローカルに保存された授業設定を整理中';
 
   @override
-  String get courseAdded => 'コースが追加されました';
+  String get courseAdded => '授業が追加されました';
 
   @override
   String get scoresAndGpa => '成績とGPA';
@@ -1166,67 +1166,67 @@ class AppLocalizationsJa extends AppLocalizations {
   String get done => '完了';
 
   @override
-  String get todoListLabel => '待办事务';
+  String get todoListLabel => 'タスクリスト';
 
   @override
-  String get readingTodos => '正在读取待办事务';
+  String get readingTodos => 'タスクを読み込み中';
 
   @override
-  String get readingTodosSubtitle => '正在加载本地待办列表与提醒状态';
+  String get readingTodosSubtitle => 'ローカルのタスクリストとリマインダー状態を読み込み中';
 
   @override
-  String get noTodos => '当前没有待办事务';
+  String get noTodos => '現在タスクはありません';
 
   @override
-  String get noTodosSubtitle => '点击右上角添加待办事项';
+  String get noTodosSubtitle => '右上の＋をタップして追加';
 
   @override
-  String get todoLoadFailedSubtitle => '无法加载待办事项';
+  String get todoLoadFailedSubtitle => 'タスクを読み込めません';
 
   @override
   String deadlineLabel(Object date) {
-    return '截止日期: $date';
+    return '締切日: $date';
   }
 
   @override
-  String get noDeadline => '无';
+  String get noDeadline => 'なし';
 
   @override
-  String get titleRequired => '标题是必须项';
+  String get titleRequired => 'タイトルは必須です';
 
   @override
-  String get deadlineRequired => '截至日期是必须项';
+  String get deadlineRequired => '締切日は必須です';
 
   @override
-  String get add => '添加';
+  String get add => '追加';
 
   @override
-  String get upcomingExams => '近期考试';
+  String get upcomingExams => '近日の試験';
 
   @override
-  String get loadingExams => '正在加载考试信息';
+  String get loadingExams => '試験情報を読み込み中';
 
   @override
-  String get loadingExamsSubtitle => '正在同步近期考试安排、考场和座位信息';
+  String get loadingExamsSubtitle => '最近の試験日程、会場、座席情報を同期中';
 
   @override
-  String get noExams => '最近没有考试';
+  String get noExams => '試験はありません';
 
   @override
-  String get noExamsSubtitle => '说不定刷新一下就有了';
+  String get noExamsSubtitle => '更新すると表示されるかもしれません';
 
   @override
-  String get examTime => '考试时间';
+  String get examTime => '試験時間';
 
   @override
-  String get examLocation => '考试地点';
+  String get examLocation => '試験会場';
 
   @override
-  String get seatNumber => '座位号';
+  String get seatNumber => '座席番号';
 
   @override
   String seatNumberLabel(Object seat) {
-    return '座位号 $seat';
+    return '座席番号 $seat';
   }
 
   @override
@@ -1264,6 +1264,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get customCourseManage => 'カスタム授業管理';
+
+  @override
+  String get showCourseGrid => '時間割のグリッド線を表示';
 
   @override
   String get noBackground => '背景なし';
@@ -1308,7 +1311,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get loadingSchedule => '時間割を読み込み中';
 
   @override
-  String get loadingScheduleSubtitle => 'コース、設定、背景設定を読み込み中';
+  String get loadingScheduleSubtitle => '授業、設定、背景設定を読み込み中';
 
   @override
   String get updatingSchedule => '時間割を更新中...';
@@ -1687,22 +1690,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteSubFailed => 'サブスクリプションの削除に失敗しました';
 
   @override
-  String get electricitySubLoadFailed => '加载电费订阅失败';
+  String get electricitySubLoadFailed => '電気料金サブスクリプションの読み込みに失敗しました';
 
   @override
-  String get subscriptionDetail => '订阅内容';
+  String get subscriptionDetail => 'サブスクリプション内容';
 
   @override
-  String get create => '创建';
+  String get create => '作成';
 
   @override
-  String get webNotSupported => '暂不支持Web版';
+  String get webNotSupported => 'Web版は未対応です';
 
   @override
-  String get webNotSupportedSubtitle => '请使用其他版本';
+  String get webNotSupportedSubtitle => '他のバージョンをお使いください';
 
   @override
-  String get reorderFailed => '重新排序失败';
+  String get reorderFailed => '並べ替えに失敗しました';
 
   @override
   String get searchLocation => '場所や建物を検索...';

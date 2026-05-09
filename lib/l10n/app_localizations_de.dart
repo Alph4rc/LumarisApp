@@ -40,7 +40,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get payment => 'Karte';
 
   @override
-  String get map => 'Karte';
+  String get map => 'Plan';
 
   @override
   String get settings => 'Einstellungen';
@@ -91,7 +91,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get systemLanguage => 'System';
 
   @override
-  String get simplifiedChinese => 'Vereinfachtes Chinesisch';
+  String get simplifiedChinese => '简体中文';
 
   @override
   String get english => 'English';
@@ -109,7 +109,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get german => 'Deutsch';
 
   @override
-  String get korean => 'Koreanisch';
+  String get korean => '한국어';
+
+  @override
+  String get traditionalChinese => '繁體中文';
 
   @override
   String get team => 'Team';
@@ -141,7 +144,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get clearCache => 'Cache leeren';
 
   @override
-  String get clearingCache => 'Cache wird geleert...';
+  String get clearingCache => 'Cache leeren...';
 
   @override
   String get cacheCleared => 'Cache geleert';
@@ -165,9 +168,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get logout => 'Abmelden';
-
-  @override
-  String get showCourseGrid => 'Raster anzeigen';
 
   @override
   String get agreementAuthDebug => 'Zustimmungsstatus [Debug]';
@@ -826,7 +826,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String currentWeek(Object n) {
-    return 'Aktuell Woche $n';
+    return 'Aktuelle Woche $n';
   }
 
   @override
@@ -1346,6 +1346,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get customCourseManage => 'Eigene Kursverwaltung';
 
   @override
+  String get showCourseGrid => 'Raster anzeigen';
+
+  @override
   String get noBackground => 'Kein Hintergrund';
 
   @override
@@ -1456,7 +1459,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get programLabel => 'Studienplan';
 
   @override
-  String get campusMap => 'Campus-Karte';
+  String get campusMap => 'Campus-Plan';
 
   @override
   String get help => 'Hilfe';

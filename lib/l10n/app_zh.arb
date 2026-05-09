@@ -40,7 +40,7 @@
   "french": "Français",
   "german": "Deutsch",
   "korean": "한국어",
-
+  "traditionalChinese": "繁體中文",
   "team": "制作团队",
   "teamName": "Lumaris Team",
   "openSourceLicense": "开源协议",
@@ -61,7 +61,6 @@
   "confirmLogoutContent": "退出后需要重新登录才能访问教务系统数据",
   "logout": "退出登录",
 
-  "showCourseGrid": "显示课表网格线",
   "agreementAuthDebug": "协议授权状态 [Debug]",
   "agreementAuthDebugSubtitle": "关闭后下次启动将重新显示授权页",
 
@@ -388,7 +387,6 @@
   "retry": "重试",
   "loadFailed": "加载失败",
   "noData": "暂无数据",
-  "confirm": "确认",
   "ok": "确定",
 
   "classroom": "上课地点",
@@ -491,8 +489,6 @@
   "profileReadingSubtitle": "正在同步本地登录状态和个人资料入口，请稍等一下",
   "campusNavigation": "校园导航",
   "settingsAbout": "设置/关于",
-  "schoolBus": "校车",
-  "electricity": "电费",
   "programLabel": "培养方案",
   "campusMap": "校园地图",
   "help": "帮助",
@@ -685,11 +681,9 @@
   "poiYanTaEastGateDesc": "历史悠久的老校区入口",
 
   "durationDHMS": "{d}天{h}小时{m}分{s}秒",
-  "help": "帮助",
   "shortcuts": "快捷功能",
   "moreFunctions": "更多功能",
   "noShortcuts": "暂无快捷功能",
   "addInEditMode": "请在编辑模式中添加",
-  "delete": "删除",
   "eduSystem": "教务系统"
 }

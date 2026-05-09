@@ -10,6 +10,7 @@ enum AppLocaleCode {
   fr,
   de,
   ko,
+  zhHant,
 }
 
 class AppLocaleOption {
@@ -35,6 +36,7 @@ class AppLocaleService {
   static const String frPreferenceValue = 'fr';
   static const String dePreferenceValue = 'de';
   static const String koPreferenceValue = 'ko';
+  static const String zhHantPreferenceValue = 'zh_Hant';
 
   static const List<Locale> supportedLocales = [
     Locale('zh'),
@@ -44,6 +46,7 @@ class AppLocaleService {
     Locale('fr'),
     Locale('de'),
     Locale('ko'),
+    Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   ];
 
   static final List<AppLocaleOption> options = [
@@ -87,6 +90,11 @@ class AppLocaleService {
       locale: const Locale('ko'),
       labelBuilder: (l10n) => l10n.korean,
     ),
+    AppLocaleOption(
+      code: AppLocaleCode.zhHant,
+      locale: const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+      labelBuilder: (l10n) => l10n.traditionalChinese,
+    ),
   ];
 
   static String toPreference(AppLocaleCode code) {
@@ -107,6 +115,8 @@ class AppLocaleService {
         return dePreferenceValue;
       case AppLocaleCode.ko:
         return koPreferenceValue;
+      case AppLocaleCode.zhHant:
+        return zhHantPreferenceValue;
     }
   }
 
@@ -126,6 +136,8 @@ class AppLocaleService {
         return AppLocaleCode.de;
       case koPreferenceValue:
         return AppLocaleCode.ko;
+      case zhHantPreferenceValue:
+        return AppLocaleCode.zhHant;
       case systemPreferenceValue:
       default:
         return AppLocaleCode.system;
@@ -150,6 +162,8 @@ class AppLocaleService {
         return const Locale('de');
       case AppLocaleCode.ko:
         return const Locale('ko');
+      case AppLocaleCode.zhHant:
+        return const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant');
     }
   }
 

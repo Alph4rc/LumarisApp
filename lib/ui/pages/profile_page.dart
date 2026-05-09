@@ -309,6 +309,9 @@ class ProfileButtonItem {
                 ),
                 Text(
                   title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
