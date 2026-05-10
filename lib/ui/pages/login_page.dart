@@ -106,7 +106,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } catch (e, stackTrace) {
       AppLogger.error('[LoginPage] 登录失败', error: e, stackTrace: stackTrace);
       if (mounted) {
-        showClubSnackBar(context, Text('${context.l10n.loginFailed}: ${e.toString()}'));
+        showClubSnackBar(
+            context, Text('${context.l10n.loginFailed}: ${e.toString()}'));
       }
     } finally {
       if (mounted) {
@@ -204,24 +205,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 const SizedBox(height: 40),
                 // Logo
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: ClubRadii.tile,
-                    boxShadow: [
-                      BoxShadow(
-                        color: colors.shadowColor.withValues(alpha: 0.9),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: ClubRadii.tile,
-                    child: LazyLoadImage.assets(
-                      'assets/icon.webp',
-                      width: 100,
-                      height: 100,
-                    ),
+                ClipRRect(
+                  borderRadius: ClubRadii.tile,
+                  child: LazyLoadImage.assets(
+                    'assets/icon.webp',
+                    width: 100,
+                    height: 100,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -264,7 +253,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         isFirst: true,
                         isLast: false,
                       ),
-                      const Divider(height: 1, indent: 48),
                       _buildCupertinoLikeTextField(
                         context,
                         controller: _passwordController,

@@ -35,7 +35,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
   final List<ScoreList> _scoreList = [];
   bool _isLoading = true;
   bool _isFool = false;
-  String _loadingText = '';
   final List<ScoreList> _yearList = [];
   bool _isYear = false;
   bool _isRefreshing = false;
@@ -89,7 +88,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
     setState(() {
       _isLoading = !keepCurrentDataWhileLoading;
-      _loadingText = l10n.fetchingScores;
     });
 
     try {
@@ -248,7 +246,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
       return Scaffold(
         body: Center(
           child: LoadingStateView(
-            title: _loadingText,
+            title: context.l10n.fetchingScores,
             subtitle: context.l10n.readingScoresSubtitle,
           ),
         ),

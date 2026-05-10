@@ -72,6 +72,9 @@ android {
         release {
             signingConfig signingConfigs.release
         }
+        profile {
+            signingConfig signingConfigs.release
+        }
     }
 
     compileOptions {
