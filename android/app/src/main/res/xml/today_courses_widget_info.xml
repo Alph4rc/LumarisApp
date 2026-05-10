@@ -4,5 +4,6 @@
     android:updatePeriodMillis="600000"
     android:initialLayout="@layout/today_courses_widget"
     android:resizeMode="horizontal|vertical"
+    android:previewImage="@drawable/today_courses_widget_preview"
     android:widgetCategory="home_screen"
     android:label="今日课程" />
