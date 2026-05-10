@@ -18,7 +18,7 @@
             android:id="@+id/widget_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="今日课程"
+            android:text="今日课表"
             android:textColor="@color/time_indicator_text_light"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="3月26日 星期四"
             android:textColor="@color/widget_title_text_light"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="-2dp" />
 
@@ -67,7 +67,7 @@
                 android:layout_marginBottom="4dp"
                 android:text="今天没有课程"
                 android:textColor="@color/widget_empty_text_primary_light"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="享受你的自由时光"
                 android:textColor="@color/widget_empty_text_secondary_light"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 
