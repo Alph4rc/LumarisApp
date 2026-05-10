@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:display_mode/display_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/basic/services/basic_http_client_manager.dart';
 import 'package:ios_club_app/state/auth_state_notifier.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
@@ -64,6 +65,7 @@ void main() async {
       onRelogFailed: authStateNotifier.relogFailed,
     ),
   );
+  BasicHttpClientManager.initialize();
   EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
   if (!PlatformUtils.isMacOS) {
