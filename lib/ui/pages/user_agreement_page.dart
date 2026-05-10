@@ -39,7 +39,7 @@ class UserAgreementPage extends StatelessWidget {
             _buildSectionTitle('一、服务说明', titleColor),
             const SizedBox(height: 12),
             _buildBodyText(
-              '1.1 本应用是西安建筑科技大学 iOS Club 开发的校园助手应用，旨在为在校学生提供'
+              '1.1 本应用是 Lumaris Team 开发的校园助手应用，旨在为在校学生提供'
               '便捷的校园信息服务，包括但不限于课程管理、成绩查询、校车时刻、电费查询、'
               '饭卡消费记录、校园网流量查询、培养方案查看等功能。',
               textColor,

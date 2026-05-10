@@ -130,7 +130,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _buildBodyText(
-              '4.2 应用更新服务：本应用通过 Gitee 平台检查版本更新信息，'
+              '4.2 应用更新服务：本应用通过 Downloader 平台检查版本更新信息，'
               '此过程中不会传输您的个人信息。',
               textColor,
             ),
