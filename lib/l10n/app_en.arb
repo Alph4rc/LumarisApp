@@ -694,5 +694,8 @@
   "parseAndPreview": "Parse & Preview",
   "importCourses": "Import Courses",
   "parseResult": "Parse Result",
-  "noCoursesParsed": "No courses parsed"
+  "noCoursesParsed": "No courses parsed",
+  "selectSchool": "Select School",
+  "enterCustomUrl": "Or enter a custom URL",
+  "urlHint": "Enter website URL"
 }

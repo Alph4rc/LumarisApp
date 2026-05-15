@@ -48,6 +48,7 @@ void main() {
         id: 'xauat',
         name: '自定义',
         eduApiBaseUrl: 'https://custom.edu.example',
+        scheduleUrl: '',
       );
 
       manager.updateSchoolConfig(custom);

@@ -34,6 +34,7 @@ void main() {
         id: 'test',
         name: 'Test',
         eduApiBaseUrl: 'http://api.test',
+        scheduleUrl: '',
       ),
     );
   });

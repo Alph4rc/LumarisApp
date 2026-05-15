@@ -2075,4 +2075,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noCoursesParsed => 'Aucun cours analysé';
+
+  @override
+  String get selectSchool => 'Sélectionner l\'école';
+
+  @override
+  String get enterCustomUrl => 'Ou entrer une URL personnalisée';
+
+  @override
+  String get urlHint => 'Entrer l\'URL du site web';
 }

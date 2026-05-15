@@ -694,5 +694,8 @@
   "parseAndPreview": "Analyser & Aperçu",
   "importCourses": "Importer les cours",
   "parseResult": "Résultat de l'analyse",
-  "noCoursesParsed": "Aucun cours analysé"
+  "noCoursesParsed": "Aucun cours analysé",
+  "selectSchool": "Sélectionner l'école",
+  "enterCustomUrl": "Ou entrer une URL personnalisée",
+  "urlHint": "Entrer l'URL du site web"
 }

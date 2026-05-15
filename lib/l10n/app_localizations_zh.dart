@@ -1984,6 +1984,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noCoursesParsed => '未解析到课程';
+
+  @override
+  String get selectSchool => '选择学校';
+
+  @override
+  String get enterCustomUrl => '或输入自定义网址';
+
+  @override
+  String get urlHint => '请输入网址';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3966,4 +3975,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get noCoursesParsed => '未解析到課程';
+
+  @override
+  String get selectSchool => '選擇學校';
+
+  @override
+  String get enterCustomUrl => '或輸入自訂網址';
+
+  @override
+  String get urlHint => '請輸入網址';
 }

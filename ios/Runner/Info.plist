@@ -73,7 +73,10 @@
 		<string>应用需要您的同意才能获取位置信息，以便在校园地图中显示您的当前位置并提供导航服务。</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 		<string>应用需要您的同意才能始终获取位置信息，以便提供持续的后台定位服务。</string>
-		<key>UIStatusBarHidden</key>
+		<!-- WebView embedded views support -->
+<key>io.flutter.embedded_views_preview</key>
+<true/>
+<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>
 </plist>

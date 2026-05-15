@@ -698,5 +698,8 @@
   "parseAndPreview": "解析＆プレビュー",
   "importCourses": "授業をインポート",
   "parseResult": "解析結果",
-  "noCoursesParsed": "授業が解析されませんでした"
+  "noCoursesParsed": "授業が解析されませんでした",
+  "selectSchool": "学校を選択",
+  "enterCustomUrl": "またはカスタムURLを入力",
+  "urlHint": "ウェブサイトのURLを入力"
 }

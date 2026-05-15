@@ -2057,4 +2057,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noCoursesParsed => 'Курсы не найдены';
+
+  @override
+  String get selectSchool => 'Выбрать школу';
+
+  @override
+  String get enterCustomUrl => 'Или введите свой URL';
+
+  @override
+  String get urlHint => 'Введите URL веб-сайта';
 }

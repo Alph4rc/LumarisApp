@@ -49,6 +49,7 @@ void main() {
           id: 'offline',
           name: 'Offline',
           eduApiBaseUrl: 'http://127.0.0.1:1',
+          scheduleUrl: '',
         ),
       );
     });

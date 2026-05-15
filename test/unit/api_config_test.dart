@@ -54,6 +54,7 @@ void main() {
         id: 'test',
         name: '测试大学',
         eduApiBaseUrl: 'https://api.test.edu.cn',
+        scheduleUrl: '',
       );
 
       final json = config.toJson();

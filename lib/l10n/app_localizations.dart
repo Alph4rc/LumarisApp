@@ -3871,6 +3871,24 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'未解析到课程'**
   String get noCoursesParsed;
+
+  /// No description provided for @selectSchool.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择学校'**
+  String get selectSchool;
+
+  /// No description provided for @enterCustomUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'或输入自定义网址'**
+  String get enterCustomUrl;
+
+  /// No description provided for @urlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入网址'**
+  String get urlHint;
 }
 
 class _AppLocalizationsDelegate

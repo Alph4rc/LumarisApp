@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:ios_club_app/core/services/course_html_parser.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/schedule_store.dart';
+import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+
+class HtmlImportWebViewPage extends ConsumerStatefulWidget {
+  final String url;
+
+  const HtmlImportWebViewPage({super.key, required this.url});
+
+  @override
+  ConsumerState<HtmlImportWebViewPage> createState() =>
+      _HtmlImportWebViewPageState();
+}
+
+class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
+  late final WebViewController _controller;
+  var _isImporting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) {
+            if (_isImporting) setState(() => _isImporting = false);
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(widget.url));
+  }
+
+  Future<void> _importHtml() async {
+    setState(() => _isImporting = true);
+
+    try {
+      final result = await _controller.runJavaScriptReturningResult(
+        'document.documentElement.outerHTML',
+      );
+      final html = result.toString();
+
+      if (html.isEmpty) {
+        if (mounted) {
+          showClubSnackBar(
+            context,
+            Text(context.l10n.noCoursesParsed),
+          );
+        }
+        return;
+      }
+
+      final courses = CourseHtmlParser.parseHtml(html);
+
+      if (courses.isEmpty) {
+        if (mounted) {
+          showClubSnackBar(
+            context,
+            Text(context.l10n.noCoursesParsed),
+          );
+        }
+        return;
+      }
+
+      await ref
+          .read(courseStoreProvider.notifier)
+          .saveGuestCourses(courses);
+      ref.read(scheduleStoreProvider.notifier).loadGuestCourseData();
+
+      if (mounted) {
+        showClubSnackBar(
+          context,
+          Text(
+            '${context.l10n.importCourses} ${courses.length} ${context.l10n.parseResult}',
+          ),
+        );
+        Navigator.of(context).pop(true);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isImporting = false);
+        showClubSnackBar(
+          context,
+          Text('${context.l10n.noCoursesParsed}: $e'),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: ClubAppBar(title: context.l10n.htmlImport),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            child: Text(
+              context.l10n.pasteHtmlHint,
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(child: WebViewWidget(controller: _controller)),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isImporting ? null : _importHtml,
+        icon: _isImporting
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.download),
+        label: Text(context.l10n.importCourses),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}

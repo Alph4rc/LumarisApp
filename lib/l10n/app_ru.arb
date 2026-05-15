@@ -692,5 +692,8 @@
   "parseAndPreview": "Разбор и просмотр",
   "importCourses": "Импорт курсов",
   "parseResult": "Результат разбора",
-  "noCoursesParsed": "Курсы не найдены"
+  "noCoursesParsed": "Курсы не найдены",
+  "selectSchool": "Выбрать школу",
+  "enterCustomUrl": "Или введите свой URL",
+  "urlHint": "Введите URL веб-сайта"
 }

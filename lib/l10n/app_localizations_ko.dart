@@ -2008,4 +2008,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noCoursesParsed => '분석된 강의 없음';
+
+  @override
+  String get selectSchool => '학교 선택';
+
+  @override
+  String get enterCustomUrl => '또는 사용자 정의 URL 입력';
+
+  @override
+  String get urlHint => '웹사이트 URL 입력';
 }

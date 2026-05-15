@@ -696,6 +696,9 @@
   "importCourses": "匯入課程",
   "parseResult": "解析結果",
   "noCoursesParsed": "未解析到課程",
+  "selectSchool": "選擇學校",
+  "enterCustomUrl": "或輸入自訂網址",
+  "urlHint": "請輸入網址",
 
   "traditionalChinese": "繁體中文"
 }

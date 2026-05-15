@@ -1954,4 +1954,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noCoursesParsed => '授業が解析されませんでした';
+
+  @override
+  String get selectSchool => '学校を選択';
+
+  @override
+  String get enterCustomUrl => 'またはカスタムURLを入力';
+
+  @override
+  String get urlHint => 'ウェブサイトのURLを入力';
 }

@@ -693,5 +693,8 @@
   "parseAndPreview": "解析预览",
   "importCourses": "导入课程",
   "parseResult": "解析结果",
-  "noCoursesParsed": "未解析到课程"
+  "noCoursesParsed": "未解析到课程",
+  "selectSchool": "选择学校",
+  "enterCustomUrl": "或输入自定义网址",
+  "urlHint": "请输入网址"
 }

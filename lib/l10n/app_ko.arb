@@ -694,5 +694,8 @@
   "parseAndPreview": "분석 및 미리보기",
   "importCourses": "강의 가져오기",
   "parseResult": "분석 결과",
-  "noCoursesParsed": "분석된 강의 없음"
+  "noCoursesParsed": "분석된 강의 없음",
+  "selectSchool": "학교 선택",
+  "enterCustomUrl": "또는 사용자 정의 URL 입력",
+  "urlHint": "웹사이트 URL 입력"
 }
