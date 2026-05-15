@@ -692,5 +692,11 @@
   "noShortcuts": "ショートカットなし",
   "addInEditMode": "編集モードで追加",
   "delete": "削除",
-  "eduSystem": "教育システム"
+  "eduSystem": "教育システム",
+  "htmlImport": "HTMLインポート",
+  "pasteHtmlHint": "時間割のHTMLコードを貼り付けてください",
+  "parseAndPreview": "解析＆プレビュー",
+  "importCourses": "授業をインポート",
+  "parseResult": "解析結果",
+  "noCoursesParsed": "授業が解析されませんでした"
 }

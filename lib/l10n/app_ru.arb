@@ -686,5 +686,11 @@
   "moreFunctions": "Другие функции",
   "noShortcuts": "Нет ярлыков",
   "addInEditMode": "Добавить в режиме редактирования",
-  "eduSystem": "Образовательная система"
+  "eduSystem": "Образовательная система",
+  "htmlImport": "HTML импорт",
+  "pasteHtmlHint": "Вставьте HTML расписания сюда",
+  "parseAndPreview": "Разбор и просмотр",
+  "importCourses": "Импорт курсов",
+  "parseResult": "Результат разбора",
+  "noCoursesParsed": "Курсы не найдены"
 }

@@ -690,6 +690,12 @@
   "noShortcuts": "暫無快捷功能",
   "addInEditMode": "請在編輯模式中新增",
   "eduSystem": "教務系統",
+  "htmlImport": "HTML匯入",
+  "pasteHtmlHint": "請貼上課表HTML代碼",
+  "parseAndPreview": "解析預覽",
+  "importCourses": "匯入課程",
+  "parseResult": "解析結果",
+  "noCoursesParsed": "未解析到課程",
 
   "traditionalChinese": "繁體中文"
 }

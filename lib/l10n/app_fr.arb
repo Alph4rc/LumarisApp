@@ -688,5 +688,11 @@
   "moreFunctions": "Plus de fonctions",
   "noShortcuts": "Aucun raccourci",
   "addInEditMode": "Ajouter en mode édition",
-  "eduSystem": "Système éducatif"
+  "eduSystem": "Système éducatif",
+  "htmlImport": "Import HTML",
+  "pasteHtmlHint": "Collez le HTML de l'emploi du temps ici",
+  "parseAndPreview": "Analyser & Aperçu",
+  "importCourses": "Importer les cours",
+  "parseResult": "Résultat de l'analyse",
+  "noCoursesParsed": "Aucun cours analysé"
 }

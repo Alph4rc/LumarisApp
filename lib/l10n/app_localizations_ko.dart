@@ -1992,20 +1992,20 @@ class AppLocalizationsKo extends AppLocalizations {
   String get eduSystem => '학사 시스템';
 
   @override
-  String get htmlImport => 'HTML导入';
+  String get htmlImport => 'HTML 가져오기';
 
   @override
-  String get pasteHtmlHint => '请粘贴课表HTML代码';
+  String get pasteHtmlHint => '시간표 HTML 코드를 붙여넣으세요';
 
   @override
-  String get parseAndPreview => '解析预览';
+  String get parseAndPreview => '분석 및 미리보기';
 
   @override
-  String get importCourses => '导入课程';
+  String get importCourses => '강의 가져오기';
 
   @override
-  String get parseResult => '解析结果';
+  String get parseResult => '분석 결과';
 
   @override
-  String get noCoursesParsed => '未解析到课程';
+  String get noCoursesParsed => '분석된 강의 없음';
 }

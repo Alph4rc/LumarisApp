@@ -3948,4 +3948,22 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get eduSystem => '教務系統';
+
+  @override
+  String get htmlImport => 'HTML匯入';
+
+  @override
+  String get pasteHtmlHint => '請貼上課表HTML代碼';
+
+  @override
+  String get parseAndPreview => '解析預覽';
+
+  @override
+  String get importCourses => '匯入課程';
+
+  @override
+  String get parseResult => '解析結果';
+
+  @override
+  String get noCoursesParsed => '未解析到課程';
 }

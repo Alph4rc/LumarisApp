@@ -688,5 +688,11 @@
   "moreFunctions": "더 많은 기능",
   "noShortcuts": "바로가기 기능 없음",
   "addInEditMode": "편집 모드에서 추가하세요",
-  "eduSystem": "학사 시스템"
+  "eduSystem": "학사 시스템",
+  "htmlImport": "HTML 가져오기",
+  "pasteHtmlHint": "시간표 HTML 코드를 붙여넣으세요",
+  "parseAndPreview": "분석 및 미리보기",
+  "importCourses": "강의 가져오기",
+  "parseResult": "분석 결과",
+  "noCoursesParsed": "분석된 강의 없음"
 }

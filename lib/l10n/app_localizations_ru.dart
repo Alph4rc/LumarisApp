@@ -1455,7 +1455,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get guestMode => 'Гостевой режим';
 
   @override
-  String get guestModeSubtitle => 'Войдите, чтобы получить доступ ко всем функциям';
+  String get guestModeSubtitle =>
+      'Войдите, чтобы получить доступ ко всем функциям';
 
   @override
   String get syncingAcademic => 'Синхронизация учебной информации';
@@ -2040,20 +2041,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get eduSystem => 'Образовательная система';
 
   @override
-  String get htmlImport => 'HTML导入';
+  String get htmlImport => 'HTML импорт';
 
   @override
-  String get pasteHtmlHint => '请粘贴课表HTML代码';
+  String get pasteHtmlHint => 'Вставьте HTML расписания сюда';
 
   @override
-  String get parseAndPreview => '解析预览';
+  String get parseAndPreview => 'Разбор и просмотр';
 
   @override
-  String get importCourses => '导入课程';
+  String get importCourses => 'Импорт курсов';
 
   @override
-  String get parseResult => '解析结果';
+  String get parseResult => 'Результат разбора';
 
   @override
-  String get noCoursesParsed => '未解析到课程';
+  String get noCoursesParsed => 'Курсы не найдены';
 }

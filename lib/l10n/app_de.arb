@@ -688,5 +688,11 @@
   "moreFunctions": "Weitere Funktionen",
   "noShortcuts": "Keine Verknüpfungen",
   "addInEditMode": "Im Bearbeitungsmodus hinzufügen",
-  "eduSystem": "Bildungssystem"
+  "eduSystem": "Bildungssystem",
+  "htmlImport": "HTML-Import",
+  "pasteHtmlHint": "Stundenplan-HTML hier einfügen",
+  "parseAndPreview": "Parsen & Vorschau",
+  "importCourses": "Kurse importieren",
+  "parseResult": "Parse-Ergebnis",
+  "noCoursesParsed": "Keine Kurse analysiert"
 }

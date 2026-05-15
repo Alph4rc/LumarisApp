@@ -1474,7 +1474,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get guestMode => 'Gastmodus';
 
   @override
-  String get guestModeSubtitle => 'Melden Sie sich an, um alle Funktionen zu nutzen';
+  String get guestModeSubtitle =>
+      'Melden Sie sich an, um alle Funktionen zu nutzen';
 
   @override
   String get syncingAcademic => 'Akademische Daten werden synchronisiert';
@@ -2068,20 +2069,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get eduSystem => 'Bildungssystem';
 
   @override
-  String get htmlImport => 'HTML导入';
+  String get htmlImport => 'HTML-Import';
 
   @override
-  String get pasteHtmlHint => '请粘贴课表HTML代码';
+  String get pasteHtmlHint => 'Stundenplan-HTML hier einfügen';
 
   @override
-  String get parseAndPreview => '解析预览';
+  String get parseAndPreview => 'Parsen & Vorschau';
 
   @override
-  String get importCourses => '导入课程';
+  String get importCourses => 'Kurse importieren';
 
   @override
-  String get parseResult => '解析结果';
+  String get parseResult => 'Parse-Ergebnis';
 
   @override
-  String get noCoursesParsed => '未解析到课程';
+  String get noCoursesParsed => 'Keine Kurse analysiert';
 }

@@ -1938,20 +1938,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String get eduSystem => '教育システム';
 
   @override
-  String get htmlImport => 'HTML导入';
+  String get htmlImport => 'HTMLインポート';
 
   @override
-  String get pasteHtmlHint => '请粘贴课表HTML代码';
+  String get pasteHtmlHint => '時間割のHTMLコードを貼り付けてください';
 
   @override
-  String get parseAndPreview => '解析预览';
+  String get parseAndPreview => '解析＆プレビュー';
 
   @override
-  String get importCourses => '导入课程';
+  String get importCourses => '授業をインポート';
 
   @override
-  String get parseResult => '解析结果';
+  String get parseResult => '解析結果';
 
   @override
-  String get noCoursesParsed => '未解析到课程';
+  String get noCoursesParsed => '授業が解析されませんでした';
 }
