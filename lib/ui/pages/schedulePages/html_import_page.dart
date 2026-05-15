@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'html_import_webview_page.dart';
+
 
 class HtmlImportPage extends ConsumerStatefulWidget {
   const HtmlImportPage({super.key});
@@ -26,12 +28,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
   void _openWebView() {
     final url = _selectedUrl ?? _urlController.text.trim();
     if (url.isEmpty) return;
-
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => HtmlImportWebViewPage(url: url),
-      ),
-    );
+    context.push(AppRoutes.htmlImportWebview, extra: url);
   }
 
   @override

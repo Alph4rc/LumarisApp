@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:ios_club_app/core/services/course_html_parser.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -80,7 +81,7 @@ class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
             '${context.l10n.importCourses} ${courses.length} ${context.l10n.parseResult}',
           ),
         );
-        Navigator.of(context).pop(true);
+        context.pop(true);
       }
     } catch (e) {
       if (mounted) {
