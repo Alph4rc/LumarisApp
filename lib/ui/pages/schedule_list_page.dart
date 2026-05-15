@@ -13,6 +13,7 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -247,6 +248,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Widget _buildActionButtons(BuildContext context, bool isDark) {
     final l10n = context.l10n;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -260,6 +262,13 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           },
           tooltip: l10n.switchStyle,
         ),
+        // 游客模式：HTML 导入
+        if (!isLogin)
+          IconButton(
+            icon: const Icon(Icons.file_upload_outlined),
+            onPressed: _handleHtmlImport,
+            tooltip: l10n.htmlImport,
+          ),
         // 刷新
         IconButton(
           icon: const Icon(Icons.refresh),
@@ -399,6 +408,13 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
         );
       },
     );
+  }
+
+  Future<void> _handleHtmlImport() async {
+    final result = await AppRouter.push<bool>(AppRoutes.htmlImport);
+    if (result == true) {
+      ref.read(scheduleStoreProvider.notifier).loadGuestCourseData();
+    }
   }
 
   Future<void> _handleRefresh() async {

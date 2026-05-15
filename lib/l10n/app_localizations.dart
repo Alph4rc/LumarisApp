@@ -3823,6 +3823,42 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'教务系统'**
   String get eduSystem;
+
+  /// No description provided for @htmlImport.
+  ///
+  /// In zh, this message translates to:
+  /// **'HTML导入'**
+  String get htmlImport;
+
+  /// No description provided for @pasteHtmlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请粘贴课表HTML代码'**
+  String get pasteHtmlHint;
+
+  /// No description provided for @parseAndPreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'解析预览'**
+  String get parseAndPreview;
+
+  /// No description provided for @importCourses.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入课程'**
+  String get importCourses;
+
+  /// No description provided for @parseResult.
+  ///
+  /// In zh, this message translates to:
+  /// **'解析结果'**
+  String get parseResult;
+
+  /// No description provided for @noCoursesParsed.
+  ///
+  /// In zh, this message translates to:
+  /// **'未解析到课程'**
+  String get noCoursesParsed;
 }
 
 class _AppLocalizationsDelegate

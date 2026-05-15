@@ -1,4 +1,6 @@
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'auth_service.dart';
 import 'course_service.dart';
@@ -23,6 +25,7 @@ class EducationRefreshService {
 
   static Future<bool> loginAndRefresh(String username, String password) async {
     await EducationCacheService.clearEduCache();
+    await PrefsService.instance.remove(PrefsKeys.GUEST_COURSE_DATA);
     final loginResult = await AuthService.loginFromData(username, password);
     if (!loginResult) {
       return false;

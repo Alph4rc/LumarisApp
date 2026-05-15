@@ -686,5 +686,11 @@
   "moreFunctions": "More Functions",
   "noShortcuts": "No shortcuts available",
   "addInEditMode": "Add in edit mode",
-  "eduSystem": "Edu System"
+  "eduSystem": "Edu System",
+  "htmlImport": "HTML Import",
+  "pasteHtmlHint": "Paste course schedule HTML here",
+  "parseAndPreview": "Parse & Preview",
+  "importCourses": "Import Courses",
+  "parseResult": "Parse Result",
+  "noCoursesParsed": "No courses parsed"
 }

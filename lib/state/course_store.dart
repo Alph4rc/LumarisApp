@@ -86,6 +86,37 @@ class CourseStore extends Notifier<CourseState> {
   }
 
   void clearCourseData() {
+    PrefsService.instance.remove(PrefsKeys.GUEST_COURSE_DATA);
+    state = state.copyWith(courses: const []);
+  }
+
+  Future<void> saveGuestCourses(List<CourseModel> courses) async {
+    final jsonList = courses.map((c) => c.toJson()).toList();
+    await PrefsService.instance.setString(
+      PrefsKeys.GUEST_COURSE_DATA,
+      jsonEncode(jsonList),
+    );
+    state = state.copyWith(courses: courses);
+  }
+
+  Future<void> loadGuestCourses() async {
+    final prefs = PrefsService.instance;
+    final String? jsonString = prefs.getString(PrefsKeys.GUEST_COURSE_DATA);
+    if (jsonString == null || jsonString.isEmpty) return;
+
+    try {
+      final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
+      final courses = jsonList
+          .map((e) => CourseModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      state = state.copyWith(courses: courses);
+    } catch (_) {
+      await prefs.remove(PrefsKeys.GUEST_COURSE_DATA);
+    }
+  }
+
+  Future<void> clearGuestCourses() async {
+    await PrefsService.instance.remove(PrefsKeys.GUEST_COURSE_DATA);
     state = state.copyWith(courses: const []);
   }
 }

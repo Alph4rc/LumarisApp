@@ -2032,4 +2032,22 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eduSystem => 'Образовательная система';
+
+  @override
+  String get htmlImport => 'HTML导入';
+
+  @override
+  String get pasteHtmlHint => '请粘贴课表HTML代码';
+
+  @override
+  String get parseAndPreview => '解析预览';
+
+  @override
+  String get importCourses => '导入课程';
+
+  @override
+  String get parseResult => '解析结果';
+
+  @override
+  String get noCoursesParsed => '未解析到课程';
 }

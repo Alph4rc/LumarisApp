@@ -7,7 +7,6 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/homePages/exam_card.dart';
 import 'package:ios_club_app/ui/pages/homePages/schedule_widget.dart';
 import 'package:ios_club_app/ui/pages/homePages/tiles_widget.dart';
-import 'package:ios_club_app/ui/pages/homePages/todo_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

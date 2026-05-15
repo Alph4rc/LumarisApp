@@ -2027,4 +2027,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eduSystem => 'Edu System';
+
+  @override
+  String get htmlImport => 'HTML Import';
+
+  @override
+  String get pasteHtmlHint => 'Paste course schedule HTML here';
+
+  @override
+  String get parseAndPreview => 'Parse & Preview';
+
+  @override
+  String get importCourses => 'Import Courses';
+
+  @override
+  String get parseResult => 'Parse Result';
+
+  @override
+  String get noCoursesParsed => 'No courses parsed';
 }

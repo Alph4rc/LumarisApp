@@ -685,5 +685,11 @@
   "moreFunctions": "更多功能",
   "noShortcuts": "暂无快捷功能",
   "addInEditMode": "请在编辑模式中添加",
-  "eduSystem": "教务系统"
+  "eduSystem": "教务系统",
+  "htmlImport": "HTML导入",
+  "pasteHtmlHint": "请粘贴课表HTML代码",
+  "parseAndPreview": "解析预览",
+  "importCourses": "导入课程",
+  "parseResult": "解析结果",
+  "noCoursesParsed": "未解析到课程"
 }
