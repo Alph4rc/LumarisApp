@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/state/user_store.dart';
 
 import 'package:ios_club_app/ui/pages/homePages/exam_card.dart';
 import 'package:ios_club_app/ui/pages/homePages/schedule_widget.dart';
 import 'package:ios_club_app/ui/pages/homePages/tiles_widget.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   DateTime? _lastPressedTime;
 
   Future<bool> _handleWillPop() async {
@@ -44,6 +46,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userStoreProvider);
+    final isGuest = !userState.isLogin;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
@@ -56,14 +61,10 @@ class _HomePageState extends State<HomePage> {
       },
       child: Scaffold(
         body: ListView(
-          // 使用 ListView 替代 SingleChildScrollView + Column 以获得更好的滚动性能
-          children: const [
-            ScheduleWidget(),
-            TilesWidget(),
-            // 考试列表
-            ExamCard(),
-            // 待办事项
-            // TodoWidget(),
+          children: [
+            const ScheduleWidget(),
+            if (isGuest) const TilesWidget(),
+            const ExamCard(),
           ],
         ),
       ),

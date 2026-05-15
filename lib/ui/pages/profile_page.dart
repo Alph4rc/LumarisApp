@@ -108,28 +108,35 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final l10n = context.l10n;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     return [
+      if (isLogin)
+        ProfileButtonItem(
+            icon: CupertinoIcons.link_circle,
+            title: l10n.campusNavigation,
+            route: AppRoutes.link),
       ProfileButtonItem(
-          icon: CupertinoIcons.link_circle,
-          title: l10n.campusNavigation,
-          route: AppRoutes.link),
-      ProfileButtonItem(
-          icon: Icons.settings, title: l10n.settingsAbout, route: AppRoutes.about),
-      ProfileButtonItem(
-          title: l10n.schoolBus,
-          icon: Icons.directions_bus_rounded,
-          route: AppRoutes.schoolBus),
-      if (!kIsWeb)
+          icon: Icons.settings,
+          title: l10n.settingsAbout,
+          route: AppRoutes.about),
+      if (isLogin)
+        ProfileButtonItem(
+            title: l10n.schoolBus,
+            icon: Icons.directions_bus_rounded,
+            route: AppRoutes.schoolBus),
+      if (!kIsWeb && isLogin)
         ProfileButtonItem(
             icon: CupertinoIcons.bolt_fill,
             title: l10n.electricity,
             route: AppRoutes.electricity),
       if (isLogin)
         ProfileButtonItem(
-            icon: Icons.toc, title: l10n.programLabel, route: AppRoutes.program),
-      ProfileButtonItem(
-          icon: Icons.monetization_on_outlined,
-          title: l10n.payment,
-          route: AppRoutes.payment),
+            icon: Icons.toc,
+            title: l10n.programLabel,
+            route: AppRoutes.program),
+      if (isLogin)
+        ProfileButtonItem(
+            icon: Icons.monetization_on_outlined,
+            title: l10n.payment,
+            route: AppRoutes.payment),
       // if (!kIsWeb)
       //   ProfileButtonItem(
       //       icon: Icons.wifi_outlined, title: '校园网', route: AppRoutes.net),
@@ -141,7 +148,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
       ProfileButtonItem(
-          icon: CupertinoIcons.map, title: l10n.campusMap, route: AppRoutes.campusMap),
+          icon: CupertinoIcons.map,
+          title: l10n.campusMap,
+          route: AppRoutes.campusMap),
       ProfileButtonItem(
           icon: Icons.help_outline, title: l10n.help, route: AppRoutes.helper),
     ];
@@ -213,7 +222,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       return AnimatedCard(
                         delay: Duration(milliseconds: 50 * index),
                         child: Center(
-                          child: getProfileButtonItems(context)[index].build(context),
+                          child: getProfileButtonItems(context)[index]
+                              .build(context),
                         ),
                       );
                     },
