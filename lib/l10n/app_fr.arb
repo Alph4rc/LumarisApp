@@ -470,6 +470,8 @@
   "help": "Aide",
   "academicAccount": "Compte académique",
   "guest": "Invité",
+  "guestMode": "Mode invité",
+  "guestModeSubtitle": "Connectez-vous pour accéder à toutes les fonctionnalités",
   "syncingAcademic": "Synchronisation académique",
   "syncingAcademicSubtitle": "Lecture des crédits et des fiches de profil",
   "loginEduSystem": "Connexion au système académique",

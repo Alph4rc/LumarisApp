@@ -1465,6 +1465,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get guest => 'Invité';
 
   @override
+  String get guestMode => 'Mode invité';
+
+  @override
+  String get guestModeSubtitle => 'Connectez-vous pour accéder à toutes les fonctionnalités';
+
+  @override
   String get syncingAcademic => 'Synchronisation académique';
 
   @override

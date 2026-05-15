@@ -6,6 +6,7 @@ import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -23,6 +24,18 @@ class SchoolBusPage extends ConsumerWidget {
     final busState = ref.watch(busControllerProvider);
     final busController = ref.read(busControllerProvider.notifier);
     final colors = context.clubColors;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
+
+    if (isLogin) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schoolBus)),
+        body: EmptyWidget(
+          title: context.l10n.guestMode,
+          subtitle: context.l10n.guestModeSubtitle,
+          icon: Icons.lock_outline,
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

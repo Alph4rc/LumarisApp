@@ -470,6 +470,8 @@
   "help": "Hilfe",
   "academicAccount": "Hochschulkonto",
   "guest": "Gast",
+  "guestMode": "Gastmodus",
+  "guestModeSubtitle": "Melden Sie sich an, um alle Funktionen zu nutzen",
   "syncingAcademic": "Akademische Daten werden synchronisiert",
   "syncingAcademicSubtitle": "Credits und Profilkarten lesen",
   "loginEduSystem": "Im Hochschulsystem anmelden",

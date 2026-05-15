@@ -1434,6 +1434,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get guest => '게스트';
 
   @override
+  String get guestMode => '게스트 모드';
+
+  @override
+  String get guestModeSubtitle => '로그인하여 모든 기능을 이용하세요';
+
+  @override
   String get syncingAcademic => '학업 정보 동기화 중';
 
   @override

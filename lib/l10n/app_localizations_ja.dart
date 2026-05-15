@@ -1386,6 +1386,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get guest => 'ゲスト';
 
   @override
+  String get guestMode => 'ゲストモード';
+
+  @override
+  String get guestModeSubtitle => 'ログインするとすべての機能を使用できます';
+
+  @override
   String get syncingAcademic => '学務情報を同期中';
 
   @override

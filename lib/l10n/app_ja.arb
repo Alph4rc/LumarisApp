@@ -472,6 +472,8 @@
   "help": "ヘルプ",
   "academicAccount": "学務アカウント",
   "guest": "ゲスト",
+  "guestMode": "ゲストモード",
+  "guestModeSubtitle": "ログインするとすべての機能を使用できます",
   "syncingAcademic": "学務情報を同期中",
   "syncingAcademicSubtitle": "単位とプロフィールカードを読み込み中",
   "loginEduSystem": "学務システムにログイン",

@@ -468,6 +468,8 @@
   "help": "Помощь",
   "academicAccount": "Учебная учётная запись",
   "guest": "Гость",
+  "guestMode": "Гостевой режим",
+  "guestModeSubtitle": "Войдите, чтобы получить доступ ко всем функциям",
   "syncingAcademic": "Синхронизация учебной информации",
   "syncingAcademicSubtitle": "Чтение кредитов и карточек профиля",
   "loginEduSystem": "Войти в учебную систему",

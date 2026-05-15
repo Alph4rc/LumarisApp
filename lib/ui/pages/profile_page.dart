@@ -147,10 +147,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             onPressed: () {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
-      ProfileButtonItem(
-          icon: CupertinoIcons.map,
-          title: l10n.campusMap,
-          route: AppRoutes.campusMap),
+      if (isLogin)
+        ProfileButtonItem(
+            icon: CupertinoIcons.map,
+            title: l10n.campusMap,
+            route: AppRoutes.campusMap),
       ProfileButtonItem(
           icon: Icons.help_outline, title: l10n.help, route: AppRoutes.helper),
     ];

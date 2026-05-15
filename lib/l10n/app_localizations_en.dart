@@ -1453,6 +1453,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guest => 'Guest';
 
   @override
+  String get guestMode => 'Guest Mode';
+
+  @override
+  String get guestModeSubtitle => 'Sign in to access full features';
+
+  @override
   String get syncingAcademic => 'Syncing academic info';
 
   @override

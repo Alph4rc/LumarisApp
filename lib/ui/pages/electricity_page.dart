@@ -16,6 +16,7 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
+import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ElectricityPage extends ConsumerStatefulWidget {
@@ -56,6 +57,19 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget build(BuildContext context) {
     final electricityState = ref.watch(electricityStoreProvider);
     final l10n = context.l10n;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
+
+    if (isLogin) {
+      return Scaffold(
+        appBar: ClubAppBar(title: l10n.electricityManagement),
+        body: EmptyWidget(
+          title: l10n.guestMode,
+          subtitle: l10n.guestModeSubtitle,
+          icon: Icons.lock_outline,
+        ),
+      );
+    }
+
     if (electricityState.hasData &&
         !_hasLoadedSubscriptions &&
         !_isSubscriptionLoading) {

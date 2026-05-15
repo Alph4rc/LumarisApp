@@ -2750,6 +2750,18 @@ abstract class AppLocalizations {
   /// **'游客'**
   String get guest;
 
+  /// No description provided for @guestMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'游客模式'**
+  String get guestMode;
+
+  /// No description provided for @guestModeSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录后可使用完整功能'**
+  String get guestModeSubtitle;
+
   /// No description provided for @syncingAcademic.
   ///
   /// In zh, this message translates to:

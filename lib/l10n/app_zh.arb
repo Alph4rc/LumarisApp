@@ -494,6 +494,8 @@
   "help": "帮助",
   "academicAccount": "教务系统账号",
   "guest": "游客",
+  "guestMode": "游客模式",
+  "guestModeSubtitle": "登录后可使用完整功能",
   "syncingAcademic": "正在同步学业信息",
   "syncingAcademicSubtitle": "正在读取学分与个人信息卡片",
   "loginEduSystem": "登录教务系统",

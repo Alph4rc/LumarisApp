@@ -1452,6 +1452,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get guest => 'Гость';
 
   @override
+  String get guestMode => 'Гостевой режим';
+
+  @override
+  String get guestModeSubtitle => 'Войдите, чтобы получить доступ ко всем функциям';
+
+  @override
   String get syncingAcademic => 'Синхронизация учебной информации';
 
   @override

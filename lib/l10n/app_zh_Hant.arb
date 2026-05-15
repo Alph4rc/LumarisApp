@@ -496,6 +496,8 @@
   "help": "幫助",
   "academicAccount": "教務系統帳號",
   "guest": "訪客",
+  "guestMode": "訪客模式",
+  "guestModeSubtitle": "登錄後可使用完整功能",
   "syncingAcademic": "正在同步學業資訊",
   "syncingAcademicSubtitle": "正在讀取學分與個人資訊卡片",
   "loginEduSystem": "登入教務系統",

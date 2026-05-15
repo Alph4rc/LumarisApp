@@ -1417,6 +1417,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get guest => '游客';
 
   @override
+  String get guestMode => '游客模式';
+
+  @override
+  String get guestModeSubtitle => '登录后可使用完整功能';
+
+  @override
   String get syncingAcademic => '正在同步学业信息';
 
   @override
@@ -3391,6 +3397,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get guest => '訪客';
+
+  @override
+  String get guestMode => '訪客模式';
+
+  @override
+  String get guestModeSubtitle => '登錄後可使用完整功能';
 
   @override
   String get syncingAcademic => '正在同步學業資訊';
