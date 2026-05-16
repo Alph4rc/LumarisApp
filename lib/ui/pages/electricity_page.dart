@@ -59,7 +59,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final l10n = context.l10n;
     final isLogin = ref.watch(userStoreProvider).isLogin;
 
-    if (isLogin) {
+    if (!isLogin) {
       return Scaffold(
         appBar: ClubAppBar(title: l10n.electricityManagement),
         body: EmptyWidget(

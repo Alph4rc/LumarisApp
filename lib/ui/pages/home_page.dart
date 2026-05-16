@@ -47,7 +47,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(userStoreProvider);
-    final isGuest = !userState.isLogin;
+    final isLogin = userState.isLogin;
 
     return PopScope(
       canPop: false,
@@ -63,8 +63,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         body: ListView(
           children: [
             const ScheduleWidget(),
-            if (isGuest) const TilesWidget(),
-            const ExamCard(),
+            if (isLogin) const TilesWidget(),
+            if (isLogin) const ExamCard(),
           ],
         ),
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/services/link_api.dart';
+import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -12,14 +14,14 @@ import 'package:ios_club_app/features/education/models/link_model.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/icon_font.dart';
 
-class LinkPage extends StatefulWidget {
+class LinkPage extends ConsumerStatefulWidget {
   const LinkPage({super.key});
 
   @override
-  State<LinkPage> createState() => _LinkPageState();
+  ConsumerState<LinkPage> createState() => _LinkPageState();
 }
 
-class _LinkPageState extends State<LinkPage> {
+class _LinkPageState extends ConsumerState<LinkPage> {
   late Future<List<CategoryModel>> _linksFuture;
 
   @override
@@ -38,6 +40,19 @@ class _LinkPageState extends State<LinkPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.clubColors;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
+
+    if (!isLogin) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schoolBus)),
+        body: EmptyWidget(
+          title: context.l10n.guestMode,
+          subtitle: context.l10n.guestModeSubtitle,
+          icon: Icons.lock_outline,
+        ),
+      );
+    }
+    
     return Scaffold(
       appBar: ClubAppBar(
         title: l10n.campusNavigation,

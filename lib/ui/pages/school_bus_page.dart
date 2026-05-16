@@ -26,7 +26,7 @@ class SchoolBusPage extends ConsumerWidget {
     final colors = context.clubColors;
     final isLogin = ref.watch(userStoreProvider).isLogin;
 
-    if (isLogin) {
+    if (!isLogin) {
       return Scaffold(
         appBar: AppBar(title: Text(context.l10n.schoolBus)),
         body: EmptyWidget(

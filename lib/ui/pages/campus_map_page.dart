@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ios_club_app/state/map_notifier.dart';
 import 'package:ios_club_app/state/map_state.dart';
@@ -104,6 +106,18 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final clubColors = context.clubColors;
     final padding = MediaQuery.of(context).padding;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
+
+    if (!isLogin) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schoolBus)),
+        body: EmptyWidget(
+          title: context.l10n.guestMode,
+          subtitle: context.l10n.guestModeSubtitle,
+          icon: Icons.lock_outline,
+        ),
+      );
+    }
 
     // Listen for location changes to auto-center once
     ref.listen(mapNotifierProvider.select((s) => s.currentLocation),
