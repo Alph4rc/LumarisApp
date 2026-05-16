@@ -321,5 +321,6 @@ List<String> _getWeekdayNames(BuildContext context) {
     l10n.thursday,
     l10n.friday,
     l10n.saturday,
+    l10n.sunday,
   ];
 }

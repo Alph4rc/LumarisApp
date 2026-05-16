@@ -234,6 +234,7 @@ class CourseDetailSheet extends StatelessWidget {
       l10n.thursday,
       l10n.friday,
       l10n.saturday,
+      l10n.sunday,
     ];
   }
 
