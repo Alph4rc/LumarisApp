@@ -20,7 +20,7 @@ class AppApi {
         throw FormatException("Unexpected response type");
       }
 
-      return dataList.map((e) => ReleaseInfo.fromJson(e)).toList();
+      return dataList.map((e) => ReleaseInfo.fromJson(Map<String, dynamic>.from(e))).toList();
     } catch (e) {
       rethrow;
     }

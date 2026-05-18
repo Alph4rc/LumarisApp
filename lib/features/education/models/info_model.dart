@@ -48,6 +48,6 @@ class InfoModel {
 
 List<TotalData> _totalDataListFromJson(dynamic value) {
   return (value as List<dynamic>)
-      .map((item) => TotalData.fromJson(item as Map<String, dynamic>))
+      .map((item) => TotalData.fromJson(Map<String, dynamic>.from(item)))
       .toList();
 }

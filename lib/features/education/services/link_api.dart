@@ -13,7 +13,7 @@ class LinkApi {
 
       if (response is List) {
         for (final item in response) {
-          list.add(CategoryModel.fromJson(item as Map<String, dynamic>));
+          list.add(CategoryModel.fromJson(Map<String, dynamic>.from(item)));
         }
       }
     } catch (e, stackTrace) {

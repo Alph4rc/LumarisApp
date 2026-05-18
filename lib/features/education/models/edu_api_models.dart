@@ -232,7 +232,7 @@ class TimeModel {
 List<CourseModel> _courseListFromJson(dynamic value) {
   if (value is List) {
     return value
-        .map((item) => CourseModel.fromJson(item as Map<String, dynamic>))
+        .map((item) => CourseModel.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
   return <CourseModel>[];
@@ -241,7 +241,7 @@ List<CourseModel> _courseListFromJson(dynamic value) {
 List<ExamItem> _examListFromJson(dynamic value) {
   if (value is List) {
     return value
-        .map((item) => ExamItem.fromJson(item as Map<String, dynamic>))
+        .map((item) => ExamItem.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
   return <ExamItem>[];
@@ -250,7 +250,7 @@ List<ExamItem> _examListFromJson(dynamic value) {
 List<SemesterModel> _semesterListFromJson(dynamic value) {
   if (value is List) {
     return value
-        .map((item) => SemesterModel.fromJson(item as Map<String, dynamic>))
+        .map((item) => SemesterModel.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
   return <SemesterModel>[];

@@ -18,7 +18,7 @@ class InfoApi {
         throw NetworkException('信息完成度返回格式错误', -1);
       }
       return response
-          .map((item) => InfoModel.fromJson(item as Map<String, dynamic>))
+          .map((item) => InfoModel.fromJson(Map<String, dynamic>.from(item)))
           .toList();
     } catch (e) {
       _handleError(e);

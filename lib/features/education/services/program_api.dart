@@ -20,7 +20,7 @@ class ProgramApi {
         throw NetworkException('培养方案返回格式错误', -1);
       }
       return response
-          .map((item) => PlanCourse.fromJson(item as Map<String, dynamic>))
+          .map((item) => PlanCourse.fromJson(Map<String, dynamic>.from(item)))
           .toList();
     } catch (e) {
       _handleError(e);
@@ -47,7 +47,7 @@ class ProgramApi {
           Map<String, dynamic>.from(response);
       return typedResponse.map((key, value) {
         final courses = (value as List<dynamic>)
-            .map((item) => PlanCourse.fromJson(item as Map<String, dynamic>))
+            .map((item) => PlanCourse.fromJson(Map<String, dynamic>.from(item)))
             .toList();
         return MapEntry(key, courses);
       });

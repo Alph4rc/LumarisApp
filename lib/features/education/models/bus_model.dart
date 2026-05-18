@@ -94,7 +94,7 @@ class BusItem {
 List<BusItem> _busItemsFromJson(dynamic value) {
   if (value is List) {
     return value
-        .map((item) => BusItem.fromJson(item as Map<String, dynamic>))
+        .map((item) => BusItem.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
   return <BusItem>[];
