@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 @immutable
@@ -402,8 +403,8 @@ class ClubTheme {
         actionTextColor: colors.primary,
         behavior: SnackBarBehavior.floating,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: ClubRadii.card,
+        shape: ClubSmoothCorners.shape(
+          ClubRadii.card,
           side: BorderSide(
             color: colors.separator.withValues(alpha: 0.1),
             width: 0.5,

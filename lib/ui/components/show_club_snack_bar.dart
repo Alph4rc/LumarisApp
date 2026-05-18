@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 void showClubSnackBar(BuildContext context, Widget child) {
@@ -13,8 +14,8 @@ void showClubSnackBar(BuildContext context, Widget child) {
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         backgroundColor: colors.cardBackground,
-        shape: RoundedRectangleBorder(
-          borderRadius: ClubRadii.card,
+        shape: ClubSmoothCorners.shape(
+          ClubRadii.card,
           side: BorderSide(
             color: colors.separator.withValues(alpha: 0.1),
             width: 0.5,
@@ -47,14 +48,16 @@ void showClubSnackBar(BuildContext context, Widget child) {
                   constraints: const BoxConstraints(maxWidth: 520),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: overlayColors.cardBackground,
-                    borderRadius: ClubRadii.card,
-                    border: Border.all(
-                      color: overlayColors.separator.withValues(alpha: 0.1),
-                      width: 0.5,
+                    shape: ClubSmoothCorners.shape(
+                      ClubRadii.card,
+                      side: BorderSide(
+                        color: overlayColors.separator.withValues(alpha: 0.1),
+                        width: 0.5,
+                      ),
                     ),
-                    boxShadow: [
+                    shadows: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.12),
                         blurRadius: 18,

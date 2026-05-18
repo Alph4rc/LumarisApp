@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class LoadingStateView extends StatelessWidget {
@@ -147,8 +148,9 @@ class _GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 现代毛玻璃效果：大幅增加模糊半径（VisionOS 风格），优化边框和背景
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(compact ? 100 : 28),
+    final radius = BorderRadius.circular(compact ? 100 : 28);
+    return ClubSmoothCorners.clip(
+      borderRadius: radius,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), // 深度模糊
         child: Container(
@@ -156,12 +158,14 @@ class _GlassContainer extends StatelessWidget {
             horizontal: compact ? 20 : 36,
             vertical: compact ? 12 : 36,
           ),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(compact ? 100 : 28),
-            border: Border.all(
-              color: borderColor,
-              width: 0.5,
+            shape: ClubSmoothCorners.shape(
+              radius,
+              side: BorderSide(
+                color: borderColor,
+                width: 0.5,
+              ),
             ),
           ),
           child: child,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
@@ -18,9 +19,9 @@ Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
     constraints: BoxConstraints(maxWidth: a, minWidth: a, maxHeight: maxHeight),
     builder: (BuildContext context) {
       return Container(
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: ClubRadii.sheetTop,
+          shape: ClubSmoothCorners.shape(ClubRadii.sheetTop),
         ),
         child: Column(
           children: [
@@ -28,9 +29,9 @@ Future<void> showClubModalBottomSheet(BuildContext context, Widget child,
               width: 40,
               height: 5,
               margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(
+              decoration: ShapeDecoration(
                 color: colors.borderStrong.withValues(alpha: 0.8),
-                borderRadius: ClubRadii.pill,
+                shape: ClubSmoothCorners.shape(ClubRadii.pill),
               ),
             ),
             const SizedBox(height: 8),

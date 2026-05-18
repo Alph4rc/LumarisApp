@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:smooth_corner/smooth_corner.dart';
 
 import 'theme_test_helpers.dart';
 
@@ -63,11 +64,11 @@ void main() {
       await tester.pumpAndSettle();
 
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      final shape = snackBar.shape as RoundedRectangleBorder;
+      final shape = snackBar.shape as SmoothRectangleBorder;
 
       expect(snackBar.behavior, SnackBarBehavior.floating);
       expect(snackBar.duration, const Duration(seconds: 2));
-      expect(shape.borderRadius, ClubRadii.control);
+      expect(shape.borderRadius, ClubRadii.card);
       expect(snackBar.backgroundColor, ClubColors.light.cardBackground);
     });
 

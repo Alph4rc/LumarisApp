@@ -15,6 +15,7 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
@@ -300,11 +301,14 @@ class ProfileButtonItem {
 
   Widget build(BuildContext context) {
     final colors = context.clubColors;
+    final shape = ClubSmoothCorners.shape(ClubRadii.panel);
     return Material(
-        borderRadius: ClubRadii.panel,
+        shape: shape,
+        clipBehavior: Clip.antiAlias,
         color: Colors.transparent,
         child: InkWell(
           borderRadius: ClubRadii.panel,
+          customBorder: shape,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

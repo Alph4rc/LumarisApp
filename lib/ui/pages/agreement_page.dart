@@ -7,6 +7,7 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
@@ -171,9 +172,11 @@ class AgreementPage extends ConsumerWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
-        boxShadow: [
+      decoration: ShapeDecoration(
+        shape: ClubSmoothCorners.shape(
+          isWide ? ClubRadii.tile : ClubRadii.card,
+        ),
+        shadows: [
           BoxShadow(
             color: colors.shadowColor.withValues(alpha: 0.8),
             blurRadius: 16,
@@ -181,7 +184,7 @@ class AgreementPage extends ConsumerWidget {
           ),
         ],
       ),
-      child: ClipRRect(
+      child: ClubSmoothCorners.clip(
         borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
         child: const Image(
           image: AssetImage('assets/icon.webp'),
@@ -249,9 +252,11 @@ class AgreementPage extends ConsumerWidget {
     final colors = context.clubColors;
     return Material(
       color: colors.surfaceRaised,
-      borderRadius: ClubRadii.panel,
+      shape: ClubSmoothCorners.shape(ClubRadii.panel),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: ClubRadii.panel,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.panel),
         onTap: onTap,
         child: Padding(
           padding: EdgeInsets.all(isWide ? 20 : 18),
@@ -260,9 +265,9 @@ class AgreementPage extends ConsumerWidget {
               Container(
                 width: isWide ? 46 : 42,
                 height: isWide ? 46 : 42,
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: iconColor.withValues(alpha: 0.12),
-                  borderRadius: ClubRadii.navigation,
+                  shape: ClubSmoothCorners.shape(ClubRadii.navigation),
                 ),
                 child: Icon(icon, size: isWide ? 24 : 22, color: iconColor),
               ),

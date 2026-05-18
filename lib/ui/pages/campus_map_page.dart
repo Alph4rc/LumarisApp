@@ -10,6 +10,7 @@ import 'package:ios_club_app/state/map_notifier.dart';
 import 'package:ios_club_app/state/map_state.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
 
@@ -265,17 +266,20 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   Widget _buildSidebarToggle(ClubColors colors) {
+    final radius = BorderRadius.circular(20);
     return Container(
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: colors.cardOverlay,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colors.separator.withValues(alpha: 0.2),
-          width: 0.5,
+        shape: ClubSmoothCorners.shape(
+          radius,
+          side: BorderSide(
+            color: colors.separator.withValues(alpha: 0.2),
+            width: 0.5,
+          ),
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+      child: ClubSmoothCorners.clip(
+        borderRadius: radius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: IconButton(
@@ -293,6 +297,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   Widget _buildPOIMarker(CampusPOI poi, ClubColors colors, bool isSelected) {
+    final radius = BorderRadius.circular(20);
     return AnimatedScale(
       scale: isSelected ? 1.2 : 1.0,
       duration: const Duration(milliseconds: 200),
@@ -301,22 +306,24 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: isSelected ? colors.primary : colors.cardBackground,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
+              shape: ClubSmoothCorners.shape(
+                radius,
+                side: BorderSide(
+                  color: isSelected
+                      ? colors.onAccent
+                      : colors.separator.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
+              ),
+              shadows: [
                 BoxShadow(
                   color: colors.shadowColor.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 )
               ],
-              border: Border.all(
-                color: isSelected
-                    ? colors.onAccent
-                    : colors.separator.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
             ),
             child: Text(
               _resolvePoiName(poi.name, context.l10n),
@@ -379,19 +386,21 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final l10n = context.l10n;
     return Column(
       children: [
-        ClipRRect(
+        ClubSmoothCorners.clip(
           borderRadius: ClubRadii.card,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Container(
               height: 54,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
+              decoration: ShapeDecoration(
                 color: colors.cardOverlay,
-                borderRadius: ClubRadii.card,
-                border: Border.all(
-                  color: colors.separator.withValues(alpha: 0.2),
-                  width: 0.5,
+                shape: ClubSmoothCorners.shape(
+                  ClubRadii.card,
+                  side: BorderSide(
+                    color: colors.separator.withValues(alpha: 0.2),
+                    width: 0.5,
+                  ),
                 ),
               ),
               child: Row(
@@ -471,8 +480,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     fontSize: 13,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
+                  shape: ClubSmoothCorners.shape(
+                    BorderRadius.circular(100),
                     side: BorderSide(
                       color: isSelected
                           ? colors.primary
@@ -493,22 +502,25 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   Widget _buildMapControls(MapState mapState, ClubColors colors) {
+    final controlRadius = BorderRadius.circular(12);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Zoom Controls
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+        ClubSmoothCorners.clip(
+          borderRadius: controlRadius,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
               width: 44,
-              decoration: BoxDecoration(
+              decoration: ShapeDecoration(
                 color: colors.cardOverlay,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: colors.separator.withValues(alpha: 0.2),
-                  width: 0.5,
+                shape: ClubSmoothCorners.shape(
+                  controlRadius,
+                  side: BorderSide(
+                    color: colors.separator.withValues(alpha: 0.2),
+                    width: 0.5,
+                  ),
                 ),
               ),
               child: Column(
@@ -538,19 +550,21 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
         ),
         const SizedBox(height: 12),
         // Location Control
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+        ClubSmoothCorners.clip(
+          borderRadius: controlRadius,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(
+              decoration: ShapeDecoration(
                 color: colors.cardOverlay,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: colors.separator.withValues(alpha: 0.2),
-                  width: 0.5,
+                shape: ClubSmoothCorners.shape(
+                  controlRadius,
+                  side: BorderSide(
+                    color: colors.separator.withValues(alpha: 0.2),
+                    width: 0.5,
+                  ),
                 ),
               ),
               child: _buildControlItem(
@@ -605,19 +619,21 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
       MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
     final l10n = context.l10n;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return ClipRRect(
+    return ClubSmoothCorners.clip(
       borderRadius: ClubRadii.card,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: isDarkMode
                 ? colors.cardBackground.withValues(alpha: 0.8)
                 : colors.cardOverlay.withValues(alpha: 0.7),
-            borderRadius: ClubRadii.card,
-            border: Border.all(
-              color: colors.separator.withValues(alpha: 0.15),
-              width: 0.8,
+            shape: ClubSmoothCorners.shape(
+              ClubRadii.card,
+              side: BorderSide(
+                color: colors.separator.withValues(alpha: 0.15),
+                width: 0.8,
+              ),
             ),
           ),
           child: Column(
@@ -631,9 +647,11 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                     Container(
                       height: 44,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
+                      decoration: ShapeDecoration(
                         color: colors.surfaceRaised,
-                        borderRadius: BorderRadius.circular(12),
+                        shape: ClubSmoothCorners.shape(
+                          BorderRadius.circular(12),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -765,10 +783,12 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
         if (_selectedPOI == null) return const SizedBox.shrink();
 
         return Container(
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: colors.cardBackground,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
+            shape: ClubSmoothCorners.shape(
+              const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            shadows: [
               BoxShadow(
                 color: colors.shadowColor.withValues(alpha: 0.1),
                 blurRadius: 10,
@@ -784,9 +804,9 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 child: Container(
                   width: 36,
                   height: 5,
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: colors.separator.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(10),
+                    shape: ClubSmoothCorners.shape(BorderRadius.circular(10)),
                   ),
                 ),
               ),
@@ -810,8 +830,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       color: colors.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.directions_rounded,
-                        color: colors.onAccent),
+                    child:
+                        Icon(Icons.directions_rounded, color: colors.onAccent),
                   ),
                 ],
               ),
@@ -845,9 +865,9 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: colors.surfaceRaised,
-        borderRadius: BorderRadius.circular(16),
+        shape: ClubSmoothCorners.shape(BorderRadius.circular(16)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -4,6 +4,7 @@ import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程详情弹窗组件
@@ -31,9 +32,11 @@ class CourseDetailSheet extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.all(isTablet ? 24 : 20),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: colors.cardBackground,
-        borderRadius: isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
+        shape: ClubSmoothCorners.shape(
+          isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,7 +146,8 @@ class CourseDetailSheet extends StatelessWidget {
               children: [
                 Icon(Icons.delete, size: 20, color: colors.danger),
                 const SizedBox(width: 12),
-                Text(context.l10n.deleteCourse, style: TextStyle(color: colors.danger)),
+                Text(context.l10n.deleteCourse,
+                    style: TextStyle(color: colors.danger)),
               ],
             ),
           ),
@@ -174,9 +178,9 @@ class CourseDetailSheet extends StatelessWidget {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: ClubRadii.control,
+            shape: ClubSmoothCorners.shape(ClubRadii.control),
           ),
           child: Icon(
             icon,
@@ -253,9 +257,7 @@ class CourseDetailSheet extends StatelessWidget {
       return showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: ClubRadii.card,
-          ),
+          shape: ClubSmoothCorners.shape(ClubRadii.card),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: CourseDetailSheet(
