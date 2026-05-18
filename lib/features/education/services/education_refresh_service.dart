@@ -39,34 +39,37 @@ class EducationRefreshService {
       if (!loginResult) {
         return false;
       }
-      return refreshWithExistingSession();
+      return refreshWithExistingSession(isForced: true);
     } catch (e, stackTrace) {
       AppLogger.error('刷新数据失败', error: e, stackTrace: stackTrace);
       return false;
     }
   }
 
-  static Future<bool> refreshWithExistingSession() async {
+  static Future<bool> refreshWithExistingSession(
+      {bool isForced = false}) async {
     try {
       final cookieData = await AuthService.getUserData();
       if (cookieData == null) {
         return false;
       }
 
-      await Future.wait([
-        ScoreService.fetchSemestersFromRemote(
-          userData: cookieData,
-          forceRefresh: true,
-        ),
-        EduTimeService.fetchTimeInfoFromRemote(forceRefresh: true),
-        ExamService.getExam(userData: cookieData, forceRefresh: true),
-        InfoService.getInfoCompletion(
-          userData: cookieData,
-          forceRefresh: true,
-        ),
-      ]);
+      await EduTimeService.fetchTimeInfoFromRemote(forceRefresh: true);
 
-      await CourseService.getCourse(userData: cookieData, isRefresh: true);
+      if (isForced) {
+        await Future.wait([
+          ScoreService.fetchSemestersFromRemote(
+            userData: cookieData,
+            forceRefresh: true,
+          ),
+          ExamService.getExam(userData: cookieData, forceRefresh: true),
+          InfoService.getInfoCompletion(
+            userData: cookieData,
+            forceRefresh: true,
+          ),
+          CourseService.getCourse(userData: cookieData, isRefresh: true)
+        ]);
+      }
 
       final callback = _courseRefreshCallback;
       if (callback != null) {
