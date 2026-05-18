@@ -23,6 +23,7 @@ import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -184,6 +185,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
       return InkWell(
         onTap: () => _jumpToPage(scheduleState.currentWeek),
         borderRadius: ClubRadii.control,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.control),
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
@@ -289,8 +291,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        borderRadius: ClubRadii.navigation,
+      decoration: ShapeDecoration(
+        shape: ClubSmoothCorners.shape(ClubRadii.navigation),
       ),
       child: CupertinoSlidingSegmentedControl<CourseCardStyle>(
         groupValue: _cardStyle,
@@ -472,10 +474,10 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                 leading: Container(
                   width: 8,
                   height: 40,
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color:
                         CourseColorManager.generateSoftColor(course.courseName),
-                    borderRadius: ClubRadii.xsBorder,
+                    shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
                   ),
                 ),
                 title: Text(
@@ -517,7 +519,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           ),
           ClubListTile(
             leading: Icon(Icons.delete, color: colors.danger),
-            title: Text(l10n.deleteCourse, style: TextStyle(color: colors.danger)),
+            title:
+                Text(l10n.deleteCourse, style: TextStyle(color: colors.danger)),
             onTap: () {
               Navigator.pop(context);
               _deleteCustomCourse(course);

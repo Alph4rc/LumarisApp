@@ -69,9 +69,7 @@ class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
         return;
       }
 
-      await ref
-          .read(courseStoreProvider.notifier)
-          .saveGuestCourses(courses);
+      await ref.read(courseStoreProvider.notifier).saveGuestCourses(courses);
       ref.read(scheduleStoreProvider.notifier).loadGuestCourseData();
 
       if (mounted) {

@@ -3,6 +3,7 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 平板设备导航组件
@@ -62,7 +63,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                   Container(
                     width: 48,
                     height: 48,
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       gradient: LinearGradient(
                         colors: [
                           colorScheme.primary,
@@ -71,7 +72,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: ClubRadii.navigation,
+                      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
                     ),
                     child: Icon(
                       Icons.dashboard_rounded,
@@ -92,7 +93,9 @@ class _TabletNavigationState extends State<TabletNavigation> {
                         _isExtended = !_isExtended;
                       });
                     },
-                    tooltip: _isExtended ? context.l10n.collapseSidebar : context.l10n.expandSidebar,
+                    tooltip: _isExtended
+                        ? context.l10n.collapseSidebar
+                        : context.l10n.expandSidebar,
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -132,9 +135,7 @@ class _TabletNavigationState extends State<TabletNavigation> {
                 letterSpacing: 0.2,
               ),
               indicatorColor: colorScheme.primary.withValues(alpha: 0.15),
-              indicatorShape: RoundedRectangleBorder(
-                borderRadius: ClubRadii.navigation,
-              ),
+              indicatorShape: ClubSmoothCorners.shape(ClubRadii.navigation),
               minWidth: 72,
               minExtendedWidth: 220,
             ),

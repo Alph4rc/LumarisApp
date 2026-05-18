@@ -76,7 +76,7 @@ void main() {
       final shape = decoration.shape as SmoothRectangleBorder;
 
       expect(shape.borderRadius, ClubRadii.card);
-      expect(shape.smoothness, clubCornerSmoothness);
+      expect(shape.smoothness, clubCompactCornerSmoothness);
     });
 
     testWidgets('should apply custom border radius',
@@ -97,6 +97,7 @@ void main() {
       final shape = decoration.shape as SmoothRectangleBorder;
 
       expect(shape.borderRadius, borderRadius);
+      expect(shape.smoothness, clubCompactCornerSmoothness);
     });
 
     testWidgets('should use light and dark card colors',
@@ -146,6 +147,14 @@ void main() {
       container = tester.widget<Container>(decoratedContainer());
       decoration = container.decoration as ShapeDecoration;
       expect(decoration.color, ClubColors.dark.cardBackground);
+    });
+
+    test('should use stronger smoothing for large corners without border', () {
+      final shape = ClubSmoothCorners.shape(
+        const BorderRadius.all(Radius.circular(20)),
+      );
+
+      expect(shape.smoothness, clubCornerSmoothness);
     });
   });
 }

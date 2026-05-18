@@ -15,6 +15,7 @@ import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
@@ -190,9 +191,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: colors.surfaceRaised,
-                    borderRadius: ClubRadii.control,
+                    shape: ClubSmoothCorners.shape(ClubRadii.control),
                   ),
                   child: Row(
                     children: [
@@ -246,9 +247,11 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         children: [
           Material(
               color: Colors.transparent,
-              borderRadius: ClubRadii.card,
+              shape: ClubSmoothCorners.shape(ClubRadii.card),
+              clipBehavior: Clip.antiAlias,
               child: InkWell(
                   borderRadius: ClubRadii.card,
+                  customBorder: ClubSmoothCorners.shape(ClubRadii.card),
                   onTap: () => AppRouter.push(AppRoutes.customCourseManage),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -279,8 +282,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                       )))),
           Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-                borderRadius: ClubRadii.card,
+              decoration: ShapeDecoration(
+                shape: ClubSmoothCorners.shape(ClubRadii.card),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -363,10 +366,12 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     final colors = context.clubColors;
     final isSelected = settingsStore.scheduleBackground == value;
     return Material(
-      borderRadius: ClubRadii.card,
+      shape: ClubSmoothCorners.shape(ClubRadii.card),
+      clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
         borderRadius: ClubRadii.card,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.card),
         onTap: () {
           setState(() {
             settingsStore.setScheduleBackground(value);
@@ -374,8 +379,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: ClubRadii.navigation,
+          decoration: ShapeDecoration(
+            shape: ClubSmoothCorners.shape(ClubRadii.navigation),
           ),
           child: Row(
             children: [
@@ -525,9 +530,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              decoration: ShapeDecoration(
                 color: context.clubColors.surfaceRaised,
-                borderRadius: ClubRadii.xsBorder,
+                shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
               ),
               child: Row(
                 children: [
@@ -582,9 +587,11 @@ class CourseIgnoreItem extends StatelessWidget {
     final colors = context.clubColors;
     return Material(
         color: Colors.transparent,
-        borderRadius: ClubRadii.card,
+        shape: ClubSmoothCorners.shape(ClubRadii.card),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
             borderRadius: ClubRadii.card,
+            customBorder: ClubSmoothCorners.shape(ClubRadii.card),
             onTap: () => onChanged(ignore, !ignore.isCompleted),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

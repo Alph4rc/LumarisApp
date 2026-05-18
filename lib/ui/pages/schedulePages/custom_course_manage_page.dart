@@ -13,6 +13,7 @@ import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 /// 自定义课程管理页面
 ///
@@ -87,9 +88,7 @@ class _CustomCourseManagePageState
                   content: Text(context.l10n.courseAdded),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ClubRadii.navigation,
-                  ),
+                  shape: ClubSmoothCorners.shape(ClubRadii.navigation),
                 ),
               );
             }
@@ -121,9 +120,7 @@ class _CustomCourseManagePageState
                   content: Text(context.l10n.courseModified),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ClubRadii.navigation,
-                  ),
+                  shape: ClubSmoothCorners.shape(ClubRadii.navigation),
                 ),
               );
             }
@@ -220,9 +217,9 @@ class _CustomCourseManagePageState
                       children: [
                         Container(
                           padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             color: primaryColor.withValues(alpha: 0.1),
-                            borderRadius: ClubRadii.card,
+                            shape: ClubSmoothCorners.shape(ClubRadii.card),
                           ),
                           child: Icon(
                             Icons.event_available,
@@ -256,10 +253,10 @@ class _CustomCourseManagePageState
                       final course = customCourses[index];
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
+                        decoration: ShapeDecoration(
                           color: cardColor,
-                          borderRadius: ClubRadii.navigation,
-                          boxShadow: [
+                          shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+                          shadows: [
                             BoxShadow(
                               color: colors.shadowColor.withValues(alpha: 0.8),
                               blurRadius: 10,
@@ -269,8 +266,12 @@ class _CustomCourseManagePageState
                         ),
                         child: Material(
                           color: Colors.transparent,
+                          shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+                          clipBehavior: Clip.antiAlias,
                           child: InkWell(
                             borderRadius: ClubRadii.navigation,
+                            customBorder:
+                                ClubSmoothCorners.shape(ClubRadii.navigation),
                             onTap: () => _showEditCourseDialog(course),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -320,8 +321,8 @@ class _CustomCourseManagePageState
                                       showModalBottomSheet(
                                         context: context,
                                         backgroundColor: cardColor,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: ClubRadii.sheetTop,
+                                        shape: ClubSmoothCorners.shape(
+                                          ClubRadii.sheetTop,
                                         ),
                                         builder: (context) => SafeArea(
                                           child: Column(
@@ -368,9 +369,9 @@ class _CustomCourseManagePageState
   Widget _buildInfoChip(IconData icon, String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: ClubRadii.control,
+        shape: ClubSmoothCorners.shape(ClubRadii.control),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -535,10 +536,10 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: cardColor,
-          borderRadius: ClubRadii.panel,
-          boxShadow: [
+          shape: ClubSmoothCorners.shape(ClubRadii.panel),
+          shadows: [
             BoxShadow(
               color: colors.shadowColor.withValues(alpha: 0.9),
               blurRadius: 20,
@@ -630,11 +631,11 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
+                      decoration: ShapeDecoration(
                         color: colors.surfaceRaised,
-                        borderRadius: ClubRadii.navigation,
-                        border: Border.all(
-                          color: colors.borderStrong,
+                        shape: ClubSmoothCorners.shape(
+                          ClubRadii.navigation,
+                          side: BorderSide(color: colors.borderStrong),
                         ),
                       ),
                       child: DropdownButtonHideUnderline(
@@ -678,11 +679,12 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                 width: double.infinity,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
-                                decoration: BoxDecoration(
+                                decoration: ShapeDecoration(
                                   color: colors.surfaceRaised,
-                                  borderRadius: ClubRadii.navigation,
-                                  border: Border.all(
-                                    color: colors.borderStrong,
+                                  shape: ClubSmoothCorners.shape(
+                                    ClubRadii.navigation,
+                                    side:
+                                        BorderSide(color: colors.borderStrong),
                                   ),
                                 ),
                                 child: DropdownButtonHideUnderline(
@@ -728,11 +730,12 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                                 width: double.infinity,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
-                                decoration: BoxDecoration(
+                                decoration: ShapeDecoration(
                                   color: colors.surfaceRaised,
-                                  borderRadius: ClubRadii.navigation,
-                                  border: Border.all(
-                                    color: colors.borderStrong,
+                                  shape: ClubSmoothCorners.shape(
+                                    ClubRadii.navigation,
+                                    side:
+                                        BorderSide(color: colors.borderStrong),
                                   ),
                                 ),
                                 child: DropdownButtonHideUnderline(
@@ -793,15 +796,17 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                               horizontal: 16,
                               vertical: 8,
                             ),
-                            decoration: BoxDecoration(
+                            decoration: ShapeDecoration(
                               color: isSelected
                                   ? primaryColor
                                   : colors.surfaceMuted,
-                              borderRadius: ClubRadii.card,
-                              border: Border.all(
-                                color: isSelected
-                                    ? primaryColor
-                                    : colors.borderStrong,
+                              shape: ClubSmoothCorners.shape(
+                                ClubRadii.card,
+                                side: BorderSide(
+                                  color: isSelected
+                                      ? primaryColor
+                                      : colors.borderStrong,
+                                ),
                               ),
                             ),
                             child: Text(
@@ -860,9 +865,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                         horizontal: 24,
                         vertical: 12,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: ClubRadii.control,
-                      ),
+                      shape: ClubSmoothCorners.shape(ClubRadii.control),
                       elevation: 0,
                     ),
                     child: Text(

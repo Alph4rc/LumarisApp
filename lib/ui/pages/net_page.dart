@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/services/net_service.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class NetPage extends StatefulWidget {
@@ -128,7 +129,8 @@ class _DataContent extends StatelessWidget {
     int d = h ~/ 24;
     int hRemainder = h % 24;
 
-    return context.l10n.durationDHMS(d.toString(), hRemainder.toString(), mRemainder.toString(), sRemainder.toString());
+    return context.l10n.durationDHMS(d.toString(), hRemainder.toString(),
+        mRemainder.toString(), sRemainder.toString());
   }
 
   @override
@@ -177,10 +179,10 @@ class _DataContent extends StatelessWidget {
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             color: cardColor,
-                            borderRadius: ClubRadii.card, // Apple 风格圆角
-                            boxShadow: [
+                            shape: ClubSmoothCorners.shape(ClubRadii.card),
+                            shadows: [
                               BoxShadow(
                                 color:
                                     colors.shadowColor.withValues(alpha: 0.8),
@@ -222,13 +224,15 @@ class _DataContent extends StatelessWidget {
                                   horizontal: 12,
                                   vertical: 6,
                                 ),
-                                decoration: BoxDecoration(
+                                decoration: ShapeDecoration(
                                   color:
                                       theme.primaryColor.withValues(alpha: 0.1),
-                                  borderRadius: ClubRadii.card,
+                                  shape:
+                                      ClubSmoothCorners.shape(ClubRadii.card),
                                 ),
                                 child: Text(
-                                  l10n.onlineDuration(timeFormat(context, (data['sum_seconds'] as num).toInt())),
+                                  l10n.onlineDuration(timeFormat(context,
+                                      (data['sum_seconds'] as num).toInt())),
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: theme.primaryColor,
@@ -257,10 +261,10 @@ class _DataContent extends StatelessWidget {
                       child: Opacity(
                         opacity: value,
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             color: cardColor,
-                            borderRadius: ClubRadii.panel,
-                            boxShadow: [
+                            shape: ClubSmoothCorners.shape(ClubRadii.panel),
+                            shadows: [
                               BoxShadow(
                                 color:
                                     colors.shadowColor.withValues(alpha: 0.8),
@@ -347,11 +351,24 @@ class _DetailRow extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
+      shape: ClubSmoothCorners.shape(
+        BorderRadius.vertical(
+          top: isFirst ? ClubRadii.panelRadius : Radius.zero,
+          bottom: isLast ? ClubRadii.panelRadius : Radius.zero,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.vertical(
           top: isFirst ? ClubRadii.panelRadius : Radius.zero,
           bottom: isLast ? ClubRadii.panelRadius : Radius.zero,
+        ),
+        customBorder: ClubSmoothCorners.shape(
+          BorderRadius.vertical(
+            top: isFirst ? ClubRadii.panelRadius : Radius.zero,
+            bottom: isLast ? ClubRadii.panelRadius : Radius.zero,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -359,9 +376,9 @@ class _DetailRow extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: iconColor,
-                  borderRadius: ClubRadii.control,
+                  shape: ClubSmoothCorners.shape(ClubRadii.control),
                 ),
                 child: Icon(
                   icon,

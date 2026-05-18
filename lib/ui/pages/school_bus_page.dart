@@ -15,6 +15,7 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 class SchoolBusPage extends ConsumerWidget {
   const SchoolBusPage({super.key});
@@ -130,11 +131,11 @@ class SchoolBusPage extends ConsumerWidget {
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: isSelected
                       ? colors.primary
                       : colors.primary.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(24),
+                  shape: ClubSmoothCorners.shape(BorderRadius.circular(24)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -367,9 +368,9 @@ class SchoolBusPage extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              shape: ClubSmoothCorners.shape(BorderRadius.circular(8)),
             ),
             child: Icon(icon, size: 20, color: color),
           ),
@@ -430,7 +431,8 @@ class BusTimelineTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _buildTimeDisplay(bus.runTime, context.l10n.departure, colors),
+                  _buildTimeDisplay(
+                      bus.runTime, context.l10n.departure, colors),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Icon(
@@ -439,14 +441,15 @@ class BusTimelineTile extends StatelessWidget {
                       color: colors.tertiaryLabel,
                     ),
                   ),
-                  _buildTimeDisplay(bus.arrivalTime, context.l10n.arrival, colors),
+                  _buildTimeDisplay(
+                      bus.arrivalTime, context.l10n.arrival, colors),
                   const Spacer(),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: colors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
+                      shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
                     ),
                     child: Text(
                       bus.arrivalStationTime,

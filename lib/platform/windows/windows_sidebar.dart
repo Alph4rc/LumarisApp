@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Apple 风格侧边栏 (参考 iCloud / App Store 设计)
@@ -98,7 +99,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
           Container(
             width: 28,
             height: 28,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               gradient: LinearGradient(
                 colors: [
                   colorScheme.primary,
@@ -107,8 +108,8 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: ClubRadii.control, // Apple 风格圆角
-              boxShadow: [
+              shape: ClubSmoothCorners.shape(ClubRadii.control),
+              shadows: [
                 BoxShadow(
                   color: colorScheme.primary.withValues(alpha: 0.3),
                   blurRadius: 8,
@@ -171,13 +172,13 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
               horizontal: 12,
               vertical: 10,
             ),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: isSelected
                   ? selectedBgColor
                   : isHovered
                       ? hoverBgColor
                       : Colors.transparent,
-              borderRadius: ClubRadii.navigation, // Apple 风格大圆角
+              shape: ClubSmoothCorners.shape(ClubRadii.navigation),
             ),
             child: Row(
               children: [
@@ -214,11 +215,11 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                       horizontal: 8,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: isSelected
                           ? context.clubColors.onAccent.withValues(alpha: 0.2)
                           : context.clubColors.cardOverlay,
-                      borderRadius: ClubRadii.navigation,
+                      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
                     ),
                     child: Text(
                       item.badge!,

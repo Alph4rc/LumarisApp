@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import 'club_card.dart';
@@ -15,8 +16,8 @@ class StudyCreditCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: ClubRadii.card,
+      decoration: ShapeDecoration(
+        shape: ClubSmoothCorners.shape(ClubRadii.card),
       ),
       child: ClubCard(
         child: Padding(
@@ -61,9 +62,9 @@ class StudyCreditCard extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: theme.colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: ClubRadii.navigation,
+            shape: ClubSmoothCorners.shape(ClubRadii.navigation),
           ),
           child: Icon(
             Icons.school_rounded,
@@ -115,9 +116,9 @@ class StudyCreditCard extends StatelessWidget {
                   Container(
                     width: 4,
                     height: 20,
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: theme.colorScheme.error,
-                      borderRadius: ClubRadii.indicatorBorder,
+                      shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -172,9 +173,9 @@ class StudyCreditCard extends StatelessWidget {
         Container(
           width: 4,
           height: 20,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: theme.colorScheme.primary,
-            borderRadius: ClubRadii.indicatorBorder,
+            shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
           ),
         ),
         const SizedBox(width: 12),
@@ -252,9 +253,9 @@ class StudyCreditCard extends StatelessWidget {
 
     return Container(
       height: 6,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: theme.colorScheme.outline.withValues(alpha: 0.2),
-        borderRadius: ClubRadii.xsBorder,
+        shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
       ),
       child: Stack(
         children: [
@@ -262,9 +263,9 @@ class StudyCreditCard extends StatelessWidget {
             duration: const Duration(milliseconds: 1500),
             curve: Curves.easeOutCubic,
             width: double.infinity,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: theme.colorScheme.outline.withValues(alpha: 0.1),
-              borderRadius: ClubRadii.xsBorder,
+              shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
             ),
           ),
           AnimatedContainer(
@@ -273,7 +274,7 @@ class StudyCreditCard extends StatelessWidget {
             child: FractionallySizedBox(
               widthFactor: clampedProgress,
               child: Container(
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   gradient: LinearGradient(
                     colors: [
                       _getProgressColor(clampedProgress, theme),
@@ -281,8 +282,8 @@ class StudyCreditCard extends StatelessWidget {
                           .withValues(alpha: 0.8),
                     ],
                   ),
-                  borderRadius: ClubRadii.xsBorder,
-                  boxShadow: clampedProgress > 0
+                  shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+                  shadows: clampedProgress > 0
                       ? [
                           BoxShadow(
                             color: _getProgressColor(clampedProgress, theme)

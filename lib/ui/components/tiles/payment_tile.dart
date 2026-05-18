@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import '../../../state/payment_store.dart';
 import '../club_card.dart';
@@ -23,6 +24,7 @@ class PaymentTile extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: ClubRadii.tile,
+          customBorder: ClubSmoothCorners.shape(ClubRadii.tile),
           onTap: () => AppRouter.push(AppRoutes.payment),
           child: Padding(
             padding: const EdgeInsets.all(16.0),

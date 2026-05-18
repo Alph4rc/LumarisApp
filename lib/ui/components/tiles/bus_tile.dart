@@ -5,6 +5,7 @@ import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/bus_tile_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import '../club_card.dart';
 
@@ -23,6 +24,7 @@ class BusTile extends ConsumerWidget {
         child: InkWell(
           onTap: () => AppRouter.push(AppRoutes.schoolBus),
           borderRadius: ClubRadii.tile,
+          customBorder: ClubSmoothCorners.shape(ClubRadii.tile),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Builder(builder: (context) {

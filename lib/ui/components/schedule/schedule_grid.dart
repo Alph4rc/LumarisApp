@@ -4,6 +4,7 @@ import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/timeline_column.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import '../../../core/services/course_color_manager.dart';
@@ -224,12 +225,13 @@ class ScheduleGrid extends StatelessWidget {
       height: height,
       child: Container(
         margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          borderRadius: ClubRadii.control,
+        decoration: ShapeDecoration(
+          shape: ClubSmoothCorners.shape(ClubRadii.control),
           color: courseColor,
         ),
         child: InkWell(
           borderRadius: ClubRadii.control,
+          customBorder: ClubSmoothCorners.shape(ClubRadii.control),
           onTap: onConflictCourseTap != null
               ? () => onConflictCourseTap!(courses)
               : (onCourseTap != null

@@ -14,6 +14,7 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ExamCard extends StatefulWidget {
@@ -234,7 +235,8 @@ class _ExamCardState extends State<ExamCard> {
                     index: index,
                     child: Material(
                       color: Colors.transparent,
-                      borderRadius: ClubRadii.card,
+                      shape: ClubSmoothCorners.shape(ClubRadii.card),
+                      clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         onTap: () {
                           if (isTablet) {
@@ -250,6 +252,7 @@ class _ExamCardState extends State<ExamCard> {
                           }
                         },
                         borderRadius: ClubRadii.card,
+                        customBorder: ClubSmoothCorners.shape(ClubRadii.card),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: Row(
@@ -258,9 +261,10 @@ class _ExamCardState extends State<ExamCard> {
                               Container(
                                 width: 5,
                                 height: isTablet ? 42 : 52,
-                                decoration: BoxDecoration(
+                                decoration: ShapeDecoration(
                                   color: exam.color,
-                                  borderRadius: ClubRadii.xsBorder,
+                                  shape: ClubSmoothCorners.shape(
+                                      ClubRadii.xsBorder),
                                 ),
                               ),
                               const SizedBox(width: 16),

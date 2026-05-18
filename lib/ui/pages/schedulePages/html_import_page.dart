@@ -5,8 +5,8 @@ import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
-
 
 class HtmlImportPage extends ConsumerStatefulWidget {
   const HtmlImportPage({super.key});
@@ -60,9 +60,12 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
                 color: _selectedUrl == school.scheduleUrl
                     ? colors.selectionFill
                     : colors.groupedBackground,
-                borderRadius: BorderRadius.circular(12),
+                shape: ClubSmoothCorners.shape(BorderRadius.circular(12)),
+                clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
+                  customBorder:
+                      ClubSmoothCorners.shape(BorderRadius.circular(12)),
                   onTap: () {
                     setState(() => _selectedUrl = school.scheduleUrl);
                     _urlController.clear();

@@ -7,6 +7,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -52,7 +53,7 @@ class _LinkPageState extends ConsumerState<LinkPage> {
         ),
       );
     }
-    
+
     return Scaffold(
       appBar: ClubAppBar(
         title: l10n.campusNavigation,
@@ -165,9 +166,9 @@ class ScoreBuilder extends StatelessWidget {
                   Container(
                     width: 4,
                     height: 20,
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: colors.indigo,
-                      borderRadius: ClubRadii.indicatorBorder,
+                      shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -222,8 +223,11 @@ class _LinkItem extends StatelessWidget {
     final colors = context.clubColors;
     return Material(
       color: Colors.transparent,
+      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: ClubRadii.navigation,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.navigation),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -245,8 +249,8 @@ class _LinkItem extends StatelessWidget {
                   return Container(
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(
-                      borderRadius: ClubRadii.control,
+                    decoration: ShapeDecoration(
+                      shape: ClubSmoothCorners.shape(ClubRadii.control),
                     ),
                   );
                 },

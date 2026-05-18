@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Modal 内部布局组件库
@@ -136,9 +137,9 @@ class ModalInfoRow extends StatelessWidget {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: ClubRadii.control,
+            shape: ClubSmoothCorners.shape(ClubRadii.control),
           ),
           child: Icon(
             icon,
@@ -222,7 +223,8 @@ class ModalActionMenu extends StatelessWidget {
               children: [
                 Icon(Icons.delete, size: 20, color: colors.danger),
                 const SizedBox(width: 12),
-                Text(context.l10n.delete, style: TextStyle(color: colors.danger)),
+                Text(context.l10n.delete,
+                    style: TextStyle(color: colors.danger)),
               ],
             ),
           ),
