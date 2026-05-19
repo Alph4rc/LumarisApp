@@ -269,7 +269,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dontUpdate => '나중에 업데이트';
 
   @override
-  String confirmUpdateTitle(Object version) {
+  String confirmUpdateTitle(String version) {
     return '최신 버전 $version으로 업데이트하시겠습니까?';
   }
 
@@ -705,7 +705,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get remindMinutesBefore => '몇 분 전에 알림';
 
   @override
-  String remindMinutes(Object n) {
+  String remindMinutes(int n) {
     return '$n분 전';
   }
 
@@ -806,22 +806,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get decShort => '12월';
 
   @override
-  String weekUnit(Object n) {
+  String weekUnit(int n) {
     return '$n주차';
   }
 
   @override
-  String currentWeek(Object n) {
+  String currentWeek(int n) {
     return '현재 $n주차';
   }
 
   @override
-  String weeksUntilStart(Object n) {
+  String weeksUntilStart(int n) {
     return '개강까지 $n주 남음';
   }
 
   @override
-  String periodRange(Object end, Object start) {
+  String periodRange(int start, int end) {
     return '제$start-$end교시';
   }
 
@@ -865,7 +865,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmDelete => '삭제 확인';
 
   @override
-  String confirmDeleteCourseContent(Object name) {
+  String confirmDeleteCourseContent(String name) {
     return '\"$name\" 수업을 정말 삭제하시겠습니까?';
   }
 
@@ -915,7 +915,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get courseWeeks => '수업 주차';
 
   @override
-  String selectedWeeks(Object count) {
+  String selectedWeeks(int count) {
     return '$count주 선택됨';
   }
 
@@ -923,7 +923,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get customCourses => '사용자 지정 수업';
 
   @override
-  String customCoursesCount(Object count) {
+  String customCoursesCount(int count) {
     return '$count개 수업';
   }
 
@@ -1008,28 +1008,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get foolishModeMessage => '네, 제 평점은 5.0입니다';
 
   @override
-  String creditUnit(Object credit) {
+  String creditUnit(String credit) {
     return '$credit 학점';
   }
 
   @override
-  String gradeLabel(Object grade) {
+  String gradeLabel(String grade) {
     return '성적 $grade';
   }
 
   @override
-  String gpaLabel(Object gpa) {
+  String gpaLabel(String gpa) {
     return '평점 $gpa';
   }
 
   @override
   String scheduleCourseTime(
-      Object end, Object start, Object weekRanges, Object weekday) {
+      String weekRanges, String weekday, int start, int end) {
     return '$weekRanges주차 매주 $weekday 제$start-$end교시';
   }
 
   @override
-  String semesterRange(Object end, Object num, Object start) {
+  String semesterRange(String start, String end, String num) {
     return '$start~$end년도 제$num학기';
   }
 
@@ -1160,7 +1160,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get doubleTapExit => '한 번 더 누르면 앱이 종료됩니다';
 
   @override
-  String copySuccess(Object text) {
+  String copySuccess(String text) {
     return '복사됨: $text';
   }
 
@@ -1231,7 +1231,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get todoLoadFailedSubtitle => '할 일을 불러올 수 없습니다';
 
   @override
-  String deadlineLabel(Object date) {
+  String deadlineLabel(String date) {
     return '마감일: $date';
   }
 
@@ -1272,7 +1272,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get seatNumber => '좌석 번호';
 
   @override
-  String seatNumberLabel(Object seat) {
+  String seatNumberLabel(String seat) {
     return '좌석 $seat번';
   }
 
@@ -1370,7 +1370,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get updateTimeout => '업데이트 시간 초과, 네트워크 연결을 확인한 후 다시 시도해 주세요';
 
   @override
-  String updateFailed(Object error) {
+  String updateFailed(String error) {
     return '업데이트 실패: $error';
   }
 
@@ -1381,7 +1381,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get currentWeekLabel => '이번 주';
 
   @override
-  String periodUnit(Object n) {
+  String periodUnit(int n) {
     return '제$n교시';
   }
 
@@ -1549,7 +1549,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get usedTraffic => '사용한 데이터';
 
   @override
-  String onlineDuration(Object time) {
+  String onlineDuration(String time) {
     return '온라인 시간: $time';
   }
 
@@ -1611,7 +1611,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get electricityCost => '전기 사용 요금';
 
   @override
-  String lastNDays(Object n) {
+  String lastNDays(int n) {
     return '최근 $n일';
   }
 
@@ -1711,7 +1711,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get createSubFailed => '전기요금 구독 생성 실패';
 
   @override
-  String currentSubInfo(Object email, Object threshold) {
+  String currentSubInfo(String email, String threshold) {
     return '현재 이메일 $email, $threshold위안 미만 시 알림';
   }
 
@@ -1972,7 +1972,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get poiYanTaEastGateDesc => '역사적인 캠퍼스 입구';
 
   @override
-  String durationDHMS(Object d, Object h, Object m, Object s) {
+  String durationDHMS(String d, String h, String m, String s) {
     return '$d일 $h시간 $m분 $s초';
   }
 

@@ -3,5 +3,5 @@ template-arb-file: app_zh.arb
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 nullable-getter: false
-required-resource-attributes: false
+required-resource-attributes: true
 untranslated-messages-file: untranslated.json

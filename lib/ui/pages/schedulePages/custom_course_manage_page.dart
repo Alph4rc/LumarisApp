@@ -167,7 +167,6 @@ class _CustomCourseManagePageState
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.clubColors;
-    final cardColor = colors.cardBackground;
 
     return Scaffold(
         appBar: ClubAppBar(

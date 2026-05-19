@@ -30,7 +30,6 @@ import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 
 import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/language_setting.dart';
 
 class SettingPage extends ConsumerWidget {

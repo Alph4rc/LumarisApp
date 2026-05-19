@@ -273,7 +273,7 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                           shape: ClubSmoothCorners.shape(ClubRadii.control),
                         ),
                         child: Text(
-                          l10n.creditUnit(course.credits),
+                          l10n.creditUnit(course.credits.toString()),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

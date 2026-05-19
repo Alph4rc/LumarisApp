@@ -275,7 +275,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dontUpdate => 'Später';
 
   @override
-  String confirmUpdateTitle(Object version) {
+  String confirmUpdateTitle(String version) {
     return 'Auf neueste Version aktualisieren: $version?';
   }
 
@@ -718,7 +718,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get remindMinutesBefore => 'Wie viele Minuten vorher erinnern';
 
   @override
-  String remindMinutes(Object n) {
+  String remindMinutes(int n) {
     return '$n Minuten';
   }
 
@@ -819,22 +819,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get decShort => 'Dez.';
 
   @override
-  String weekUnit(Object n) {
+  String weekUnit(int n) {
     return 'Woche $n';
   }
 
   @override
-  String currentWeek(Object n) {
+  String currentWeek(int n) {
     return 'Aktuelle Woche $n';
   }
 
   @override
-  String weeksUntilStart(Object n) {
+  String weeksUntilStart(int n) {
     return 'Noch $n Woche(n) bis zum Semesterbeginn';
   }
 
   @override
-  String periodRange(Object end, Object start) {
+  String periodRange(int start, int end) {
     return 'Stunde $start-$end';
   }
 
@@ -878,7 +878,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get confirmDelete => 'Löschen bestätigen';
 
   @override
-  String confirmDeleteCourseContent(Object name) {
+  String confirmDeleteCourseContent(String name) {
     return 'Möchten Sie \"$name\" wirklich löschen?';
   }
 
@@ -928,7 +928,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get courseWeeks => 'Wochen';
 
   @override
-  String selectedWeeks(Object count) {
+  String selectedWeeks(int count) {
     return '$count Woche(n) ausgewählt';
   }
 
@@ -936,7 +936,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get customCourses => 'Eigene Kurse';
 
   @override
-  String customCoursesCount(Object count) {
+  String customCoursesCount(int count) {
     return '$count Kurs(e)';
   }
 
@@ -1027,28 +1027,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get foolishModeMessage => 'Ja, ich habe einen GPA von 5.0';
 
   @override
-  String creditUnit(Object credit) {
+  String creditUnit(String credit) {
     return '$credit Credits';
   }
 
   @override
-  String gradeLabel(Object grade) {
+  String gradeLabel(String grade) {
     return 'Note $grade';
   }
 
   @override
-  String gpaLabel(Object gpa) {
+  String gpaLabel(String gpa) {
     return 'GPA $gpa';
   }
 
   @override
   String scheduleCourseTime(
-      Object end, Object start, Object weekRanges, Object weekday) {
+      String weekRanges, String weekday, int start, int end) {
     return 'Woche $weekRanges jeden $weekday Stunde $start-$end';
   }
 
   @override
-  String semesterRange(Object end, Object num, Object start) {
+  String semesterRange(String start, String end, String num) {
     return '$start-$end Semester $num';
   }
 
@@ -1184,7 +1184,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get doubleTapExit => 'Erneut drücken zum Beenden';
 
   @override
-  String copySuccess(Object text) {
+  String copySuccess(String text) {
     return 'Kopiert: $text';
   }
 
@@ -1259,7 +1259,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get todoLoadFailedSubtitle => 'Aufgaben konnten nicht geladen werden';
 
   @override
-  String deadlineLabel(Object date) {
+  String deadlineLabel(String date) {
     return 'Frist: $date';
   }
 
@@ -1301,7 +1301,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get seatNumber => 'Sitzplatz';
 
   @override
-  String seatNumberLabel(Object seat) {
+  String seatNumberLabel(String seat) {
     return 'Sitzplatz $seat';
   }
 
@@ -1405,7 +1405,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktualisierung abgelaufen. Bitte überprüfen Sie Ihr Netzwerk.';
 
   @override
-  String updateFailed(Object error) {
+  String updateFailed(String error) {
     return 'Aktualisierung fehlgeschlagen: $error';
   }
 
@@ -1416,7 +1416,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get currentWeekLabel => 'Diese Woche';
 
   @override
-  String periodUnit(Object n) {
+  String periodUnit(int n) {
     return 'Stunde $n';
   }
 
@@ -1591,7 +1591,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get usedTraffic => 'Verbrauchtes Datenvolumen';
 
   @override
-  String onlineDuration(Object time) {
+  String onlineDuration(String time) {
     return 'Online: $time';
   }
 
@@ -1656,7 +1656,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get electricityCost => 'Stromkosten';
 
   @override
-  String lastNDays(Object n) {
+  String lastNDays(int n) {
     return 'Letzte $n Tage';
   }
 
@@ -1763,7 +1763,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get createSubFailed => 'Abonnement konnte nicht erstellt werden';
 
   @override
-  String currentSubInfo(Object email, Object threshold) {
+  String currentSubInfo(String email, String threshold) {
     return 'E-Mail $email wird gewarnt, wenn unter $threshold CNY';
   }
 
@@ -2048,7 +2048,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get poiYanTaEastGateDesc => 'Historischer Campus-Eingang';
 
   @override
-  String durationDHMS(Object d, Object h, Object m, Object s) {
+  String durationDHMS(String d, String h, String m, String s) {
     return '${d}T ${h}Std ${m}Min ${s}Sek';
   }
 
