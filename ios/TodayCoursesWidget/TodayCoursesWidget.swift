@@ -95,55 +95,74 @@ struct CourseEntry: TimelineEntry {
 struct TodayCoursesWidgetEntryView: View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var family
+
+    private var maxVisibleCourses: Int {
+        2
+    }
+
+    private var visibleCourses: [Course] {
+        Array(entry.courses.prefix(maxVisibleCourses))
+    }
+
+    private var hiddenCoursesCount: Int {
+        max(entry.courses.count - visibleCourses.count, 0)
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Header
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 VStack(alignment: .leading) {
                     Text(entry.title)
-                        .font(.headline)
-                        .fontWeight(.bold)
+                        .font(.system(size: 18, weight: .bold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     
                     if !entry.dateString.isEmpty {
                         Text(entry.dateString)
-                            .font(.caption)
+                            .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
                 
                 Spacer()
             }
             
-            // Divider
             Rectangle()
-                .fill(Color.gray.opacity(0.5))
+                .fill(Color.secondary.opacity(0.25))
                 .frame(height: 1)
             
-            // Course list or empty state
             if entry.courses.isEmpty {
-                VStack(alignment: .center, spacing: 4) {
+                VStack(alignment: .center, spacing: 6) {
                     Text("今天没有课程")
-                        .font(.body)
+                        .font(.system(size: 16, weight: .semibold))
                         .fontWeight(.semibold)
                     
                     Text("享受你的自由时光吧！")
-                        .font(.caption)
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .multilineTextAlignment(.center)
             } else {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(entry.courses) { course in
-                            CourseRowView(course: course)
-                        }
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(visibleCourses) { course in
+                        CourseRowView(course: course)
+                    }
+
+                    if hiddenCoursesCount > 0 {
+                        Text("还有\(hiddenCoursesCount)节课程")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(.secondary)
                     }
                 }
             }
         }
-        .padding()
+        .padding(10)
+        .containerBackground(for: .widget) {
+            Color(.systemBackground)
+        }
     }
 }
 
@@ -151,30 +170,53 @@ struct CourseRowView: View {
     let course: Course
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(course.title)
-                .font(.body)
-                .fontWeight(.semibold)
-                .lineLimit(1)
-            
-            Text(course.time)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-            
-            HStack {
-                Text(course.location)
-                    .font(.caption2)
+        HStack(alignment: .top, spacing: 6) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(ultraCompactPeriodText(from: course.time))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
+
+                Text(ultraCompactStartTime(from: course.time))
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+            }
+            .frame(width: 40, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(course.title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+
+                Text(course.location)
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 1)
+    }
+
+    private func ultraCompactPeriodText(from source: String) -> String {
+        if let range = source.range(of: #"第\d+-\d+节"#, options: .regularExpression) {
+            return String(source[range]).replacingOccurrences(of: "第", with: "")
+        }
+        return source
+    }
+
+    private func ultraCompactStartTime(from source: String) -> String {
+        if let range = source.range(of: #"\d{2}:\d{2}"#, options: .regularExpression) {
+            return String(source[range])
+        }
+        return source
     }
 }
 
 struct TodayCoursesWidget: Widget {
-    let kind: String = "TodayCoursesWidget"
+    let kind: String = "TodayCoursesWidgetSmall"
     
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
@@ -182,7 +224,7 @@ struct TodayCoursesWidget: Widget {
         }
         .configurationDisplayName("今日课表")
         .description("查看今天的课程安排")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall])
     }
 }
 
@@ -200,6 +242,6 @@ struct TodayCoursesWidget_Previews: PreviewProvider {
                 ]
             )
         )
-        .previewContext(WidgetPreviewContext(family: .systemMedium))
+        .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }

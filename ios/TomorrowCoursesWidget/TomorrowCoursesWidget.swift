@@ -142,145 +142,127 @@ func extractDateInfo(from dateString: String) -> (day: String, weekday: String) 
 }
 
 struct TomorrowCoursesWidgetEntryView: View {
-    @Environment(\.colorScheme) var colorScheme
     var entry: Provider.Entry
+    @Environment(\.widgetFamily) var family
 
-    // 使用系统默认的强调色，更符合苹果设计风格
     let accentColor = Color(.systemBlue)
-    @State private var selectedTab = 0
 
     var body: some View {
-        ZStack {
-            VStack(alignment: .leading, spacing: 10) {
-                // 标题栏
-                HStack {
-                    Text(entry.title)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    Spacer()
-                }
-                
-                // 显示当前日期信息
-                HStack {
-                    Text(extractDateInfo(from: entry.todayDateString).day)
-                        .font(.caption)
-                        .foregroundColor(Color.gray.opacity(0.7))
-                    Text(extractDateInfo(from: entry.todayDateString).weekday)
-                        .font(.caption)
-                        .foregroundColor(Color.gray.opacity(0.7))
-                }
-                
-                // TabView：滑动标签页
-                TabView(selection: $selectedTab) {
-                    // 今天
-                    CoursesPanelView(
-                        title: "今天",
-                        courses: entry.todayCourses,
-                        accentColor: accentColor,
-                        colorScheme: colorScheme
-                    )
-                    .tag(0)
-
-                    // 明天
-                    CoursesPanelView(
-                        title: "明天",
-                        courses: entry.tomorrowCourses,
-                        accentColor: accentColor,
-                        colorScheme: colorScheme
-                    )
-                    .tag(1)
-                }
-#if os(macOS)
-                .frame(height: 180)
-#else
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .frame(height: 180)
-                // 隐藏分页指示器，更简约
-                .onAppear {
-                    UIPageControl.appearance().isHidden = false
-                    UIPageControl.appearance().currentPageIndicatorTintColor = UIColor(accentColor)
-                    UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray3
-                }
-#endif
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(entry.title)
+                    .font(.system(size: 20, weight: .bold))
+                Spacer()
             }
-            .padding(12)
+
+            HStack(spacing: 10) {
+                DayColumnView(
+                    title: "今天",
+                    dateText: entry.todayDateString,
+                    courses: entry.todayCourses,
+                    accentColor: accentColor,
+                    maxVisibleCourses: family == .systemLarge ? 3 : 2
+                )
+
+                DayColumnView(
+                    title: "明天",
+                    dateText: entry.tomorrowDateString,
+                    courses: entry.tomorrowCourses,
+                    accentColor: accentColor,
+                    maxVisibleCourses: family == .systemLarge ? 3 : 2
+                )
+            }
+        }
+        .padding(12)
+        .containerBackground(for: .widget) {
+            Color(.systemBackground)
         }
         // 添加点击交互，点击后打开应用
         .widgetURL(URL(string: "iosclubapp://courses"))
     }
 }
 
-struct CoursesPanelView: View {
+struct DayColumnView: View {
     let title: String
+    let dateText: String
     let courses: [Course]
     let accentColor: Color
-    let colorScheme: ColorScheme
+    let maxVisibleCourses: Int
+
+    private var visibleCourses: [Course] {
+        Array(courses.prefix(maxVisibleCourses))
+    }
+
+    private var hiddenCoursesCount: Int {
+        max(courses.count - visibleCourses.count, 0)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title.uppercased())
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(accentColor)
+
+                Text(dateText)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+
             if !courses.isEmpty {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(courses) { course in
-                            CourseRowView(course: course, accentColor: accentColor, colorScheme: colorScheme)
-                        }
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(visibleCourses) { course in
+                        CourseRowView(course: course, accentColor: accentColor)
+                    }
+
+                    if hiddenCoursesCount > 0 {
+                        Text("还有\(hiddenCoursesCount)节")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
                 }
             } else {
                 EmptyCoursesView(text: "\(title)无课程")
-                    .frame(maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
 struct CourseRowView: View {
     let course: Course
     let accentColor: Color
-    let colorScheme: ColorScheme
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            // 左侧强调色竖条，更细更符合苹果风格
-            RoundedRectangle(cornerRadius: 1)
-                .fill(accentColor)
-                .frame(width: 3)
+        VStack(alignment: .leading, spacing: 3) {
+            Text(compactTimeRange(from: course.time))
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundColor(.secondary)
+                .monospacedDigit()
+                .lineLimit(1)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(course.title)
-                    .font(.subheadline)
+                    .font(.system(size: 14, weight: .semibold))
                     .fontWeight(.semibold)
                     .lineLimit(1)
 
-                Text(course.time)
-                    .font(.caption)
-                    .foregroundColor(Color.gray.opacity(0.7))
+                Text(course.location)
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
                     .lineLimit(1)
-
-                HStack(alignment: .center, spacing: 12) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "location")
-                            .font(.caption2)
-                            .foregroundColor(Color.gray.opacity(0.6))
-                        Text(course.location)
-                            .font(.caption2)
-                            .foregroundColor(Color.gray.opacity(0.6))
-                    }
-                    .lineLimit(1)
-
-                }
             }
-
-            Spacer()
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.gray.opacity(0.1))
-        )
-        // 添加轻微的阴影效果
-        .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
+        .padding(.bottom, 2)
+    }
+
+    private func compactTimeRange(from source: String) -> String {
+        if let range = source.range(of: #"\d{2}:\d{2}-\d{2}:\d{2}"#, options: .regularExpression) {
+            return String(source[range])
+        }
+        return source
     }
 }
 
@@ -288,24 +270,22 @@ struct EmptyCoursesView: View {
     let text: String
 
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
+        VStack(alignment: .center, spacing: 6) {
             Image(systemName: "calendar.badge.clock")
-                .font(.system(size: 24))
-                .padding(.bottom, 4)
+                .font(.system(size: 18))
+                .foregroundColor(.secondary)
             
             Text(text)
-                .font(.subheadline)
+                .font(.system(size: 12, weight: .semibold))
                 .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
 
             Text("享受自由时光")
-                .font(.caption)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .multilineTextAlignment(.center)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.gray.opacity(0.1))
-        )
     }
 }
 
@@ -318,6 +298,6 @@ struct TomorrowCoursesWidget: Widget {
         }
         .configurationDisplayName("近日课表")
         .description("查看今天和明天的课程安排")
-        .supportedFamilies([.systemMedium])
+        .supportedFamilies([.systemMedium, .systemLarge])
     }
 }

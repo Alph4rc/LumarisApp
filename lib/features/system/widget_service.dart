@@ -53,7 +53,7 @@ class WidgetService {
     await HomeWidget.updateWidget(
       name: 'TodayCoursesWidgetProvider',
       androidName: 'TodayCoursesWidgetProvider',
-      iOSName: 'TodayCoursesWidget',
+      iOSName: 'TodayCoursesWidgetSmall',
       qualifiedAndroidName:
           'com.example.ios_club_app.TodayCoursesWidgetProvider',
     );
