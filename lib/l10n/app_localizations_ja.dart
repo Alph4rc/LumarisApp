@@ -15,7 +15,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appSlogan => 'キャンパスライフをひとつのアプリに';
 
   @override
-  String get tagline => '西安建築科技大学の学生により良いサービスを';
+  String get tagline => '大学生により良いサービスを';
 
   @override
   String get home => 'ホーム';

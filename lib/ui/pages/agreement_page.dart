@@ -178,7 +178,7 @@ class AgreementPage extends ConsumerWidget {
         ),
         shadows: [
           BoxShadow(
-            color: colors.shadowColor.withValues(alpha: 0.8),
+            color: colors.shadowColor.withValues(alpha: 0.2),
             blurRadius: 16,
             spreadRadius: 2,
           ),

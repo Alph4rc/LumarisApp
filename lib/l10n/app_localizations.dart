@@ -124,7 +124,7 @@ abstract class AppLocalizations {
   /// No description provided for @tagline.
   ///
   /// In zh, this message translates to:
-  /// **'致力于为建大学子提供更好的服务'**
+  /// **'致力于为大学生提供更好的服务'**
   String get tagline;
 
   /// No description provided for @home.

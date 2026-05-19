@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appSlogan => 'Try to fit campus life into one app';
 
   @override
-  String get tagline => 'Committed to serving XAUAT students';
+  String get tagline => 'Committed to serving students';
 
   @override
   String get home => 'Home';

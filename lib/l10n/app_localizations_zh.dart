@@ -15,7 +15,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appSlogan => '试着把大学囊括其中';
 
   @override
-  String get tagline => '致力于为建大学子提供更好的服务';
+  String get tagline => '致力于为大学生提供更好的服务';
 
   @override
   String get home => '首页';
@@ -2006,7 +2006,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get appSlogan => '試著把大學囊括其中';
 
   @override
-  String get tagline => '致力於為建大學子提供更好的服務';
+  String get tagline => '致力於為大學生提供更好的服務';
 
   @override
   String get home => '首頁';

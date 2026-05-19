@@ -15,7 +15,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appSlogan => '대학 생활을 하나의 앱에 담다';
 
   @override
-  String get tagline => '건축대학교 학생들을 위한 더 나은 서비스를 위해';
+  String get tagline => '대학생들에게 더 나은 서비스를 제공하기 위해';
 
   @override
   String get home => '홈';

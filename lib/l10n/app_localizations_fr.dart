@@ -15,8 +15,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appSlogan => 'Toute la vie étudiante dans une seule app';
 
   @override
-  String get tagline =>
-      'Dédié à offrir un meilleur service aux étudiants de XAUAT';
+  String get tagline => 'Dédié à offrir un meilleur service aux étudiants';
 
   @override
   String get home => 'Accueil';

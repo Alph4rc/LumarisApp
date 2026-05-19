@@ -15,7 +15,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appSlogan => 'Вся студенческая жизнь в одном приложении';
 
   @override
-  String get tagline => 'Стремясь предоставить лучший сервис студентам САСУ';
+  String get tagline => 'Стремясь предоставить лучший сервис студентам';
 
   @override
   String get home => 'Главная';

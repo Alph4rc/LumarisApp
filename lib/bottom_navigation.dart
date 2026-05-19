@@ -30,38 +30,29 @@ class BottomNavigation extends StatelessWidget {
     final selectedColor = selectedItemColor ?? colorScheme.primary;
     final unselectedColor = unselectedItemColor ?? colors.secondaryLabel;
 
+    final bottom = MediaQuery.of(context).padding.bottom + 60;
+
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadowColor,
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
-      child: SafeArea(
-        child: Container(
-          height: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(
-              destinations.length,
-              (index) => _NavigationItem(
-                destination: destinations[index],
-                isSelected: selectedIndex == index,
-                onTap: () {
-                  // if (settingsStore.enableHapticFeedback) {
-                  //   Feedback.forLongPress(context);
-                  // }
-                  onDestinationSelected(index);
-                },
-                selectedColor: selectedColor,
-                unselectedColor: unselectedColor,
-              ),
-            ),
+      height: bottom,
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(
+          destinations.length,
+          (index) => _NavigationItem(
+            destination: destinations[index],
+            isSelected: selectedIndex == index,
+            onTap: () {
+              // if (settingsStore.enableHapticFeedback) {
+              //   Feedback.forLongPress(context);
+              // }
+              onDestinationSelected(index);
+            },
+            selectedColor: selectedColor,
+            unselectedColor: unselectedColor,
           ),
         ),
       ),
