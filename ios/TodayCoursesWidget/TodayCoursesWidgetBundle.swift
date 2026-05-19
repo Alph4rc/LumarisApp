@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct TodayCoursesWidgetBundle: WidgetBundle {
     var body: some Widget {
-        TodayCoursesWidget()
+        ScheduleWidget()
         TodayCoursesWidgetControl()
         TodayCoursesWidgetLiveActivity()
     }
