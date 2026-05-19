@@ -14,6 +14,7 @@ import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -532,9 +533,11 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   void _editCustomCourse(CourseModel course) {
-    showDialog(
-      context: context,
-      builder: (context) => AddEditCourseDialog(
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showClubModalBottomSheet(
+      context,
+      AddEditCourseDialog(
         course: course,
         onSave: (updatedCourse) async {
           await _saveUpdatedCustomCourse(updatedCourse);
@@ -543,6 +546,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           }
         },
       ),
+      maxHeight: screenHeight * 0.7,
     );
   }
 
@@ -567,7 +571,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
     if (confirm == true) {
       final prefs = PrefsService.instance;
-      final jsonString = prefs.getString('custom_courses');
+      final jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
 
       if (jsonString != null) {
         try {
@@ -579,8 +583,9 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
           final updatedJsonString =
               jsonEncode(customCourses.map((c) => c.toJson()).toList());
-          await prefs.setString('custom_courses', updatedJsonString);
-          await ref.read(scheduleStoreProvider.notifier).refreshCourses();
+          await prefs.setString(
+              PrefsKeys.CUSTOM_COURSE_DATA, updatedJsonString);
+          await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
 
           if (mounted) {
             showClubSnackBar(context, Text(l10n.courseDeleted));
@@ -596,7 +601,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Future<void> _saveUpdatedCustomCourse(CourseModel updatedCourse) async {
     final prefs = PrefsService.instance;
-    final jsonString = prefs.getString('custom_courses');
+    final jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
 
     if (jsonString != null) {
       try {
@@ -614,8 +619,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
         final updatedJsonString =
             jsonEncode(customCourses.map((c) => c.toJson()).toList());
-        await prefs.setString('custom_courses', updatedJsonString);
-        await ref.read(scheduleStoreProvider.notifier).refreshCourses();
+        await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, updatedJsonString);
+        await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
       } catch (e) {
         // 处理错误
       }

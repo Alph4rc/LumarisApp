@@ -58,8 +58,9 @@ class ScheduleStore extends Notifier<ScheduleState> {
         await getRemindCourses();
         await _loadCourses();
       } else {
-        await ref.read(courseStoreProvider.notifier).loadGuestCourses();
-        final guestCourses = ref.read(courseStoreProvider).courses;
+        final guestCourses = await ref
+            .read(courseStoreProvider.notifier)
+            .loadGuestAndCustomCourses();
         if (guestCourses.isNotEmpty) {
           _applyCourses(guestCourses);
         } else {
@@ -74,9 +75,13 @@ class ScheduleStore extends Notifier<ScheduleState> {
 
   /// 从 CourseStore 加载游客课程并应用到课表
   Future<void> loadGuestCourseData() async {
-    final guestCourses = ref.read(courseStoreProvider).courses;
+    final guestCourses = await ref
+        .read(courseStoreProvider.notifier)
+        .loadGuestAndCustomCourses();
     if (guestCourses.isNotEmpty) {
       _applyCourses(guestCourses);
+    } else {
+      state = state.copyWith(allCourses: const [], isLoading: false);
     }
   }
 
@@ -149,9 +154,9 @@ class ScheduleStore extends Notifier<ScheduleState> {
       AppLogger.debug('[ScheduleStore] 调用 CourseService.getCourse');
 
       final weekData = await EduTimeService.getWeek(isRefresh: true);
-      
+
       if (currentRefreshId != _refreshCount) return;
-      
+
       _handleWeekData(weekData);
 
       await CourseService.getCourse(isRefresh: true).timeout(
@@ -197,6 +202,20 @@ class ScheduleStore extends Notifier<ScheduleState> {
         AppLogger.debug('[ScheduleStore] 设置 isLoading = false');
         state = state.copyWith(isLoading: false);
       }
+    }
+  }
+
+  Future<void> refreshLocalCourses() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      if (ref.read(userStoreProvider).isLogin) {
+        await getRemindCourses();
+        await _loadCourses();
+      } else {
+        await loadGuestCourseData();
+      }
+    } finally {
+      state = state.copyWith(isLoading: false);
     }
   }
 

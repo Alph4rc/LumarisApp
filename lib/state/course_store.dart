@@ -115,6 +115,35 @@ class CourseStore extends Notifier<CourseState> {
     }
   }
 
+  Future<List<CourseModel>> loadCustomCourses() async {
+    final prefs = PrefsService.instance;
+    final String? jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
+    if (jsonString == null || jsonString.isEmpty) {
+      return const <CourseModel>[];
+    }
+
+    try {
+      final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
+      return jsonList
+          .map((e) => CourseModel.fromJson(e as Map<String, dynamic>))
+          .where((course) => course.isCustom)
+          .toList();
+    } catch (_) {
+      await prefs.remove(PrefsKeys.CUSTOM_COURSE_DATA);
+      return const <CourseModel>[];
+    }
+  }
+
+  Future<List<CourseModel>> loadGuestAndCustomCourses() async {
+    await loadGuestCourses();
+    final guestCourses =
+        state.courses.where((course) => !course.isCustom).toList();
+    final customCourses = await loadCustomCourses();
+    final mergedCourses = [...guestCourses, ...customCourses];
+    state = state.copyWith(courses: mergedCourses);
+    return mergedCourses;
+  }
+
   Future<void> clearGuestCourses() async {
     await PrefsService.instance.remove(PrefsKeys.GUEST_COURSE_DATA);
     state = state.copyWith(courses: const []);

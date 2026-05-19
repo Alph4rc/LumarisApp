@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
@@ -12,6 +13,8 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -45,7 +48,7 @@ class _CustomCourseManagePageState
     });
 
     final prefs = PrefsService.instance;
-    final String? jsonString = prefs.getString('custom_courses');
+    final String? jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
 
     if (jsonString != null) {
       try {
@@ -70,7 +73,7 @@ class _CustomCourseManagePageState
     final prefs = PrefsService.instance;
     final jsonString =
         jsonEncode(customCourses.map((course) => course.toJson()).toList());
-    await prefs.setString('custom_courses', jsonString);
+    await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, jsonString);
   }
 
   void _showAddCourseDialog() {
@@ -156,8 +159,8 @@ class _CustomCourseManagePageState
   }
 
   Future<void> _refreshCourseStore() async {
-    // 刷新CourseStore以包含最新的自定义课程
     await ref.read(courseStoreProvider.notifier).loadCourses();
+    await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
   }
 
   @override
@@ -223,13 +226,6 @@ class _CustomCourseManagePageState
                         decoration: ShapeDecoration(
                           color: cardColor,
                           shape: ClubSmoothCorners.shape(ClubRadii.navigation),
-                          shadows: [
-                            BoxShadow(
-                              color: colors.shadowColor.withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -240,7 +236,7 @@ class _CustomCourseManagePageState
                             customBorder:
                                 ClubSmoothCorners.shape(ClubRadii.navigation),
                             onTap: () => _showEditCourseDialog(course),
-                            child: Padding(
+                            child: ClubCard(
                               padding: const EdgeInsets.all(16),
                               child: Row(
                                 children: [
@@ -511,6 +507,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
             ),
           ],
         ),
+
+        const SizedBox(height: 12,),
 
         // Content
         Column(
