@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -221,22 +221,18 @@ class _CustomCourseManagePageState
                     itemCount: customCourses.length,
                     itemBuilder: (context, index) {
                       final course = customCourses[index];
-                      return Container(
+                      return ClubCard(
                         margin: const EdgeInsets.only(bottom: 12),
-                        decoration: ShapeDecoration(
-                          color: cardColor,
-                          shape: ClubSmoothCorners.shape(ClubRadii.navigation),
-                        ),
                         child: Material(
                           color: Colors.transparent,
-                          shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+                          shape: ClubSmoothCorners.shape(ClubRadii.card),
                           clipBehavior: Clip.antiAlias,
                           child: InkWell(
-                            borderRadius: ClubRadii.navigation,
+                            borderRadius: ClubRadii.card,
                             customBorder:
-                                ClubSmoothCorners.shape(ClubRadii.navigation),
+                                ClubSmoothCorners.shape(ClubRadii.card),
                             onTap: () => _showEditCourseDialog(course),
-                            child: ClubCard(
+                            child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Row(
                                 children: [
@@ -275,48 +271,27 @@ class _CustomCourseManagePageState
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.more_horiz,
-                                      color: colors.secondaryLabel,
-                                    ),
-                                    onPressed: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: cardColor,
-                                        shape: ClubSmoothCorners.shape(
-                                          ClubRadii.sheetTop,
-                                        ),
-                                        builder: (context) => SafeArea(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ClubListTile(
-                                                leading: Icon(
-                                                  Icons.edit_outlined,
-                                                  color: colors.primary,
-                                                ),
-                                                title: Text(l10n.editCourse),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _showEditCourseDialog(course);
-                                                },
-                                              ),
-                                              ClubListTile(
-                                                leading: Icon(
-                                                  Icons.delete_outline,
-                                                  color: colors.danger,
-                                                ),
-                                                title: Text(l10n.deleteCourse),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _deleteCourse(course);
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
+                                  ClubMenu<String>(
+                                    tooltip: l10n.moreFunctions,
+                                    items: <ClubMenuItem<String>>[
+                                      ClubMenuItem<String>(
+                                        value: 'edit',
+                                        label: l10n.editCourse,
+                                        icon: Icons.edit_outlined,
+                                      ),
+                                      ClubMenuItem<String>(
+                                        value: 'delete',
+                                        label: l10n.deleteCourse,
+                                        icon: Icons.delete_outline,
+                                        isDestructive: true,
+                                      ),
+                                    ],
+                                    onSelected: (String value) {
+                                      if (value == 'edit') {
+                                        _showEditCourseDialog(course);
+                                      } else if (value == 'delete') {
+                                        _deleteCourse(course);
+                                      }
                                     },
                                   ),
                                 ],
@@ -508,7 +483,9 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
           ],
         ),
 
-        const SizedBox(height: 12,),
+        const SizedBox(
+          height: 12,
+        ),
 
         // Content
         Column(

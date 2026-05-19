@@ -20,6 +20,7 @@ class PaymentTile extends ConsumerWidget {
     final colors = context.clubColors;
 
     return ClubCard(
+      borderRadius: ClubRadii.tile,
       child: Material(
         color: Colors.transparent,
         child: InkWell(

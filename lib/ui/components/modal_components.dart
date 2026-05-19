@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -193,44 +194,30 @@ class ModalActionMenu extends StatelessWidget {
 
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
-  final List<PopupMenuEntry<String>>? customActions;
+  final List<ClubMenuItem<String>>? customActions;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final List<ClubMenuItem<String>> items = <ClubMenuItem<String>>[
+      if (onEdit != null)
+        ClubMenuItem<String>(
+          value: 'edit',
+          label: context.l10n.edit,
+          icon: CupertinoIcons.pencil,
+        ),
+      if (onDelete != null)
+        ClubMenuItem<String>(
+          value: 'delete',
+          label: context.l10n.delete,
+          icon: CupertinoIcons.delete,
+          isDestructive: true,
+        ),
+      if (customActions != null) ...customActions!,
+    ];
 
-    return PopupMenuButton<String>(
-      icon: Icon(
-        Icons.more_horiz,
-        color: colors.secondaryLabel,
-      ),
-      itemBuilder: (context) => [
-        if (onEdit != null)
-          PopupMenuItem(
-            value: 'edit',
-            child: Row(
-              children: [
-                const Icon(Icons.edit, size: 20),
-                const SizedBox(width: 12),
-                Text(context.l10n.edit),
-              ],
-            ),
-          ),
-        if (onDelete != null)
-          PopupMenuItem(
-            value: 'delete',
-            child: Row(
-              children: [
-                Icon(Icons.delete, size: 20, color: colors.danger),
-                const SizedBox(width: 12),
-                Text(context.l10n.delete,
-                    style: TextStyle(color: colors.danger)),
-              ],
-            ),
-          ),
-        if (customActions != null) ...customActions!,
-      ],
-      onSelected: (value) {
+    return ClubMenu<String>(
+      items: items,
+      onSelected: (String value) {
         Navigator.of(context).pop();
         if (value == 'edit' && onEdit != null) {
           onEdit!();

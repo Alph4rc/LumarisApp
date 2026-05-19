@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
@@ -121,38 +122,23 @@ class CourseDetailSheet extends StatelessWidget {
   }
 
   Widget _buildActionMenu(BuildContext context) {
-    final colors = context.clubColors;
-    return PopupMenuButton(
-      icon: Icon(
-        Icons.more_horiz,
-        color: colors.secondaryLabel,
-      ),
-      itemBuilder: (context) => [
+    return ClubMenu<String>(
+      items: <ClubMenuItem<String>>[
         if (onEdit != null)
-          PopupMenuItem(
+          ClubMenuItem<String>(
             value: 'edit',
-            child: Row(
-              children: [
-                const Icon(Icons.edit, size: 20),
-                const SizedBox(width: 12),
-                Text(context.l10n.editCourse),
-              ],
-            ),
+            label: context.l10n.editCourse,
+            icon: CupertinoIcons.pencil,
           ),
         if (onDelete != null)
-          PopupMenuItem(
+          ClubMenuItem<String>(
             value: 'delete',
-            child: Row(
-              children: [
-                Icon(Icons.delete, size: 20, color: colors.danger),
-                const SizedBox(width: 12),
-                Text(context.l10n.deleteCourse,
-                    style: TextStyle(color: colors.danger)),
-              ],
-            ),
+            label: context.l10n.deleteCourse,
+            icon: CupertinoIcons.delete,
+            isDestructive: true,
           ),
       ],
-      onSelected: (value) {
+      onSelected: (String value) {
         Navigator.of(context).pop();
         if (value == 'edit' && onEdit != null) {
           onEdit!();
