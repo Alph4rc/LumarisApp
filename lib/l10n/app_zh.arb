@@ -675,6 +675,8 @@
   "campusCaoTang": "草堂",
   "campusYanTa": "雁塔",
   "busRefreshStale": "刷新完成，已保留上次校车数据",
+  "arrivalStationTime": "{h}小时 {m}分钟",
+
   "poiMainLibrary": "主图书馆",
   "poiMainLibraryDesc": "24小时开放自习室",
   "poiCaoTangNorthGate": "草堂校区北门",
@@ -1313,6 +1315,7 @@
   "@poiYanTaEastGate": {"description": ""},
   "@poiYanTaEastGateDesc": {"description": ""},
   "@durationDHMS": {"description": "", "placeholders": {"d": {"type": "String"}, "h": {"type": "String"}, "m": {"type": "String"}, "s": {"type": "String"}}},
+  "@arrivalStationTime": {"description": "", "placeholders": {"h": {"type": "String"}, "m": {"type": "String"}}},
   "@shortcuts": {"description": ""},
   "@moreFunctions": {"description": ""},
   "@noShortcuts": {"description": ""},

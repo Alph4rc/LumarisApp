@@ -452,7 +452,7 @@ class BusTimelineTile extends StatelessWidget {
                       shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
                     ),
                     child: Text(
-                      bus.arrivalStationTime,
+                      _arrivalStationTimeInL10n(bus.arrivalStationTime, context),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -527,5 +527,15 @@ class BusTimelineTile extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _arrivalStationTimeInL10n(
+      String arrivalStationTime, BuildContext context) {
+    var s = arrivalStationTime.split(':');
+    if (s.length >= 2) {
+      return context.l10n.arrivalStationTime(s[0], s[1]);
+    }
+
+    return arrivalStationTime;
   }
 }

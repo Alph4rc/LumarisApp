@@ -2020,6 +2020,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get busRefreshStale => 'Actualisation terminée, données conservées';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '${h}h ${m}min';
+  }
+
+  @override
   String get poiMainLibrary => 'Bibliothèque principale';
 
   @override

@@ -3767,6 +3767,12 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
+  /// **'{h}小时 {m}分钟'**
+  String arrivalStationTime(String h, String m);
+
+  ///
+  ///
+  /// In zh, this message translates to:
   /// **'主图书馆'**
   String get poiMainLibrary;
 

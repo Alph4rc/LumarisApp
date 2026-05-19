@@ -1930,6 +1930,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get busRefreshStale => '刷新完成，已保留上次校车数据';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$h小时 $m分钟';
+  }
+
+  @override
   String get poiMainLibrary => '主图书馆';
 
   @override
@@ -3919,6 +3924,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get busRefreshStale => '重新整理完成，已保留上次校車資料';
+
+  @override
+  String arrivalStationTime(String h, String m) {
+    return '$h小時 $m分钟';
+  }
 
   @override
   String get poiMainLibrary => '主圖書館';

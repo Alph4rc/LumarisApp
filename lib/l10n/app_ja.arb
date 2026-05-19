@@ -674,6 +674,7 @@
   "campusCardBalance": "カード残高",
   "tapToView": "タップして表示",
   "tapToSubscribe": "タップして購読",
+  "arrivalStationTime": "{h}時間 {m}分",
 
   "durationDHMS": "{d}日{h}時間{m}分{s}秒",
   "campusCaoTang": "草堂",

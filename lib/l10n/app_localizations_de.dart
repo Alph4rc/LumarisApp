@@ -2030,6 +2030,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktualisierung abgeschlossen, letzte Daten beibehalten';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '${h}Std ${m}Min';
+  }
+
+  @override
   String get poiMainLibrary => 'Hauptbibliothek';
 
   @override

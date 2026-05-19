@@ -671,6 +671,8 @@
   "tapToView": "Нажмите для просмотра",
   "tapToSubscribe": "Нажмите для подписки",
 
+  "arrivalStationTime": "{h}ч {m}м",
+
   "durationDHMS": "{d}д {h}ч {m}м {s}с",
   "campusCaoTang": "Цаотан",
   "campusYanTa": "Яньта",

@@ -2003,6 +2003,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Обновление завершено, сохранены последние данные';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$hч $mм';
+  }
+
+  @override
   String get poiMainLibrary => 'Главная библиотека';
 
   @override

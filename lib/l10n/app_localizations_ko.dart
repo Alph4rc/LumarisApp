@@ -1954,6 +1954,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get busRefreshStale => '새로고침 완료, 마지막 스쿨버스 데이터가 유지됨';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$h시간 $m분';
+  }
+
+  @override
   String get poiMainLibrary => '중앙도서관';
 
   @override

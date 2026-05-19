@@ -1997,6 +1997,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get busRefreshStale => 'Refresh completed, last data preserved';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '${h}h ${m}m';
+  }
+
+  @override
   String get poiMainLibrary => 'Main Library';
 
   @override

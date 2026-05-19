@@ -677,6 +677,8 @@
   "campusCaoTang": "草堂",
   "campusYanTa": "雁塔",
   "busRefreshStale": "重新整理完成，已保留上次校車資料",
+  "arrivalStationTime": "{h}小時 {m}分钟",
+
   "poiMainLibrary": "主圖書館",
   "poiMainLibraryDesc": "24小時開放自習室",
   "poiCaoTangNorthGate": "草堂校區北門",

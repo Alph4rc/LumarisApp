@@ -1900,6 +1900,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get busRefreshStale => '更新完了、最後のデータを保持';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$h時間 $m分';
+  }
+
+  @override
   String get poiMainLibrary => '中央図書館';
 
   @override

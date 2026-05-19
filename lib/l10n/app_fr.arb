@@ -672,6 +672,7 @@
   "campusCardBalance": "Solde de la carte",
   "tapToView": "Appuyez pour voir",
   "tapToSubscribe": "Appuyez pour vous abonner",
+  "arrivalStationTime": "{h}h {m}min",
 
   "durationDHMS": "{d}j {h}h {m}min {s}s",
   "campusCaoTang": "Caotang",

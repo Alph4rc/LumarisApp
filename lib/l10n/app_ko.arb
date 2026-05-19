@@ -682,6 +682,7 @@
   "poiCaoTangNorthGateDesc": "캠퍼스 정문",
   "poiYanTaEastGate": "옌타 캠퍼스 동문",
   "poiYanTaEastGateDesc": "역사적인 캠퍼스 입구",
+  "arrivalStationTime": "{h}시간 {m}분",
 
   "durationDHMS": "{d}일 {h}시간 {m}분 {s}초",
   "shortcuts": "바로가기 기능",

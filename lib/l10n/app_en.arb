@@ -676,6 +676,8 @@
   "campusCaoTang": "Caotang",
   "campusYanTa": "Yanta",
   "busRefreshStale": "Refresh completed, last data preserved",
+  "arrivalStationTime": "{h}h {m}m",
+
   "poiMainLibrary": "Main Library",
   "poiMainLibraryDesc": "24-hour study room",
   "poiCaoTangNorthGate": "Caotang North Gate",

@@ -672,6 +672,7 @@
   "campusCardBalance": "Kartenguthaben",
   "tapToView": "Zum Anzeigen tippen",
   "tapToSubscribe": "Zum Abonnieren tippen",
+  "arrivalStationTime": "{h}Std {m}Min",
 
   "durationDHMS": "{d}T {h}Std {m}Min {s}Sek",
   "campusCaoTang": "Caotang",
