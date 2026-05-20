@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:dio/dio.dart';
+import 'package:ios_club_app/core/services/app_locale_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
@@ -83,6 +85,7 @@ class EduHttpClient {
           options.headers['Cookie'] = cookie;
           options.headers['xauat'] = cookie;
         }
+        options.headers.putIfAbsent('x-language', _resolveLanguageHeaderValue);
         handler.next(options);
       },
       onError: (DioException e, handler) async {
@@ -163,6 +166,22 @@ class EduHttpClient {
       return userData['cookie'];
     }
     return null;
+  }
+
+  String _resolveLanguageHeaderValue() {
+    final prefs = PrefsService.instance;
+    final preference = prefs.getString(PrefsKeys.LOCALE_CODE);
+    final localeCode = AppLocaleService.fromPreference(preference);
+    final locale = AppLocaleService.localeOf(localeCode) ??
+        PlatformDispatcher.instance.locale;
+    return _languageCodeFromLocale(locale);
+  }
+
+  String _languageCodeFromLocale(Locale locale) {
+    if (locale.languageCode == 'zh' && locale.scriptCode == 'Hant') {
+      return AppLocaleService.zhHantPreferenceValue;
+    }
+    return locale.languageCode;
   }
 
   /// 带全局锁的重登录方法

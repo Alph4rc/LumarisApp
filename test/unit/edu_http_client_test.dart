@@ -138,6 +138,32 @@ void main() {
       client.dispose();
     });
 
+    test('should inject x-language header from locale preference', () async {
+      await PrefsService.instance.setString(PrefsKeys.LOCALE_CODE, 'ja');
+
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            expect(options.headers['x-language'], 'ja');
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'ok': true},
+              ),
+            );
+          },
+        ),
+      );
+
+      final data = await client.get('/locale');
+      expect(data, isA<Map>());
+      expect((data as Map<String, dynamic>)['ok'], isTrue);
+
+      client.dispose();
+    });
+
     test('should bypass request cache when force refresh is requested',
         () async {
       await RequestCache.instance.set(
