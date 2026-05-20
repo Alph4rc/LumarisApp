@@ -33,11 +33,11 @@ class TabletNavigation extends StatelessWidget {
         child: Row(
           children: [
             NavigationRail(
-              backgroundColor: colors.cardOverlay,
-              elevation: 2,
+              backgroundColor: colors.groupedBackground,
               selectedIndex: selectedIndex,
               onDestinationSelected: onItemSelected,
               labelType: NavigationRailLabelType.all,
+              groupAlignment: 0,
               useIndicator: true,
               destinations: destinations.map((destination) {
                 return NavigationRailDestination(
