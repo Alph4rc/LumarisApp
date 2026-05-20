@@ -140,9 +140,11 @@ class AuthorPage extends StatelessWidget {
     final members = [
       {'name': 'LuckyFish', 'role': 'Lead Developer'},
       {'name': 'zealous', 'role': 'Developer'},
-      {'name': '乔博睿', 'role': 'Developer'},
+      {'name': 'borry', 'role': 'Developer'},
       {'name': 'YoChine_Lanee', 'role': 'Developer'},
-      {'name': 'To-fly-high', 'role': 'Developer'}
+      {'name': 'To-fly-high', 'role': 'Developer'},
+      {'name': 'Alpharc', 'role': 'Developer'},
+      {'name': '白熊', 'role': 'Developer'}
     ];
 
     return ClubCard(
