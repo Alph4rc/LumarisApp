@@ -528,25 +528,18 @@ class _ScorePageState extends ConsumerState<ScorePage>
   Widget _buildYearCard(ScoreList score, int index) {
     return ClubCard(
         margin: const EdgeInsets.all(16),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(children: [
-              Text(_yearLabel(index),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  )),
-              _buildStatsPadding(scoreList: score),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: score.list.length,
-                itemBuilder: (context, index) => AnimatedListItem(
-                  index: index,
-                  child: _buildScoreItem(score.list[index]),
-                ),
-              )
-            ])));
+        child: Column(children: [
+          _buildStatsPadding(scoreList: score),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: score.list.length,
+            itemBuilder: (context, index) => AnimatedListItem(
+              index: index,
+              child: _buildScoreItem(score.list[index]),
+            ),
+          )
+        ]));
   }
 
   Widget _buildEmptyState() {
@@ -570,38 +563,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildSemesterCard(ScoreList score) {
-    final semesterParts = score.semester.semester.isNotEmpty
-        ? score.semester.semester.split('-')
-        : score.semester.name.split('-');
-    final semesterLabel = semesterParts.length >= 3
-        ? context.l10n
-            .semesterRange(semesterParts[1], semesterParts[2], semesterParts[0])
-        : score.semester.name;
     return AnimatedCard(
       child: ClubCard(
         margin: const EdgeInsets.all(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Column(
-            children: [
-              Text(
-                semesterLabel,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: score.list.length,
-                itemBuilder: (context, index) => AnimatedListItem(
-                  index: index,
-                  child: _buildScoreItem(score.list[index]),
-                ),
-              ),
-            ],
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: score.list.length,
+          itemBuilder: (context, index) => AnimatedListItem(
+            index: index,
+            child: _buildScoreItem(score.list[index]),
           ),
         ),
       ),

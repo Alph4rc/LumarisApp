@@ -142,6 +142,7 @@ class AuthorPage extends StatelessWidget {
       {'name': 'zealous', 'role': 'Developer'},
       {'name': '乔博睿', 'role': 'Developer'},
       {'name': 'YoChine_Lanee', 'role': 'Developer'},
+      {'name': 'To-fly-high', 'role': 'Developer'}
     ];
 
     return ClubCard(
