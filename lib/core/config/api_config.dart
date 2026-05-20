@@ -9,10 +9,14 @@ class SchoolConfig {
   /// 教务系统 API 基础 URL
   final String eduApiBaseUrl;
 
+  /// 教务系统课表页面 URL（用于 WebView 导入）
+  final String scheduleUrl;
+
   const SchoolConfig({
     required this.id,
     required this.name,
     required this.eduApiBaseUrl,
+    required this.scheduleUrl,
   });
 
   /// 从 JSON 创建
@@ -21,6 +25,7 @@ class SchoolConfig {
       id: json['id'] as String,
       name: json['name'] as String,
       eduApiBaseUrl: json['eduApiBaseUrl'] as String,
+      scheduleUrl: json['scheduleUrl'] as String? ?? '',
     );
   }
 
@@ -30,6 +35,7 @@ class SchoolConfig {
       'id': id,
       'name': name,
       'eduApiBaseUrl': eduApiBaseUrl,
+      'scheduleUrl': scheduleUrl,
     };
   }
 }
@@ -42,12 +48,14 @@ class ApiConfig {
       id: 'xauat',
       name: '西安建筑科技大学',
       eduApiBaseUrl: 'https://xauatapi.xauat.site',
+      scheduleUrl: 'https://authserver.xauat.edu.cn/authserver/login?service=https%3A%2F%2Fswjw.xauat.edu.cn%2Fstudent%2Fsso%2Flogin',
     ),
     // 可以在这里添加更多学校配置
     // SchoolConfig(
     //   id: 'example',
     //   name: '示例大学',
     //   eduApiBaseUrl: 'https://api.example.edu.cn',
+    //   scheduleUrl: 'http://example.edu.cn/jwxt/',
     // ),
   ];
 

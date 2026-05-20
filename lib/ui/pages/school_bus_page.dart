@@ -6,6 +6,7 @@ import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
@@ -14,6 +15,7 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 class SchoolBusPage extends ConsumerWidget {
   const SchoolBusPage({super.key});
@@ -23,6 +25,18 @@ class SchoolBusPage extends ConsumerWidget {
     final busState = ref.watch(busControllerProvider);
     final busController = ref.read(busControllerProvider.notifier);
     final colors = context.clubColors;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
+
+    if (!isLogin) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schoolBus)),
+        body: EmptyWidget(
+          title: context.l10n.guestMode,
+          subtitle: context.l10n.guestModeSubtitle,
+          icon: Icons.lock_outline,
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -117,11 +131,11 @@ class SchoolBusPage extends ConsumerWidget {
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: isSelected
                       ? colors.primary
                       : colors.primary.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(24),
+                  shape: ClubSmoothCorners.shape(BorderRadius.circular(24)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -354,9 +368,9 @@ class SchoolBusPage extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              shape: ClubSmoothCorners.shape(BorderRadius.circular(8)),
             ),
             child: Icon(icon, size: 20, color: color),
           ),
@@ -417,7 +431,8 @@ class BusTimelineTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _buildTimeDisplay(bus.runTime, context.l10n.departure, colors),
+                  _buildTimeDisplay(
+                      bus.runTime, context.l10n.departure, colors),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Icon(
@@ -426,17 +441,18 @@ class BusTimelineTile extends StatelessWidget {
                       color: colors.tertiaryLabel,
                     ),
                   ),
-                  _buildTimeDisplay(bus.arrivalTime, context.l10n.arrival, colors),
+                  _buildTimeDisplay(
+                      bus.arrivalTime, context.l10n.arrival, colors),
                   const Spacer(),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: colors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
+                      shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
                     ),
                     child: Text(
-                      bus.arrivalStationTime,
+                      _arrivalStationTimeInL10n(bus.arrivalStationTime, context),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -511,5 +527,15 @@ class BusTimelineTile extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _arrivalStationTimeInL10n(
+      String arrivalStationTime, BuildContext context) {
+    var s = arrivalStationTime.split(':');
+    if (s.length >= 2) {
+      return context.l10n.arrivalStationTime(s[0], s[1]);
+    }
+
+    return arrivalStationTime;
   }
 }

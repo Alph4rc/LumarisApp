@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
@@ -90,14 +91,14 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
           angle: isEditMode ? _jiggleAnimation.value : 0.0,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              borderRadius: ClubRadii.tile,
+            decoration: ShapeDecoration(
+              shape: ClubSmoothCorners.shape(ClubRadii.tile),
             ),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 // Original tile content
-                ClipRRect(
+                ClubSmoothCorners.clip(
                   borderRadius: ClubRadii.tile,
                   child: widget.child,
                 ),

@@ -49,7 +49,7 @@ class ScoreApi {
         throw NetworkException('成绩返回格式错误', -1);
       }
       return response
-          .map((item) => ScoreModel.fromJson(item as Map<String, dynamic>))
+          .map((item) => ScoreModel.fromJson(Map<String, dynamic>.from(item)))
           .toList();
     } catch (e) {
       _handleError(e);

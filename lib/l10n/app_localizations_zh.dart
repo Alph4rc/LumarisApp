@@ -15,7 +15,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appSlogan => '试着把大学囊括其中';
 
   @override
-  String get tagline => '致力于为建大学子提供更好的服务';
+  String get tagline => '致力于为大学生提供更好的服务';
 
   @override
   String get home => '首页';
@@ -267,7 +267,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dontUpdate => '暂不更新';
 
   @override
-  String confirmUpdateTitle(Object version) {
+  String confirmUpdateTitle(String version) {
     return '是否更新最新版本: $version';
   }
 
@@ -694,7 +694,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get remindMinutesBefore => '提前几分钟提醒';
 
   @override
-  String remindMinutes(Object n) {
+  String remindMinutes(int n) {
     return '$n分钟';
   }
 
@@ -795,22 +795,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get decShort => '12月';
 
   @override
-  String weekUnit(Object n) {
+  String weekUnit(int n) {
     return '$n周';
   }
 
   @override
-  String currentWeek(Object n) {
+  String currentWeek(int n) {
     return '当前为第$n周';
   }
 
   @override
-  String weeksUntilStart(Object n) {
+  String weeksUntilStart(int n) {
     return '距离开学还有$n周';
   }
 
   @override
-  String periodRange(Object end, Object start) {
+  String periodRange(int start, int end) {
     return '第$start-$end节';
   }
 
@@ -854,7 +854,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmDelete => '确认删除';
 
   @override
-  String confirmDeleteCourseContent(Object name) {
+  String confirmDeleteCourseContent(String name) {
     return '确定要删除课程\"$name\"吗？';
   }
 
@@ -904,7 +904,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get courseWeeks => '上课周次';
 
   @override
-  String selectedWeeks(Object count) {
+  String selectedWeeks(int count) {
     return '已选$count周';
   }
 
@@ -912,7 +912,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get customCourses => '自定义课程';
 
   @override
-  String customCoursesCount(Object count) {
+  String customCoursesCount(int count) {
     return '$count 门课程';
   }
 
@@ -995,28 +995,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get foolishModeMessage => '是的，在下绩点5.0';
 
   @override
-  String creditUnit(Object credit) {
+  String creditUnit(String credit) {
     return '$credit 学分';
   }
 
   @override
-  String gradeLabel(Object grade) {
+  String gradeLabel(String grade) {
     return '成绩 $grade';
   }
 
   @override
-  String gpaLabel(Object gpa) {
+  String gpaLabel(String gpa) {
     return '绩点 $gpa';
   }
 
   @override
   String scheduleCourseTime(
-      Object end, Object start, Object weekRanges, Object weekday) {
+      String weekRanges, String weekday, int start, int end) {
     return '$weekRanges周 每周$weekday 第$start-$end节';
   }
 
   @override
-  String semesterRange(Object end, Object num, Object start) {
+  String semesterRange(String start, String end, String num) {
     return '$start至$end年 第$num学期';
   }
 
@@ -1145,7 +1145,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get doubleTapExit => '再按一次退出应用';
 
   @override
-  String copySuccess(Object text) {
+  String copySuccess(String text) {
     return '已复制: $text';
   }
 
@@ -1216,7 +1216,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get todoLoadFailedSubtitle => '无法加载待办事项';
 
   @override
-  String deadlineLabel(Object date) {
+  String deadlineLabel(String date) {
     return '截止日期: $date';
   }
 
@@ -1257,7 +1257,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get seatNumber => '座位号';
 
   @override
-  String seatNumberLabel(Object seat) {
+  String seatNumberLabel(String seat) {
     return '座位号 $seat';
   }
 
@@ -1355,7 +1355,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateTimeout => '更新超时，请检查网络连接后重试';
 
   @override
-  String updateFailed(Object error) {
+  String updateFailed(String error) {
     return '更新失败: $error';
   }
 
@@ -1366,7 +1366,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currentWeekLabel => '本周';
 
   @override
-  String periodUnit(Object n) {
+  String periodUnit(int n) {
     return '第$n节';
   }
 
@@ -1415,6 +1415,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get guest => '游客';
+
+  @override
+  String get guestMode => '游客模式';
+
+  @override
+  String get guestModeSubtitle => '登录后可使用完整功能';
 
   @override
   String get syncingAcademic => '正在同步学业信息';
@@ -1525,7 +1531,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get usedTraffic => '已用流量';
 
   @override
-  String onlineDuration(Object time) {
+  String onlineDuration(String time) {
     return '在线时长: $time';
   }
 
@@ -1587,7 +1593,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get electricityCost => '用电花费';
 
   @override
-  String lastNDays(Object n) {
+  String lastNDays(int n) {
     return '近$n天';
   }
 
@@ -1685,7 +1691,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get createSubFailed => '创建电费订阅失败';
 
   @override
-  String currentSubInfo(Object email, Object threshold) {
+  String currentSubInfo(String email, String threshold) {
     return '当前邮箱 $email 低于 $threshold 元时提醒';
   }
 
@@ -1924,6 +1930,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get busRefreshStale => '刷新完成，已保留上次校车数据';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$h小时 $m分钟';
+  }
+
+  @override
   String get poiMainLibrary => '主图书馆';
 
   @override
@@ -1942,7 +1953,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get poiYanTaEastGateDesc => '历史悠久的老校区入口';
 
   @override
-  String durationDHMS(Object d, Object h, Object m, Object s) {
+  String durationDHMS(String d, String h, String m, String s) {
     return '$d天$h小时$m分$s秒';
   }
 
@@ -1960,6 +1971,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get eduSystem => '教务系统';
+
+  @override
+  String get htmlImport => 'HTML导入';
+
+  @override
+  String get pasteHtmlHint => '请粘贴课表HTML代码';
+
+  @override
+  String get parseAndPreview => '解析预览';
+
+  @override
+  String get importCourses => '导入课程';
+
+  @override
+  String get parseResult => '解析结果';
+
+  @override
+  String get noCoursesParsed => '未解析到课程';
+
+  @override
+  String get selectSchool => '选择学校';
+
+  @override
+  String get enterCustomUrl => '或输入自定义网址';
+
+  @override
+  String get urlHint => '请输入网址';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1973,7 +2011,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get appSlogan => '試著把大學囊括其中';
 
   @override
-  String get tagline => '致力於為建大學子提供更好的服務';
+  String get tagline => '致力於為大學生提供更好的服務';
 
   @override
   String get home => '首頁';
@@ -2225,7 +2263,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get dontUpdate => '暫不更新';
 
   @override
-  String confirmUpdateTitle(Object version) {
+  String confirmUpdateTitle(String version) {
     return '是否更新最新版本: $version';
   }
 
@@ -2652,7 +2690,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get remindMinutesBefore => '提前幾分鐘提醒';
 
   @override
-  String remindMinutes(Object n) {
+  String remindMinutes(int n) {
     return '$n分鐘';
   }
 
@@ -2753,22 +2791,22 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get decShort => '12月';
 
   @override
-  String weekUnit(Object n) {
+  String weekUnit(int n) {
     return '$n週';
   }
 
   @override
-  String currentWeek(Object n) {
+  String currentWeek(int n) {
     return '目前為第$n週';
   }
 
   @override
-  String weeksUntilStart(Object n) {
+  String weeksUntilStart(int n) {
     return '距離開學還有$n週';
   }
 
   @override
-  String periodRange(Object end, Object start) {
+  String periodRange(int start, int end) {
     return '第$start-$end節';
   }
 
@@ -2812,7 +2850,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get confirmDelete => '確認刪除';
 
   @override
-  String confirmDeleteCourseContent(Object name) {
+  String confirmDeleteCourseContent(String name) {
     return '確定要刪除課程「$name」嗎？';
   }
 
@@ -2862,7 +2900,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get courseWeeks => '上課週次';
 
   @override
-  String selectedWeeks(Object count) {
+  String selectedWeeks(int count) {
     return '已選$count週';
   }
 
@@ -2870,7 +2908,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get customCourses => '自訂課程';
 
   @override
-  String customCoursesCount(Object count) {
+  String customCoursesCount(int count) {
     return '$count 門課程';
   }
 
@@ -2953,28 +2991,28 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get foolishModeMessage => '是的，在下績點5.0';
 
   @override
-  String creditUnit(Object credit) {
+  String creditUnit(String credit) {
     return '$credit 學分';
   }
 
   @override
-  String gradeLabel(Object grade) {
+  String gradeLabel(String grade) {
     return '成績 $grade';
   }
 
   @override
-  String gpaLabel(Object gpa) {
+  String gpaLabel(String gpa) {
     return '績點 $gpa';
   }
 
   @override
   String scheduleCourseTime(
-      Object end, Object start, Object weekRanges, Object weekday) {
+      String weekRanges, String weekday, int start, int end) {
     return '$weekRanges週 每週$weekday 第$start-$end節';
   }
 
   @override
-  String semesterRange(Object end, Object num, Object start) {
+  String semesterRange(String start, String end, String num) {
     return '$start至$end年 第$num學期';
   }
 
@@ -3103,7 +3141,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get doubleTapExit => '再按一次退出應用程式';
 
   @override
-  String copySuccess(Object text) {
+  String copySuccess(String text) {
     return '已複製: $text';
   }
 
@@ -3174,7 +3212,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get todoLoadFailedSubtitle => '無法載入待辦事項';
 
   @override
-  String deadlineLabel(Object date) {
+  String deadlineLabel(String date) {
     return '截止日期: $date';
   }
 
@@ -3215,7 +3253,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get seatNumber => '座位號碼';
 
   @override
-  String seatNumberLabel(Object seat) {
+  String seatNumberLabel(String seat) {
     return '座位號碼 $seat';
   }
 
@@ -3313,7 +3351,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get updateTimeout => '更新逾時，請檢查網路連線後重試';
 
   @override
-  String updateFailed(Object error) {
+  String updateFailed(String error) {
     return '更新失敗: $error';
   }
 
@@ -3324,7 +3362,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get currentWeekLabel => '本週';
 
   @override
-  String periodUnit(Object n) {
+  String periodUnit(int n) {
     return '第$n節';
   }
 
@@ -3373,6 +3411,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get guest => '訪客';
+
+  @override
+  String get guestMode => '訪客模式';
+
+  @override
+  String get guestModeSubtitle => '登錄後可使用完整功能';
 
   @override
   String get syncingAcademic => '正在同步學業資訊';
@@ -3483,7 +3527,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get usedTraffic => '已用流量';
 
   @override
-  String onlineDuration(Object time) {
+  String onlineDuration(String time) {
     return '線上時長: $time';
   }
 
@@ -3545,7 +3589,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get electricityCost => '用電花費';
 
   @override
-  String lastNDays(Object n) {
+  String lastNDays(int n) {
     return '近$n天';
   }
 
@@ -3643,7 +3687,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get createSubFailed => '建立電費訂閱失敗';
 
   @override
-  String currentSubInfo(Object email, Object threshold) {
+  String currentSubInfo(String email, String threshold) {
     return '目前信箱 $email 低於 $threshold 元時提醒';
   }
 
@@ -3882,6 +3926,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get busRefreshStale => '重新整理完成，已保留上次校車資料';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$h小時 $m分钟';
+  }
+
+  @override
   String get poiMainLibrary => '主圖書館';
 
   @override
@@ -3900,7 +3949,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get poiYanTaEastGateDesc => '歷史悠久的老校區入口';
 
   @override
-  String durationDHMS(Object d, Object h, Object m, Object s) {
+  String durationDHMS(String d, String h, String m, String s) {
     return '$d天$h小時$m分$s秒';
   }
 
@@ -3918,4 +3967,31 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get eduSystem => '教務系統';
+
+  @override
+  String get htmlImport => 'HTML匯入';
+
+  @override
+  String get pasteHtmlHint => '請貼上課表HTML代碼';
+
+  @override
+  String get parseAndPreview => '解析預覽';
+
+  @override
+  String get importCourses => '匯入課程';
+
+  @override
+  String get parseResult => '解析結果';
+
+  @override
+  String get noCoursesParsed => '未解析到課程';
+
+  @override
+  String get selectSchool => '選擇學校';
+
+  @override
+  String get enterCustomUrl => '或輸入自訂網址';
+
+  @override
+  String get urlHint => '請輸入網址';
 }

@@ -83,8 +83,7 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
   }
 
   /// Build reorderable grid for full Flutter platforms
-  Widget _buildReorderableGrid(
-      List visibleTiles, TileEditNotifier controller) {
+  Widget _buildReorderableGrid(List visibleTiles, TileEditNotifier controller) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       child: ReorderableGridView.builder(

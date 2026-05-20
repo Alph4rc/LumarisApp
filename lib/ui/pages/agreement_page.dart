@@ -4,14 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
-class AgreementPage extends ConsumerWidget {
+class AgreementPage extends ConsumerStatefulWidget {
   const AgreementPage({super.key});
+
+  @override
+  ConsumerState<AgreementPage> createState() => _AgreementPageState();
+}
+
+class _AgreementPageState extends ConsumerState<AgreementPage> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   Future<void> _onAgree(BuildContext context, WidgetRef ref) async {
     await ref
@@ -24,7 +31,7 @@ class AgreementPage extends ConsumerWidget {
   }
 
   void _viewPrivacyPolicy() {
-    AppRouter.rootNavigatorKey.currentState?.push(
+    _navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => const _PrivacyPolicyContentPage(),
       ),
@@ -32,7 +39,7 @@ class AgreementPage extends ConsumerWidget {
   }
 
   void _viewUserAgreement() {
-    AppRouter.rootNavigatorKey.currentState?.push(
+    _navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => const _UserAgreementContentPage(),
       ),
@@ -40,7 +47,38 @@ class AgreementPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    return Navigator(
+      key: _navigatorKey,
+      onGenerateRoute: (_) {
+        return MaterialPageRoute<void>(
+          builder: (context) => _AgreementHomeView(
+            onAgree: () => _onAgree(context, ref),
+            onDisagree: _onDisagree,
+            onViewPrivacyPolicy: _viewPrivacyPolicy,
+            onViewUserAgreement: _viewUserAgreement,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AgreementHomeView extends StatelessWidget {
+  const _AgreementHomeView({
+    required this.onAgree,
+    required this.onDisagree,
+    required this.onViewPrivacyPolicy,
+    required this.onViewUserAgreement,
+  });
+
+  final Future<void> Function() onAgree;
+  final VoidCallback onDisagree;
+  final VoidCallback onViewPrivacyPolicy;
+  final VoidCallback onViewUserAgreement;
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.clubColors;
 
     return Scaffold(
@@ -114,7 +152,7 @@ class AgreementPage extends ConsumerWidget {
                           iconColor: colors.primary,
                           title: context.l10n.privacyPolicy,
                           description: context.l10n.agreementPrivacyDescription,
-                          onTap: _viewPrivacyPolicy,
+                          onTap: onViewPrivacyPolicy,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -128,7 +166,7 @@ class AgreementPage extends ConsumerWidget {
                           iconColor: colors.purple,
                           title: context.l10n.userAgreement,
                           description: context.l10n.agreementUserDescription,
-                          onTap: _viewUserAgreement,
+                          onTap: onViewUserAgreement,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -151,7 +189,7 @@ class AgreementPage extends ConsumerWidget {
                       Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
-                        child: _buildButtons(context, ref, isWide),
+                        child: _buildButtons(context, isWide),
                       ),
                       SizedBox(height: isDesktop ? 40 : 24),
                     ],
@@ -171,17 +209,19 @@ class AgreementPage extends ConsumerWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
-        boxShadow: [
+      decoration: ShapeDecoration(
+        shape: ClubSmoothCorners.shape(
+          isWide ? ClubRadii.tile : ClubRadii.card,
+        ),
+        shadows: [
           BoxShadow(
-            color: colors.shadowColor.withValues(alpha: 0.8),
+            color: colors.shadowColor.withValues(alpha: 0.2),
             blurRadius: 16,
             spreadRadius: 2,
           ),
         ],
       ),
-      child: ClipRRect(
+      child: ClubSmoothCorners.clip(
         borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
         child: const Image(
           image: AssetImage('assets/icon.webp'),
@@ -193,7 +233,6 @@ class AgreementPage extends ConsumerWidget {
 
   Widget _buildButtons(
     BuildContext context,
-    WidgetRef ref,
     bool isWide,
   ) {
     final colors = context.clubColors;
@@ -206,7 +245,7 @@ class AgreementPage extends ConsumerWidget {
           width: double.infinity,
           height: buttonHeight,
           child: CupertinoButton.filled(
-            onPressed: () => _onAgree(context, ref),
+            onPressed: onAgree,
             child: Text(
               context.l10n.agreeAndContinue,
               style: TextStyle(
@@ -221,7 +260,7 @@ class AgreementPage extends ConsumerWidget {
           width: double.infinity,
           height: buttonHeight,
           child: CupertinoButton(
-            onPressed: _onDisagree,
+            onPressed: onDisagree,
             color: colors.surfaceRaised,
             child: Text(
               context.l10n.disagree,
@@ -249,9 +288,11 @@ class AgreementPage extends ConsumerWidget {
     final colors = context.clubColors;
     return Material(
       color: colors.surfaceRaised,
-      borderRadius: ClubRadii.panel,
+      shape: ClubSmoothCorners.shape(ClubRadii.panel),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: ClubRadii.panel,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.panel),
         onTap: onTap,
         child: Padding(
           padding: EdgeInsets.all(isWide ? 20 : 18),
@@ -260,9 +301,9 @@ class AgreementPage extends ConsumerWidget {
               Container(
                 width: isWide ? 46 : 42,
                 height: isWide ? 46 : 42,
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: iconColor.withValues(alpha: 0.12),
-                  borderRadius: ClubRadii.navigation,
+                  shape: ClubSmoothCorners.shape(ClubRadii.navigation),
                 ),
                 child: Icon(icon, size: isWide ? 24 : 22, color: iconColor),
               ),

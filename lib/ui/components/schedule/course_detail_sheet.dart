@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程详情弹窗组件
@@ -31,9 +33,11 @@ class CourseDetailSheet extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.all(isTablet ? 24 : 20),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: colors.cardBackground,
-        borderRadius: isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
+        shape: ClubSmoothCorners.shape(
+          isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -118,37 +122,23 @@ class CourseDetailSheet extends StatelessWidget {
   }
 
   Widget _buildActionMenu(BuildContext context) {
-    final colors = context.clubColors;
-    return PopupMenuButton(
-      icon: Icon(
-        Icons.more_horiz,
-        color: colors.secondaryLabel,
-      ),
-      itemBuilder: (context) => [
+    return ClubMenu<String>(
+      items: <ClubMenuItem<String>>[
         if (onEdit != null)
-          PopupMenuItem(
+          ClubMenuItem<String>(
             value: 'edit',
-            child: Row(
-              children: [
-                const Icon(Icons.edit, size: 20),
-                const SizedBox(width: 12),
-                Text(context.l10n.editCourse),
-              ],
-            ),
+            label: context.l10n.editCourse,
+            icon: CupertinoIcons.pencil,
           ),
         if (onDelete != null)
-          PopupMenuItem(
+          ClubMenuItem<String>(
             value: 'delete',
-            child: Row(
-              children: [
-                Icon(Icons.delete, size: 20, color: colors.danger),
-                const SizedBox(width: 12),
-                Text(context.l10n.deleteCourse, style: TextStyle(color: colors.danger)),
-              ],
-            ),
+            label: context.l10n.deleteCourse,
+            icon: CupertinoIcons.delete,
+            isDestructive: true,
           ),
       ],
-      onSelected: (value) {
+      onSelected: (String value) {
         Navigator.of(context).pop();
         if (value == 'edit' && onEdit != null) {
           onEdit!();
@@ -174,9 +164,9 @@ class CourseDetailSheet extends StatelessWidget {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: ClubRadii.control,
+            shape: ClubSmoothCorners.shape(ClubRadii.control),
           ),
           child: Icon(
             icon,
@@ -234,6 +224,7 @@ class CourseDetailSheet extends StatelessWidget {
       l10n.thursday,
       l10n.friday,
       l10n.saturday,
+      l10n.sunday,
     ];
   }
 
@@ -252,9 +243,7 @@ class CourseDetailSheet extends StatelessWidget {
       return showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: ClubRadii.card,
-          ),
+          shape: ClubSmoothCorners.shape(ClubRadii.card),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: CourseDetailSheet(

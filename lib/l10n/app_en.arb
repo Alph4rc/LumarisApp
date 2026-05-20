@@ -3,7 +3,7 @@
 
   "appName": "Lumaris",
   "appSlogan": "Try to fit campus life into one app",
-  "tagline": "Committed to serving XAUAT students",
+  "tagline": "Committed to serving students",
 
   "home": "Home",
   "schedule": "Schedule",
@@ -495,6 +495,8 @@
   "help": "Help",
   "academicAccount": "Academic Account",
   "guest": "Guest",
+  "guestMode": "Guest Mode",
+  "guestModeSubtitle": "Sign in to access full features",
   "syncingAcademic": "Syncing academic info",
   "syncingAcademicSubtitle": "Reading credits and profile cards",
   "loginEduSystem": "Login to Academic System",
@@ -674,6 +676,8 @@
   "campusCaoTang": "Caotang",
   "campusYanTa": "Yanta",
   "busRefreshStale": "Refresh completed, last data preserved",
+  "arrivalStationTime": "{h}h {m}m",
+
   "poiMainLibrary": "Main Library",
   "poiMainLibraryDesc": "24-hour study room",
   "poiCaoTangNorthGate": "Caotang North Gate",
@@ -686,5 +690,14 @@
   "moreFunctions": "More Functions",
   "noShortcuts": "No shortcuts available",
   "addInEditMode": "Add in edit mode",
-  "eduSystem": "Edu System"
+  "eduSystem": "Edu System",
+  "htmlImport": "HTML Import",
+  "pasteHtmlHint": "Paste course schedule HTML here",
+  "parseAndPreview": "Parse & Preview",
+  "importCourses": "Import Courses",
+  "parseResult": "Parse Result",
+  "noCoursesParsed": "No courses parsed",
+  "selectSchool": "Select School",
+  "enterCustomUrl": "Or enter a custom URL",
+  "urlHint": "Enter website URL"
 }

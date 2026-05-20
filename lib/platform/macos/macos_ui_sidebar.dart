@@ -108,15 +108,17 @@ Sidebar macosUISidebar({
                 }
                 return Text(
                   context.l10n.notLoggedIn,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              );
-            },
-          ),
-          subtitle: Text(
-              userState.isLogin ? context.l10n.eduSystem : context.l10n.clickToLogin,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                );
+              },
+            ),
+            subtitle: Text(
+              userState.isLogin
+                  ? context.l10n.eduSystem
+                  : context.l10n.clickToLogin,
               style: TextStyle(
                 fontSize: 11,
                 color: colors.secondaryLabel,

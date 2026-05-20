@@ -3,7 +3,7 @@
 
   "appName": "光序",
   "appSlogan": "試著把大學囊括其中",
-  "tagline": "致力於為建大學子提供更好的服務",
+  "tagline": "致力於為大學生提供更好的服務",
 
   "home": "首頁",
   "schedule": "課表",
@@ -496,6 +496,8 @@
   "help": "幫助",
   "academicAccount": "教務系統帳號",
   "guest": "訪客",
+  "guestMode": "訪客模式",
+  "guestModeSubtitle": "登錄後可使用完整功能",
   "syncingAcademic": "正在同步學業資訊",
   "syncingAcademicSubtitle": "正在讀取學分與個人資訊卡片",
   "loginEduSystem": "登入教務系統",
@@ -675,6 +677,8 @@
   "campusCaoTang": "草堂",
   "campusYanTa": "雁塔",
   "busRefreshStale": "重新整理完成，已保留上次校車資料",
+  "arrivalStationTime": "{h}小時 {m}分钟",
+
   "poiMainLibrary": "主圖書館",
   "poiMainLibraryDesc": "24小時開放自習室",
   "poiCaoTangNorthGate": "草堂校區北門",
@@ -688,6 +692,15 @@
   "noShortcuts": "暫無快捷功能",
   "addInEditMode": "請在編輯模式中新增",
   "eduSystem": "教務系統",
+  "htmlImport": "HTML匯入",
+  "pasteHtmlHint": "請貼上課表HTML代碼",
+  "parseAndPreview": "解析預覽",
+  "importCourses": "匯入課程",
+  "parseResult": "解析結果",
+  "noCoursesParsed": "未解析到課程",
+  "selectSchool": "選擇學校",
+  "enterCustomUrl": "或輸入自訂網址",
+  "urlHint": "請輸入網址",
 
   "traditionalChinese": "繁體中文"
 }

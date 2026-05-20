@@ -19,6 +19,8 @@ import '../ui/pages/privacy_policy_page.dart';
 import '../ui/pages/profile_page.dart';
 import '../ui/pages/program_page.dart';
 import '../ui/pages/schedulePages/custom_course_manage_page.dart';
+import '../ui/pages/schedulePages/html_import_page.dart';
+import '../ui/pages/schedulePages/html_import_webview_page.dart';
 import '../ui/pages/schedulePages/schedule_setting_page.dart';
 import '../ui/pages/schedule_list_page.dart';
 import '../ui/pages/school_bus_page.dart';
@@ -50,6 +52,8 @@ class AppRoutes {
   static const privacyPolicy = '/PrivacyPolicy';
   static const userAgreement = '/UserAgreement';
   static const author = '/Author';
+  static const htmlImport = '/HtmlImport';
+  static const htmlImportWebview = '/HtmlImportWebview';
   static const campusMap = '/CampusMap';
 }
 
@@ -98,6 +102,15 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.customCourseManage,
         builder: (context, state) => const CustomCourseManagePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.htmlImport,
+        builder: (context, state) => const HtmlImportPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.htmlImportWebview,
+        builder: (context, state) =>
+            HtmlImportWebViewPage(url: state.extra as String),
       ),
       GoRoute(
         path: AppRoutes.schoolBus,

@@ -3,7 +3,7 @@
 
   "appName": "Lumaris",
   "appSlogan": "대학 생활을 하나의 앱에 담다",
-  "tagline": "건축대학교 학생들을 위한 더 나은 서비스를 위해",
+  "tagline": "대학생들에게 더 나은 서비스를 제공하기 위해",
 
   "home": "홈",
   "schedule": "시간표",
@@ -495,6 +495,8 @@
   "help": "도움말",
   "academicAccount": "학사 시스템 계정",
   "guest": "게스트",
+  "guestMode": "게스트 모드",
+  "guestModeSubtitle": "로그인하여 모든 기능을 이용하세요",
   "syncingAcademic": "학업 정보 동기화 중",
   "syncingAcademicSubtitle": "학점 및 개인정보 카드를 읽는 중",
   "loginEduSystem": "학사 시스템 로그인",
@@ -680,11 +682,21 @@
   "poiCaoTangNorthGateDesc": "캠퍼스 정문",
   "poiYanTaEastGate": "옌타 캠퍼스 동문",
   "poiYanTaEastGateDesc": "역사적인 캠퍼스 입구",
+  "arrivalStationTime": "{h}시간 {m}분",
 
   "durationDHMS": "{d}일 {h}시간 {m}분 {s}초",
   "shortcuts": "바로가기 기능",
   "moreFunctions": "더 많은 기능",
   "noShortcuts": "바로가기 기능 없음",
   "addInEditMode": "편집 모드에서 추가하세요",
-  "eduSystem": "학사 시스템"
+  "eduSystem": "학사 시스템",
+  "htmlImport": "HTML 가져오기",
+  "pasteHtmlHint": "시간표 HTML 코드를 붙여넣으세요",
+  "parseAndPreview": "분석 및 미리보기",
+  "importCourses": "강의 가져오기",
+  "parseResult": "분석 결과",
+  "noCoursesParsed": "분석된 강의 없음",
+  "selectSchool": "학교 선택",
+  "enterCustomUrl": "또는 사용자 정의 URL 입력",
+  "urlHint": "웹사이트 URL 입력"
 }

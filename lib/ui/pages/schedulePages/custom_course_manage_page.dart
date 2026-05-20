@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
+import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -10,9 +13,12 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 /// 自定义课程管理页面
 ///
@@ -42,7 +48,7 @@ class _CustomCourseManagePageState
     });
 
     final prefs = PrefsService.instance;
-    final String? jsonString = prefs.getString('custom_courses');
+    final String? jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
 
     if (jsonString != null) {
       try {
@@ -67,13 +73,15 @@ class _CustomCourseManagePageState
     final prefs = PrefsService.instance;
     final jsonString =
         jsonEncode(customCourses.map((course) => course.toJson()).toList());
-    await prefs.setString('custom_courses', jsonString);
+    await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, jsonString);
   }
 
   void _showAddCourseDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AddEditCourseDialog(
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showClubModalBottomSheet(
+      context,
+      AddEditCourseDialog(
         onSave: (course) async {
           setState(() {
             customCourses.add(course);
@@ -82,27 +90,20 @@ class _CustomCourseManagePageState
           await _refreshCourseStore();
           if (mounted) {
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.l10n.courseAdded),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ClubRadii.navigation,
-                  ),
-                ),
-              );
+              showClubSnackBar(context, Text(context.l10n.courseAdded));
             }
           }
         },
       ),
+      maxHeight: screenHeight * 0.7,
     );
   }
 
   void _showEditCourseDialog(CourseModel course) {
-    showDialog(
-      context: context,
-      builder: (context) => AddEditCourseDialog(
+    final screenHeight = MediaQuery.of(context).size.height;
+    showClubModalBottomSheet(
+      context,
+      AddEditCourseDialog(
         course: course,
         onSave: (updatedCourse) async {
           setState(() {
@@ -116,20 +117,14 @@ class _CustomCourseManagePageState
           await _refreshCourseStore();
           if (mounted) {
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.l10n.courseModified),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: ClubRadii.navigation,
-                  ),
-                ),
-              );
+              if (context.mounted) {
+                showClubSnackBar(context, Text(context.l10n.courseAdded));
+              }
             }
           }
         },
       ),
+      maxHeight: screenHeight * 0.7,
     );
   }
 
@@ -164,36 +159,38 @@ class _CustomCourseManagePageState
   }
 
   Future<void> _refreshCourseStore() async {
-    // 刷新CourseStore以包含最新的自定义课程
     await ref.read(courseStoreProvider.notifier).loadCourses();
+    await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.clubColors;
-    final cardColor = colors.cardBackground;
-    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
         appBar: ClubAppBar(
           titleWidget: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n.customCourses,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+              Center(
+                child: Text(
+                  l10n.customCourses,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               if (customCourses.isNotEmpty)
-                Text(
-                  l10n.customCoursesCount(customCourses.length),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colors.secondaryLabel,
-                    fontWeight: FontWeight.w500,
+                Center(
+                  child: Text(
+                    l10n.customCoursesCount(customCourses.length),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colors.secondaryLabel,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
             ],
@@ -214,63 +211,25 @@ class _CustomCourseManagePageState
                 ),
               )
             : customCourses.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.1),
-                            borderRadius: ClubRadii.card,
-                          ),
-                          child: Icon(
-                            Icons.event_available,
-                            size: 48,
-                            color: primaryColor,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          l10n.noCustomCourses,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.noCustomCoursesSubtitle,
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: colors.secondaryLabel,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
+                ? EmptyWidget(
+                    title: l10n.noCustomCourses,
+                    subtitle: l10n.noCustomCoursesSubtitle,
+                    icon: Icons.event_available)
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: customCourses.length,
                     itemBuilder: (context, index) {
                       final course = customCourses[index];
-                      return Container(
+                      return ClubCard(
                         margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: cardColor,
-                          borderRadius: ClubRadii.navigation,
-                          boxShadow: [
-                            BoxShadow(
-                              color: colors.shadowColor.withValues(alpha: 0.8),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
                         child: Material(
                           color: Colors.transparent,
+                          shape: ClubSmoothCorners.shape(ClubRadii.card),
+                          clipBehavior: Clip.antiAlias,
                           child: InkWell(
-                            borderRadius: ClubRadii.navigation,
+                            borderRadius: ClubRadii.card,
+                            customBorder:
+                                ClubSmoothCorners.shape(ClubRadii.card),
                             onTap: () => _showEditCourseDialog(course),
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -311,48 +270,27 @@ class _CustomCourseManagePageState
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.more_horiz,
-                                      color: colors.secondaryLabel,
-                                    ),
-                                    onPressed: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: cardColor,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: ClubRadii.sheetTop,
-                                        ),
-                                        builder: (context) => SafeArea(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ClubListTile(
-                                                leading: Icon(
-                                                  Icons.edit_outlined,
-                                                  color: colors.primary,
-                                                ),
-                                                title: Text(l10n.editCourse),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _showEditCourseDialog(course);
-                                                },
-                                              ),
-                                              ClubListTile(
-                                                leading: Icon(
-                                                  Icons.delete_outline,
-                                                  color: colors.danger,
-                                                ),
-                                                title: Text(l10n.deleteCourse),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _deleteCourse(course);
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
+                                  ClubMenu<String>(
+                                    tooltip: l10n.moreFunctions,
+                                    items: <ClubMenuItem<String>>[
+                                      ClubMenuItem<String>(
+                                        value: 'edit',
+                                        label: l10n.editCourse,
+                                        icon: Icons.edit_outlined,
+                                      ),
+                                      ClubMenuItem<String>(
+                                        value: 'delete',
+                                        label: l10n.deleteCourse,
+                                        icon: Icons.delete_outline,
+                                        isDestructive: true,
+                                      ),
+                                    ],
+                                    onSelected: (String value) {
+                                      if (value == 'edit') {
+                                        _showEditCourseDialog(course);
+                                      } else if (value == 'delete') {
+                                        _deleteCourse(course);
+                                      }
                                     },
                                   ),
                                 ],
@@ -368,9 +306,9 @@ class _CustomCourseManagePageState
   Widget _buildInfoChip(IconData icon, String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: ClubRadii.control,
+        shape: ClubSmoothCorners.shape(ClubRadii.control),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -525,357 +463,299 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
     final l10n = context.l10n;
     final weekdays = _getWeekdayNames(l10n);
     final colors = context.clubColors;
-    final cardColor = colors.cardBackground;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
-        ),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: ClubRadii.panel,
-          boxShadow: [
-            BoxShadow(
-              color: colors.shadowColor.withValues(alpha: 0.9),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: cardColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: colors.separator,
-                  ),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    widget.course == null ? l10n.addCourse : l10n.editCourse,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                    iconSize: 20,
-                  ),
-                ],
-              ),
-            ),
-
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTextField(
-                      l10n.courseName,
-                      _courseNameController,
-                      l10n.courseName,
-                      Icons.book_outlined,
-                      required: true,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      l10n.courseRoom,
-                      _roomController,
-                      l10n.courseRoom,
-                      Icons.location_on_outlined,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      l10n.courseTeacher,
-                      _teacherController,
-                      l10n.courseTeacher,
-                      Icons.person_outline,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      l10n.courseCredits,
-                      _creditsController,
-                      l10n.courseCredits,
-                      Icons.school_outlined,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Weekday selector
-                    Text(
-                      l10n.courseWeekday,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: colors.surfaceRaised,
-                        borderRadius: ClubRadii.navigation,
-                        border: Border.all(
-                          color: colors.borderStrong,
-                        ),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          value: _selectedWeekday,
-                          isExpanded: true,
-                          items: List.generate(7, (index) {
-                            return DropdownMenuItem(
-                              value: index,
-                              child: Text(weekdays[index]),
-                            );
-                          }),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _selectedWeekday = value;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Time selector
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.courseStartUnit,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                width: double.infinity,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                decoration: BoxDecoration(
-                                  color: colors.surfaceRaised,
-                                  borderRadius: ClubRadii.navigation,
-                                  border: Border.all(
-                                    color: colors.borderStrong,
-                                  ),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<int>(
-                                    value: _startUnit,
-                                    isExpanded: true,
-                                    items: List.generate(12, (index) {
-                                      return DropdownMenuItem(
-                                        value: index + 1,
-                                        child: Text(l10n.periodUnit(index + 1)),
-                                      );
-                                    }),
-                                    onChanged: (value) {
-                                      if (value != null) {
-                                        setState(() {
-                                          _startUnit = value;
-                                          if (_startUnit > _endUnit) {
-                                            _endUnit = _startUnit;
-                                          }
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.courseEndUnit,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                width: double.infinity,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                decoration: BoxDecoration(
-                                  color: colors.surfaceRaised,
-                                  borderRadius: ClubRadii.navigation,
-                                  border: Border.all(
-                                    color: colors.borderStrong,
-                                  ),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<int>(
-                                    value: _endUnit,
-                                    isExpanded: true,
-                                    items: List.generate(12, (index) {
-                                      return DropdownMenuItem(
-                                        value: index + 1,
-                                        child: Text(l10n.periodUnit(index + 1)),
-                                      );
-                                    }),
-                                    onChanged: (value) {
-                                      if (value != null &&
-                                          value >= _startUnit) {
-                                        setState(() {
-                                          _endUnit = value;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Week selector
-                    Text(
-                      l10n.courseWeeks,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _availableWeeks.map((week) {
-                        final isSelected = _selectedWeeks.contains(week);
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isSelected) {
-                                _selectedWeeks.remove(week);
-                              } else {
-                                _selectedWeeks.add(week);
-                              }
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? primaryColor
-                                  : colors.surfaceMuted,
-                              borderRadius: ClubRadii.card,
-                              border: Border.all(
-                                color: isSelected
-                                    ? primaryColor
-                                    : colors.borderStrong,
-                              ),
-                            ),
-                            child: Text(
-                              l10n.weekUnit(week),
-                              style: TextStyle(
-                                color: isSelected
-                                    ? colors.onAccent
-                                    : colors.secondaryLabel,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
-
-            // Footer
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: cardColor,
-                border: Border(
-                  top: BorderSide(
-                    color: colors.separator,
-                  ),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      l10n.cancel,
-                      style: TextStyle(
-                        color: colors.secondaryLabel,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: _save,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: colors.onAccent,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: ClubRadii.control,
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      l10n.save,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
+            Text(
+              widget.course == null ? l10n.addCourse : l10n.editCourse,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
         ),
-      ),
+
+        const SizedBox(
+          height: 12,
+        ),
+
+        // Content
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTextField(
+              l10n.courseName,
+              _courseNameController,
+              l10n.courseName,
+              Icons.book_outlined,
+              required: true,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              l10n.courseRoom,
+              _roomController,
+              l10n.courseRoom,
+              Icons.location_on_outlined,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              l10n.courseTeacher,
+              _teacherController,
+              l10n.courseTeacher,
+              Icons.person_outline,
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              l10n.courseCredits,
+              _creditsController,
+              l10n.courseCredits,
+              Icons.school_outlined,
+            ),
+            const SizedBox(height: 20),
+
+            // Weekday selector
+            Text(
+              l10n.courseWeekday,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: ShapeDecoration(
+                color: colors.surfaceRaised,
+                shape: ClubSmoothCorners.shape(
+                  ClubRadii.navigation,
+                  side: BorderSide(color: colors.borderStrong),
+                ),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _selectedWeekday,
+                  isExpanded: true,
+                  items: List.generate(7, (index) {
+                    return DropdownMenuItem(
+                      value: index,
+                      child: Text(weekdays[index]),
+                    );
+                  }),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedWeekday = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Time selector
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.courseStartUnit,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: ShapeDecoration(
+                          color: colors.surfaceRaised,
+                          shape: ClubSmoothCorners.shape(
+                            ClubRadii.navigation,
+                            side: BorderSide(color: colors.borderStrong),
+                          ),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: _startUnit,
+                            isExpanded: true,
+                            items: List.generate(12, (index) {
+                              return DropdownMenuItem(
+                                value: index + 1,
+                                child: Text(l10n.periodUnit(index + 1)),
+                              );
+                            }),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _startUnit = value;
+                                  if (_startUnit > _endUnit) {
+                                    _endUnit = _startUnit;
+                                  }
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.courseEndUnit,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: ShapeDecoration(
+                          color: colors.surfaceRaised,
+                          shape: ClubSmoothCorners.shape(
+                            ClubRadii.navigation,
+                            side: BorderSide(color: colors.borderStrong),
+                          ),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: _endUnit,
+                            isExpanded: true,
+                            items: List.generate(12, (index) {
+                              return DropdownMenuItem(
+                                value: index + 1,
+                                child: Text(l10n.periodUnit(index + 1)),
+                              );
+                            }),
+                            onChanged: (value) {
+                              if (value != null && value >= _startUnit) {
+                                setState(() {
+                                  _endUnit = value;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Week selector
+            Text(
+              l10n.courseWeeks,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _availableWeeks.map((week) {
+                final isSelected = _selectedWeeks.contains(week);
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedWeeks.remove(week);
+                      } else {
+                        _selectedWeeks.add(week);
+                      }
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: ShapeDecoration(
+                      color: isSelected ? primaryColor : colors.surfaceMuted,
+                      shape: ClubSmoothCorners.shape(
+                        ClubRadii.card,
+                        side: BorderSide(
+                          color:
+                              isSelected ? primaryColor : colors.borderStrong,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.weekUnit(week),
+                      style: TextStyle(
+                        color: isSelected
+                            ? colors.onAccent
+                            : colors.secondaryLabel,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
+
+        // Footer
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                l10n.cancel,
+                style: TextStyle(
+                  color: colors.secondaryLabel,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton(
+              onPressed: _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: colors.onAccent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: ClubSmoothCorners.shape(ClubRadii.control),
+                elevation: 0,
+              ),
+              child: Text(
+                l10n.save,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 

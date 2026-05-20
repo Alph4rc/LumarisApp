@@ -18,6 +18,7 @@ import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ScheduleWidget extends ConsumerStatefulWidget {
@@ -48,7 +49,9 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(
-              scheduleState.showTomorrow ? l10n.tomorrowSchedule : l10n.todayScheduleLabel,
+              scheduleState.showTomorrow
+                  ? l10n.tomorrowSchedule
+                  : l10n.todayScheduleLabel,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -125,8 +128,12 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                                 '${l10n.periodRange(course.startUnit, course.endUnit)} ${time.start}-${time.end}',
                             location: course.room,
                             teacher: course.teachers.join(','),
-                            description:
-                                l10n.scheduleCourseTime(CourseModel.formatWeekRanges(course.weekIndexes), weekdayNames[course.weekday], course.startUnit, course.endUnit),
+                            description: l10n.scheduleCourseTime(
+                                CourseModel.formatWeekRanges(
+                                    course.weekIndexes),
+                                weekdayNames[course.weekday],
+                                course.startUnit,
+                                course.endUnit),
                           );
                           return AnimatedListItem(
                             index: index,
@@ -146,10 +153,12 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
       CourseModel course, ScheduleItem item, bool isTablet) {
     final colors = context.clubColors;
     return Material(
-      borderRadius: ClubRadii.card,
+      shape: ClubSmoothCorners.shape(ClubRadii.card),
+      clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
         borderRadius: ClubRadii.card,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.card),
         onTap: () {
           CourseDetailSheet.show(context, course);
         },
@@ -161,9 +170,9 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
               Container(
                 width: 5,
                 height: 52,
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: CourseColorManager.generateSoftColor(item.title),
-                  borderRadius: ClubRadii.xsBorder,
+                  shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
                 ),
               ),
               const SizedBox(width: 20),
@@ -321,5 +330,6 @@ List<String> _getWeekdayNames(BuildContext context) {
     l10n.thursday,
     l10n.friday,
     l10n.saturday,
+    l10n.sunday,
   ];
 }

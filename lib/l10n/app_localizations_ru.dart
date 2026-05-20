@@ -15,7 +15,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appSlogan => 'Вся студенческая жизнь в одном приложении';
 
   @override
-  String get tagline => 'Стремясь предоставить лучший сервис студентам САСУ';
+  String get tagline => 'Стремясь предоставить лучший сервис студентам';
 
   @override
   String get home => 'Главная';
@@ -275,7 +275,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dontUpdate => 'Не сейчас';
 
   @override
-  String confirmUpdateTitle(Object version) {
+  String confirmUpdateTitle(String version) {
     return 'Обновить до последней версии: $version?';
   }
 
@@ -715,7 +715,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get remindMinutesBefore => 'За сколько минут напоминать';
 
   @override
-  String remindMinutes(Object n) {
+  String remindMinutes(int n) {
     return '$n мин.';
   }
 
@@ -816,22 +816,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get decShort => 'дек.';
 
   @override
-  String weekUnit(Object n) {
+  String weekUnit(int n) {
     return '$n неделя';
   }
 
   @override
-  String currentWeek(Object n) {
+  String currentWeek(int n) {
     return 'Сейчас $n неделя';
   }
 
   @override
-  String weeksUntilStart(Object n) {
+  String weeksUntilStart(int n) {
     return 'До начала семестра: $n нед.';
   }
 
   @override
-  String periodRange(Object end, Object start) {
+  String periodRange(int start, int end) {
     return '$start-$end пара';
   }
 
@@ -875,7 +875,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmDelete => 'Подтвердить удаление';
 
   @override
-  String confirmDeleteCourseContent(Object name) {
+  String confirmDeleteCourseContent(String name) {
     return 'Вы уверены, что хотите удалить «$name»?';
   }
 
@@ -925,7 +925,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get courseWeeks => 'Недели';
 
   @override
-  String selectedWeeks(Object count) {
+  String selectedWeeks(int count) {
     return 'Выбрано: $count нед.';
   }
 
@@ -933,7 +933,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get customCourses => 'Свои курсы';
 
   @override
-  String customCoursesCount(Object count) {
+  String customCoursesCount(int count) {
     return 'Курсов: $count';
   }
 
@@ -1019,28 +1019,28 @@ class AppLocalizationsRu extends AppLocalizations {
   String get foolishModeMessage => 'Да, у меня GPA 5.0';
 
   @override
-  String creditUnit(Object credit) {
+  String creditUnit(String credit) {
     return '$credit кред.';
   }
 
   @override
-  String gradeLabel(Object grade) {
+  String gradeLabel(String grade) {
     return 'Оценка $grade';
   }
 
   @override
-  String gpaLabel(Object gpa) {
+  String gpaLabel(String gpa) {
     return 'GPA $gpa';
   }
 
   @override
   String scheduleCourseTime(
-      Object end, Object start, Object weekRanges, Object weekday) {
+      String weekRanges, String weekday, int start, int end) {
     return 'Недели $weekRanges по $weekday $start-$end пара';
   }
 
   @override
-  String semesterRange(Object end, Object num, Object start) {
+  String semesterRange(String start, String end, String num) {
     return '$start-$end Семестр $num';
   }
 
@@ -1172,7 +1172,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get doubleTapExit => 'Нажмите ещё раз для выхода';
 
   @override
-  String copySuccess(Object text) {
+  String copySuccess(String text) {
     return 'Скопировано: $text';
   }
 
@@ -1245,7 +1245,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get todoLoadFailedSubtitle => 'Не удалось загрузить задачи';
 
   @override
-  String deadlineLabel(Object date) {
+  String deadlineLabel(String date) {
     return 'Срок: $date';
   }
 
@@ -1287,7 +1287,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get seatNumber => 'Место';
 
   @override
-  String seatNumberLabel(Object seat) {
+  String seatNumberLabel(String seat) {
     return 'Место $seat';
   }
 
@@ -1387,7 +1387,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get updateTimeout => 'Тайм-аут обновления. Проверьте сеть.';
 
   @override
-  String updateFailed(Object error) {
+  String updateFailed(String error) {
     return 'Ошибка обновления: $error';
   }
 
@@ -1398,7 +1398,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get currentWeekLabel => 'Текущая неделя';
 
   @override
-  String periodUnit(Object n) {
+  String periodUnit(int n) {
     return 'Пара $n';
   }
 
@@ -1450,6 +1450,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get guest => 'Гость';
+
+  @override
+  String get guestMode => 'Гостевой режим';
+
+  @override
+  String get guestModeSubtitle =>
+      'Войдите, чтобы получить доступ ко всем функциям';
 
   @override
   String get syncingAcademic => 'Синхронизация учебной информации';
@@ -1564,7 +1571,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get usedTraffic => 'Использованный трафик';
 
   @override
-  String onlineDuration(Object time) {
+  String onlineDuration(String time) {
     return 'В сети: $time';
   }
 
@@ -1630,7 +1637,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get electricityCost => 'Стоимость электричества';
 
   @override
-  String lastNDays(Object n) {
+  String lastNDays(int n) {
     return 'Последние $n дн.';
   }
 
@@ -1731,7 +1738,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createSubFailed => 'Не удалось создать подписку';
 
   @override
-  String currentSubInfo(Object email, Object threshold) {
+  String currentSubInfo(String email, String threshold) {
     return 'Оповещение на $email при балансе ниже ¥$threshold';
   }
 
@@ -1996,6 +2003,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Обновление завершено, сохранены последние данные';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$hч $mм';
+  }
+
+  @override
   String get poiMainLibrary => 'Главная библиотека';
 
   @override
@@ -2014,7 +2026,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get poiYanTaEastGateDesc => 'Вход в исторический кампус';
 
   @override
-  String durationDHMS(Object d, Object h, Object m, Object s) {
+  String durationDHMS(String d, String h, String m, String s) {
     return '$dд $hч $mм $sс';
   }
 
@@ -2032,4 +2044,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eduSystem => 'Образовательная система';
+
+  @override
+  String get htmlImport => 'HTML импорт';
+
+  @override
+  String get pasteHtmlHint => 'Вставьте HTML расписания сюда';
+
+  @override
+  String get parseAndPreview => 'Разбор и просмотр';
+
+  @override
+  String get importCourses => 'Импорт курсов';
+
+  @override
+  String get parseResult => 'Результат разбора';
+
+  @override
+  String get noCoursesParsed => 'Курсы не найдены';
+
+  @override
+  String get selectSchool => 'Выбрать школу';
+
+  @override
+  String get enterCustomUrl => 'Или введите свой URL';
+
+  @override
+  String get urlHint => 'Введите URL веб-сайта';
 }

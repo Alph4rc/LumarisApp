@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 统一的错误显示组件
@@ -45,9 +46,9 @@ class ErrorBanner extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: backgroundColor,
-        borderRadius: ClubRadii.navigation,
+        shape: ClubSmoothCorners.shape(ClubRadii.navigation),
       ),
       child: Row(
         children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ClubListTile extends StatelessWidget {
@@ -46,8 +47,11 @@ class ClubListTile extends StatelessWidget {
           horizontal: 16,
           vertical: subtitle == null ? 14 : 10,
         );
-    final effectiveBorderRadius =
-        borderRadius.resolve(Directionality.of(context));
+    final effectiveBorderRadius = ClubSmoothCorners.resolve(
+      context,
+      borderRadius,
+    );
+    final effectiveShape = ClubSmoothCorners.shape(borderRadius);
     final effectiveTitleStyle = TextStyle(
       fontSize: 16,
       color: enabled ? null : theme.disabledColor,
@@ -67,48 +71,53 @@ class ClubListTile extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        borderRadius: effectiveBorderRadius,
-        onTap: enabled ? onTap : null,
-        onLongPress: enabled ? onLongPress : null,
-        child: Container(
-          padding: effectivePadding,
-          decoration: BoxDecoration(
-            color: selected
-                ? selectedBackgroundColor ?? colors.selectionFill
-                : Colors.transparent,
-            borderRadius: borderRadius,
-          ),
-          child: Row(
-            children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DefaultTextStyle.merge(
-                      style: effectiveTitleStyle,
-                      child: title,
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
+      shape: effectiveShape,
+      clipBehavior: Clip.antiAlias,
+      child: Ink(
+        decoration: ShapeDecoration(
+          color: selected
+              ? selectedBackgroundColor ?? colors.selectionFill
+              : Colors.transparent,
+          shape: effectiveShape,
+        ),
+        child: InkWell(
+          borderRadius: effectiveBorderRadius,
+          customBorder: effectiveShape,
+          onTap: enabled ? onTap : null,
+          onLongPress: enabled ? onLongPress : null,
+          child: Padding(
+            padding: effectivePadding,
+            child: Row(
+              children: [
+                if (leading != null) ...[
+                  leading!,
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       DefaultTextStyle.merge(
-                        style: effectiveSubtitleStyle,
-                        child: subtitle!,
+                        style: effectiveTitleStyle,
+                        child: title,
                       ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        DefaultTextStyle.merge(
+                          style: effectiveSubtitleStyle,
+                          child: subtitle!,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              if (effectiveTrailing != null) ...[
-                const SizedBox(width: 12),
-                effectiveTrailing,
+                if (effectiveTrailing != null) ...[
+                  const SizedBox(width: 12),
+                  effectiveTrailing,
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

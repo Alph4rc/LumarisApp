@@ -324,7 +324,7 @@ class CourseService {
     }
 
     final prefs = PrefsService.instance;
-    final customJsonString = prefs.getString('custom_courses');
+    final customJsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
     if (customJsonString != null) {
       try {
         final List<dynamic> customJsonList = jsonDecode(customJsonString);

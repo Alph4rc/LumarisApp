@@ -21,6 +21,7 @@ import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
@@ -29,7 +30,6 @@ import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 
 import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/language_setting.dart';
 
 class SettingPage extends ConsumerWidget {
@@ -67,7 +67,7 @@ class SettingPage extends ConsumerWidget {
                   const LanguageSetting(),
                   const ShowTomorrowSetting(),
                   if (PlatformUtils.isMobile) const RemindSetting(),
-                  const TodoRemindSetting(),
+                  // const TodoRemindSetting(),
                   const HomePageSetting(),
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
                     const FontFamilySetting(),
@@ -158,9 +158,9 @@ class SettingPage extends ConsumerWidget {
         Container(
           width: 120,
           height: 120,
-          decoration: BoxDecoration(
-            borderRadius: ClubRadii.tile,
-            boxShadow: [
+          decoration: ShapeDecoration(
+            shape: ClubSmoothCorners.shape(ClubRadii.tile),
+            shadows: [
               BoxShadow(
                 color: colors.shadowColor,
                 blurRadius: 18,
@@ -168,7 +168,7 @@ class SettingPage extends ConsumerWidget {
               ),
             ],
           ),
-          child: ClipRRect(
+          child: ClubSmoothCorners.clip(
             borderRadius: ClubRadii.tile,
             child: const Image(
               image: AssetImage('assets/icon.webp'),

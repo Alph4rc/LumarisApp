@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:smooth_corner/smooth_corner.dart';
 
 Widget _wrap(
   Widget child, {
@@ -73,6 +74,6 @@ void main() {
     expect(find.text('正在刷新用电趋势'), findsOneWidget);
     expect(find.text('正在读取最新电费记录'), findsOneWidget);
     expect(find.byKey(const ValueKey('loading_compact')), findsOneWidget);
-    expect(find.byType(ClipRRect), findsOneWidget);
+    expect(find.byType(SmoothClipRRect), findsOneWidget);
   });
 }
