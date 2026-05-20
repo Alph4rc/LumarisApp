@@ -344,6 +344,206 @@ void main() {
       client.dispose();
     });
 
+    test('should map 429 response into rate limit network exception', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                response: Response<dynamic>(
+                  requestOptions: options,
+                  statusCode: 429,
+                ),
+                type: DioExceptionType.badResponse,
+              ),
+            );
+          },
+        ),
+      );
+
+      await expectLater(
+        () => client.get('/rate-limit'),
+        throwsA(
+          isA<NetworkException>()
+              .having((e) => e.statusCode, 'statusCode', 429)
+              .having((e) => e.message, 'message', '已被限流，请稍后再试'),
+        ),
+      );
+
+      client.dispose();
+    });
+
+    test('should block identical request during rate limit cooldown', () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      var nowMs = 1000;
+      var networkHits = 0;
+      EduHttpClient.setNowProviderForTest(() => nowMs);
+
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            networkHits++;
+            if (networkHits == 1) {
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  response: Response<dynamic>(
+                    requestOptions: options,
+                    statusCode: 429,
+                  ),
+                  type: DioExceptionType.badResponse,
+                ),
+              );
+              return;
+            }
+
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'ok': true},
+              ),
+            );
+          },
+        ),
+      );
+
+      await expectLater(
+        () => client.get('/rate-limit-cooldown'),
+        throwsA(
+          isA<NetworkException>().having(
+            (e) => e.message,
+            'message',
+            '已被限流，请稍后再试',
+          ),
+        ),
+      );
+
+      await expectLater(
+        () => client.get('/rate-limit-cooldown'),
+        throwsA(
+          isA<NetworkException>().having(
+            (e) => e.statusCode,
+            'statusCode',
+            429,
+          ),
+        ),
+      );
+
+      expect(networkHits, 1);
+      client.dispose();
+    });
+
+    test('should not block different request signatures during cooldown',
+        () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      var nowMs = 2000;
+      var networkHits = 0;
+      EduHttpClient.setNowProviderForTest(() => nowMs);
+
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            networkHits++;
+            if (options.path == '/same-path' &&
+                options.queryParameters['page'] == 1) {
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  response: Response<dynamic>(
+                    requestOptions: options,
+                    statusCode: 429,
+                  ),
+                  type: DioExceptionType.badResponse,
+                ),
+              );
+              return;
+            }
+
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'ok': true},
+              ),
+            );
+          },
+        ),
+      );
+
+      await expectLater(
+        () => client.get('/same-path', queryParameters: <String, dynamic>{
+          'page': 1,
+        }),
+        throwsA(isA<NetworkException>()),
+      );
+
+      final differentQuery = await client.get(
+        '/same-path',
+        queryParameters: <String, dynamic>{'page': 2},
+      ) as Map<String, dynamic>;
+      final differentPath =
+          await client.get('/different-path') as Map<String, dynamic>;
+
+      expect(differentQuery['ok'], isTrue);
+      expect(differentPath['ok'], isTrue);
+      expect(networkHits, 3);
+      client.dispose();
+    });
+
+    test('should allow identical request after rate limit cooldown expires',
+        () async {
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      var nowMs = 3000;
+      var networkHits = 0;
+      EduHttpClient.setNowProviderForTest(() => nowMs);
+
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            networkHits++;
+            if (networkHits == 1) {
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  response: Response<dynamic>(
+                    requestOptions: options,
+                    statusCode: 429,
+                  ),
+                  type: DioExceptionType.badResponse,
+                ),
+              );
+              return;
+            }
+
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'ok': true},
+              ),
+            );
+          },
+        ),
+      );
+
+      await expectLater(
+        () => client.get('/rate-limit-expire'),
+        throwsA(isA<NetworkException>()),
+      );
+
+      nowMs += 5001;
+
+      final data =
+          await client.get('/rate-limit-expire') as Map<String, dynamic>;
+
+      expect(data['ok'], isTrue);
+      expect(networkHits, 2);
+      client.dispose();
+    });
+
     test('should relogin and retry when adapter returns 401 then 200',
         () async {
       secureStore[PrefsKeys.USERNAME] = 'u1';

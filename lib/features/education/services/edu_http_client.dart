@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
+import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
@@ -30,8 +31,12 @@ class AuthStateCallbacks {
 }
 
 class EduHttpClient {
+  static const String _rateLimitMessage = '已被限流，请稍后再试';
+  static const int _rateLimitCooldownMs = 5000;
+
   final Dio _dio;
   final AuthStateCallbacks _authStateCallbacks;
+  final Map<String, int> _rateLimitCooldowns = <String, int>{};
   String _baseUrl;
 
   /// 全局登录锁，确保同一时间只有一个登录请求
@@ -46,6 +51,7 @@ class EduHttpClient {
   // Test hook: allows injecting deterministic login behavior in unit tests.
   static Future<Map<String, dynamic>> Function(String, String)?
       _loginHandlerForTest;
+  static int Function()? _nowProviderForTest;
 
   EduHttpClient({
     Dio? dio,
@@ -79,6 +85,14 @@ class EduHttpClient {
     // 添加认证拦截器
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
+        final rateLimitException = _createRateLimitExceptionIfCoolingDown(
+          options,
+        );
+        if (rateLimitException != null) {
+          handler.reject(rateLimitException);
+          return;
+        }
+
         // 自动添加认证cookie
         final cookie = await _getCookie();
         if (cookie != null) {
@@ -90,6 +104,17 @@ class EduHttpClient {
       },
       onError: (DioException e, handler) async {
         final statusCode = e.response?.statusCode;
+
+        if (statusCode == 429) {
+          _recordRateLimit(e.requestOptions);
+          handler.next(
+            _buildRateLimitException(
+              e.requestOptions,
+              response: e.response,
+            ),
+          );
+          return;
+        }
 
         // 只在认证相关错误（401/403）时尝试重登录
         if (statusCode == 401 || statusCode == 403) {
@@ -182,6 +207,91 @@ class EduHttpClient {
       return AppLocaleService.zhHantPreferenceValue;
     }
     return locale.languageCode;
+  }
+
+  int get _nowMs =>
+      _nowProviderForTest?.call() ?? DateTime.now().millisecondsSinceEpoch;
+
+  DioException? _createRateLimitExceptionIfCoolingDown(RequestOptions options) {
+    _cleanupExpiredRateLimitCooldowns();
+    final requestKey = _buildRequestFingerprint(options);
+    final cooldownUntil = _rateLimitCooldowns[requestKey];
+    if (cooldownUntil == null || cooldownUntil <= _nowMs) {
+      return null;
+    }
+
+    AppLogger.debug('请求命中限流冷却: $requestKey');
+    return _buildRateLimitException(options);
+  }
+
+  void _recordRateLimit(RequestOptions options) {
+    final requestKey = _buildRequestFingerprint(options);
+    _rateLimitCooldowns[requestKey] = _nowMs + _rateLimitCooldownMs;
+    AppLogger.warning('请求触发限流，进入冷却: $requestKey');
+  }
+
+  void _cleanupExpiredRateLimitCooldowns() {
+    final now = _nowMs;
+    _rateLimitCooldowns.removeWhere((_, cooldownUntil) => cooldownUntil <= now);
+  }
+
+  String _buildRequestFingerprint(RequestOptions options) {
+    return jsonEncode(<String, dynamic>{
+      'method': options.method,
+      'path': options.path,
+      'queryParameters': _normalizeRequestValue(options.queryParameters),
+      'data': _normalizeRequestValue(options.data),
+    });
+  }
+
+  dynamic _normalizeRequestValue(dynamic value) {
+    if (value is Map) {
+      final sortedEntries = value.entries.toList()
+        ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
+      return <String, dynamic>{
+        for (final entry in sortedEntries)
+          entry.key.toString(): _normalizeRequestValue(entry.value),
+      };
+    }
+    if (value is List) {
+      return value.map(_normalizeRequestValue).toList();
+    }
+    if (value is FormData) {
+      return <String, dynamic>{
+        'fields': value.fields
+            .map((field) => <String, dynamic>{
+                  'key': field.key,
+                  'value': field.value,
+                })
+            .toList(),
+        'files': value.files
+            .map((file) => <String, dynamic>{
+                  'key': file.key,
+                  'filename': file.value.filename,
+                  'contentType': file.value.contentType?.toString(),
+                })
+            .toList(),
+      };
+    }
+    return value;
+  }
+
+  DioException _buildRateLimitException(
+    RequestOptions options, {
+    Response<dynamic>? response,
+  }) {
+    final effectiveResponse = response ??
+        Response<dynamic>(
+          requestOptions: options,
+          statusCode: 429,
+          data: _rateLimitMessage,
+        );
+    return DioException(
+      requestOptions: options,
+      response: effectiveResponse,
+      type: DioExceptionType.badResponse,
+      message: _rateLimitMessage,
+    );
   }
 
   /// 带全局锁的重登录方法
@@ -337,7 +447,7 @@ class EduHttpClient {
       );
       return response.data;
     } on DioException catch (e) {
-      DioErrorHandler.handleError(e);
+      _handleDioException(e);
     }
   }
 
@@ -357,7 +467,7 @@ class EduHttpClient {
       );
       return response.data;
     } on DioException catch (e) {
-      DioErrorHandler.handleError(e);
+      _handleDioException(e);
     }
   }
 
@@ -377,8 +487,16 @@ class EduHttpClient {
       );
       return response.data;
     } on DioException catch (e) {
-      DioErrorHandler.handleError(e);
+      _handleDioException(e);
     }
+  }
+
+  Never _handleDioException(DioException e) {
+    if (e.response?.statusCode == 429) {
+      _recordRateLimit(e.requestOptions);
+      DioErrorHandler.handleError(_buildRateLimitException(e.requestOptions));
+    }
+    DioErrorHandler.handleError(e);
   }
 
   void dispose() {
@@ -394,10 +512,15 @@ class EduHttpClient {
     _loginCompleter = null;
     _lastLoginFailTime = null;
     _loginHandlerForTest = null;
+    _nowProviderForTest = null;
   }
 
   static void setLastLoginFailTimeForTest(int? timestampMs) {
     _lastLoginFailTime = timestampMs;
+  }
+
+  static void setNowProviderForTest(int Function()? provider) {
+    _nowProviderForTest = provider;
   }
 
   Future<bool> reLoginWithLockForTest() {
