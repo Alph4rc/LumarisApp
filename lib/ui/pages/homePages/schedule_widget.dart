@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
@@ -79,7 +80,8 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                               },
                             ),
                           ),
-                          if (PlatformUtils.isIOS || PlatformUtils.isAndroid)
+                          if (ref.read(currentSchoolProvider).supports(AppFeature.notifications) &&
+                              (PlatformUtils.isIOS || PlatformUtils.isAndroid))
                             ClubListTile(
                               title: Text(l10n.courseReminder),
                               trailing: CupertinoSwitch(

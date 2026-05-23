@@ -1108,6 +1108,24 @@ class AppLocalizationsKo extends AppLocalizations {
       '로그인 성공, 그러나 보안 저장소를 사용할 수 없어 다음 실행 시 계정 정보를 다시 입력해야 할 수 있습니다';
 
   @override
+  String get selectSchool => '选择学校';
+
+  @override
+  String get searchSchool => '搜索学校…';
+
+  @override
+  String get basicSupport => '基础';
+
+  @override
+  String get advancedSupport => '高级';
+
+  @override
+  String get schoolNotSupported => '当前学校不支持此功能';
+
+  @override
+  String get switchSchool => '切换学校';
+
+  @override
   String get loadingDefaultTitle => '데이터 동기화 중';
 
   @override

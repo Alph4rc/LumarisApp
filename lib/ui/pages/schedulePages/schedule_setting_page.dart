@@ -4,6 +4,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -110,6 +111,10 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
     final colors = context.clubColors;
 
+    final school = ref.watch(currentSchoolProvider);
+    final canSyncCalendar = school.supports(AppFeature.calendarSync);
+    final canEdit = school.supports(AppFeature.editTimetable);
+
     return Scaffold(
         appBar: ClubAppBar(
           title: l10n.scheduleSettingsTitle,
@@ -119,16 +124,18 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!isDesktop) ...[
+              if (!isDesktop && canSyncCalendar) ...[
                 _buildSectionTitle(l10n.calendarSubscription),
                 const SizedBox(height: 12),
                 _buildCalendarSection(context, colors),
                 const SizedBox(height: 24),
               ],
-              _buildSectionTitle(l10n.scheduleManagement),
-              const SizedBox(height: 12),
-              _buildManagementSection(context, colors),
-              const SizedBox(height: 24),
+              if (canEdit) ...[
+                _buildSectionTitle(l10n.scheduleManagement),
+                const SizedBox(height: 12),
+                _buildManagementSection(context, colors),
+                const SizedBox(height: 24),
+              ],
               _buildSectionTitle(l10n.scheduleBackground),
               const SizedBox(height: 12),
               _buildBackgroundSection(context, colors),

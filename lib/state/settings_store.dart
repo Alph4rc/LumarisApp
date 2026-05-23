@@ -14,6 +14,12 @@ import 'prefs_keys.dart';
 final settingsStoreProvider =
     NotifierProvider<SettingsStore, SettingsState>(SettingsStore.new);
 
+/// 便捷 Provider：直接获取当前学校配置，schoolId 变化时自动刷新
+final currentSchoolProvider = Provider<SchoolConfig>((ref) {
+  final schoolId = ref.watch(settingsStoreProvider.select((s) => s.schoolId));
+  return ApiConfig.getSchoolById(schoolId) ?? ApiConfig.getDefaultSchool();
+});
+
 class SettingsStore extends Notifier<SettingsState> {
   @override
   SettingsState build() {

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,8 @@ class SettingPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.clubColors;
+    final school = ref.watch(currentSchoolProvider);
+    final canNotify = school.supports(AppFeature.notifications);
     final userState = ref.watch(userStoreProvider);
     final userStore = ref.read(userStoreProvider.notifier);
     final settings = ref.watch(settingsStoreProvider);
@@ -66,8 +69,8 @@ class SettingPage extends ConsumerWidget {
                   _buildThemeModeTile(context, settings, settingsStore),
                   const LanguageSetting(),
                   const ShowTomorrowSetting(),
-                  if (PlatformUtils.isMobile) const RemindSetting(),
-                  const TodoRemindSetting(),
+                  if (canNotify && PlatformUtils.isMobile) const RemindSetting(),
+                  if (canNotify) const TodoRemindSetting(),
                   const HomePageSetting(),
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
                     const FontFamilySetting(),

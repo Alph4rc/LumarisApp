@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -11,7 +12,9 @@ import 'package:ios_club_app/features/education/services/education_cache_service
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
+import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/components/school_selector.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
@@ -35,10 +38,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   bool _obscureText = true;
   bool _isLoading = false;
+  late SchoolConfig _selectedSchool;
 
   @override
   void initState() {
     super.initState();
+    _selectedSchool = ref.read(settingsStoreProvider.notifier).currentSchool;
   }
 
   @override
@@ -154,6 +159,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ) &&
         saveSuccess;
 
+    // 保存选中的学校
+    await ref
+        .read(settingsStoreProvider.notifier)
+        .setSchoolId(_selectedSchool.id);
+
     final userDataString = prefs.getString(PrefsKeys.USER_DATA);
     if (userDataString != null) {
       final userData = jsonDecode(userDataString);
@@ -236,6 +246,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
+
+                // School Selector
+                Container(
+                  decoration: BoxDecoration(
+                    color: groupBackgroundColor,
+                    borderRadius: ClubRadii.navigation,
+                  ),
+                  child: SchoolSelector(
+                    selectedSchool: _selectedSchool,
+                    onChanged: (school) {
+                      setState(() => _selectedSchool = school);
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 12),
 
                 // Grouped Inputs
                 Container(

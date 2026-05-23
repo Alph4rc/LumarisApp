@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
@@ -10,6 +11,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -174,6 +176,7 @@ class _CustomCourseManagePageState
     final colors = context.clubColors;
     final cardColor = colors.cardBackground;
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final canEdit = ref.watch(currentSchoolProvider).supports(AppFeature.editTimetable);
 
     return Scaffold(
         appBar: ClubAppBar(
@@ -199,62 +202,84 @@ class _CustomCourseManagePageState
             ],
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _showAddCourseDialog,
-              tooltip: l10n.addCourse,
-            ),
+            if (canEdit)
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: _showAddCourseDialog,
+                tooltip: l10n.addCourse,
+              ),
           ],
         ),
-        body: isLoading
-            ? Center(
-                child: LoadingStateView(
-                  title: l10n.readingCustomCourses,
-                  subtitle: l10n.readingCustomCoursesSubtitle,
-                ),
-              )
-            : customCourses.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.1),
-                            borderRadius: ClubRadii.card,
-                          ),
-                          child: Icon(
-                            Icons.event_available,
-                            size: 48,
-                            color: primaryColor,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          l10n.noCustomCourses,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.noCustomCoursesSubtitle,
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: colors.secondaryLabel,
-                          ),
-                        ),
-                      ],
+        body: Column(
+          children: [
+            if (!canEdit)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                color: colors.warning.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 18, color: colors.warning),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.schoolNotSupported,
+                        style: TextStyle(fontSize: 13, color: colors.warning),
+                      ),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: customCourses.length,
-                    itemBuilder: (context, index) {
-                      final course = customCourses[index];
-                      return Container(
+                  ],
+                ),
+              ),
+            Expanded(
+              child: isLoading
+                  ? Center(
+                      child: LoadingStateView(
+                        title: l10n.readingCustomCourses,
+                        subtitle: l10n.readingCustomCoursesSubtitle,
+                      ),
+                    )
+                  : customCourses.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: ClubRadii.card,
+                                ),
+                                child: Icon(
+                                  Icons.event_available,
+                                  size: 48,
+                                  color: primaryColor,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                l10n.noCustomCourses,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                l10n.noCustomCoursesSubtitle,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: colors.secondaryLabel,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: customCourses.length,
+                          itemBuilder: (context, index) {
+                            final course = customCourses[index];
+                            return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: cardColor,
@@ -271,7 +296,13 @@ class _CustomCourseManagePageState
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: ClubRadii.navigation,
-                            onTap: () => _showEditCourseDialog(course),
+                            onTap: () {
+                              if (canEdit) {
+                                _showEditCourseDialog(course);
+                              } else {
+                                showClubSnackBar(context, Text(l10n.schoolNotSupported));
+                              }
+                            },
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Row(
@@ -310,24 +341,25 @@ class _CustomCourseManagePageState
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.more_horiz,
-                                      color: colors.secondaryLabel,
-                                    ),
-                                    onPressed: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: cardColor,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: ClubRadii.sheetTop,
-                                        ),
-                                        builder: (context) => SafeArea(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ClubListTile(
+                                  if (canEdit) ...[
+                                    const SizedBox(width: 12),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.more_horiz,
+                                        color: colors.secondaryLabel,
+                                      ),
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          backgroundColor: cardColor,
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: ClubRadii.sheetTop,
+                                          ),
+                                          builder: (context) => SafeArea(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ClubListTile(
                                                 leading: Icon(
                                                   Icons.edit_outlined,
                                                   color: colors.primary,
@@ -355,6 +387,7 @@ class _CustomCourseManagePageState
                                       );
                                     },
                                   ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -362,7 +395,11 @@ class _CustomCourseManagePageState
                         ),
                       );
                     },
-                  ));
+                  ),
+            ),
+          ],
+        ),
+      );
   }
 
   Widget _buildInfoChip(IconData icon, String label, Color color) {

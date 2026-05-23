@@ -381,6 +381,13 @@
   "loginTimeout": "登录超时，请检查网络连接后重试",
   "loginSecurityStorageUnavailable": "登录成功，但安全存储不可用，下次启动后可能需要重新输入账号密码",
 
+  "selectSchool": "选择学校",
+  "searchSchool": "搜索学校…",
+  "basicSupport": "基础",
+  "advancedSupport": "高级",
+  "schoolNotSupported": "当前学校不支持此功能",
+  "switchSchool": "切换学校",
+
   "loadingDefaultTitle": "正在同步数据",
   "loadingDefaultSubtitle": "网络较慢时可能需要几秒，请稍等一下",
   "errorOccurred": "出错了",

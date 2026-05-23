@@ -1094,6 +1094,24 @@ class AppLocalizationsZh extends AppLocalizations {
       '登录成功，但安全存储不可用，下次启动后可能需要重新输入账号密码';
 
   @override
+  String get selectSchool => '选择学校';
+
+  @override
+  String get searchSchool => '搜索学校…';
+
+  @override
+  String get basicSupport => '基础';
+
+  @override
+  String get advancedSupport => '高级';
+
+  @override
+  String get schoolNotSupported => '当前学校不支持此功能';
+
+  @override
+  String get switchSchool => '切换学校';
+
+  @override
   String get loadingDefaultTitle => '正在同步数据';
 
   @override
@@ -3050,6 +3068,24 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String get loginSecurityStorageUnavailable =>
       '登入成功，但安全儲存不可用，下次啟動後可能需要重新輸入帳號密碼';
+
+  @override
+  String get selectSchool => '選擇學校';
+
+  @override
+  String get searchSchool => '搜尋學校…';
+
+  @override
+  String get basicSupport => '基礎';
+
+  @override
+  String get advancedSupport => '進階';
+
+  @override
+  String get schoolNotSupported => '目前學校不支援此功能';
+
+  @override
+  String get switchSchool => '切換學校';
 
   @override
   String get loadingDefaultTitle => '正在同步資料';

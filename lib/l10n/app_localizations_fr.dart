@@ -1130,6 +1130,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connexion réussie, mais le stockage sécurisé est indisponible.';
 
   @override
+  String get selectSchool => '选择学校';
+
+  @override
+  String get searchSchool => '搜索学校…';
+
+  @override
+  String get basicSupport => '基础';
+
+  @override
+  String get advancedSupport => '高级';
+
+  @override
+  String get schoolNotSupported => '当前学校不支持此功能';
+
+  @override
+  String get switchSchool => '切换学校';
+
+  @override
   String get loadingDefaultTitle => 'Synchronisation';
 
   @override

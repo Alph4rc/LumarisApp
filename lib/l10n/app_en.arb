@@ -382,6 +382,13 @@
   "loginTimeout": "Login timed out, please check your network and try again",
   "loginSecurityStorageUnavailable": "Login successful, but secure storage is unavailable. You may need to re-enter your credentials next time.",
 
+  "selectSchool": "Select School",
+  "searchSchool": "Search school...",
+  "basicSupport": "Basic",
+  "advancedSupport": "Advanced",
+  "schoolNotSupported": "This feature is not supported by the current school",
+  "switchSchool": "Switch School",
+
   "loadingDefaultTitle": "Syncing Data",
   "loadingDefaultSubtitle": "This may take a few seconds on a slow network",
   "errorOccurred": "An Error Occurred",
