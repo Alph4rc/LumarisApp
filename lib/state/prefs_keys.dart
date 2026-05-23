@@ -88,6 +88,12 @@ class PrefsKeys {
   /// 学校配置相关
   static const String SCHOOL_ID = 'school_id';
 
+  /// 游客课程数据（HTML 导入等）
+  static const String GUEST_COURSE_DATA = 'guest_course_data';
+
+  /// 自定义课程数据
+  static const String CUSTOM_COURSE_DATA = 'custom_courses';
+
   /// 协议相关
   static const String AGREEMENT_ACCEPTED = 'agreement_accepted';
 }

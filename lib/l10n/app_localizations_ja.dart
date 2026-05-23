@@ -15,7 +15,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appSlogan => 'キャンパスライフをひとつのアプリに';
 
   @override
-  String get tagline => '西安建築科技大学の学生により良いサービスを';
+  String get tagline => '大学生により良いサービスを';
 
   @override
   String get home => 'ホーム';
@@ -267,7 +267,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dontUpdate => '後で';
 
   @override
-  String confirmUpdateTitle(Object version) {
+  String confirmUpdateTitle(String version) {
     return '最新バージョンに更新しますか: $version？';
   }
 
@@ -662,7 +662,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get remindMinutesBefore => '何分前にリマインドするか';
 
   @override
-  String remindMinutes(Object n) {
+  String remindMinutes(int n) {
     return '$n分';
   }
 
@@ -763,22 +763,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get decShort => '12月';
 
   @override
-  String weekUnit(Object n) {
+  String weekUnit(int n) {
     return '第$n週';
   }
 
   @override
-  String currentWeek(Object n) {
+  String currentWeek(int n) {
     return '現在第$n週';
   }
 
   @override
-  String weeksUntilStart(Object n) {
+  String weeksUntilStart(int n) {
     return '開講まであと$n週間';
   }
 
   @override
-  String periodRange(Object end, Object start) {
+  String periodRange(int start, int end) {
     return '$start-$end限';
   }
 
@@ -822,7 +822,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirmDelete => '削除確認';
 
   @override
-  String confirmDeleteCourseContent(Object name) {
+  String confirmDeleteCourseContent(String name) {
     return '「$name」を削除してもよろしいですか？';
   }
 
@@ -872,7 +872,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get courseWeeks => '週';
 
   @override
-  String selectedWeeks(Object count) {
+  String selectedWeeks(int count) {
     return '$count週選択済み';
   }
 
@@ -880,7 +880,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get customCourses => 'カスタム授業';
 
   @override
-  String customCoursesCount(Object count) {
+  String customCoursesCount(int count) {
     return '$count件の授業';
   }
 
@@ -963,28 +963,28 @@ class AppLocalizationsJa extends AppLocalizations {
   String get foolishModeMessage => 'はい、GPAは5.0です';
 
   @override
-  String creditUnit(Object credit) {
+  String creditUnit(String credit) {
     return '$credit単位';
   }
 
   @override
-  String gradeLabel(Object grade) {
+  String gradeLabel(String grade) {
     return '成績 $grade';
   }
 
   @override
-  String gpaLabel(Object gpa) {
+  String gpaLabel(String gpa) {
     return 'GPA $gpa';
   }
 
   @override
   String scheduleCourseTime(
-      Object end, Object start, Object weekRanges, Object weekday) {
+      String weekRanges, String weekday, int start, int end) {
     return '第$weekRanges週 毎$weekday曜日 $start-$end限';
   }
 
   @override
-  String semesterRange(Object end, Object num, Object start) {
+  String semesterRange(String start, String end, String num) {
     return '$start～$end年 第$num学期';
   }
 
@@ -1131,7 +1131,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get doubleTapExit => 'もう一度押して終了';
 
   @override
-  String copySuccess(Object text) {
+  String copySuccess(String text) {
     return 'コピーしました: $text';
   }
 
@@ -1202,7 +1202,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get todoLoadFailedSubtitle => 'タスクを読み込めません';
 
   @override
-  String deadlineLabel(Object date) {
+  String deadlineLabel(String date) {
     return '締切日: $date';
   }
 
@@ -1243,7 +1243,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get seatNumber => '座席番号';
 
   @override
-  String seatNumberLabel(Object seat) {
+  String seatNumberLabel(String seat) {
     return '座席番号 $seat';
   }
 
@@ -1341,7 +1341,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateTimeout => '更新がタイムアウトしました。ネットワークを確認して再試行してください';
 
   @override
-  String updateFailed(Object error) {
+  String updateFailed(String error) {
     return '更新失敗: $error';
   }
 
@@ -1352,7 +1352,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get currentWeekLabel => '今週';
 
   @override
-  String periodUnit(Object n) {
+  String periodUnit(int n) {
     return '第$n限';
   }
 
@@ -1402,6 +1402,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get guest => 'ゲスト';
+
+  @override
+  String get guestMode => 'ゲストモード';
+
+  @override
+  String get guestModeSubtitle => 'ログインするとすべての機能を使用できます';
 
   @override
   String get syncingAcademic => '学務情報を同期中';
@@ -1512,7 +1518,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get usedTraffic => '使用済み通信量';
 
   @override
-  String onlineDuration(Object time) {
+  String onlineDuration(String time) {
     return 'オンライン時間: $time';
   }
 
@@ -1574,7 +1580,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get electricityCost => '電気料金';
 
   @override
-  String lastNDays(Object n) {
+  String lastNDays(int n) {
     return '過去$n日間';
   }
 
@@ -1673,7 +1679,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get createSubFailed => 'サブスクリプションの作成に失敗しました';
 
   @override
-  String currentSubInfo(Object email, Object threshold) {
+  String currentSubInfo(String email, String threshold) {
     return '残高が¥$thresholdを下回った場合、$emailに通知';
   }
 
@@ -1912,6 +1918,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get busRefreshStale => '更新完了、最後のデータを保持';
 
   @override
+  String arrivalStationTime(String h, String m) {
+    return '$h時間 $m分';
+  }
+
+  @override
   String get poiMainLibrary => '中央図書館';
 
   @override
@@ -1930,7 +1941,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get poiYanTaEastGateDesc => '歴史あるキャンパスの入り口';
 
   @override
-  String durationDHMS(Object d, Object h, Object m, Object s) {
+  String durationDHMS(String d, String h, String m, String s) {
     return '$d日$h時間$m分$s秒';
   }
 
@@ -1948,4 +1959,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eduSystem => '教育システム';
+
+  @override
+  String get htmlImport => 'HTMLインポート';
+
+  @override
+  String get pasteHtmlHint => '時間割のHTMLコードを貼り付けてください';
+
+  @override
+  String get parseAndPreview => '解析＆プレビュー';
+
+  @override
+  String get importCourses => '授業をインポート';
+
+  @override
+  String get parseResult => '解析結果';
+
+  @override
+  String get noCoursesParsed => '授業が解析されませんでした';
+
+  @override
+  String get selectSchool => '学校を選択';
+
+  @override
+  String get enterCustomUrl => 'またはカスタムURLを入力';
+
+  @override
+  String get urlHint => 'ウェブサイトのURLを入力';
 }

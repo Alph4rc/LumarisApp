@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -18,11 +19,11 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   late PageController _pageController;
 
   List<String> _getTabs(BuildContext context) => [
-    context.l10n.helpFeaturesTab,
-    context.l10n.helpInstructionsTab,
-    context.l10n.helpNotesTab,
-    context.l10n.helpAboutTab,
-  ];
+        context.l10n.helpFeaturesTab,
+        context.l10n.helpInstructionsTab,
+        context.l10n.helpNotesTab,
+        context.l10n.helpAboutTab,
+      ];
 
   @override
   void initState() {
@@ -347,9 +348,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                     Container(
                       width: 36,
                       height: 36,
-                      decoration: BoxDecoration(
+                      decoration: ShapeDecoration(
                         color: colors.successSoft,
-                        borderRadius: ClubRadii.control,
+                        shape: ClubSmoothCorners.shape(ClubRadii.control),
                       ),
                       child: Icon(
                         CupertinoIcons.device_phone_portrait,
@@ -420,9 +421,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                     Container(
                       width: 36,
                       height: 36,
-                      decoration: BoxDecoration(
+                      decoration: ShapeDecoration(
                         color: colors.warningSoft,
-                        borderRadius: ClubRadii.control,
+                        shape: ClubSmoothCorners.shape(ClubRadii.control),
                       ),
                       child: Icon(
                         CupertinoIcons.heart,
@@ -491,9 +492,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
           Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: ClubRadii.control,
+              shape: ClubSmoothCorners.shape(ClubRadii.control),
             ),
             child: Icon(
               icon,
@@ -548,9 +549,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
           Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: ClubRadii.control,
+              shape: ClubSmoothCorners.shape(ClubRadii.control),
             ),
             child: Icon(
               icon,
@@ -601,9 +602,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
         Container(
           width: 32,
           height: 32,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: ClubRadii.control,
+            shape: ClubSmoothCorners.shape(ClubRadii.control),
           ),
           child: Icon(
             icon,

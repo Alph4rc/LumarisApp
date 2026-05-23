@@ -7,7 +7,7 @@ class SchoolApi {
   static Future<SchoolListData> listSchools() async {
     final response = await BasicHttpClientManager.instance.get('/api/schools');
     final data = response.data['data'];
-    return SchoolListData.fromJson(data as Map<String, dynamic>);
+    return SchoolListData.fromJson(Map<String, dynamic>.from(data));
   }
 
   /// 需求2：根据代号返回学校详情及支持功能
@@ -15,6 +15,6 @@ class SchoolApi {
   static Future<School> getSchool(String code) async {
     final response = await BasicHttpClientManager.instance.get('/api/schools/$code');
     final data = response.data['data'];
-    return School.fromJson(data as Map<String, dynamic>);
+    return School.fromJson(Map<String, dynamic>.from(data));
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ClubCard extends StatelessWidget {
@@ -24,14 +25,17 @@ class ClubCard extends StatelessWidget {
     return Container(
       padding: padding,
       margin: margin,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: colors.cardBackground,
-        borderRadius: borderRadius,
-        border: Border.all(
-          color: colors.separator.withValues(alpha: 0.1), // Very subtle border
-          width: 0.5,
+        shape: ClubSmoothCorners.shape(
+          borderRadius,
+          side: BorderSide(
+            color:
+                colors.separator.withValues(alpha: 0.1), // Very subtle border
+            width: 0.5,
+          ),
         ),
-        boxShadow: theme.brightness == Brightness.dark
+        shadows: theme.brightness == Brightness.dark
             ? []
             : [
                 BoxShadow(

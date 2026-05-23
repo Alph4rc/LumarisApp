@@ -3,7 +3,7 @@
 
   "appName": "Lumaris",
   "appSlogan": "Toute la vie étudiante dans une seule app",
-  "tagline": "Dédié à offrir un meilleur service aux étudiants de XAUAT",
+  "tagline": "Dédié à offrir un meilleur service aux étudiants",
 
   "home": "Accueil",
   "schedule": "Emploi du temps",
@@ -470,6 +470,8 @@
   "help": "Aide",
   "academicAccount": "Compte académique",
   "guest": "Invité",
+  "guestMode": "Mode invité",
+  "guestModeSubtitle": "Connectez-vous pour accéder à toutes les fonctionnalités",
   "syncingAcademic": "Synchronisation académique",
   "syncingAcademicSubtitle": "Lecture des crédits et des fiches de profil",
   "loginEduSystem": "Connexion au système académique",
@@ -670,6 +672,7 @@
   "campusCardBalance": "Solde de la carte",
   "tapToView": "Appuyez pour voir",
   "tapToSubscribe": "Appuyez pour vous abonner",
+  "arrivalStationTime": "{h}h {m}min",
 
   "durationDHMS": "{d}j {h}h {m}min {s}s",
   "campusCaoTang": "Caotang",
@@ -686,5 +689,14 @@
   "moreFunctions": "Plus de fonctions",
   "noShortcuts": "Aucun raccourci",
   "addInEditMode": "Ajouter en mode édition",
-  "eduSystem": "Système éducatif"
+  "eduSystem": "Système éducatif",
+  "htmlImport": "Import HTML",
+  "pasteHtmlHint": "Collez le HTML de l'emploi du temps ici",
+  "parseAndPreview": "Analyser & Aperçu",
+  "importCourses": "Importer les cours",
+  "parseResult": "Résultat de l'analyse",
+  "noCoursesParsed": "Aucun cours analysé",
+  "selectSchool": "Sélectionner l'école",
+  "enterCustomUrl": "Ou entrer une URL personnalisée",
+  "urlHint": "Entrer l'URL du site web"
 }

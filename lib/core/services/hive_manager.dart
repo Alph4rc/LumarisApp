@@ -60,6 +60,7 @@ class HiveManager {
     } catch (e, stackTrace) {
       AppLogger.error('Failed to initialize Hive',
           error: e, stackTrace: stackTrace);
+      rethrow;
     } finally {
       _initializing = null;
     }
@@ -70,7 +71,27 @@ class HiveManager {
     if (Hive.isBoxOpen(boxName)) {
       return Hive.box<T>(boxName);
     }
-    return await Hive.openBox<T>(boxName);
+
+    if (_initializing != null) {
+      await _initializing;
+    }
+
+    try {
+      return await Hive.openBox<T>(boxName);
+    } on HiveError catch (e, stackTrace) {
+      if (!_shouldRetryAfterInit(e)) {
+        rethrow;
+      }
+
+      AppLogger.warning(
+        'Hive box "$boxName" opened before initialization, retrying after init',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      await init();
+      return await Hive.openBox<T>(boxName);
+    }
   }
 
   /// 获取已打开的 Box
@@ -88,5 +109,11 @@ class HiveManager {
   /// 清除所有数据
   Future<void> clearAll() async {
     await Hive.deleteFromDisk();
+  }
+
+  bool _shouldRetryAfterInit(HiveError error) {
+    final message = error.toString();
+    return message.contains('initialize Hive') ||
+        message.contains('provide a path to store the box');
   }
 }

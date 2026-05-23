@@ -15,6 +15,7 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
@@ -108,28 +109,35 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final l10n = context.l10n;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     return [
+      if (isLogin)
+        ProfileButtonItem(
+            icon: CupertinoIcons.link_circle,
+            title: l10n.campusNavigation,
+            route: AppRoutes.link),
       ProfileButtonItem(
-          icon: CupertinoIcons.link_circle,
-          title: l10n.campusNavigation,
-          route: AppRoutes.link),
-      ProfileButtonItem(
-          icon: Icons.settings, title: l10n.settingsAbout, route: AppRoutes.about),
-      ProfileButtonItem(
-          title: l10n.schoolBus,
-          icon: Icons.directions_bus_rounded,
-          route: AppRoutes.schoolBus),
-      if (!kIsWeb)
+          icon: Icons.settings,
+          title: l10n.settingsAbout,
+          route: AppRoutes.about),
+      if (isLogin)
+        ProfileButtonItem(
+            title: l10n.schoolBus,
+            icon: Icons.directions_bus_rounded,
+            route: AppRoutes.schoolBus),
+      if (!kIsWeb && isLogin)
         ProfileButtonItem(
             icon: CupertinoIcons.bolt_fill,
             title: l10n.electricity,
             route: AppRoutes.electricity),
       if (isLogin)
         ProfileButtonItem(
-            icon: Icons.toc, title: l10n.programLabel, route: AppRoutes.program),
-      ProfileButtonItem(
-          icon: Icons.monetization_on_outlined,
-          title: l10n.payment,
-          route: AppRoutes.payment),
+            icon: Icons.toc,
+            title: l10n.programLabel,
+            route: AppRoutes.program),
+      if (isLogin)
+        ProfileButtonItem(
+            icon: Icons.monetization_on_outlined,
+            title: l10n.payment,
+            route: AppRoutes.payment),
       // if (!kIsWeb)
       //   ProfileButtonItem(
       //       icon: Icons.wifi_outlined, title: '校园网', route: AppRoutes.net),
@@ -140,8 +148,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             onPressed: () {
               _enterLoginMode(isOnlyLoginMember: false);
             }),
-      ProfileButtonItem(
-          icon: CupertinoIcons.map, title: l10n.campusMap, route: AppRoutes.campusMap),
+      if (isLogin)
+        ProfileButtonItem(
+            icon: CupertinoIcons.map,
+            title: l10n.campusMap,
+            route: AppRoutes.campusMap),
       ProfileButtonItem(
           icon: Icons.help_outline, title: l10n.help, route: AppRoutes.helper),
     ];
@@ -213,7 +224,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       return AnimatedCard(
                         delay: Duration(milliseconds: 50 * index),
                         child: Center(
-                          child: getProfileButtonItems(context)[index].build(context),
+                          child: getProfileButtonItems(context)[index]
+                              .build(context),
                         ),
                       );
                     },
@@ -289,11 +301,14 @@ class ProfileButtonItem {
 
   Widget build(BuildContext context) {
     final colors = context.clubColors;
+    final shape = ClubSmoothCorners.shape(ClubRadii.panel);
     return Material(
-        borderRadius: ClubRadii.panel,
+        shape: shape,
+        clipBehavior: Clip.antiAlias,
         color: Colors.transparent,
         child: InkWell(
           borderRadius: ClubRadii.panel,
+          customBorder: shape,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

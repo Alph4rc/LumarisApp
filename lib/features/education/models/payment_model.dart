@@ -61,6 +61,6 @@ double _totalFromJson(dynamic total) {
 
 List<PaymentModel> _paymentsFromJson(dynamic value) {
   return (value as List<dynamic>)
-      .map((item) => PaymentModel.fromJson(item as Map<String, dynamic>))
+      .map((item) => PaymentModel.fromJson(Map<String, dynamic>.from(item)))
       .toList();
 }

@@ -11,6 +11,7 @@ import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 class PaymentPage extends ConsumerWidget {
   const PaymentPage({super.key});
@@ -73,11 +74,12 @@ class PaymentPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildBalanceCard(PaymentState payment, ClubColors colors, AppLocalizations l10n) {
+  Widget _buildBalanceCard(
+      PaymentState payment, ClubColors colors, AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -86,8 +88,8 @@ class PaymentPage extends ConsumerWidget {
             colors.primary.withValues(alpha: 0.8),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+        shape: ClubSmoothCorners.shape(BorderRadius.circular(20)),
+        shadows: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.3),
             blurRadius: 15,

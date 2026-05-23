@@ -3,7 +3,7 @@
 
   "appName": "Lumaris",
   "appSlogan": "Das gesamte Campusleben in einer App",
-  "tagline": "Engagiert, XAUAT-Studenten einen besseren Service zu bieten",
+  "tagline": "Engagiert, Studenten einen besseren Service zu bieten",
 
   "home": "Start",
   "schedule": "Stundenplan",
@@ -470,6 +470,8 @@
   "help": "Hilfe",
   "academicAccount": "Hochschulkonto",
   "guest": "Gast",
+  "guestMode": "Gastmodus",
+  "guestModeSubtitle": "Melden Sie sich an, um alle Funktionen zu nutzen",
   "syncingAcademic": "Akademische Daten werden synchronisiert",
   "syncingAcademicSubtitle": "Credits und Profilkarten lesen",
   "loginEduSystem": "Im Hochschulsystem anmelden",
@@ -670,6 +672,7 @@
   "campusCardBalance": "Kartenguthaben",
   "tapToView": "Zum Anzeigen tippen",
   "tapToSubscribe": "Zum Abonnieren tippen",
+  "arrivalStationTime": "{h}Std {m}Min",
 
   "durationDHMS": "{d}T {h}Std {m}Min {s}Sek",
   "campusCaoTang": "Caotang",
@@ -686,5 +689,14 @@
   "moreFunctions": "Weitere Funktionen",
   "noShortcuts": "Keine Verknüpfungen",
   "addInEditMode": "Im Bearbeitungsmodus hinzufügen",
-  "eduSystem": "Bildungssystem"
+  "eduSystem": "Bildungssystem",
+  "htmlImport": "HTML-Import",
+  "pasteHtmlHint": "Stundenplan-HTML hier einfügen",
+  "parseAndPreview": "Parsen & Vorschau",
+  "importCourses": "Kurse importieren",
+  "parseResult": "Parse-Ergebnis",
+  "noCoursesParsed": "Keine Kurse analysiert",
+  "selectSchool": "Schule auswählen",
+  "enterCustomUrl": "Oder eigene URL eingeben",
+  "urlHint": "Website-URL eingeben"
 }

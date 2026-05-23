@@ -15,6 +15,7 @@ import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/state/user_store.dart';
 
 final scheduleStoreProvider =
     NotifierProvider<ScheduleStore, ScheduleState>(ScheduleStore.new);
@@ -52,11 +53,35 @@ class ScheduleStore extends Notifier<ScheduleState> {
     try {
       final weekData = await EduTimeService.getWeek();
       _handleWeekData(weekData);
-      await getRemindCourses();
-      await _loadCourses();
+      final isLogin = ref.read(userStoreProvider).isLogin;
+      if (isLogin) {
+        await getRemindCourses();
+        await _loadCourses();
+      } else {
+        final guestCourses = await ref
+            .read(courseStoreProvider.notifier)
+            .loadGuestAndCustomCourses();
+        if (guestCourses.isNotEmpty) {
+          _applyCourses(guestCourses);
+        } else {
+          state = state.copyWith(isLoading: false);
+        }
+      }
       await _loadPreferences();
     } catch (e) {
       AppLogger.debug('初始化课表数据出错: $e');
+    }
+  }
+
+  /// 从 CourseStore 加载游客课程并应用到课表
+  Future<void> loadGuestCourseData() async {
+    final guestCourses = await ref
+        .read(courseStoreProvider.notifier)
+        .loadGuestAndCustomCourses();
+    if (guestCourses.isNotEmpty) {
+      _applyCourses(guestCourses);
+    } else {
+      state = state.copyWith(allCourses: const [], isLoading: false);
     }
   }
 
@@ -129,9 +154,9 @@ class ScheduleStore extends Notifier<ScheduleState> {
       AppLogger.debug('[ScheduleStore] 调用 CourseService.getCourse');
 
       final weekData = await EduTimeService.getWeek(isRefresh: true);
-      
+
       if (currentRefreshId != _refreshCount) return;
-      
+
       _handleWeekData(weekData);
 
       await CourseService.getCourse(isRefresh: true).timeout(
@@ -177,6 +202,20 @@ class ScheduleStore extends Notifier<ScheduleState> {
         AppLogger.debug('[ScheduleStore] 设置 isLoading = false');
         state = state.copyWith(isLoading: false);
       }
+    }
+  }
+
+  Future<void> refreshLocalCourses() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      if (ref.read(userStoreProvider).isLogin) {
+        await getRemindCourses();
+        await _loadCourses();
+      } else {
+        await loadGuestCourseData();
+      }
+    } finally {
+      state = state.copyWith(isLoading: false);
     }
   }
 

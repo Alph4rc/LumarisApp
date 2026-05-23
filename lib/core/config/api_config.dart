@@ -43,12 +43,16 @@ class SchoolConfig {
   /// 支持级别
   final SupportLevel supportLevel;
 
+  /// 教务系统课表页面 URL（用于 WebView 导入）
+  final String scheduleUrl;
+
   const SchoolConfig({
     required this.id,
     required this.name,
     required this.shortName,
     required this.eduApiBaseUrl,
     this.supportLevel = SupportLevel.basic,
+    this.scheduleUrl = '',
   });
 
   /// 可用功能列表（根据支持级别自动派生）
@@ -69,6 +73,7 @@ class SchoolConfig {
       shortName: json['shortName'] as String? ?? json['name'] as String,
       eduApiBaseUrl: json['eduApiBaseUrl'] as String,
       supportLevel: level,
+      scheduleUrl: json['scheduleUrl'] as String? ?? '',
     );
   }
 
@@ -80,6 +85,7 @@ class SchoolConfig {
       'shortName': shortName,
       'eduApiBaseUrl': eduApiBaseUrl,
       'supportLevel': supportLevel.name,
+      'scheduleUrl': scheduleUrl,
     };
   }
 }
@@ -94,6 +100,8 @@ class ApiConfig {
       shortName: '西建大',
       eduApiBaseUrl: 'https://xauatapi.xauat.site',
       supportLevel: SupportLevel.advanced,
+      scheduleUrl:
+          'https://authserver.xauat.edu.cn/authserver/login?service=https%3A%2F%2Fswjw.xauat.edu.cn%2Fstudent%2Fsso%2Flogin',
     ),
     SchoolConfig(
       id: 'snnu',
@@ -101,6 +109,7 @@ class ApiConfig {
       shortName: '陕师大',
       eduApiBaseUrl: 'https://snnuapi.example.edu.cn',
       supportLevel: SupportLevel.advanced,
+      scheduleUrl: '',
     ),
     SchoolConfig(
       id: 'xidian',
@@ -108,6 +117,7 @@ class ApiConfig {
       shortName: '西电',
       eduApiBaseUrl: 'https://xidianapi.example.edu.cn',
       supportLevel: SupportLevel.advanced,
+      scheduleUrl: '',
     ),
     SchoolConfig(
       id: 'nwu',
@@ -115,6 +125,7 @@ class ApiConfig {
       shortName: '西大',
       eduApiBaseUrl: 'https://nwuapi.example.edu.cn',
       supportLevel: SupportLevel.basic,
+      scheduleUrl: '',
     ),
     SchoolConfig(
       id: 'xaut',
@@ -122,7 +133,15 @@ class ApiConfig {
       shortName: '西安理工',
       eduApiBaseUrl: 'https://xautapi.example.edu.cn',
       supportLevel: SupportLevel.basic,
+      scheduleUrl: '',
     ),
+    // 可以在这里添加更多学校配置
+    // SchoolConfig(
+    //   id: 'example',
+    //   name: '示例大学',
+    //   eduApiBaseUrl: 'https://api.example.edu.cn',
+    //   scheduleUrl: 'http://example.edu.cn/jwxt/',
+    // ),
   ];
 
   /// 默认学校 ID

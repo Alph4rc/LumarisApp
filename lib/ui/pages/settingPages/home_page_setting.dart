@@ -16,7 +16,12 @@ class HomePageSetting extends ConsumerWidget {
     final settingsStore = ref.read(settingsStoreProvider.notifier);
     final colors = context.clubColors;
     final l10n = context.l10n;
-    final pageNames = [l10n.home, l10n.schedulePage, l10n.scorePage, l10n.profilePage];
+    final pageNames = [
+      l10n.home,
+      l10n.schedulePage,
+      l10n.scorePage,
+      l10n.profilePage
+    ];
 
     return ClubListTile(
       leading: Icon(

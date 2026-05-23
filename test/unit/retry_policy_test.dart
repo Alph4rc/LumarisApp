@@ -43,9 +43,14 @@ void main() {
         requestOptions: request,
         response: Response<dynamic>(requestOptions: request, statusCode: 403),
       );
+      final rateLimited = DioException(
+        requestOptions: request,
+        response: Response<dynamic>(requestOptions: request, statusCode: 429),
+      );
 
       expect(RetryPolicy.defaultShouldRetry(serverError), isTrue);
       expect(RetryPolicy.defaultShouldRetry(forbidden), isFalse);
+      expect(RetryPolicy.defaultShouldRetry(rateLimited), isFalse);
     });
 
     test('predefined policies should expose expected limits and delays', () {
@@ -81,7 +86,11 @@ void main() {
       );
       expect(
         () => DioErrorHandler.handleErrorResponse(429, 'too many'),
-        throwsA(isA<NetworkException>()),
+        throwsA(
+          isA<NetworkException>()
+              .having((e) => e.statusCode, 'statusCode', 429)
+              .having((e) => e.message, 'message', '已被限流，请稍后再试'),
+        ),
       );
     });
 

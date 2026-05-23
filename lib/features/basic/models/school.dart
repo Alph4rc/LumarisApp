@@ -72,7 +72,7 @@ class SchoolListData {
   factory SchoolListData.fromJson(Map<String, dynamic> json) => SchoolListData(
     total: json['total'] as int,
     items: (json['items'] as List<dynamic>)
-        .map((e) => School.fromJson(e as Map<String, dynamic>))
+        .map((e) => School.fromJson(Map<String, dynamic>.from(e)))
         .toList(),
   );
 }

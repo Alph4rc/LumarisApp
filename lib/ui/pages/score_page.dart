@@ -19,6 +19,7 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -167,7 +168,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
     for (var i = 0; i < count; i++) {
       final y = count - i + 1;
       selectorList.add(
-        '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
+          '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
     }
     return selectorList;
   }
@@ -333,12 +334,13 @@ class _ScorePageState extends ConsumerState<ScorePage>
           for (var i = 0; i < _scoreList.length; i++) {
             var y = _scoreList.length - i + 1;
             _selectorList.add(
-              '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
+                '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
           }
         }
 
         if (_currentIndex >= _selectorList.length) {
-          _currentIndex = _selectorList.isNotEmpty ? _selectorList.length - 1 : 0;
+          _currentIndex =
+              _selectorList.isNotEmpty ? _selectorList.length - 1 : 0;
         }
         if (_selectorList.isNotEmpty && pageController.hasClients) {
           pageController.jumpToPage(_currentIndex);
@@ -378,7 +380,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
             value: scoreList == null
                 ? ScoreList.getTotalCourse(_scoreList).toString()
                 : scoreList.totalCourse.toString(),
-          label: context.l10n.passedCourses,
+            label: context.l10n.passedCourses,
           ),
           InkWell(
             onTap: _showCreditInfoDialog,
@@ -526,25 +528,18 @@ class _ScorePageState extends ConsumerState<ScorePage>
   Widget _buildYearCard(ScoreList score, int index) {
     return ClubCard(
         margin: const EdgeInsets.all(16),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(children: [
-              Text(_yearLabel(index),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  )),
-              _buildStatsPadding(scoreList: score),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: score.list.length,
-                itemBuilder: (context, index) => AnimatedListItem(
-                  index: index,
-                  child: _buildScoreItem(score.list[index]),
-                ),
-              )
-            ])));
+        child: Column(children: [
+          _buildStatsPadding(scoreList: score),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: score.list.length,
+            itemBuilder: (context, index) => AnimatedListItem(
+              index: index,
+              child: _buildScoreItem(score.list[index]),
+            ),
+          )
+        ]));
   }
 
   Widget _buildEmptyState() {
@@ -568,37 +563,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildSemesterCard(ScoreList score) {
-    final semesterParts = score.semester.semester.isNotEmpty
-        ? score.semester.semester.split('-')
-        : score.semester.name.split('-');
-    final semesterLabel = semesterParts.length >= 3
-        ? context.l10n.semesterRange(semesterParts[1], semesterParts[2], semesterParts[0])
-        : score.semester.name;
     return AnimatedCard(
       child: ClubCard(
         margin: const EdgeInsets.all(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Column(
-            children: [
-              Text(
-                semesterLabel,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: score.list.length,
-                itemBuilder: (context, index) => AnimatedListItem(
-                  index: index,
-                  child: _buildScoreItem(score.list[index]),
-                ),
-              ),
-            ],
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: score.list.length,
+          itemBuilder: (context, index) => AnimatedListItem(
+            index: index,
+            child: _buildScoreItem(score.list[index]),
           ),
         ),
       ),
@@ -609,10 +583,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
     final isTablet = MediaQuery.of(context).size.width > 600;
 
     return Material(
-      borderRadius: ClubRadii.navigation,
+      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+      clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
         borderRadius: ClubRadii.navigation,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.navigation),
         onTap: () => _showScoreDetails(item),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -621,9 +597,9 @@ class _ScorePageState extends ConsumerState<ScorePage>
               Container(
                 width: 4,
                 height: 40,
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: CourseColorManager.generateSoftColor(item.name),
-                  borderRadius: ClubRadii.indicatorBorder,
+                  shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
                 ),
               ),
               const SizedBox(width: 16),

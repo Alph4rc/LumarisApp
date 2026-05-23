@@ -66,7 +66,6 @@ class BusItem {
       var s = arrivalStationTime.split(':');
       // 确保分割后的数组至少有2个元素
       if (s.length >= 2) {
-        arrivalStationTime = '${s[0]}小时 ${s[1]}分钟';
         int h = int.parse(s[0]);
         int m = int.parse(s[1]);
         if (runTime.isNotEmpty && runTime.contains(':')) {
@@ -94,7 +93,7 @@ class BusItem {
 List<BusItem> _busItemsFromJson(dynamic value) {
   if (value is List) {
     return value
-        .map((item) => BusItem.fromJson(item as Map<String, dynamic>))
+        .map((item) => BusItem.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
   return <BusItem>[];

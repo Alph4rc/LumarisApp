@@ -6,6 +6,7 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ProgramPage extends ConsumerStatefulWidget {
@@ -191,9 +192,9 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                       vertical: 8.0,
                     ),
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: colors.warningSoft,
-                      borderRadius: ClubRadii.panel,
+                      shape: ClubSmoothCorners.shape(ClubRadii.panel),
                     ),
                     child: Row(
                       children: [
@@ -267,12 +268,12 @@ class _ProgramPageState extends ConsumerState<ProgramPage>
                           horizontal: 10.0,
                           vertical: 5.0,
                         ),
-                        decoration: BoxDecoration(
+                        decoration: ShapeDecoration(
                           color: courseColor.withValues(alpha: 0.15),
-                          borderRadius: ClubRadii.control,
+                          shape: ClubSmoothCorners.shape(ClubRadii.control),
                         ),
                         child: Text(
-                          l10n.creditUnit(course.credits),
+                          l10n.creditUnit(course.credits.toString()),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

@@ -3,7 +3,7 @@
 
   "appName": "Lumaris",
   "appSlogan": "キャンパスライフをひとつのアプリに",
-  "tagline": "西安建築科技大学の学生により良いサービスを",
+  "tagline": "大学生により良いサービスを",
 
   "home": "ホーム",
   "schedule": "時間割",
@@ -472,6 +472,8 @@
   "help": "ヘルプ",
   "academicAccount": "学務アカウント",
   "guest": "ゲスト",
+  "guestMode": "ゲストモード",
+  "guestModeSubtitle": "ログインするとすべての機能を使用できます",
   "syncingAcademic": "学務情報を同期中",
   "syncingAcademicSubtitle": "単位とプロフィールカードを読み込み中",
   "loginEduSystem": "学務システムにログイン",
@@ -672,6 +674,7 @@
   "campusCardBalance": "カード残高",
   "tapToView": "タップして表示",
   "tapToSubscribe": "タップして購読",
+  "arrivalStationTime": "{h}時間 {m}分",
 
   "durationDHMS": "{d}日{h}時間{m}分{s}秒",
   "campusCaoTang": "草堂",
@@ -690,5 +693,14 @@
   "noShortcuts": "ショートカットなし",
   "addInEditMode": "編集モードで追加",
   "delete": "削除",
-  "eduSystem": "教育システム"
+  "eduSystem": "教育システム",
+  "htmlImport": "HTMLインポート",
+  "pasteHtmlHint": "時間割のHTMLコードを貼り付けてください",
+  "parseAndPreview": "解析＆プレビュー",
+  "importCourses": "授業をインポート",
+  "parseResult": "解析結果",
+  "noCoursesParsed": "授業が解析されませんでした",
+  "selectSchool": "学校を選択",
+  "enterCustomUrl": "またはカスタムURLを入力",
+  "urlHint": "ウェブサイトのURLを入力"
 }

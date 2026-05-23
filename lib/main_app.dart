@@ -17,7 +17,7 @@ import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
-import 'bottom_navigation.dart';
+import 'platform/mobile/bottom_navigation.dart';
 import 'platform/tablet/tablet_navigation.dart';
 import 'platform/macos/macos_ui_sidebar.dart';
 import 'platform/windows/windows_sidebar.dart';
@@ -272,6 +272,18 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     ];
   }
 
+  List<NavigationDestination> _buildPrimaryNavigationDestinations(
+    BuildContext context,
+  ) {
+    return _buildDestinations(context).take(4).map((destination) {
+      return NavigationDestination(
+        icon: Icon(destination.icon),
+        selectedIcon: Icon(destination.selectedIcon),
+        label: destination.label,
+      );
+    }).toList();
+  }
+
   static const Map<int, String> _routeMap = {
     0: AppRoutes.home,
     1: AppRoutes.schedule,
@@ -323,10 +335,9 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     final settings = ref.watch(settingsStoreProvider);
     final routedChild = widget.child;
     final destinations = _buildDestinations(context);
+    final primaryDestinations = _buildPrimaryNavigationDestinations(context);
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     // 判断设备类型
     final isMacOS = PlatformUtils.isMacOS;
     final isWindows = PlatformUtils.isWindows;
@@ -334,12 +345,6 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
 
     // 平板判断：宽度 > 600 且不是桌面平台
     final isTablet = screenWidth > 600 && !PlatformUtils.isDesktop;
-
-    // 平板横屏判断（使用 NavigationRail）
-    final isTabletLandscape = isTablet && screenWidth > screenHeight;
-
-    // 平板竖屏判断（使用 Drawer）
-    final isTabletPortrait = isTablet && screenWidth <= screenHeight;
 
     // macOS - 使用原生 macOS UI
     late final Widget shell;
@@ -381,20 +386,10 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
           ),
         ),
       );
-    } else if (isTabletLandscape) {
-      // 平板横屏 - 使用 NavigationRail
+    } else if (isTablet) {
+      // 平板 - 使用 NavigationRail，并与手机端主导航保持一致
       shell = TabletNavigation(
-        items: destinations,
-        selectedIndex: _currentIndex,
-        onItemSelected: (int index) {
-          _navigateToMainRoute(index);
-        },
-        child: routedChild,
-      );
-    } else if (isTabletPortrait) {
-      // 平板竖屏 - 使用 Drawer
-      shell = TabletDrawerNavigation(
-        items: destinations,
+        destinations: primaryDestinations,
         selectedIndex: _currentIndex,
         onItemSelected: (int index) {
           _navigateToMainRoute(index);
@@ -407,13 +402,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
         body: SafeArea(child: routedChild),
         bottomNavigationBar: _showBottomNav
             ? BottomNavigation(
-                destinations: destinations.sublist(0, 4).map((destination) {
-                  return NavigationDestination(
-                    icon: Icon(destination.icon),
-                    selectedIcon: Icon(destination.selectedIcon),
-                    label: destination.label,
-                  );
-                }).toList(),
+                destinations: primaryDestinations,
                 selectedIndex: _currentIndex,
                 onDestinationSelected: (int index) {
                   _navigateToMainRoute(index);

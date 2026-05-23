@@ -16,6 +16,8 @@ import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
+import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ElectricityPage extends ConsumerStatefulWidget {
@@ -56,6 +58,19 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Widget build(BuildContext context) {
     final electricityState = ref.watch(electricityStoreProvider);
     final l10n = context.l10n;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
+
+    if (!isLogin) {
+      return Scaffold(
+        appBar: ClubAppBar(title: l10n.electricityManagement),
+        body: EmptyWidget(
+          title: l10n.guestMode,
+          subtitle: l10n.guestModeSubtitle,
+          icon: Icons.lock_outline,
+        ),
+      );
+    }
+
     if (electricityState.hasData &&
         !_hasLoadedSubscriptions &&
         !_isSubscriptionLoading) {
@@ -205,15 +220,17 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: electricityState.hasData
                   ? statusColor.withValues(alpha: 0.1)
                   : colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(20),
+              shape: ClubSmoothCorners.shape(BorderRadius.circular(20)),
             ),
             child: Text(
               electricityState.hasData
-                  ? (electricityState.electricity <= 10 ? l10n.electricityLowBalance : l10n.electricitySufficient)
+                  ? (electricityState.electricity <= 10
+                      ? l10n.electricityLowBalance
+                      : l10n.electricitySufficient)
                   : l10n.electricityAddTip,
               style: TextStyle(
                 fontSize: 13,
@@ -303,9 +320,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
+                      decoration: ShapeDecoration(
                         color: colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
+                        shape:
+                            ClubSmoothCorners.shape(BorderRadius.circular(12)),
                       ),
                       child: Text(
                         l10n.lastNDays(dailySummaries.length),
@@ -484,9 +502,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 heightFactor: fillRatio.clamp(0.05, 1.0).toDouble(),
                 child: Container(
                   width: 12,
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(6),
+                    shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
                   ),
                 ),
               ),
@@ -657,7 +675,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                   color: colorScheme.primary,
                 ),
                 title: Text(
-                  _hasActiveSubscription ? l10n.lowBalanceEnabled : l10n.addLowBalanceAlert,
+                  _hasActiveSubscription
+                      ? l10n.lowBalanceEnabled
+                      : l10n.addLowBalanceAlert,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(
@@ -1049,7 +1069,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   String _buildSubscriptionSummary() {
     final l10n = context.l10n;
     if (_hasActiveSubscription && _subscriptionEmail.isNotEmpty) {
-      return l10n.currentSubInfo(_subscriptionEmail, _formatThreshold(_subscriptionThreshold));
+      return l10n.currentSubInfo(
+          _subscriptionEmail, _formatThreshold(_subscriptionThreshold));
     }
     return l10n.subSetupHint;
   }
@@ -1066,7 +1087,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           children: [
             _buildSubscriptionDetailLine(
               label: l10n.remindEmailLabel,
-              value: _subscriptionEmail.isEmpty ? l10n.notSet : _subscriptionEmail,
+              value:
+                  _subscriptionEmail.isEmpty ? l10n.notSet : _subscriptionEmail,
             ),
             const SizedBox(height: 10),
             _buildSubscriptionDetailLine(

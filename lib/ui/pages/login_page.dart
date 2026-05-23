@@ -16,6 +16,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/school_selector.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
@@ -215,7 +216,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 const SizedBox(height: 40),
                 // Logo
-                ClipRRect(
+                ClubSmoothCorners.clip(
                   borderRadius: ClubRadii.tile,
                   child: LazyLoadImage.assets(
                     'assets/icon.webp',

@@ -149,6 +149,8 @@ class DioErrorHandler {
         throw AuthorizationException('权限不足');
       case 404:
         throw NotFoundException('资源未找到');
+      case 429:
+        throw NetworkException('已被限流，请稍后再试', 429);
       case 500:
         throw ServerException('服务器内部错误');
       default:

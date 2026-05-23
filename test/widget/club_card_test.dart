@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:smooth_corner/smooth_corner.dart';
 
 import 'theme_test_helpers.dart';
 
@@ -70,9 +72,11 @@ void main() {
       );
 
       final container = tester.widget<Container>(find.byType(Container));
-      final decoration = container.decoration as BoxDecoration;
+      final decoration = container.decoration as ShapeDecoration;
+      final shape = decoration.shape as SmoothRectangleBorder;
 
-      expect(decoration.borderRadius, ClubRadii.card);
+      expect(shape.borderRadius, ClubRadii.card);
+      expect(shape.smoothness, clubCompactCornerSmoothness);
     });
 
     testWidgets('should apply custom border radius',
@@ -89,9 +93,11 @@ void main() {
       );
 
       final container = tester.widget<Container>(find.byType(Container));
-      final decoration = container.decoration as BoxDecoration;
+      final decoration = container.decoration as ShapeDecoration;
+      final shape = decoration.shape as SmoothRectangleBorder;
 
-      expect(decoration.borderRadius, borderRadius);
+      expect(shape.borderRadius, borderRadius);
+      expect(shape.smoothness, clubCompactCornerSmoothness);
     });
 
     testWidgets('should use light and dark card colors',
@@ -101,8 +107,12 @@ void main() {
           of: find.byType(ClubCard),
           matching: find.byWidgetPredicate((Widget widget) {
             return widget is Container &&
-                widget.decoration is BoxDecoration &&
-                (widget.decoration as BoxDecoration).borderRadius ==
+                widget.decoration is ShapeDecoration &&
+                (widget.decoration as ShapeDecoration).shape
+                    is SmoothRectangleBorder &&
+                ((widget.decoration as ShapeDecoration).shape
+                            as SmoothRectangleBorder)
+                        .borderRadius ==
                     ClubRadii.card;
           }),
         );
@@ -116,7 +126,7 @@ void main() {
       );
 
       var container = tester.widget<Container>(decoratedContainer());
-      var decoration = container.decoration as BoxDecoration;
+      var decoration = container.decoration as ShapeDecoration;
       expect(decoration.color, ClubColors.light.cardBackground);
 
       await tester.pumpWidget(
@@ -135,8 +145,16 @@ void main() {
       );
 
       container = tester.widget<Container>(decoratedContainer());
-      decoration = container.decoration as BoxDecoration;
+      decoration = container.decoration as ShapeDecoration;
       expect(decoration.color, ClubColors.dark.cardBackground);
+    });
+
+    test('should use stronger smoothing for large corners without border', () {
+      final shape = ClubSmoothCorners.shape(
+        const BorderRadius.all(Radius.circular(20)),
+      );
+
+      expect(shape.smoothness, clubCornerSmoothness);
     });
   });
 }

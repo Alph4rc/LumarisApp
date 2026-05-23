@@ -4,6 +4,7 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -74,9 +75,9 @@ class AuthorPage extends StatelessWidget {
         Container(
           width: 100,
           height: 100,
-          decoration: BoxDecoration(
-            borderRadius: ClubRadii.tile,
-            boxShadow: [
+          decoration: ShapeDecoration(
+            shape: ClubSmoothCorners.shape(ClubRadii.tile),
+            shadows: [
               BoxShadow(
                 color: colors.shadowColor,
                 blurRadius: 20,
@@ -85,7 +86,7 @@ class AuthorPage extends StatelessWidget {
               ),
             ],
           ),
-          child: ClipRRect(
+          child: ClubSmoothCorners.clip(
             borderRadius: ClubRadii.tile,
             child: Image.asset(
               'assets/icon.webp',
@@ -139,8 +140,11 @@ class AuthorPage extends StatelessWidget {
     final members = [
       {'name': 'LuckyFish', 'role': 'Lead Developer'},
       {'name': 'zealous', 'role': 'Developer'},
-      {'name': '乔博睿', 'role': 'Developer'},
+      {'name': 'borry', 'role': 'Developer'},
       {'name': 'YoChine_Lanee', 'role': 'Developer'},
+      {'name': 'To-fly-high', 'role': 'Developer'},
+      {'name': 'Alpharc', 'role': 'Developer'},
+      {'name': '白熊', 'role': 'Developer'}
     ];
 
     return ClubCard(
@@ -164,9 +168,9 @@ class AuthorPage extends StatelessWidget {
                 leading: Container(
                   width: 36,
                   height: 36,
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: colors.primary.withValues(alpha: 0.1),
-                    borderRadius: ClubRadii.control,
+                    shape: ClubSmoothCorners.shape(ClubRadii.control),
                   ),
                   child: Icon(
                     CupertinoIcons.person_fill,

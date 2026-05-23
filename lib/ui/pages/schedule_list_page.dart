@@ -14,6 +14,8 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/state/user_store.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -23,6 +25,7 @@ import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -184,6 +187,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
       return InkWell(
         onTap: () => _jumpToPage(scheduleState.currentWeek),
         borderRadius: ClubRadii.control,
+        customBorder: ClubSmoothCorners.shape(ClubRadii.control),
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
@@ -248,6 +252,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Widget _buildActionButtons(BuildContext context, bool isDark) {
     final l10n = context.l10n;
+    final isLogin = ref.watch(userStoreProvider).isLogin;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -261,6 +266,13 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           },
           tooltip: l10n.switchStyle,
         ),
+        // 游客模式：HTML 导入
+        if (!isLogin)
+          IconButton(
+            icon: const Icon(Icons.file_upload_outlined),
+            onPressed: _handleHtmlImport,
+            tooltip: l10n.htmlImport,
+          ),
         // 刷新
         IconButton(
           icon: const Icon(Icons.refresh),
@@ -281,8 +293,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        borderRadius: ClubRadii.navigation,
+      decoration: ShapeDecoration(
+        shape: ClubSmoothCorners.shape(ClubRadii.navigation),
       ),
       child: CupertinoSlidingSegmentedControl<CourseCardStyle>(
         groupValue: _cardStyle,
@@ -407,6 +419,13 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     );
   }
 
+  Future<void> _handleHtmlImport() async {
+    final result = await AppRouter.push<bool>(AppRoutes.htmlImport);
+    if (result == true) {
+      ref.read(scheduleStoreProvider.notifier).loadGuestCourseData();
+    }
+  }
+
   Future<void> _handleRefresh() async {
     final l10n = context.l10n;
     showClubSnackBar(context, Text(l10n.updatingSchedule));
@@ -464,10 +483,10 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                 leading: Container(
                   width: 8,
                   height: 40,
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color:
                         CourseColorManager.generateSoftColor(course.courseName),
-                    borderRadius: ClubRadii.xsBorder,
+                    shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
                   ),
                 ),
                 title: Text(
@@ -509,7 +528,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           ),
           ClubListTile(
             leading: Icon(Icons.delete, color: colors.danger),
-            title: Text(l10n.deleteCourse, style: TextStyle(color: colors.danger)),
+            title:
+                Text(l10n.deleteCourse, style: TextStyle(color: colors.danger)),
             onTap: () {
               Navigator.pop(context);
               _deleteCustomCourse(course);
@@ -521,9 +541,11 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   void _editCustomCourse(CourseModel course) {
-    showDialog(
-      context: context,
-      builder: (context) => AddEditCourseDialog(
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showClubModalBottomSheet(
+      context,
+      AddEditCourseDialog(
         course: course,
         onSave: (updatedCourse) async {
           await _saveUpdatedCustomCourse(updatedCourse);
@@ -532,6 +554,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           }
         },
       ),
+      maxHeight: screenHeight * 0.7,
     );
   }
 
@@ -556,7 +579,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
     if (confirm == true) {
       final prefs = PrefsService.instance;
-      final jsonString = prefs.getString('custom_courses');
+      final jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
 
       if (jsonString != null) {
         try {
@@ -568,8 +591,9 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
           final updatedJsonString =
               jsonEncode(customCourses.map((c) => c.toJson()).toList());
-          await prefs.setString('custom_courses', updatedJsonString);
-          await ref.read(scheduleStoreProvider.notifier).refreshCourses();
+          await prefs.setString(
+              PrefsKeys.CUSTOM_COURSE_DATA, updatedJsonString);
+          await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
 
           if (mounted) {
             showClubSnackBar(context, Text(l10n.courseDeleted));
@@ -585,7 +609,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Future<void> _saveUpdatedCustomCourse(CourseModel updatedCourse) async {
     final prefs = PrefsService.instance;
-    final jsonString = prefs.getString('custom_courses');
+    final jsonString = prefs.getString(PrefsKeys.CUSTOM_COURSE_DATA);
 
     if (jsonString != null) {
       try {
@@ -603,8 +627,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
         final updatedJsonString =
             jsonEncode(customCourses.map((c) => c.toJson()).toList());
-        await prefs.setString('custom_courses', updatedJsonString);
-        await ref.read(scheduleStoreProvider.notifier).refreshCourses();
+        await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, updatedJsonString);
+        await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
       } catch (e) {
         // 处理错误
       }

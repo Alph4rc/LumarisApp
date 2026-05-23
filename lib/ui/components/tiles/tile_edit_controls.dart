@@ -7,6 +7,7 @@ import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
+import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Maps tile identifiers to their localized display names.
@@ -117,14 +118,16 @@ class EditModeIndicator extends ConsumerWidget {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        border: isEditMode
-            ? Border.all(
-                color: colors.primary.withValues(alpha: 0.3),
-                width: 2,
-              )
-            : null,
-        borderRadius: ClubRadii.control,
+      decoration: ShapeDecoration(
+        shape: ClubSmoothCorners.shape(
+          ClubRadii.control,
+          side: isEditMode
+              ? BorderSide(
+                  color: colors.primary.withValues(alpha: 0.3),
+                  width: 2,
+                )
+              : BorderSide.none,
+        ),
       ),
       child: child,
     );
@@ -141,7 +144,9 @@ class EmptyTilesMessage extends StatelessWidget {
     return ClubCard(
       margin: const EdgeInsets.all(16),
       child: EmptyWidget(
-          title: l10n.noShortcuts, icon: Icons.widgets_outlined, subtitle: l10n.addInEditMode),
+          title: l10n.noShortcuts,
+          icon: Icons.widgets_outlined,
+          subtitle: l10n.addInEditMode),
     );
   }
 }
@@ -185,7 +190,8 @@ class AvailableTilesList extends ConsumerWidget {
                 final tileId = tile.id;
                 return ClubListTile(
                   leading: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                     decoration: BoxDecoration(
                       color: colors.success,
                       shape: BoxShape.circle,

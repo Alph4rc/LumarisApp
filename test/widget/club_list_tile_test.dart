@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:smooth_corner/smooth_corner.dart';
 
 import 'theme_test_helpers.dart';
 
@@ -80,8 +81,17 @@ void main() {
       );
 
       final inkWell = tester.widget<InkWell>(find.byType(InkWell));
+      final material = tester.widget<Material>(
+        find
+            .ancestor(
+              of: find.byType(InkWell),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
 
       expect(inkWell.borderRadius, ClubRadii.card);
+      expect(material.shape, isA<SmoothRectangleBorder>());
     });
 
     testWidgets('should apply custom round radius',
@@ -96,8 +106,20 @@ void main() {
       );
 
       final inkWell = tester.widget<InkWell>(find.byType(InkWell));
+      final material = tester.widget<Material>(
+        find
+            .ancestor(
+              of: find.byType(InkWell),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
 
       expect(inkWell.borderRadius, ClubRadii.navigation);
+      expect(
+        (material.shape as SmoothRectangleBorder).borderRadius,
+        ClubRadii.navigation,
+      );
     });
 
     testWidgets('should show chevron when requested',
@@ -129,9 +151,9 @@ void main() {
       );
 
       final containerFinder = find.byWidgetPredicate((Widget widget) {
-        return widget is Container &&
-            widget.decoration is BoxDecoration &&
-            (widget.decoration as BoxDecoration).color == selectedColor;
+        return widget is Ink &&
+            widget.decoration is ShapeDecoration &&
+            (widget.decoration as ShapeDecoration).color == selectedColor;
       });
 
       expect(containerFinder, findsOneWidget);
@@ -151,7 +173,7 @@ void main() {
       );
 
       final containerFinder = find.byWidgetPredicate((Widget widget) {
-        return widget is Container && widget.padding == padding;
+        return widget is Padding && widget.padding == padding;
       });
 
       expect(containerFinder, findsOneWidget);
