@@ -696,6 +696,11 @@
   "importCourses": "Kurse importieren",
   "parseResult": "Parse-Ergebnis",
   "noCoursesParsed": "Keine Kurse analysiert",
+  "searchSchool": "Schule suchen...",
+  "basicSupport": "Basis",
+  "advancedSupport": "Erweitert",
+  "schoolNotSupported": "Diese Funktion wird von der aktuellen Hochschule nicht unterstützt",
+  "switchSchool": "Hochschule wechseln",
   "selectSchool": "Schule auswählen",
   "enterCustomUrl": "Oder eigene URL eingeben",
   "urlHint": "Website-URL eingeben"

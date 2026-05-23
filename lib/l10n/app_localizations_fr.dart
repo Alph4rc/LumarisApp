@@ -1129,22 +1129,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connexion réussie, mais le stockage sécurisé est indisponible.';
 
   @override
-  String get selectSchool => '选择学校';
+  String get selectSchool => 'Sélectionner l\'école';
 
   @override
-  String get searchSchool => '搜索学校…';
+  String get searchSchool => 'Rechercher un établissement...';
 
   @override
-  String get basicSupport => '基础';
+  String get basicSupport => 'Basique';
 
   @override
-  String get advancedSupport => '高级';
+  String get advancedSupport => 'Avancé';
 
   @override
-  String get schoolNotSupported => '当前学校不支持此功能';
+  String get schoolNotSupported =>
+      'Cette fonctionnalité n\'est pas prise en charge par l\'établissement actuel';
 
   @override
-  String get switchSchool => '切换学校';
+  String get switchSchool => 'Changer d\'établissement';
 
   @override
   String get loadingDefaultTitle => 'Synchronisation';
@@ -2097,9 +2098,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noCoursesParsed => 'Aucun cours analysé';
-
-  @override
-  String get selectSchool => 'Sélectionner l\'école';
 
   @override
   String get enterCustomUrl => 'Ou entrer une URL personnalisée';

@@ -696,6 +696,11 @@
   "importCourses": "Importer les cours",
   "parseResult": "Résultat de l'analyse",
   "noCoursesParsed": "Aucun cours analysé",
+  "searchSchool": "Rechercher un établissement...",
+  "basicSupport": "Basique",
+  "advancedSupport": "Avancé",
+  "schoolNotSupported": "Cette fonctionnalité n'est pas prise en charge par l'établissement actuel",
+  "switchSchool": "Changer d'établissement",
   "selectSchool": "Sélectionner l'école",
   "enterCustomUrl": "Ou entrer une URL personnalisée",
   "urlHint": "Entrer l'URL du site web"

@@ -695,6 +695,11 @@
   "importCourses": "Импорт курсов",
   "parseResult": "Результат разбора",
   "noCoursesParsed": "Курсы не найдены",
+  "searchSchool": "Поиск учебного заведения...",
+  "basicSupport": "Базовая",
+  "advancedSupport": "Расширенная",
+  "schoolNotSupported": "Эта функция не поддерживается текущим учебным заведением",
+  "switchSchool": "Сменить учебное заведение",
   "selectSchool": "Выбрать школу",
   "enterCustomUrl": "Или введите свой URL",
   "urlHint": "Введите URL веб-сайта"

@@ -2126,37 +2126,43 @@ abstract class AppLocalizations {
   /// **'登录成功，但安全存储不可用，下次启动后可能需要重新输入账号密码'**
   String get loginSecurityStorageUnavailable;
 
-  /// No description provided for @searchSchool.
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'选择学校'**
+  String get selectSchool;
+
+  ///
   ///
   /// In zh, this message translates to:
   /// **'搜索学校…'**
   String get searchSchool;
 
-  /// No description provided for @basicSupport.
+  ///
   ///
   /// In zh, this message translates to:
   /// **'基础'**
   String get basicSupport;
 
-  /// No description provided for @advancedSupport.
+  ///
   ///
   /// In zh, this message translates to:
   /// **'高级'**
   String get advancedSupport;
 
-  /// No description provided for @schoolNotSupported.
+  ///
   ///
   /// In zh, this message translates to:
   /// **'当前学校不支持此功能'**
   String get schoolNotSupported;
 
-  /// No description provided for @switchSchool.
+  ///
   ///
   /// In zh, this message translates to:
   /// **'切换学校'**
   String get switchSchool;
 
-  /// No description provided for @loadingDefaultTitle.
+  ///
   ///
   /// In zh, this message translates to:
   /// **'正在同步数据'**
@@ -3907,12 +3913,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'未解析到课程'**
   String get noCoursesParsed;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'选择学校'**
-  String get selectSchool;
 
   ///
   ///

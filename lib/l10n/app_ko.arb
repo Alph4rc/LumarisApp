@@ -696,6 +696,11 @@
   "importCourses": "강의 가져오기",
   "parseResult": "분석 결과",
   "noCoursesParsed": "분석된 강의 없음",
+  "searchSchool": "학교 검색...",
+  "basicSupport": "기본",
+  "advancedSupport": "고급",
+  "schoolNotSupported": "현재 학교에서는 이 기능을 지원하지 않아요",
+  "switchSchool": "학교 변경",
   "selectSchool": "학교 선택",
   "enterCustomUrl": "또는 사용자 정의 URL 입력",
   "urlHint": "웹사이트 URL 입력"

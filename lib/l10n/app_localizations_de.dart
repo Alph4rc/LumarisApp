@@ -1131,6 +1131,25 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anmeldung erfolgreich, aber sicherer Speicher nicht verfügbar.';
 
   @override
+  String get selectSchool => 'Schule auswählen';
+
+  @override
+  String get searchSchool => 'Schule suchen...';
+
+  @override
+  String get basicSupport => 'Basis';
+
+  @override
+  String get advancedSupport => 'Erweitert';
+
+  @override
+  String get schoolNotSupported =>
+      'Diese Funktion wird von der aktuellen Hochschule nicht unterstützt';
+
+  @override
+  String get switchSchool => 'Hochschule wechseln';
+
+  @override
   String get loadingDefaultTitle => 'Synchronisierung';
 
   @override
@@ -2089,9 +2108,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noCoursesParsed => 'Keine Kurse analysiert';
-
-  @override
-  String get selectSchool => 'Schule auswählen';
 
   @override
   String get enterCustomUrl => 'Oder eigene URL eingeben';

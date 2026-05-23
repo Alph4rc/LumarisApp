@@ -2009,9 +2009,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noCoursesParsed => '未解析到课程';
 
   @override
-  String get selectSchool => '选择学校';
-
-  @override
   String get enterCustomUrl => '或输入自定义网址';
 
   @override
@@ -3117,7 +3114,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get basicSupport => '基礎';
 
   @override
-  String get advancedSupport => '進階';
+  String get advancedSupport => '高級';
 
   @override
   String get schoolNotSupported => '目前學校不支援此功能';
@@ -4021,9 +4018,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get noCoursesParsed => '未解析到課程';
-
-  @override
-  String get selectSchool => '選擇學校';
 
   @override
   String get enterCustomUrl => '或輸入自訂網址';

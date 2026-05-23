@@ -700,6 +700,11 @@
   "importCourses": "授業をインポート",
   "parseResult": "解析結果",
   "noCoursesParsed": "授業が解析されませんでした",
+  "searchSchool": "学校を検索...",
+  "basicSupport": "基本",
+  "advancedSupport": "高度",
+  "schoolNotSupported": "現在の学校ではこの機能はサポートされていません",
+  "switchSchool": "学校を切り替える",
   "selectSchool": "学校を選択",
   "enterCustomUrl": "またはカスタムURLを入力",
   "urlHint": "ウェブサイトのURLを入力"

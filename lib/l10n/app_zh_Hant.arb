@@ -61,7 +61,6 @@
   "confirmLogoutContent": "退出後需要重新登入才能存取教務系統資料",
   "logout": "退出登入",
 
-  "showCourseGrid": "顯示課表格線",
   "agreementAuthDebug": "授權條款授權狀態 [Debug]",
   "agreementAuthDebugSubtitle": "關閉後下次啟動將重新顯示授權頁面",
 
@@ -388,7 +387,6 @@
   "retry": "重試",
   "loadFailed": "載入失敗",
   "noData": "暫無資料",
-  "confirm": "確認",
   "ok": "確定",
 
   "classroom": "上課地點",
@@ -698,6 +696,11 @@
   "importCourses": "匯入課程",
   "parseResult": "解析結果",
   "noCoursesParsed": "未解析到課程",
+  "searchSchool": "搜尋學校…",
+  "basicSupport": "基礎",
+  "advancedSupport": "高級",
+  "schoolNotSupported": "目前學校不支援此功能",
+  "switchSchool": "切換學校",
   "selectSchool": "選擇學校",
   "enterCustomUrl": "或輸入自訂網址",
   "urlHint": "請輸入網址",

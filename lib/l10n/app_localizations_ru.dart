@@ -1120,22 +1120,23 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вход выполнен, но защищённое хранилище недоступно. Может потребоваться повторный ввод данных.';
 
   @override
-  String get selectSchool => '选择学校';
+  String get selectSchool => 'Выбрать школу';
 
   @override
-  String get searchSchool => '搜索学校…';
+  String get searchSchool => 'Поиск учебного заведения...';
 
   @override
-  String get basicSupport => '基础';
+  String get basicSupport => 'Базовая';
 
   @override
-  String get advancedSupport => '高级';
+  String get advancedSupport => 'Расширенная';
 
   @override
-  String get schoolNotSupported => '当前学校不支持此功能';
+  String get schoolNotSupported =>
+      'Эта функция не поддерживается текущим учебным заведением';
 
   @override
-  String get switchSchool => '切换学校';
+  String get switchSchool => 'Сменить учебное заведение';
 
   @override
   String get loadingDefaultTitle => 'Синхронизация';
@@ -2080,9 +2081,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noCoursesParsed => 'Курсы не найдены';
-
-  @override
-  String get selectSchool => 'Выбрать школу';
 
   @override
   String get enterCustomUrl => 'Или введите свой URL';
