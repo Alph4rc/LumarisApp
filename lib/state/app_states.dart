@@ -142,11 +142,12 @@ class ProgramState with _$ProgramState {
 class BusPageState with _$BusPageState {
   const factory BusPageState({
     @Default('') String selectedDate,
+    @Default('') String selectedCampus,
+    @Default(<String>[]) List<String> campusOptions,
     @Default(<BusItem>[]) List<BusItem> busData,
     @Default(<BusItem>[]) List<BusItem> todayBusData,
     @Default(false) bool isLoading,
     @Default('') String errorMessage,
-    @Default(true) bool isCaoTang,
     @Default(false) bool isShowBus,
     @Default(<String>[]) List<String> tiles,
   }) = _BusPageState;

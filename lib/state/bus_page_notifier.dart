@@ -92,11 +92,19 @@ class BusPageNotifier extends Notifier<BusPageState> {
       }
 
       final todayBusData = data.records;
-      final busData = state.isCaoTang
-          ? todayBusData.where((bus) => bus.lineName.startsWith('草堂')).toList()
-          : todayBusData.where((bus) => bus.lineName.startsWith('雁塔')).toList();
+      final campusOptions = _extractCampusOptions(todayBusData);
+      final selectedCampus = campusOptions.contains(state.selectedCampus) &&
+              state.selectedCampus.isNotEmpty
+          ? state.selectedCampus
+          : (campusOptions.isNotEmpty ? campusOptions.first : '');
+      final busData = _filterBusData(todayBusData, selectedCampus);
 
-      state = state.copyWith(todayBusData: todayBusData, busData: busData);
+      state = state.copyWith(
+        todayBusData: todayBusData,
+        campusOptions: campusOptions,
+        selectedCampus: selectedCampus,
+        busData: busData,
+      );
     } catch (e) {
       if (state.selectedDate != currentSelectedDate) {
         return;
@@ -113,16 +121,15 @@ class BusPageNotifier extends Notifier<BusPageState> {
     }
   }
 
-  void toggleCampus() {
-    final isCaoTang = !state.isCaoTang;
-    final busData = isCaoTang
-        ? state.todayBusData
-            .where((bus) => bus.lineName.startsWith('草堂'))
-            .toList()
-        : state.todayBusData
-            .where((bus) => bus.lineName.startsWith('雁塔'))
-            .toList();
-    state = state.copyWith(isCaoTang: isCaoTang, busData: busData);
+  void selectCampus(String campus) {
+    if (campus.isEmpty || campus == state.selectedCampus) {
+      return;
+    }
+
+    state = state.copyWith(
+      selectedCampus: campus,
+      busData: _filterBusData(state.todayBusData, campus),
+    );
   }
 
   Future<void> refreshData() async {
@@ -137,5 +144,26 @@ class BusPageNotifier extends Notifier<BusPageState> {
     }
     await ref.read(tileEditControllerProvider.notifier).reload();
     await _loadTiles();
+  }
+
+  List<String> _extractCampusOptions(List<BusItem> busItems) {
+    final campusCounts = <String, int>{};
+    for (final bus in busItems) {
+      final campus = bus.departureStation.trim();
+      if (campus.isEmpty) {
+        continue;
+      }
+      campusCounts.update(campus, (count) => count + 1, ifAbsent: () => 1);
+    }
+    return campusCounts.keys.toList();
+  }
+
+  List<BusItem> _filterBusData(List<BusItem> busItems, String selectedCampus) {
+    if (selectedCampus.isEmpty) {
+      return <BusItem>[];
+    }
+    return busItems
+        .where((bus) => bus.departureStation.trim() == selectedCampus)
+        .toList();
   }
 }

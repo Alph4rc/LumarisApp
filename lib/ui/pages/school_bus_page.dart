@@ -84,36 +84,46 @@ class SchoolBusPage extends ConsumerWidget {
     BusPageNotifier busController,
     ClubColors colors,
   ) {
-    return CupertinoSlidingSegmentedControl<bool>(
-      groupValue: busState.isCaoTang,
+    final campusOptions = busState.campusOptions;
+    if (campusOptions.isEmpty) {
+      return Text(context.l10n.schoolBus);
+    }
+
+    if (campusOptions.length == 1) {
+      return Text(
+        _displayCampusName(campusOptions.first),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      );
+    }
+
+    return CupertinoSlidingSegmentedControl<String>(
+      groupValue: busState.selectedCampus,
       children: {
-        true: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            context.l10n.campusCaoTang,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: busState.isCaoTang ? FontWeight.w600 : null,
+        for (final campus in campusOptions)
+          campus: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              _displayCampusName(campus),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight:
+                    busState.selectedCampus == campus ? FontWeight.w600 : null,
+              ),
             ),
           ),
-        ),
-        false: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            context.l10n.campusYanTa,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: !busState.isCaoTang ? FontWeight.w600 : null,
-            ),
-          ),
-        ),
       },
       onValueChanged: (val) {
-        if (val != null && val != busState.isCaoTang) {
-          busController.toggleCampus();
+        if (val != null) {
+          busController.selectCampus(val);
         }
       },
     );
+  }
+
+  String _displayCampusName(String campus) {
+    return campus.endsWith('校区')
+        ? campus.substring(0, campus.length - 2)
+        : campus;
   }
 
   Widget _buildDateSelector(
@@ -463,7 +473,8 @@ class BusTimelineTile extends StatelessWidget {
                       shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
                     ),
                     child: Text(
-                      _arrivalStationTimeInL10n(bus.arrivalStationTime, context),
+                      _arrivalStationTimeInL10n(
+                          bus.arrivalStationTime, context),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

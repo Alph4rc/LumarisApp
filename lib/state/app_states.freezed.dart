@@ -2330,11 +2330,12 @@ abstract class _ProgramState implements ProgramState {
 /// @nodoc
 mixin _$BusPageState {
   String get selectedDate => throw _privateConstructorUsedError;
+  String get selectedCampus => throw _privateConstructorUsedError;
+  List<String> get campusOptions => throw _privateConstructorUsedError;
   List<BusItem> get busData => throw _privateConstructorUsedError;
   List<BusItem> get todayBusData => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   String get errorMessage => throw _privateConstructorUsedError;
-  bool get isCaoTang => throw _privateConstructorUsedError;
   bool get isShowBus => throw _privateConstructorUsedError;
   List<String> get tiles => throw _privateConstructorUsedError;
 
@@ -2351,11 +2352,12 @@ abstract class $BusPageStateCopyWith<$Res> {
   @useResult
   $Res call(
       {String selectedDate,
+      String selectedCampus,
+      List<String> campusOptions,
       List<BusItem> busData,
       List<BusItem> todayBusData,
       bool isLoading,
       String errorMessage,
-      bool isCaoTang,
       bool isShowBus,
       List<String> tiles});
 }
@@ -2374,11 +2376,12 @@ class _$BusPageStateCopyWithImpl<$Res, $Val extends BusPageState>
   @override
   $Res call({
     Object? selectedDate = null,
+    Object? selectedCampus = null,
+    Object? campusOptions = null,
     Object? busData = null,
     Object? todayBusData = null,
     Object? isLoading = null,
     Object? errorMessage = null,
-    Object? isCaoTang = null,
     Object? isShowBus = null,
     Object? tiles = null,
   }) {
@@ -2387,6 +2390,14 @@ class _$BusPageStateCopyWithImpl<$Res, $Val extends BusPageState>
           ? _value.selectedDate
           : selectedDate // ignore: cast_nullable_to_non_nullable
               as String,
+      selectedCampus: null == selectedCampus
+          ? _value.selectedCampus
+          : selectedCampus // ignore: cast_nullable_to_non_nullable
+              as String,
+      campusOptions: null == campusOptions
+          ? _value.campusOptions
+          : campusOptions // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       busData: null == busData
           ? _value.busData
           : busData // ignore: cast_nullable_to_non_nullable
@@ -2403,10 +2414,6 @@ class _$BusPageStateCopyWithImpl<$Res, $Val extends BusPageState>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String,
-      isCaoTang: null == isCaoTang
-          ? _value.isCaoTang
-          : isCaoTang // ignore: cast_nullable_to_non_nullable
-              as bool,
       isShowBus: null == isShowBus
           ? _value.isShowBus
           : isShowBus // ignore: cast_nullable_to_non_nullable
@@ -2429,11 +2436,12 @@ abstract class _$$BusPageStateImplCopyWith<$Res>
   @useResult
   $Res call(
       {String selectedDate,
+      String selectedCampus,
+      List<String> campusOptions,
       List<BusItem> busData,
       List<BusItem> todayBusData,
       bool isLoading,
       String errorMessage,
-      bool isCaoTang,
       bool isShowBus,
       List<String> tiles});
 }
@@ -2450,11 +2458,12 @@ class __$$BusPageStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? selectedDate = null,
+    Object? selectedCampus = null,
+    Object? campusOptions = null,
     Object? busData = null,
     Object? todayBusData = null,
     Object? isLoading = null,
     Object? errorMessage = null,
-    Object? isCaoTang = null,
     Object? isShowBus = null,
     Object? tiles = null,
   }) {
@@ -2463,6 +2472,14 @@ class __$$BusPageStateImplCopyWithImpl<$Res>
           ? _value.selectedDate
           : selectedDate // ignore: cast_nullable_to_non_nullable
               as String,
+      selectedCampus: null == selectedCampus
+          ? _value.selectedCampus
+          : selectedCampus // ignore: cast_nullable_to_non_nullable
+              as String,
+      campusOptions: null == campusOptions
+          ? _value._campusOptions
+          : campusOptions // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       busData: null == busData
           ? _value._busData
           : busData // ignore: cast_nullable_to_non_nullable
@@ -2479,10 +2496,6 @@ class __$$BusPageStateImplCopyWithImpl<$Res>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String,
-      isCaoTang: null == isCaoTang
-          ? _value.isCaoTang
-          : isCaoTang // ignore: cast_nullable_to_non_nullable
-              as bool,
       isShowBus: null == isShowBus
           ? _value.isShowBus
           : isShowBus // ignore: cast_nullable_to_non_nullable
@@ -2500,20 +2513,34 @@ class __$$BusPageStateImplCopyWithImpl<$Res>
 class _$BusPageStateImpl implements _BusPageState {
   const _$BusPageStateImpl(
       {this.selectedDate = '',
+      this.selectedCampus = '',
+      final List<String> campusOptions = const <String>[],
       final List<BusItem> busData = const <BusItem>[],
       final List<BusItem> todayBusData = const <BusItem>[],
       this.isLoading = false,
       this.errorMessage = '',
-      this.isCaoTang = true,
       this.isShowBus = false,
       final List<String> tiles = const <String>[]})
-      : _busData = busData,
+      : _campusOptions = campusOptions,
+        _busData = busData,
         _todayBusData = todayBusData,
         _tiles = tiles;
 
   @override
   @JsonKey()
   final String selectedDate;
+  @override
+  @JsonKey()
+  final String selectedCampus;
+  final List<String> _campusOptions;
+  @override
+  @JsonKey()
+  List<String> get campusOptions {
+    if (_campusOptions is EqualUnmodifiableListView) return _campusOptions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_campusOptions);
+  }
+
   final List<BusItem> _busData;
   @override
   @JsonKey()
@@ -2540,9 +2567,6 @@ class _$BusPageStateImpl implements _BusPageState {
   final String errorMessage;
   @override
   @JsonKey()
-  final bool isCaoTang;
-  @override
-  @JsonKey()
   final bool isShowBus;
   final List<String> _tiles;
   @override
@@ -2555,7 +2579,7 @@ class _$BusPageStateImpl implements _BusPageState {
 
   @override
   String toString() {
-    return 'BusPageState(selectedDate: $selectedDate, busData: $busData, todayBusData: $todayBusData, isLoading: $isLoading, errorMessage: $errorMessage, isCaoTang: $isCaoTang, isShowBus: $isShowBus, tiles: $tiles)';
+    return 'BusPageState(selectedDate: $selectedDate, selectedCampus: $selectedCampus, campusOptions: $campusOptions, busData: $busData, todayBusData: $todayBusData, isLoading: $isLoading, errorMessage: $errorMessage, isShowBus: $isShowBus, tiles: $tiles)';
   }
 
   @override
@@ -2565,6 +2589,10 @@ class _$BusPageStateImpl implements _BusPageState {
             other is _$BusPageStateImpl &&
             (identical(other.selectedDate, selectedDate) ||
                 other.selectedDate == selectedDate) &&
+            (identical(other.selectedCampus, selectedCampus) ||
+                other.selectedCampus == selectedCampus) &&
+            const DeepCollectionEquality()
+                .equals(other._campusOptions, _campusOptions) &&
             const DeepCollectionEquality().equals(other._busData, _busData) &&
             const DeepCollectionEquality()
                 .equals(other._todayBusData, _todayBusData) &&
@@ -2572,8 +2600,6 @@ class _$BusPageStateImpl implements _BusPageState {
                 other.isLoading == isLoading) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
-            (identical(other.isCaoTang, isCaoTang) ||
-                other.isCaoTang == isCaoTang) &&
             (identical(other.isShowBus, isShowBus) ||
                 other.isShowBus == isShowBus) &&
             const DeepCollectionEquality().equals(other._tiles, _tiles));
@@ -2583,11 +2609,12 @@ class _$BusPageStateImpl implements _BusPageState {
   int get hashCode => Object.hash(
       runtimeType,
       selectedDate,
+      selectedCampus,
+      const DeepCollectionEquality().hash(_campusOptions),
       const DeepCollectionEquality().hash(_busData),
       const DeepCollectionEquality().hash(_todayBusData),
       isLoading,
       errorMessage,
-      isCaoTang,
       isShowBus,
       const DeepCollectionEquality().hash(_tiles));
 
@@ -2601,16 +2628,21 @@ class _$BusPageStateImpl implements _BusPageState {
 abstract class _BusPageState implements BusPageState {
   const factory _BusPageState(
       {final String selectedDate,
+      final String selectedCampus,
+      final List<String> campusOptions,
       final List<BusItem> busData,
       final List<BusItem> todayBusData,
       final bool isLoading,
       final String errorMessage,
-      final bool isCaoTang,
       final bool isShowBus,
       final List<String> tiles}) = _$BusPageStateImpl;
 
   @override
   String get selectedDate;
+  @override
+  String get selectedCampus;
+  @override
+  List<String> get campusOptions;
   @override
   List<BusItem> get busData;
   @override
@@ -2619,8 +2651,6 @@ abstract class _BusPageState implements BusPageState {
   bool get isLoading;
   @override
   String get errorMessage;
-  @override
-  bool get isCaoTang;
   @override
   bool get isShowBus;
   @override
