@@ -272,7 +272,39 @@ class _ScorePageState extends ConsumerState<ScorePage>
         children: [
           _buildAppBar(),
           _buildStatsCard(),
-          _buildSelector(),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                      color: colors.cardBackground,
+                      borderRadius: BorderRadius.circular(25.0), 
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              colors.shadowColor.withValues(alpha: 0.1), 
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: _changeScoreList,
+                      icon: Icon(_isYear
+                          ? Icons.calendar_today_rounded
+                          : Icons.calendar_view_day_rounded),
+                    )),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: _buildSelector(),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: _buildScoreList(),
           )
@@ -296,12 +328,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
             ),
             Row(
               children: [
-                IconButton(
-                  onPressed: _changeScoreList,
-                  icon: Icon(_isYear
-                      ? Icons.calendar_today_rounded
-                      : Icons.calendar_view_day_rounded),
-                ),
                 if (!_isFool)
                   IconButton(
                     onPressed: _handleFoolishMode,
@@ -485,7 +511,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
       child: CupertinoSlidingSegmentedControl<int>(
         proportionalWidth: true,
         groupValue: _currentIndex,
@@ -502,44 +527,41 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildDropdownSelector() {
     final colors = context.clubColors;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: ClubMenu<int>(
-        items: List.generate(_selectorList.length, (index) {
-          return ClubMenuItem<int>(
-            value: index,
-            label: _selectorList[index],
-          );
-        }),
-        onSelected: _handleSelectorChanged,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: ShapeDecoration(
-            color: colors.cardBackground,
-            shape: ClubSmoothCorners.shape(
-              ClubRadii.navigation,
-            ),
+    return ClubMenu<int>(
+      items: List.generate(_selectorList.length, (index) {
+        return ClubMenuItem<int>(
+          value: index,
+          label: _selectorList[index],
+        );
+      }),
+      onSelected: _handleSelectorChanged,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: ShapeDecoration(
+          color: colors.cardBackground,
+          shape: ClubSmoothCorners.shape(
+            ClubRadii.navigation,
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  _selectorList[_currentIndex],
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _selectorList[_currentIndex],
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              Icon(
-                CupertinoIcons.chevron_down,
-                size: 16,
-                color: colors.secondaryLabel,
-              ),
-            ],
-          ),
+            ),
+            Icon(
+              CupertinoIcons.chevron_down,
+              size: 16,
+              color: colors.secondaryLabel,
+            ),
+          ],
         ),
       ),
     );
@@ -601,6 +623,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
   Widget _buildYearCard(ScoreList score, int index) {
     return ClubCard(
         margin: const EdgeInsets.all(16),
+        borderRadius: ClubRadii.navigation,
         child: Column(children: [
           _buildStatsPadding(scoreList: score),
           ListView.builder(
@@ -639,6 +662,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
     return AnimatedCard(
       child: ClubCard(
         margin: const EdgeInsets.all(16),
+        borderRadius: ClubRadii.navigation,
         child: ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
