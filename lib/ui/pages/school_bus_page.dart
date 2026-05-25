@@ -11,7 +11,9 @@ import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
+import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
@@ -96,6 +98,10 @@ class SchoolBusPage extends ConsumerWidget {
       );
     }
 
+    if (campusOptions.length >= 3) {
+      return _buildDropdownSelector(context, busState, busController, campusOptions);
+    }
+
     return CupertinoSlidingSegmentedControl<String>(
       groupValue: busState.selectedCampus,
       children: {
@@ -117,6 +123,58 @@ class SchoolBusPage extends ConsumerWidget {
           busController.selectCampus(val);
         }
       },
+    );
+  }
+
+  Widget _buildDropdownSelector(
+    BuildContext context,
+    BusPageState busState,
+    BusPageNotifier busController,
+    List<String> campusOptions) {
+    final colors = context.clubColors;
+    final selectedCampus = busState.selectedCampus;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: ClubMenu<String>(
+        items: List.generate(campusOptions.length, (index) {
+          return ClubMenuItem<String>(
+            value: campusOptions[index],
+            label: _displayCampusName(campusOptions[index]),
+          );
+        }),
+        onSelected: (val) {
+        busController.selectCampus(val);
+      },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: ShapeDecoration(
+            color: colors.cardBackground,
+            shape: ClubSmoothCorners.shape(
+              ClubRadii.navigation,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _displayCampusName(selectedCampus),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                CupertinoIcons.chevron_down,
+                size: 16,
+                color: colors.secondaryLabel,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

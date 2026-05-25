@@ -28,12 +28,14 @@ class ClubMenu<T> extends StatelessWidget {
     required this.items,
     required this.onSelected,
     this.icon = CupertinoIcons.ellipsis_circle,
+    this.child,
     this.tooltip,
   });
 
   final List<ClubMenuItem<T>> items;
   final ValueChanged<T> onSelected;
   final IconData icon;
+  final Widget? child;
   final String? tooltip;
 
   @override
@@ -79,11 +81,12 @@ class ClubMenu<T> extends StatelessWidget {
         }).toList(growable: false);
       },
       onSelected: onSelected,
-      child: Icon(
-        icon,
-        size: 19,
-        color: colors.secondaryLabel,
-      ),
+      child: child ??
+          Icon(
+            icon,
+            size: 19,
+            color: colors.secondaryLabel,
+          ),
     );
   }
 }

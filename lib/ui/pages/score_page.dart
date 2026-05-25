@@ -12,6 +12,7 @@ import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/ui/components/club_menu.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
@@ -375,7 +376,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildStatsPadding({ScoreList? scoreList}) {
-    final canGpa = ref.read(schoolStoreProvider).school?.supports(Feature.gpaCalculation) ?? true;
+    final canGpa = ref
+            .read(schoolStoreProvider)
+            .school
+            ?.supports(Feature.gpaCalculation) ??
+        true;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -474,22 +479,17 @@ class _ScorePageState extends ConsumerState<ScorePage>
       return Container();
     }
 
+    if (_selectorList.length > 6) {
+      return _buildDropdownSelector();
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       child: CupertinoSlidingSegmentedControl<int>(
         proportionalWidth: true,
         groupValue: _currentIndex,
-        onValueChanged: (int? value) async {
-          if (value != null && value < _selectorList.length) {
-            setState(() {
-              _currentIndex = value;
-            });
-            if (pageController.hasClients) {
-              pageController.jumpToPage(value);
-            }
-          }
-        },
+        onValueChanged: _handleSelectorChanged,
         children: _selectorList
             .map(
               (x) => Text(x),
@@ -498,6 +498,65 @@ class _ScorePageState extends ConsumerState<ScorePage>
             .asMap(),
       ),
     );
+  }
+
+  Widget _buildDropdownSelector() {
+    final colors = context.clubColors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: ClubMenu<int>(
+        items: List.generate(_selectorList.length, (index) {
+          return ClubMenuItem<int>(
+            value: index,
+            label: _selectorList[index],
+          );
+        }),
+        onSelected: _handleSelectorChanged,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: ShapeDecoration(
+            color: colors.cardBackground,
+            shape: ClubSmoothCorners.shape(
+              ClubRadii.navigation,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _selectorList[_currentIndex],
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                CupertinoIcons.chevron_down,
+                size: 16,
+                color: colors.secondaryLabel,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleSelectorChanged(int? value) {
+    if (value == null || value >= _selectorList.length) {
+      return;
+    }
+
+    setState(() {
+      _currentIndex = value;
+    });
+
+    if (pageController.hasClients) {
+      pageController.jumpToPage(value);
+    }
   }
 
   Widget _buildScoreList() {
@@ -657,7 +716,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildScoreMeta(ScoreModel item) {
     final colors = context.clubColors;
-    final canGpa = ref.read(schoolStoreProvider).school?.supports(Feature.gpaCalculation) ?? true;
+    final canGpa = ref
+            .read(schoolStoreProvider)
+            .school
+            ?.supports(Feature.gpaCalculation) ??
+        true;
     return Wrap(
       spacing: 16,
       children: [
@@ -710,7 +773,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildScoreDetailsContent(ScoreModel score, bool isTablet) {
     final colors = context.clubColors;
-    final canGpa = ref.read(schoolStoreProvider).school?.supports(Feature.gpaCalculation) ?? true;
+    final canGpa = ref
+            .read(schoolStoreProvider)
+            .school
+            ?.supports(Feature.gpaCalculation) ??
+        true;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
