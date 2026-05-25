@@ -1,14 +1,14 @@
 enum Feature {
-  timetable('timetable'),
-  gradeQuery('grade_query'),
-  gpaCalculation('gpa_calculation'),
-  courseSelection('course_selection'),
-  examSchedule('exam_schedule'),
-  login('login'),
-  busSchedule('bus_schedule'),
-  program('program'),
-  studyProgress('study_progress'),
-  semesterInfo('semester_info');
+  timetable('timetable'), // 课表显示
+  gradeQuery('grade_query'), // 成绩查询
+  gpaCalculation('gpa_calculation'), // 课表显示
+  courseSelection('course_selection'), // 选课信息
+  examSchedule('exam_schedule'), // 考试安排
+  login('login'), // 登录，必须要有的
+  busSchedule('bus_schedule'), // 校车时刻表
+  program('program'), // 培养计划
+  studyProgress('study_progress'), // 学习进度
+  semesterInfo('semester_info'); // 学期信息
 
   const Feature(this.value);
   final String value;

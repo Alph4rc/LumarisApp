@@ -7,7 +7,6 @@ import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
 
 import '../core/config/api_config.dart';
-import '../features/basic/models/school.dart';
 import '../features/basic/services/school_api.dart';
 import '../features/education/services/edu_http_client_manager.dart';
 import '../features/education/services/education_cache_service.dart';

@@ -372,7 +372,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                   onCourseLongPress: (course) {
                     if (course.isCustom) {
                       final school = ref.read(currentSchoolProvider);
-                      if (school?.supports(AppFeature.editTimetable) ?? false) {
+                      if (school?.supports(Feature.timetable) ?? false) {
                         _showCourseActions(course);
                       } else {
                         showClubSnackBar(context, Text(context.l10n.schoolNotSupported));
@@ -453,7 +453,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   void _showCourseDetail(CourseModel course) {
     final school = ref.read(currentSchoolProvider);
-    final canEdit = school?.supports(AppFeature.editTimetable) ?? false;
+    final canEdit = school?.supports(Feature.timetable) ?? false;
     CourseDetailSheet.show(
       context,
       course,

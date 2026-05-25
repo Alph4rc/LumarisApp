@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
-import 'package:ios_club_app/features/basic/models/school.dart';
 
 void main() {
   group('ApiConfig', () {

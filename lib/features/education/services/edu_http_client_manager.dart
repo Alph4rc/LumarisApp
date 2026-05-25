@@ -1,5 +1,4 @@
 import 'package:ios_club_app/core/config/api_config.dart';
-import 'package:ios_club_app/features/basic/models/school.dart';
 import 'edu_http_client.dart';
 
 /// 教务系统 HTTP 客户端管理器

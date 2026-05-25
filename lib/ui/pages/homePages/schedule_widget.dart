@@ -83,7 +83,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                               },
                             ),
                           ),
-                          if ((ref.read(currentSchoolProvider)?.supports(AppFeature.notifications) ?? false) &&
+                          if ((ref.read(currentSchoolProvider)?.supports(Feature.login) ?? false) &&
                               (PlatformUtils.isIOS || PlatformUtils.isAndroid))
                             ClubListTile(
                               title: Text(l10n.courseReminder),
