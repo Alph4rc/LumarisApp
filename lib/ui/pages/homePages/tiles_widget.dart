@@ -60,6 +60,7 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
+    final isTablet = MediaQuery.of(context).size.width >= 600;
     final tileEditState = ref.watch(tileEditControllerProvider);
     final controller = ref.read(tileEditControllerProvider.notifier);
     final school = ref.watch(schoolStoreProvider).school;
@@ -81,20 +82,20 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
         if (visibleTiles.isEmpty)
           const EmptyTilesMessage()
         else if (isEditMode)
-          _buildReorderableGrid(visibleTiles, controller)
+          _buildReorderableGrid(visibleTiles, controller,isTablet)
         else
-          _buildNormalGrid(visibleTiles),
+          _buildNormalGrid(visibleTiles,isTablet),
       ],
     );
   }
 
   /// Build reorderable grid for full Flutter platforms
-  Widget _buildReorderableGrid(List visibleTiles, TileEditNotifier controller) {
+  Widget _buildReorderableGrid(List visibleTiles, TileEditNotifier controller, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       child: ReorderableGridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isTablet ? 3 : 2,
           mainAxisSpacing: 16.0,
           crossAxisSpacing: 16.0,
           childAspectRatio: 1.0,
@@ -135,12 +136,12 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
   }
 
   /// Build normal grid (non-edit mode)
-  Widget _buildNormalGrid(List visibleTiles) {
+  Widget _buildNormalGrid(List visibleTiles, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isTablet ? 3 : 2,
           mainAxisSpacing: 16.0,
           crossAxisSpacing: 16.0,
           childAspectRatio: 1.0,

@@ -109,7 +109,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               child: Icon(
                 electricityState.hasData
                     ? CupertinoIcons.arrow_2_circlepath
-                    : CupertinoIcons.add_circled_solid,
+                    : CupertinoIcons.add,
                 color: Theme.of(context).colorScheme.primary,
                 size: 24,
               ),
@@ -661,7 +661,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                           ? null
                           : () => _loadSubscriptions(force: true),
                       child: Icon(
-                        CupertinoIcons.arrow_clockwise,
+                        Icons.refresh,
                         size: 20,
                         color: _isSubscriptionLoading
                             ? colorScheme.onSurfaceVariant
