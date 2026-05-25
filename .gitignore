@@ -54,3 +54,6 @@ nul
 
 # FVM Version Cache
 .fvm/
+
+# yaml
+v1.yaml

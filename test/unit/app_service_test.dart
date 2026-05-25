@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/features/education/models/release_info.dart';
-import 'package:ios_club_app/features/education/services/app_service.dart';
+import 'package:ios_club_app/core/services/app_service.dart';
 
 void main() {
   group('AppService', () {

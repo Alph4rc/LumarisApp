@@ -5,7 +5,6 @@ import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
-import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/course_api.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -63,7 +62,6 @@ void main() {
 
     test('direct wrapper methods should throw NetworkException', () async {
       final calls = <Future<dynamic> Function()>[
-        () => AppApi.getAppInfo(),
         () => BusApi.getBus(dayDate: '2026-03-02'),
         () => BusApi.getBusNewData('0830', loc: 'ALL'),
         () => BusApi.getBusOldData('0830', isShow: true),

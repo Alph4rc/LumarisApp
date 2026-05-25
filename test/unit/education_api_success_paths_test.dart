@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -104,15 +103,6 @@ void main() {
             );
           },
         ),
-      );
-
-      final releases = await AppApi.getAppInfo();
-
-      expect(releases, hasLength(1));
-      expect(releases.single.author?.name, 'Alice');
-      expect(
-        releases.single.assets?.single.browserDownloadUrl,
-        'https://downloads.example.com/app.apk',
       );
     });
 

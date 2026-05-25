@@ -6,7 +6,7 @@ import 'package:ios_club_app/features/education/models/release_info.dart';
 class AppApi {
   static Future<List<ReleaseInfo>> getAppInfo() async {
     try {
-      final response = await BasicHttpClientManager.instance.get('/api/v1/App/GetTag');
+      final response = await BasicHttpClientManager.instance.get('/api/v1/App');
 
       final List<dynamic> dataList;
 

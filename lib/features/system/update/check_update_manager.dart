@@ -1,4 +1,4 @@
-import 'package:ios_club_app/features/education/services/app_service.dart';
+import 'package:ios_club_app/core/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 /// 更新管理类

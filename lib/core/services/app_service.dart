@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:ios_club_app/features/basic/services/app_api.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/release_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-
-import 'app_api.dart';
 
 class AppService {
   static Future<ReleaseModel> getReleases() async {
@@ -72,7 +71,7 @@ class AppService {
       return assetUrl;
     }
 
-    return 'https://gitee.com/luckyfishisdashen/iOSClub.AppMobile/releases/download/${release.name}/app-release.apk';
+    return '';
   }
 
   static Future<void> updateApp(ReleaseModel release) async {

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
-import 'package:ios_club_app/features/education/services/app_service.dart';
+import 'package:ios_club_app/core/services/app_service.dart';
 import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/routes/router.dart';
