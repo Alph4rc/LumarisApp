@@ -22,6 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/image_brightness.dart';
 
@@ -112,7 +113,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
     final colors = context.clubColors;
 
-    final school = ref.watch(currentSchoolProvider);
+    final schoolState = ref.watch(schoolStoreProvider);
+    final school = schoolState.school;
     final canSyncCalendar = school?.supports(Feature.timetable) ?? false;
     final canEdit = school?.supports(Feature.timetable) ?? false;
 

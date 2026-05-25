@@ -2630,3 +2630,161 @@ abstract class _BusPageState implements BusPageState {
   _$$BusPageStateImplCopyWith<_$BusPageStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+/// @nodoc
+mixin _$SchoolStoreState {
+  bool get isLoading => throw _privateConstructorUsedError;
+  String get errorMessage => throw _privateConstructorUsedError;
+  School? get school => throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $SchoolStoreStateCopyWith<SchoolStoreState> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SchoolStoreStateCopyWith<$Res> {
+  factory $SchoolStoreStateCopyWith(
+          SchoolStoreState value, $Res Function(SchoolStoreState) then) =
+      _$SchoolStoreStateCopyWithImpl<$Res, SchoolStoreState>;
+  @useResult
+  $Res call({bool isLoading, String errorMessage, School? school});
+}
+
+/// @nodoc
+class _$SchoolStoreStateCopyWithImpl<$Res, $Val extends SchoolStoreState>
+    implements $SchoolStoreStateCopyWith<$Res> {
+  _$SchoolStoreStateCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? isLoading = null,
+    Object? errorMessage = null,
+    Object? school = freezed,
+  }) {
+    return _then(_value.copyWith(
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      errorMessage: null == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+      school: freezed == school
+          ? _value.school
+          : school // ignore: cast_nullable_to_non_nullable
+              as School?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$SchoolStoreStateImplCopyWith<$Res>
+    implements $SchoolStoreStateCopyWith<$Res> {
+  factory _$$SchoolStoreStateImplCopyWith(_$SchoolStoreStateImpl value,
+          $Res Function(_$SchoolStoreStateImpl) then) =
+      __$$SchoolStoreStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({bool isLoading, String errorMessage, School? school});
+}
+
+/// @nodoc
+class __$$SchoolStoreStateImplCopyWithImpl<$Res>
+    extends _$SchoolStoreStateCopyWithImpl<$Res, _$SchoolStoreStateImpl>
+    implements _$$SchoolStoreStateImplCopyWith<$Res> {
+  __$$SchoolStoreStateImplCopyWithImpl(_$SchoolStoreStateImpl _value,
+      $Res Function(_$SchoolStoreStateImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? isLoading = null,
+    Object? errorMessage = null,
+    Object? school = freezed,
+  }) {
+    return _then(_$SchoolStoreStateImpl(
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      errorMessage: null == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+      school: freezed == school
+          ? _value.school
+          : school // ignore: cast_nullable_to_non_nullable
+              as School?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SchoolStoreStateImpl implements _SchoolStoreState {
+  const _$SchoolStoreStateImpl(
+      {this.isLoading = false, this.errorMessage = '', this.school});
+
+  @override
+  @JsonKey()
+  final bool isLoading;
+  @override
+  @JsonKey()
+  final String errorMessage;
+  @override
+  final School? school;
+
+  @override
+  String toString() {
+    return 'SchoolStoreState(isLoading: $isLoading, errorMessage: $errorMessage, school: $school)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SchoolStoreStateImpl &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage) &&
+            (identical(other.school, school) || other.school == school));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, isLoading, errorMessage, school);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SchoolStoreStateImplCopyWith<_$SchoolStoreStateImpl> get copyWith =>
+      __$$SchoolStoreStateImplCopyWithImpl<_$SchoolStoreStateImpl>(
+          this, _$identity);
+}
+
+abstract class _SchoolStoreState implements SchoolStoreState {
+  const factory _SchoolStoreState(
+      {final bool isLoading,
+      final String errorMessage,
+      final School? school}) = _$SchoolStoreStateImpl;
+
+  @override
+  bool get isLoading;
+  @override
+  String get errorMessage;
+  @override
+  School? get school;
+  @override
+  @JsonKey(ignore: true)
+  _$$SchoolStoreStateImplCopyWith<_$SchoolStoreStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

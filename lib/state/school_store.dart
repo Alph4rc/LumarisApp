@@ -1,0 +1,63 @@
+import 'dart:convert';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/basic/services/school_api.dart';
+import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
+import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
+
+final schoolStoreProvider =
+    NotifierProvider<SchoolStore, SchoolStoreState>(SchoolStore.new);
+
+class SchoolStore extends Notifier<SchoolStoreState> {
+  @override
+  SchoolStoreState build() {
+    final school = _loadCachedSchool() ?? _fallbackSchool();
+    return SchoolStoreState(isLoading: false, school: school);
+  }
+
+  Future<void> fetchSchool(String code) async {
+    state = state.copyWith(isLoading: true, errorMessage: '');
+
+    try {
+      final school = await SchoolApi.getSchool(code);
+      _cacheSchool(school);
+      state = state.copyWith(isLoading: false, school: school);
+
+      try {
+        EduHttpClientManager.current.updateSchoolConfig(school);
+      } catch (_) {
+        // Manager may not be initialized during early startup or tests.
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  School? _loadCachedSchool() {
+    final jsonStr = PrefsService.instance.getString(PrefsKeys.SCHOOL_DATA);
+    if (jsonStr == null || jsonStr.isEmpty) return null;
+    try {
+      return School.fromJson(jsonDecode(jsonStr) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _cacheSchool(School school) {
+    PrefsService.instance.setString(
+      PrefsKeys.SCHOOL_DATA,
+      jsonEncode(school.toJson()),
+    );
+  }
+
+  School _fallbackSchool() {
+    final schoolId =
+        PrefsService.instance.getString(PrefsKeys.SCHOOL_ID) ??
+        ApiConfig.defaultSchoolCode;
+    return ApiConfig.findSchoolByCode(ApiConfig.fallbackSchools, schoolId) ??
+        ApiConfig.fallbackSchools.first;
+  }
+}

@@ -24,6 +24,7 @@ import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:macos_ui/macos_ui.dart';
@@ -66,6 +67,12 @@ void main() async {
     ),
   );
   BasicHttpClientManager.initialize();
+
+  // 触发学校信息获取，确保 SchoolStore 在首帧渲染前开始加载
+  providerContainer
+      .read(schoolStoreProvider.notifier)
+      .fetchSchool(settingsStore.schoolId);
+
   EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
   if (!PlatformUtils.isMacOS) {

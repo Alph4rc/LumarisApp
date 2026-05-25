@@ -11,6 +11,7 @@ import '../features/basic/services/school_api.dart';
 import '../features/education/services/edu_http_client_manager.dart';
 import '../features/education/services/education_cache_service.dart';
 import 'prefs_keys.dart';
+import 'school_store.dart';
 
 final settingsStoreProvider =
     NotifierProvider<SettingsStore, SettingsState>(SettingsStore.new);
@@ -32,15 +33,6 @@ class SchoolListNotifier extends AsyncNotifier<List<School>> {
     }
   }
 }
-
-/// 便捷 Provider：从 schoolListProvider 中按 schoolId 查找当前学校
-final currentSchoolProvider = Provider<School?>((ref) {
-  final schoolId = ref.watch(settingsStoreProvider.select((s) => s.schoolId));
-  final schoolListAsync = ref.watch(schoolListProvider);
-  final schools = schoolListAsync.valueOrNull ?? ApiConfig.fallbackSchools;
-  return ApiConfig.findSchoolByCode(schools, schoolId) ??
-      (schools.isNotEmpty ? schools.first : null);
-});
 
 class SettingsStore extends Notifier<SettingsState> {
   @override
@@ -218,6 +210,8 @@ class SettingsStore extends Notifier<SettingsState> {
     } catch (_) {
       // The manager may not be initialized during early app startup or tests.
     }
+
+    ref.read(schoolStoreProvider.notifier).fetchSchool(schoolId);
 
     await EducationCacheService.clearEduCache();
     await _clearSchoolRelatedData();

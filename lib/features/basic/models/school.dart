@@ -1,5 +1,5 @@
 enum Feature {
-  /// 日历添加显示
+  /// 日历显示
   timetable('timetable'),
 
   /// 成绩查询
@@ -9,7 +9,7 @@ enum Feature {
   gpaCalculation('gpa_calculation'),
 
   /// 课程信息
-  courseSelection('course_selection'),
+  courseSelection('course_schedule'),
 
   /// 考试安排
   examSchedule('exam_schedule'),
@@ -24,10 +24,7 @@ enum Feature {
   program('program'),
 
   /// 学习进度
-  studyProgress('study_progress'),
-
-  /// 学期信息
-  semesterInfo('semester_info');
+  studyProgress('study_progress');
 
   const Feature(this.value);
   final String value;

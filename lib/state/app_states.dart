@@ -151,3 +151,12 @@ class BusPageState with _$BusPageState {
     @Default(<String>[]) List<String> tiles,
   }) = _BusPageState;
 }
+
+@freezed
+class SchoolStoreState with _$SchoolStoreState {
+  const factory SchoolStoreState({
+    @Default(false) bool isLoading,
+    @Default('') String errorMessage,
+    School? school,
+  }) = _SchoolStoreState;
+}
