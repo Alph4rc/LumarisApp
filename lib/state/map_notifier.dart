@@ -4,35 +4,43 @@ import 'package:geolocator/geolocator.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/features/education/services/map_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'map_state.dart';
 
 class MapNotifier extends Notifier<MapState> {
   @override
   MapState build() {
-    return const MapState(
-      campusPOIs: [
-        CampusPOI(
-          name: '主图书馆',
-          description: '24小时开放自习室',
-          position: LatLng(34.232230, 108.964230),
-        ),
-        CampusPOI(
-          name: '草堂校区北门',
-          description: '学校主入口',
-          position: LatLng(34.053678, 108.775890),
-        ),
-        CampusPOI(
-          name: '雁塔校区东门',
-          description: '历史悠久的老校区入口',
-          position: LatLng(34.233456, 108.965678),
-        ),
-      ],
-    );
+    return const MapState();
   }
 
   void updateSearchQuery(String query) {
     state = state.copyWith(searchQuery: query);
+  }
+
+  Future<void> fetchCampusPOIs() async {
+    if (state.isLoadingPOIs) return;
+
+    state = state.copyWith(isLoadingPOIs: true);
+    try {
+      final models = await MapApi.getMap();
+      final pois = models.where((m) => m.isActive).map((m) {
+        return CampusPOI(
+          name: m.name,
+          description: m.description ?? '',
+          position: LatLng(double.parse(m.latitude), double.parse(m.longitude)),
+        );
+      }).toList();
+
+      if (pois.isNotEmpty) {
+        state = state.copyWith(campusPOIs: pois, isLoadingPOIs: false);
+      } else {
+        state = state.copyWith(isLoadingPOIs: false);
+      }
+    } catch (e) {
+      AppLogger.error('MapNotifier: Failed to fetch POIs: $e');
+      state = state.copyWith(isLoadingPOIs: false);
+    }
   }
 
   Future<void> checkLocationPermission() async {
