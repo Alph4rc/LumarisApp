@@ -13,7 +13,6 @@ import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/school_store.dart';
 
 class CampusMapPage extends ConsumerStatefulWidget {
