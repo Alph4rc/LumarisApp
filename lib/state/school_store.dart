@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/basic/services/school_api.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
@@ -13,7 +13,7 @@ class SchoolStore extends Notifier<SchoolStoreState> {
   @override
   SchoolStoreState build() {
     final school = _hasLoginData()
-        ? ApiConfig.fallbackSchools.first
+        ? School.fallbackList.first
         : _fallbackSchool();
     return SchoolStoreState(isLoading: false, school: school);
   }
@@ -43,8 +43,8 @@ class SchoolStore extends Notifier<SchoolStoreState> {
   School _fallbackSchool() {
     final schoolId =
         PrefsService.instance.getString(PrefsKeys.SCHOOL_ID) ??
-        ApiConfig.defaultSchoolCode;
-    return ApiConfig.findSchoolByCode(ApiConfig.fallbackSchools, schoolId) ??
-        ApiConfig.fallbackSchools.first;
+        School.defaultCode;
+    return School.findByCode(School.fallbackList, schoolId) ??
+        School.fallbackList.first;
   }
 }

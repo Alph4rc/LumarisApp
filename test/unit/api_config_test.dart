@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 
 void main() {
-  group('ApiConfig', () {
+  group('School fallback', () {
     test('should have default school', () {
-      final defaultSchool = ApiConfig.fallbackSchools.first;
+      final defaultSchool = School.fallbackList.first;
       expect(defaultSchool, isNotNull);
       expect(defaultSchool.code, equals('xauat'));
       expect(defaultSchool.name, equals('西安建筑科技大学'));
@@ -12,8 +12,8 @@ void main() {
     });
 
     test('should find school by code', () {
-      final school = ApiConfig.findSchoolByCode(
-        ApiConfig.fallbackSchools,
+      final school = School.findByCode(
+        School.fallbackList,
         'xauat',
       );
       expect(school, isNotNull);
@@ -21,23 +21,23 @@ void main() {
     });
 
     test('should return null for invalid school code', () {
-      final school = ApiConfig.findSchoolByCode(
-        ApiConfig.fallbackSchools,
+      final school = School.findByCode(
+        School.fallbackList,
         'invalid_code',
       );
       expect(school, isNull);
     });
 
     test('should get fallback schools', () {
-      final schools = ApiConfig.fallbackSchools;
+      final schools = School.fallbackList;
       expect(schools, isNotEmpty);
       expect(schools.length, greaterThanOrEqualTo(1));
     });
 
     test('default school code should be valid', () {
-      final school = ApiConfig.findSchoolByCode(
-        ApiConfig.fallbackSchools,
-        ApiConfig.defaultSchoolCode,
+      final school = School.findByCode(
+        School.fallbackList,
+        School.defaultCode,
       );
       expect(school, isNotNull);
     });

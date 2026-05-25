@@ -49,6 +49,33 @@ enum Feature {
 }
 
 class School {
+  static const String defaultCode = 'xauat';
+
+  static List<School> get fallbackList => [
+        School(
+          code: 'xauat',
+          name: '西安建筑科技大学',
+          website: 'https://xauatapi.xauat.site',
+          features: [
+            Feature.timetable,
+            Feature.gradeQuery,
+            Feature.gpaCalculation,
+            Feature.courseSelection,
+            Feature.examSchedule,
+            Feature.login,
+            Feature.busSchedule,
+            Feature.program,
+            Feature.studyProgress,
+            Feature.electricity,
+            Feature.payment,
+            Feature.map,
+          ],
+          enabled: true,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+      ];
+
   final String code;
   final String name;
   final String website;
@@ -66,6 +93,26 @@ class School {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  bool supports(Feature feature) => features.contains(feature);
+
+  static School? findByCode(List<School> schools, String code) {
+    try {
+      return schools.firstWhere((s) => s.code == code);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static List<School> searchLocally(List<School> schools, String query) {
+    if (query.isEmpty) return schools;
+    final lower = query.toLowerCase();
+    return schools
+        .where((s) =>
+            s.name.toLowerCase().contains(lower) ||
+            s.code.toLowerCase().contains(lower))
+        .toList();
+  }
 
   factory School.fromJson(Map<String, dynamic> json) => School(
     code: json['code'] as String,

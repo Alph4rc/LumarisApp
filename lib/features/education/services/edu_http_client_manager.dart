@@ -1,4 +1,4 @@
-import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'edu_http_client.dart';
 
 /// 教务系统 HTTP 客户端管理器
@@ -10,7 +10,7 @@ class EduHttpClientManager {
     School? school,
     AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
   }) : _authStateCallbacks = authStateCallbacks {
-    _initializeClient(school ?? ApiConfig.fallbackSchools.first);
+    _initializeClient(school ?? School.fallbackList.first);
   }
 
   static EduHttpClientManager? _shared;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
@@ -36,7 +36,7 @@ class SettingsState with _$SettingsState {
     @Default('') String scheduleBackground,
     @Default('') String customBackgroundImage,
     bool? customBackgroundIsDark,
-    @Default(ApiConfig.defaultSchoolCode) String schoolId,
+    @Default(School.defaultCode) String schoolId,
     @Default(false) bool hasAcceptedAgreement,
   }) = _SettingsState;
 }

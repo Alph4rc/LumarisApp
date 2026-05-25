@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/settings_store.dart';
@@ -37,8 +37,8 @@ void main() {
       expect(settingsStore.themeMode, ThemeMode.system);
       expect(settingsStore.scheduleBackground, '');
       expect(settingsStore.customBackgroundImage, '');
-      expect(settingsStore.schoolId, ApiConfig.defaultSchoolCode);
-      expect(settingsStore.currentSchool?.code, ApiConfig.defaultSchoolCode);
+      expect(settingsStore.schoolId, School.defaultCode);
+      expect(settingsStore.currentSchool?.code, School.defaultCode);
     });
 
     test('should load existing values from prefs', () async {
@@ -143,7 +143,7 @@ void main() {
       final settingsStore = store();
 
       expect(settingsStore.schoolId, 'unknown-school');
-      expect(settingsStore.currentSchool?.code, ApiConfig.defaultSchoolCode);
+      expect(settingsStore.currentSchool?.code, School.defaultCode);
     });
 
     test('should fallback theme mode to system when prefs value is invalid',

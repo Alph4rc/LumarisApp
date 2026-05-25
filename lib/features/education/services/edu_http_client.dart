@@ -8,7 +8,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/retry_policy.dart';
-import '../../../core/config/api_config.dart';
+import '../../basic/models/school.dart';
 import 'login_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
@@ -58,7 +58,7 @@ class EduHttpClient {
     AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
   })  : _dio = dio ?? Dio(),
         _authStateCallbacks = authStateCallbacks,
-        _baseUrl = baseUrl ?? ApiConfig.fallbackSchools.first.website {
+        _baseUrl = baseUrl ?? School.fallbackList.first.website {
     _setupDio();
   }
 

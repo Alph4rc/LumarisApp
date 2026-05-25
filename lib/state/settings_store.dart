@@ -6,7 +6,7 @@ import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
 
-import '../core/config/api_config.dart';
+import '../features/basic/models/school.dart';
 import '../features/basic/services/school_api.dart';
 import '../features/education/services/edu_http_client_manager.dart';
 import 'prefs_keys.dart';
@@ -28,7 +28,7 @@ class SchoolListNotifier extends AsyncNotifier<List<School>> {
       final data = await SchoolApi.listSchools();
       return data.items.where((s) => s.supports(Feature.login)).toList();
     } catch (e) {
-      return ApiConfig.fallbackSchools;
+      return School.fallbackList;
     }
   }
 }
@@ -60,8 +60,8 @@ class SettingsStore extends Notifier<SettingsState> {
 
   School? get currentSchool {
     final schools =
-        ref.read(schoolListProvider).valueOrNull ?? ApiConfig.fallbackSchools;
-    return ApiConfig.findSchoolByCode(schools, state.schoolId) ??
+        ref.read(schoolListProvider).valueOrNull ?? School.fallbackList;
+    return School.findByCode(schools, state.schoolId) ??
         (schools.isNotEmpty ? schools.first : null);
   }
 
@@ -91,7 +91,7 @@ class SettingsStore extends Notifier<SettingsState> {
       customBackgroundIsDark:
           prefs.getBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK),
       schoolId:
-          prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolCode,
+          prefs.getString(PrefsKeys.SCHOOL_ID) ?? School.defaultCode,
       hasAcceptedAgreement:
           prefs.getBool(PrefsKeys.AGREEMENT_ACCEPTED) ?? false,
     );
@@ -195,8 +195,8 @@ class SettingsStore extends Notifier<SettingsState> {
 
   Future<void> setSchoolId(String schoolId) async {
     final schools =
-        ref.read(schoolListProvider).valueOrNull ?? ApiConfig.fallbackSchools;
-    final school = ApiConfig.findSchoolByCode(schools, schoolId);
+        ref.read(schoolListProvider).valueOrNull ?? School.fallbackList;
+    final school = School.findByCode(schools, schoolId);
     if (school == null) {
       throw ArgumentError('Invalid school code: $schoolId');
     }

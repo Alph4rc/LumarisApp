@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
@@ -19,14 +19,14 @@ class SchoolSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.clubColors;
-    final allSchools = schools ?? ApiConfig.fallbackSchools;
+    final allSchools = schools ?? School.fallbackList;
 
     return Autocomplete<School>(
       initialValue: TextEditingValue(text: selectedSchool?.name ?? ''),
       displayStringForOption: (school) => school.name,
       optionsBuilder: (textEditingValue) {
         if (textEditingValue.text.isEmpty) return allSchools;
-        return ApiConfig.searchSchoolsLocally(
+        return School.searchLocally(
             allSchools, textEditingValue.text);
       },
       fieldViewBuilder: (context, controller, focusNode, onSubmit) {
@@ -61,7 +61,7 @@ class SchoolSelector extends StatelessWidget {
           ),
           onSubmitted: (value) {
             final match =
-                ApiConfig.searchSchoolsLocally(allSchools, value);
+                School.searchLocally(allSchools, value);
             if (match.isNotEmpty) {
               onChanged(match.first);
               controller.text = match.first.name;
