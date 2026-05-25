@@ -14,8 +14,21 @@ final schoolStoreProvider =
 class SchoolStore extends Notifier<SchoolStoreState> {
   @override
   SchoolStoreState build() {
-    final school = _loadCachedSchool() ?? _fallbackSchool();
+    School? school = _loadCachedSchool();
+    if (school == null) {
+      if (_hasLoginData()) {
+        school = ApiConfig.fallbackSchools.first;
+        _cacheSchool(school);
+      } else {
+        school = _fallbackSchool();
+      }
+    }
     return SchoolStoreState(isLoading: false, school: school);
+  }
+
+  bool _hasLoginData() {
+    final userData = PrefsService.instance.getString(PrefsKeys.USER_DATA);
+    return userData != null && userData.isNotEmpty;
   }
 
   Future<void> fetchSchool(String code) async {

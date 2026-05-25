@@ -1121,25 +1121,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Login successful, but secure storage is unavailable. You may need to re-enter your credentials next time.';
 
   @override
-  String get selectSchool => 'Select School';
-
-  @override
-  String get searchSchool => 'Search school...';
-
-  @override
-  String get basicSupport => 'Basic';
-
-  @override
-  String get advancedSupport => 'Advanced';
-
-  @override
-  String get schoolNotSupported =>
-      'This feature is not supported by the current school';
-
-  @override
-  String get switchSchool => 'Switch School';
-
-  @override
   String get loadingDefaultTitle => 'Syncing Data';
 
   @override
@@ -2075,6 +2056,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noCoursesParsed => 'No courses parsed';
+
+  @override
+  String get searchSchool => 'Search school...';
+
+  @override
+  String get basicSupport => 'Basic';
+
+  @override
+  String get advancedSupport => 'Advanced';
+
+  @override
+  String get schoolNotSupported =>
+      'This feature is not supported by the current school';
+
+  @override
+  String get switchSchool => 'Switch School';
+
+  @override
+  String get selectSchool => 'Select School';
 
   @override
   String get enterCustomUrl => 'Or enter a custom URL';

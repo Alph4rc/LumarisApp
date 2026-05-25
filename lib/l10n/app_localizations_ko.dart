@@ -1108,24 +1108,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '로그인 성공, 그러나 보안 저장소를 사용할 수 없어 다음 실행 시 계정 정보를 다시 입력해야 할 수 있습니다';
 
   @override
-  String get selectSchool => '학교 선택';
-
-  @override
-  String get searchSchool => '학교 검색...';
-
-  @override
-  String get basicSupport => '기본';
-
-  @override
-  String get advancedSupport => '고급';
-
-  @override
-  String get schoolNotSupported => '현재 학교에서는 이 기능을 지원하지 않아요';
-
-  @override
-  String get switchSchool => '학교 변경';
-
-  @override
   String get loadingDefaultTitle => '데이터 동기화 중';
 
   @override
@@ -2031,6 +2013,24 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noCoursesParsed => '분석된 강의 없음';
+
+  @override
+  String get searchSchool => '학교 검색...';
+
+  @override
+  String get basicSupport => '기본';
+
+  @override
+  String get advancedSupport => '고급';
+
+  @override
+  String get schoolNotSupported => '현재 학교에서는 이 기능을 지원하지 않아요';
+
+  @override
+  String get switchSchool => '학교 변경';
+
+  @override
+  String get selectSchool => '학교 선택';
 
   @override
   String get enterCustomUrl => '또는 사용자 정의 URL 입력';

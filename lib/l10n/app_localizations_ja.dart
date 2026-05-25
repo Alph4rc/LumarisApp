@@ -1062,24 +1062,6 @@ class AppLocalizationsJa extends AppLocalizations {
       'ログインに成功しましたが、安全なストレージが利用できません。次回起動時に認証情報の再入力が必要になる場合があります';
 
   @override
-  String get selectSchool => '学校を選択';
-
-  @override
-  String get searchSchool => '学校を検索...';
-
-  @override
-  String get basicSupport => '基本';
-
-  @override
-  String get advancedSupport => '高度';
-
-  @override
-  String get schoolNotSupported => '現在の学校ではこの機能はサポートされていません';
-
-  @override
-  String get switchSchool => '学校を切り替える';
-
-  @override
   String get loadingDefaultTitle => 'データ同期中';
 
   @override
@@ -1977,6 +1959,24 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noCoursesParsed => '授業が解析されませんでした';
+
+  @override
+  String get searchSchool => '学校を検索...';
+
+  @override
+  String get basicSupport => '基本';
+
+  @override
+  String get advancedSupport => '高度';
+
+  @override
+  String get schoolNotSupported => '現在の学校ではこの機能はサポートされていません';
+
+  @override
+  String get switchSchool => '学校を切り替える';
+
+  @override
+  String get selectSchool => '学校を選択';
 
   @override
   String get enterCustomUrl => 'またはカスタムURLを入力';

@@ -24,7 +24,13 @@ enum Feature {
   program('program'),
 
   /// 学习进度
-  studyProgress('study_progress');
+  studyProgress('study_progress'),
+
+  electricity('electricity'),
+
+  payment('payment');
+
+   /// 其他功能
 
   const Feature(this.value);
   final String value;

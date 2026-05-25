@@ -2129,42 +2129,6 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
-  /// **'选择学校'**
-  String get selectSchool;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'搜索学校…'**
-  String get searchSchool;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'基础'**
-  String get basicSupport;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'高级'**
-  String get advancedSupport;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'当前学校不支持此功能'**
-  String get schoolNotSupported;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'切换学校'**
-  String get switchSchool;
-
-  ///
-  ///
-  /// In zh, this message translates to:
   /// **'正在同步数据'**
   String get loadingDefaultTitle;
 
@@ -3913,6 +3877,42 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'未解析到课程'**
   String get noCoursesParsed;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索学校…'**
+  String get searchSchool;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'基础'**
+  String get basicSupport;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'高级'**
+  String get advancedSupport;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'当前学校不支持此功能'**
+  String get schoolNotSupported;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'切换学校'**
+  String get switchSchool;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'选择学校'**
+  String get selectSchool;
 
   ///
   ///
