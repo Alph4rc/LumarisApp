@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
-import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
@@ -59,7 +58,7 @@ class EduHttpClient {
     AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
   })  : _dio = dio ?? Dio(),
         _authStateCallbacks = authStateCallbacks,
-        _baseUrl = baseUrl ?? ApiConfig.getDefaultSchool().eduApiBaseUrl {
+        _baseUrl = baseUrl ?? ApiConfig.fallbackSchools.first.website {
     _setupDio();
   }
 

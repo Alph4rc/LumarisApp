@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -16,6 +15,7 @@ import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
@@ -148,11 +148,13 @@ void main() {
 
     final manager = EduHttpClientManager.initialize();
     manager.updateSchoolConfig(
-      const SchoolConfig(
-        id: 'offline',
+      School(
+        code: 'offline',
         name: 'Offline',
-        eduApiBaseUrl: 'http://127.0.0.1:1',
-        scheduleUrl: '',
+        website: 'http://127.0.0.1:1',
+        features: [],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
       ),
     );
   });

@@ -170,7 +170,7 @@ class _CustomCourseManagePageState
     final colors = context.clubColors;
     final primaryColor = Theme.of(context).colorScheme.primary;
     final canEdit =
-        ref.watch(currentSchoolProvider).supports(AppFeature.editTimetable);
+        ref.watch(currentSchoolProvider)?.supports(AppFeature.editTimetable) ?? false;
 
     return Scaffold(
       appBar: ClubAppBar(

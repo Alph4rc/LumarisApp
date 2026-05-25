@@ -113,8 +113,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     final colors = context.clubColors;
 
     final school = ref.watch(currentSchoolProvider);
-    final canSyncCalendar = school.supports(AppFeature.calendarSync);
-    final canEdit = school.supports(AppFeature.editTimetable);
+    final canSyncCalendar = school?.supports(AppFeature.calendarSync) ?? false;
+    final canEdit = school?.supports(AppFeature.editTimetable) ?? false;
 
     return Scaffold(
         appBar: ClubAppBar(

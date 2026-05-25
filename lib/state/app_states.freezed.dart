@@ -304,7 +304,7 @@ class _$SettingsStateImpl implements _SettingsState {
       this.scheduleBackground = '',
       this.customBackgroundImage = '',
       this.customBackgroundIsDark,
-      this.schoolId = ApiConfig.defaultSchoolId,
+      this.schoolId = ApiConfig.defaultSchoolCode,
       this.hasAcceptedAgreement = false});
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
@@ -8,23 +9,26 @@ class SchoolSelector extends StatelessWidget {
     super.key,
     required this.selectedSchool,
     required this.onChanged,
+    this.schools,
   });
 
-  final SchoolConfig? selectedSchool;
-  final ValueChanged<SchoolConfig> onChanged;
+  final School? selectedSchool;
+  final ValueChanged<School> onChanged;
+  final List<School>? schools;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.clubColors;
-    final schools = ApiConfig.getAllSchools();
+    final allSchools = schools ?? ApiConfig.fallbackSchools;
 
-    return Autocomplete<SchoolConfig>(
+    return Autocomplete<School>(
       initialValue: TextEditingValue(text: selectedSchool?.name ?? ''),
-      displayStringForOption: (school) => '${school.name} (${school.shortName})',
+      displayStringForOption: (school) => school.name,
       optionsBuilder: (textEditingValue) {
-        if (textEditingValue.text.isEmpty) return schools;
-        return ApiConfig.searchSchools(textEditingValue.text);
+        if (textEditingValue.text.isEmpty) return allSchools;
+        return ApiConfig.searchSchoolsLocally(
+            allSchools, textEditingValue.text);
       },
       fieldViewBuilder: (context, controller, focusNode, onSubmit) {
         return TextField(
@@ -57,8 +61,8 @@ class SchoolSelector extends StatelessWidget {
             isDense: true,
           ),
           onSubmitted: (value) {
-            // Find exact match on submit
-            final match = ApiConfig.searchSchools(value);
+            final match =
+                ApiConfig.searchSchoolsLocally(allSchools, value);
             if (match.isNotEmpty) {
               onChanged(match.first);
               controller.text = match.first.name;
@@ -80,7 +84,7 @@ class SchoolSelector extends StatelessWidget {
                 itemCount: options.length,
                 itemBuilder: (context, index) {
                   final school = options.elementAt(index);
-                  final isSelected = school.id == selectedSchool?.id;
+                  final isSelected = school.code == selectedSchool?.code;
                   return ListTile(
                     selected: isSelected,
                     selectedTileColor:
@@ -99,10 +103,10 @@ class SchoolSelector extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      school.shortName,
-                      style: TextStyle(fontSize: 13),
+                      school.code,
+                      style: const TextStyle(fontSize: 13),
                     ),
-                    trailing: _SupportLevelBadge(school: school),
+                    trailing: _SchoolFeatureBadge(school: school),
                     onTap: () => onSelected(school),
                   );
                 },
@@ -116,15 +120,17 @@ class SchoolSelector extends StatelessWidget {
   }
 }
 
-class _SupportLevelBadge extends StatelessWidget {
-  const _SupportLevelBadge({required this.school});
+class _SchoolFeatureBadge extends StatelessWidget {
+  const _SchoolFeatureBadge({required this.school});
 
-  final SchoolConfig school;
+  final School school;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final isAdvanced = school.supportLevel == SupportLevel.advanced;
+    final hasTimetable = school.features.contains(Feature.timetable);
+    final hasLogin = school.features.contains(Feature.login);
+    final isAdvanced = hasTimetable && hasLogin;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(

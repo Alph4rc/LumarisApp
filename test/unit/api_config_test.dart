@@ -1,66 +1,83 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 
 void main() {
   group('ApiConfig', () {
     test('should have default school', () {
-      final defaultSchool = ApiConfig.getDefaultSchool();
+      final defaultSchool = ApiConfig.fallbackSchools.first;
       expect(defaultSchool, isNotNull);
-      expect(defaultSchool.id, equals('xauat'));
+      expect(defaultSchool.code, equals('xauat'));
       expect(defaultSchool.name, equals('西安建筑科技大学'));
-      expect(
-          defaultSchool.eduApiBaseUrl, equals('https://xauatapi.xauat.site'));
+      expect(defaultSchool.website, equals('https://xauatapi.xauat.site'));
     });
 
-    test('should get school by id', () {
-      final school = ApiConfig.getSchoolById('xauat');
+    test('should find school by code', () {
+      final school = ApiConfig.findSchoolByCode(
+        ApiConfig.fallbackSchools,
+        'xauat',
+      );
       expect(school, isNotNull);
-      expect(school!.id, equals('xauat'));
+      expect(school!.code, equals('xauat'));
     });
 
-    test('should return null for invalid school id', () {
-      final school = ApiConfig.getSchoolById('invalid_id');
+    test('should return null for invalid school code', () {
+      final school = ApiConfig.findSchoolByCode(
+        ApiConfig.fallbackSchools,
+        'invalid_code',
+      );
       expect(school, isNull);
     });
 
-    test('should get all schools', () {
-      final schools = ApiConfig.getAllSchools();
+    test('should get fallback schools', () {
+      final schools = ApiConfig.fallbackSchools;
       expect(schools, isNotEmpty);
       expect(schools.length, greaterThanOrEqualTo(1));
     });
 
-    test('default school id should be valid', () {
-      final school = ApiConfig.getSchoolById(ApiConfig.defaultSchoolId);
+    test('default school code should be valid', () {
+      final school = ApiConfig.findSchoolByCode(
+        ApiConfig.fallbackSchools,
+        ApiConfig.defaultSchoolCode,
+      );
       expect(school, isNotNull);
     });
   });
 
-  group('SchoolConfig', () {
+  group('School', () {
     test('should create from json', () {
       final json = {
-        'id': 'test',
+        'code': 'test',
         'name': '测试大学',
-        'eduApiBaseUrl': 'https://api.test.edu.cn',
+        'website': 'https://api.test.edu.cn',
+        'features': <String>['timetable'],
+        'enabled': true,
+        'created_at': '2024-01-01T00:00:00.000',
+        'updated_at': '2024-01-01T00:00:00.000',
       };
 
-      final config = SchoolConfig.fromJson(json);
-      expect(config.id, equals('test'));
-      expect(config.name, equals('测试大学'));
-      expect(config.eduApiBaseUrl, equals('https://api.test.edu.cn'));
+      final school = School.fromJson(json);
+      expect(school.code, equals('test'));
+      expect(school.name, equals('测试大学'));
+      expect(school.website, equals('https://api.test.edu.cn'));
+      expect(school.features, equals([Feature.timetable]));
     });
 
     test('should convert to json', () {
-      const config = SchoolConfig(
-        id: 'test',
+      final school = School(
+        code: 'test',
         name: '测试大学',
-        eduApiBaseUrl: 'https://api.test.edu.cn',
-        scheduleUrl: '',
+        website: 'https://api.test.edu.cn',
+        features: [Feature.timetable],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
       );
 
-      final json = config.toJson();
-      expect(json['id'], equals('test'));
+      final json = school.toJson();
+      expect(json['code'], equals('test'));
       expect(json['name'], equals('测试大学'));
-      expect(json['eduApiBaseUrl'], equals('https://api.test.edu.cn'));
+      expect(json['website'], equals('https://api.test.edu.cn'));
+      expect(json['features'], equals(['timetable']));
     });
   });
 }

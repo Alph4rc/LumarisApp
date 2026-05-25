@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -39,12 +40,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   bool _obscureText = true;
   bool _isLoading = false;
-  late SchoolConfig _selectedSchool;
+  late School _selectedSchool;
 
   @override
   void initState() {
     super.initState();
-    _selectedSchool = ref.read(settingsStoreProvider.notifier).currentSchool;
+    _selectedSchool = ref.read(settingsStoreProvider.notifier).currentSchool ??
+        ApiConfig.fallbackSchools.first;
   }
 
   @override
@@ -163,7 +165,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // 保存选中的学校
     await ref
         .read(settingsStoreProvider.notifier)
-        .setSchoolId(_selectedSchool.id);
+        .setSchoolId(_selectedSchool.code);
 
     final userDataString = prefs.getString(PrefsKeys.USER_DATA);
     if (userDataString != null) {

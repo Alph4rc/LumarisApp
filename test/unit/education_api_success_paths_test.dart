@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/services/app_api.dart';
 import 'package:ios_club_app/features/education/services/bus_api.dart';
 import 'package:ios_club_app/features/education/services/bus_service.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/exam_api.dart';
@@ -41,11 +41,13 @@ void main() {
     LoginService.setLoginOverrideForTest(null);
     final manager = EduHttpClientManager.initialize();
     manager.updateSchoolConfig(
-      const SchoolConfig(
-        id: 'test',
+      School(
+        code: 'test',
         name: 'Test',
-        eduApiBaseUrl: 'http://api.test',
-        scheduleUrl: '',
+        website: 'http://api.test',
+        features: [],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
       ),
     );
   });

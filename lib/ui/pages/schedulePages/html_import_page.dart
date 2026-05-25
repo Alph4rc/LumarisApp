@@ -35,7 +35,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.clubColors;
-    final schools = ApiConfig.getAllSchools();
+    final schools = ApiConfig.fallbackSchools;
 
     return Scaffold(
       appBar: ClubAppBar(title: l10n.htmlImport),
@@ -57,7 +57,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
             (school) => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Material(
-                color: _selectedUrl == school.scheduleUrl
+                color: _selectedUrl == school.website
                     ? colors.selectionFill
                     : colors.groupedBackground,
                 shape: ClubSmoothCorners.shape(BorderRadius.circular(12)),
@@ -67,7 +67,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
                   customBorder:
                       ClubSmoothCorners.shape(BorderRadius.circular(12)),
                   onTap: () {
-                    setState(() => _selectedUrl = school.scheduleUrl);
+                    setState(() => _selectedUrl = school.website);
                     _urlController.clear();
                   },
                   child: Padding(
@@ -88,7 +88,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                school.scheduleUrl,
+                                school.website,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: colors.secondaryLabel,
@@ -99,7 +99,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
                             ],
                           ),
                         ),
-                        if (_selectedUrl == school.scheduleUrl)
+                        if (_selectedUrl == school.website)
                           Icon(Icons.check_circle, color: colors.primary),
                       ],
                     ),

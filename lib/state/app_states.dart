@@ -36,7 +36,7 @@ class SettingsState with _$SettingsState {
     @Default('') String scheduleBackground,
     @Default('') String customBackgroundImage,
     bool? customBackgroundIsDark,
-    @Default(ApiConfig.defaultSchoolId) String schoolId,
+    @Default(ApiConfig.defaultSchoolCode) String schoolId,
     @Default(false) bool hasAcceptedAgreement,
   }) = _SettingsState;
 }

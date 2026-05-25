@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/electricity_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,11 +30,13 @@ void main() {
     EduHttpClientManager.resetForTest();
     final manager = EduHttpClientManager.initialize();
     manager.updateSchoolConfig(
-      const SchoolConfig(
-        id: 'test',
+      School(
+        code: 'test',
         name: 'Test',
-        eduApiBaseUrl: 'http://api.test',
-        scheduleUrl: '',
+        website: 'http://api.test',
+        features: [],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
       ),
     );
   });

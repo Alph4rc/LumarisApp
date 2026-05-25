@@ -7,6 +7,8 @@ import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
 
 import '../core/config/api_config.dart';
+import '../features/basic/models/school.dart';
+import '../features/basic/services/school_api.dart';
 import '../features/education/services/edu_http_client_manager.dart';
 import '../features/education/services/education_cache_service.dart';
 import 'prefs_keys.dart';
@@ -14,10 +16,31 @@ import 'prefs_keys.dart';
 final settingsStoreProvider =
     NotifierProvider<SettingsStore, SettingsState>(SettingsStore.new);
 
-/// 便捷 Provider：直接获取当前学校配置，schoolId 变化时自动刷新
-final currentSchoolProvider = Provider<SchoolConfig>((ref) {
+/// 学校列表 Provider：从 API 获取，失败时回退到本地 fallback
+final schoolListProvider =
+    AsyncNotifierProvider<SchoolListNotifier, List<School>>(
+  SchoolListNotifier.new,
+);
+
+class SchoolListNotifier extends AsyncNotifier<List<School>> {
+  @override
+  Future<List<School>> build() async {
+    try {
+      final data = await SchoolApi.listSchools();
+      return data.items;
+    } catch (e) {
+      return ApiConfig.fallbackSchools;
+    }
+  }
+}
+
+/// 便捷 Provider：从 schoolListProvider 中按 schoolId 查找当前学校
+final currentSchoolProvider = Provider<School?>((ref) {
   final schoolId = ref.watch(settingsStoreProvider.select((s) => s.schoolId));
-  return ApiConfig.getSchoolById(schoolId) ?? ApiConfig.getDefaultSchool();
+  final schoolListAsync = ref.watch(schoolListProvider);
+  final schools = schoolListAsync.valueOrNull ?? ApiConfig.fallbackSchools;
+  return ApiConfig.findSchoolByCode(schools, schoolId) ??
+      (schools.isNotEmpty ? schools.first : null);
 });
 
 class SettingsStore extends Notifier<SettingsState> {
@@ -45,9 +68,11 @@ class SettingsStore extends Notifier<SettingsState> {
   AppLocaleCode get localeCode => state.localeCode;
   Locale? get locale => AppLocaleService.localeOf(state.localeCode);
 
-  SchoolConfig get currentSchool {
-    return ApiConfig.getSchoolById(state.schoolId) ??
-        ApiConfig.getDefaultSchool();
+  School? get currentSchool {
+    final schools =
+        ref.read(schoolListProvider).valueOrNull ?? ApiConfig.fallbackSchools;
+    return ApiConfig.findSchoolByCode(schools, state.schoolId) ??
+        (schools.isNotEmpty ? schools.first : null);
   }
 
   SettingsState _readSettings() {
@@ -76,7 +101,7 @@ class SettingsStore extends Notifier<SettingsState> {
       customBackgroundIsDark:
           prefs.getBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK),
       schoolId:
-          prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolId,
+          prefs.getString(PrefsKeys.SCHOOL_ID) ?? ApiConfig.defaultSchoolCode,
       hasAcceptedAgreement:
           prefs.getBool(PrefsKeys.AGREEMENT_ACCEPTED) ?? false,
     );
@@ -179,9 +204,11 @@ class SettingsStore extends Notifier<SettingsState> {
   }
 
   Future<void> setSchoolId(String schoolId) async {
-    final school = ApiConfig.getSchoolById(schoolId);
+    final schools =
+        ref.read(schoolListProvider).valueOrNull ?? ApiConfig.fallbackSchools;
+    final school = ApiConfig.findSchoolByCode(schools, schoolId);
     if (school == null) {
-      throw ArgumentError('Invalid school ID: $schoolId');
+      throw ArgumentError('Invalid school code: $schoolId');
     }
 
     state = state.copyWith(schoolId: schoolId);

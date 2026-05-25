@@ -1,13 +1,6 @@
-/// 学校支持级别
-enum SupportLevel {
-  /// 基础支持：仅可查看课表
-  basic,
+import 'package:ios_club_app/features/basic/models/school.dart';
 
-  /// 高级支持：可查看、编辑、导出课表，接收通知
-  advanced;
-}
-
-/// 应用功能（用于权限控制）
+/// 应用功能（用于 UI 权限控制）
 enum AppFeature {
   viewTimetable,
   editTimetable,
@@ -16,163 +9,105 @@ enum AppFeature {
   calendarSync;
 }
 
-/// 根据支持级别获取可用功能列表
-List<AppFeature> featuresForLevel(SupportLevel level) {
-  switch (level) {
-    case SupportLevel.basic:
-      return [AppFeature.viewTimetable];
-    case SupportLevel.advanced:
-      return AppFeature.values;
+/// 从后端 Feature 列表映射出 UI AppFeature 集合
+Set<AppFeature> appFeaturesForFeatureList(List<Feature> features) {
+  final result = <AppFeature>{};
+  for (final f in features) {
+    switch (f) {
+      case Feature.timetable:
+        result.addAll([
+          AppFeature.viewTimetable,
+          AppFeature.editTimetable,
+          AppFeature.exportTimetable,
+          AppFeature.calendarSync,
+        ]);
+      case Feature.login:
+        result.add(AppFeature.notifications);
+      default:
+        break;
+    }
   }
-}
-
-/// 学校 API 配置
-class SchoolConfig {
-  /// 学校唯一标识
-  final String id;
-
-  /// 学校全称
-  final String name;
-
-  /// 学校简称
-  final String shortName;
-
-  /// 教务系统 API 基础 URL
-  final String eduApiBaseUrl;
-
-  /// 支持级别
-  final SupportLevel supportLevel;
-
-  /// 教务系统课表页面 URL（用于 WebView 导入）
-  final String scheduleUrl;
-
-  const SchoolConfig({
-    required this.id,
-    required this.name,
-    required this.shortName,
-    required this.eduApiBaseUrl,
-    this.supportLevel = SupportLevel.basic,
-    this.scheduleUrl = '',
-  });
-
-  /// 可用功能列表（根据支持级别自动派生）
-  List<AppFeature> get features => featuresForLevel(supportLevel);
-
-  /// 是否支持指定功能
-  bool supports(AppFeature feature) => features.contains(feature);
-
-  /// 从 JSON 创建
-  factory SchoolConfig.fromJson(Map<String, dynamic> json) {
-    final levelStr = json['supportLevel'] as String?;
-    final level = levelStr != null
-        ? SupportLevel.values.firstWhere((e) => e.name == levelStr)
-        : SupportLevel.basic;
-    return SchoolConfig(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      shortName: json['shortName'] as String? ?? json['name'] as String,
-      eduApiBaseUrl: json['eduApiBaseUrl'] as String,
-      supportLevel: level,
-      scheduleUrl: json['scheduleUrl'] as String? ?? '',
-    );
-  }
-
-  /// 转换为 JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'shortName': shortName,
-      'eduApiBaseUrl': eduApiBaseUrl,
-      'supportLevel': supportLevel.name,
-      'scheduleUrl': scheduleUrl,
-    };
-  }
+  return result;
 }
 
 /// API 配置管理类
 class ApiConfig {
-  /// 预定义的学校配置列表
-  static const List<SchoolConfig> schools = [
-    SchoolConfig(
-      id: 'xauat',
-      name: '西安建筑科技大学',
-      shortName: '西建大',
-      eduApiBaseUrl: 'https://xauatapi.xauat.site',
-      supportLevel: SupportLevel.advanced,
-      scheduleUrl:
-          'https://authserver.xauat.edu.cn/authserver/login?service=https%3A%2F%2Fswjw.xauat.edu.cn%2Fstudent%2Fsso%2Flogin',
-    ),
-    SchoolConfig(
-      id: 'snnu',
-      name: '陕西师范大学',
-      shortName: '陕师大',
-      eduApiBaseUrl: 'https://snnuapi.example.edu.cn',
-      supportLevel: SupportLevel.advanced,
-      scheduleUrl: '',
-    ),
-    SchoolConfig(
-      id: 'xidian',
-      name: '西安电子科技大学',
-      shortName: '西电',
-      eduApiBaseUrl: 'https://xidianapi.example.edu.cn',
-      supportLevel: SupportLevel.advanced,
-      scheduleUrl: '',
-    ),
-    SchoolConfig(
-      id: 'nwu',
-      name: '西北大学',
-      shortName: '西大',
-      eduApiBaseUrl: 'https://nwuapi.example.edu.cn',
-      supportLevel: SupportLevel.basic,
-      scheduleUrl: '',
-    ),
-    SchoolConfig(
-      id: 'xaut',
-      name: '西安理工大学',
-      shortName: '西安理工',
-      eduApiBaseUrl: 'https://xautapi.example.edu.cn',
-      supportLevel: SupportLevel.basic,
-      scheduleUrl: '',
-    ),
-    // 可以在这里添加更多学校配置
-    // SchoolConfig(
-    //   id: 'example',
-    //   name: '示例大学',
-    //   eduApiBaseUrl: 'https://api.example.edu.cn',
-    //   scheduleUrl: 'http://example.edu.cn/jwxt/',
-    // ),
-  ];
+  /// 默认学校 code
+  static const String defaultSchoolCode = 'xauat';
 
-  /// 默认学校 ID
-  static const String defaultSchoolId = 'xauat';
+  /// API 失败时的本地 fallback 学校列表
+  static List<School> get fallbackSchools => [
+        School(
+          code: 'xauat',
+          name: '西安建筑科技大学',
+          website: 'https://xauatapi.xauat.site',
+          features: [Feature.timetable, Feature.gradeQuery, Feature.login],
+          enabled: true,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+        School(
+          code: 'snnu',
+          name: '陕西师范大学',
+          website: 'https://snnuapi.example.edu.cn',
+          features: [Feature.timetable, Feature.gradeQuery, Feature.login],
+          enabled: true,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+        School(
+          code: 'xidian',
+          name: '西安电子科技大学',
+          website: 'https://xidianapi.example.edu.cn',
+          features: [Feature.timetable, Feature.gradeQuery, Feature.login],
+          enabled: true,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+        School(
+          code: 'nwu',
+          name: '西北大学',
+          website: 'https://nwuapi.example.edu.cn',
+          features: [Feature.timetable],
+          enabled: true,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+        School(
+          code: 'xaut',
+          name: '西安理工大学',
+          website: 'https://xautapi.example.edu.cn',
+          features: [Feature.timetable],
+          enabled: true,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+      ];
 
-  /// 根据学校 ID 获取配置
-  static SchoolConfig? getSchoolById(String schoolId) {
+  /// 在列表中按 code 查找学校
+  static School? findSchoolByCode(List<School> schools, String code) {
     try {
-      return schools.firstWhere((school) => school.id == schoolId);
+      return schools.firstWhere((s) => s.code == code);
     } catch (e) {
       return null;
     }
   }
 
-  /// 获取默认学校配置
-  static SchoolConfig getDefaultSchool() {
-    return getSchoolById(defaultSchoolId) ?? schools.first;
-  }
-
-  /// 获取所有学校列表
-  static List<SchoolConfig> getAllSchools() {
-    return schools;
-  }
-
-  /// 搜索学校（按名称或简称模糊匹配）
-  static List<SchoolConfig> searchSchools(String query) {
+  /// 按名称或 code 本地搜索学校
+  static List<School> searchSchoolsLocally(List<School> schools, String query) {
     if (query.isEmpty) return schools;
     final lower = query.toLowerCase();
-    return schools.where((s) {
-      return s.name.toLowerCase().contains(lower) ||
-          s.shortName.toLowerCase().contains(lower);
-    }).toList();
+    return schools
+        .where((s) =>
+            s.name.toLowerCase().contains(lower) ||
+            s.code.toLowerCase().contains(lower))
+        .toList();
   }
+}
+
+/// UI 层扩展方法：为后端 School 模型添加前端权限判断能力
+extension SchoolUx on School {
+  /// 是否支持指定 UI 功能（从后端 Feature 列表映射）
+  bool supports(AppFeature feature) =>
+      appFeaturesForFeatureList(features).contains(feature);
 }

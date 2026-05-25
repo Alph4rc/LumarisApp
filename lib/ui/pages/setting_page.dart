@@ -41,7 +41,7 @@ class SettingPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.clubColors;
     final school = ref.watch(currentSchoolProvider);
-    final canNotify = school.supports(AppFeature.notifications);
+    final canNotify = school?.supports(AppFeature.notifications) ?? false;
     final userState = ref.watch(userStoreProvider);
     final userStore = ref.read(userStoreProvider.notifier);
     final settings = ref.watch(settingsStoreProvider);

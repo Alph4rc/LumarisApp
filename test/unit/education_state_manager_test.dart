@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
@@ -31,7 +32,7 @@ void main() {
       EduHttpClientManager.initialize();
       expect(
         EduHttpClientManager.instance.baseUrl,
-        ApiConfig.getDefaultSchool().eduApiBaseUrl,
+        ApiConfig.fallbackSchools.first.website,
       );
     });
 
@@ -39,25 +40,27 @@ void main() {
         () async {
       final container = createContainer();
       final settings = container.read(settingsStoreProvider.notifier);
-      expect(settings.schoolId, ApiConfig.defaultSchoolId);
+      expect(settings.schoolId, ApiConfig.defaultSchoolCode);
 
       final manager = EduHttpClientManager.initialize(
         school: settings.currentSchool,
       );
-      final custom = SchoolConfig(
-        id: 'xauat',
+      final custom = School(
+        code: 'xauat',
         name: '自定义',
-        eduApiBaseUrl: 'https://custom.edu.example',
-        scheduleUrl: '',
+        website: 'https://custom.edu.example',
+        features: [Feature.timetable],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
       );
 
       manager.updateSchoolConfig(custom);
-      expect(EduHttpClientManager.instance.baseUrl, custom.eduApiBaseUrl);
+      expect(EduHttpClientManager.instance.baseUrl, custom.website);
 
       manager.reinitialize(school: settings.currentSchool);
       expect(
         EduHttpClientManager.instance.baseUrl,
-        ApiConfig.getDefaultSchool().eduApiBaseUrl,
+        ApiConfig.fallbackSchools.first.website,
       );
     });
   });

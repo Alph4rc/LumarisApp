@@ -37,8 +37,8 @@ void main() {
       expect(settingsStore.themeMode, ThemeMode.system);
       expect(settingsStore.scheduleBackground, '');
       expect(settingsStore.customBackgroundImage, '');
-      expect(settingsStore.schoolId, ApiConfig.defaultSchoolId);
-      expect(settingsStore.currentSchool.id, ApiConfig.defaultSchoolId);
+      expect(settingsStore.schoolId, ApiConfig.defaultSchoolCode);
+      expect(settingsStore.currentSchool?.code, ApiConfig.defaultSchoolCode);
     });
 
     test('should load existing values from prefs', () async {
@@ -143,7 +143,7 @@ void main() {
       final settingsStore = store();
 
       expect(settingsStore.schoolId, 'unknown-school');
-      expect(settingsStore.currentSchool.id, ApiConfig.defaultSchoolId);
+      expect(settingsStore.currentSchool?.code, ApiConfig.defaultSchoolCode);
     });
 
     test('should fallback theme mode to system when prefs value is invalid',

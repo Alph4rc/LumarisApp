@@ -1,4 +1,5 @@
-import '../../../core/config/api_config.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'edu_http_client.dart';
 
 /// 教务系统 HTTP 客户端管理器
@@ -7,21 +8,21 @@ import 'edu_http_client.dart';
 /// 这是普通 Dart 服务管理器，不依赖 GetX 容器。
 class EduHttpClientManager {
   EduHttpClientManager._({
-    SchoolConfig? school,
+    School? school,
     AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
   }) : _authStateCallbacks = authStateCallbacks {
-    _initializeClient(school ?? ApiConfig.getDefaultSchool());
+    _initializeClient(school ?? ApiConfig.fallbackSchools.first);
   }
 
   static EduHttpClientManager? _shared;
 
   late EduHttpClient _client;
-  late SchoolConfig _school;
+  late School _school;
   AuthStateCallbacks _authStateCallbacks;
 
   /// 初始化全局 HTTP 客户端管理器。
   static EduHttpClientManager initialize({
-    SchoolConfig? school,
+    School? school,
     AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
   }) {
     _shared?.dispose();
@@ -46,10 +47,10 @@ class EduHttpClientManager {
     _shared = null;
   }
 
-  void _initializeClient(SchoolConfig school) {
+  void _initializeClient(School school) {
     _school = school;
     _client = EduHttpClient(
-      baseUrl: school.eduApiBaseUrl,
+      baseUrl: school.website,
       authStateCallbacks: _authStateCallbacks,
     );
   }
@@ -57,16 +58,16 @@ class EduHttpClientManager {
   /// 更新学校配置。
   ///
   /// 当切换学校时调用此方法更新 API 基础 URL。
-  void updateSchoolConfig(SchoolConfig school) {
+  void updateSchoolConfig(School school) {
     _school = school;
-    _client.updateBaseUrl(school.eduApiBaseUrl);
+    _client.updateBaseUrl(school.website);
   }
 
   /// 重新初始化客户端。
   ///
   /// 用于完全重置客户端实例（例如在登出后）。
   void reinitialize({
-    SchoolConfig? school,
+    School? school,
     AuthStateCallbacks? authStateCallbacks,
   }) {
     _client.dispose();
