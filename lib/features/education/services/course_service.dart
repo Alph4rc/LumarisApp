@@ -109,7 +109,7 @@ class CourseService {
         cookieData.studentId,
         forceRefresh: forceRefresh,
       );
-      final courses = response.data;
+      final courses = response;
       await courseRepo.saveCourses(courses);
       await setIgnore([]);
       return courses;

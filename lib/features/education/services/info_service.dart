@@ -7,7 +7,7 @@ import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'auth_service.dart';
-import 'info_api.dart';
+import '../apis/info_api.dart';
 
 class InfoService {
   static Future<void> getInfoCompletion({

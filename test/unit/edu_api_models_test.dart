@@ -1,35 +1,69 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/features/education/models/api_response.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/education/models/raw_string_response.dart';
 
 void main() {
-  group('CourseResultResponse', () {
-    test('should deserialize v1 payload', () {
-      final response = CourseResultResponse.fromJson(<String, dynamic>{
-        'success': true,
-        'data': <Map<String, dynamic>>[
+  group('ApiResponse for CourseActivity', () {
+    test('should deserialize v1 payload with envelope', () {
+      final apiResponse = ApiResponse<List<CourseModel>>.parsed(
+        <String, dynamic>{
+          'code': 0,
+          'message': 'ok',
+          'total': 1,
+          'data': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'weekIndexes': <dynamic>[1, '2'],
+              'teachers': <String>['T1'],
+              'campus': 'Main',
+              'room': 'A101',
+              'courseName': 'Math',
+              'courseCode': 'M101',
+              'weekday': '1',
+              'startUnit': 1,
+              'endUnit': '2',
+              'credits': '3.0',
+              'lessonId': 'L1',
+            }
+          ],
+        },
+        (data) => (data as List<dynamic>)
+            .map((e) => CourseModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
+
+      expect(apiResponse.isSuccess, isTrue);
+      expect(apiResponse.data!.single.courseName, 'Math');
+      expect(apiResponse.data!.single.weekIndexes, <int>[1, 2]);
+      expect(apiResponse.data!.single.endUnit, 2);
+    });
+
+    test('should handle bare response without envelope', () {
+      final apiResponse = ApiResponse<List<CourseModel>>.parsed(
+        <Map<String, dynamic>>[
           <String, dynamic>{
-            'weekIndexes': <dynamic>[1, '2'],
-            'teachers': <String>['T1'],
-            'campus': 'Main',
-            'room': 'A101',
-            'courseName': 'Math',
-            'courseCode': 'M101',
-            'weekday': '1',
-            'startUnit': 1,
-            'endUnit': '2',
-            'credits': '3.0',
-            'lessonId': 'L1',
+            'weekIndexes': <dynamic>[1, 2],
+            'teachers': <String>['T2'],
+            'campus': 'East',
+            'room': 'B201',
+            'courseName': 'Physics',
+            'courseCode': 'P201',
+            'weekday': 2,
+            'startUnit': 3,
+            'endUnit': 4,
+            'credits': '4.0',
+            'lessonId': 'L2',
           }
         ],
-        'expirationTime': '2026-03-23T00:00:00Z',
-      });
+        (data) => (data as List<dynamic>)
+            .map((e) => CourseModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
 
-      expect(response.success, isTrue);
-      expect(response.data.single.courseName, 'Math');
-      expect(response.data.single.weekIndexes, <int>[1, 2]);
-      expect(response.data.single.endUnit, 2);
+      expect(apiResponse.isSuccess, isTrue); // null code → success
+      expect(apiResponse.data!.single.courseName, 'Physics');
     });
   });
 

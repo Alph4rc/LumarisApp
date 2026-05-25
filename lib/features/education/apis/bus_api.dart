@@ -1,6 +1,6 @@
 import 'package:ios_club_app/features/education/models/bus_model.dart';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client_manager.dart';
+import '../services/edu_http_client_manager.dart';
 
 /// Bus相关API
 class BusApi {

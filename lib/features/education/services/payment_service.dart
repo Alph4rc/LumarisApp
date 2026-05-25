@@ -1,5 +1,5 @@
 import 'package:ios_club_app/features/education/models/payment_model.dart';
-import 'package:ios_club_app/features/education/services/payment_api.dart';
+import 'package:ios_club_app/features/education/apis/payment_api.dart';
 
 /// 支付数据分析器类
 ///

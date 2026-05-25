@@ -7,7 +7,7 @@ import 'package:ios_club_app/features/education/models/week_info.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import '../models/edu_fetch_models.dart';
-import 'info_api.dart';
+import '../apis/info_api.dart';
 
 class EduTimeService {
   static Future<void> syncTime() async {

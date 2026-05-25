@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/features/education/services/map_api.dart';
+import 'package:ios_club_app/features/education/apis/map_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'map_state.dart';
 

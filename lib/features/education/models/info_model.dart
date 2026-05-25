@@ -4,6 +4,7 @@ import 'schema_parsers.dart';
 
 part 'info_model.g.dart';
 
+/// Maps to v1.yaml schema: CreditInfo
 @JsonSerializable(explicitToJson: true)
 class TotalData {
   @JsonKey(fromJson: parseSchemaString)
@@ -25,6 +26,7 @@ class TotalData {
   Map<String, dynamic> toJson() => _$TotalDataToJson(this);
 }
 
+/// Maps to v1.yaml schema: StudyModule
 // 主数据模型类
 @JsonSerializable(explicitToJson: true)
 class InfoModel {

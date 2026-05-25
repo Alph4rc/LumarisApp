@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import '../../../core/services/network_exception.dart';
+import '../models/api_response.dart';
 import '../models/login_response.dart';
-import 'edu_http_client_manager.dart';
+import '../services/edu_http_client_manager.dart';
 
-/// Login相关API
+/// Login相关API — v1.yaml tag: LoginV1
 class LoginApi {
-  /// 登录
+  /// POST /v1/login → ApiResponseOfLoginResponse
   static Future<LoginResponse> login(String username, String password) async {
     try {
       final response = await EduHttpClientManager.instance.post(
@@ -24,7 +25,18 @@ class LoginApi {
       } else {
         throw NetworkException('登录返回格式错误', -1);
       }
-      return LoginResponse.fromJson(responseData);
+
+      final apiResponse = ApiResponse<LoginResponse>.parsed(
+        responseData,
+        (data) => LoginResponse.fromJson(Map<String, dynamic>.from(data as Map)),
+      );
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '登录失败',
+          -1,
+        );
+      }
+      return apiResponse.data ?? LoginResponse();
     } catch (e) {
       _handleError(e);
       rethrow;

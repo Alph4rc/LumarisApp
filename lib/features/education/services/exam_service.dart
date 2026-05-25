@@ -11,7 +11,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auth_service.dart';
-import 'exam_api.dart';
+import '../apis/exam_api.dart';
 
 class ExamService {
   static Future<void> getExam({

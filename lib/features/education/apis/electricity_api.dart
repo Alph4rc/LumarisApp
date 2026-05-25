@@ -1,7 +1,7 @@
 import '../models/electric_data.dart';
 import '../models/edu_api_models.dart';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client_manager.dart';
+import '../services/edu_http_client_manager.dart';
 
 /// Electricity 相关 API
 class ElectricityApi {

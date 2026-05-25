@@ -5,7 +5,7 @@ import '../models/edu_api_models.dart';
 import '../../../core/services/prefs_service.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../state/prefs_keys.dart';
-import 'electricity_api.dart';
+import '../apis/electricity_api.dart';
 
 typedef ElectricityBalanceReader = Future<double?> Function({String? url});
 typedef ElectricityWeeklyDataReader = Future<List<ElectricData>> Function(

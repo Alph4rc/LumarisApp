@@ -6,44 +6,6 @@ part of 'edu_api_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CourseErrorResponse _$CourseErrorResponseFromJson(Map<String, dynamic> json) =>
-    CourseErrorResponse(
-      success: parseSchemaBool(json['success']),
-      message: parseSchemaString(json['message']),
-    );
-
-Map<String, dynamic> _$CourseErrorResponseToJson(
-        CourseErrorResponse instance) =>
-    <String, dynamic>{
-      'success': instance.success,
-      'message': instance.message,
-    };
-
-CourseResultResponse _$CourseResultResponseFromJson(
-        Map<String, dynamic> json) =>
-    CourseResultResponse(
-      success: parseSchemaBool(json['success']),
-      data: _courseListFromJson(json['data']),
-      expirationTime: json['expirationTime'] as String?,
-    );
-
-Map<String, dynamic> _$CourseResultResponseToJson(
-    CourseResultResponse instance) {
-  final val = <String, dynamic>{
-    'success': instance.success,
-    'data': instance.data.map((e) => e.toJson()).toList(),
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('expirationTime', instance.expirationTime);
-  return val;
-}
-
 ErrorResponse _$ErrorResponseFromJson(Map<String, dynamic> json) =>
     ErrorResponse(
       error: parseSchemaString(json['error']),

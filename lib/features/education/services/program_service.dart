@@ -3,7 +3,7 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 
 import 'auth_service.dart';
-import 'program_api.dart';
+import '../apis/program_api.dart';
 
 class ProgramService {
   static Future<List<PlanCourse>> getProgram({

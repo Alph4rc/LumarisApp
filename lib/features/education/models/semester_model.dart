@@ -7,6 +7,7 @@ part 'semester_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 @HiveType(typeId: 3)
+/// Maps to v1.yaml schema: SemesterItem
 class SemesterModel {
   @JsonKey(name: 'value', fromJson: parseSchemaString)
   @HiveField(0)

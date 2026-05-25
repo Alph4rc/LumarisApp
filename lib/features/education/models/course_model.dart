@@ -5,7 +5,7 @@ import 'schema_parsers.dart';
 
 part 'course_model.g.dart';
 
-/// 课程模型类
+/// 课程模型类 — v1.yaml schema: CourseActivity
 ///
 /// 用于表示课程的详细信息，包括课程名称、上课时间、地点、教师等。
 /// 是应用中核心的数据结构之一，用于课程表展示、查询和管理。

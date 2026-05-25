@@ -1,50 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'course_model.dart';
 import 'exam_model.dart';
 import 'semester_model.dart';
 import 'schema_parsers.dart';
 
 part 'edu_api_models.g.dart';
-
-@JsonSerializable(explicitToJson: true)
-class CourseErrorResponse {
-  @JsonKey(fromJson: parseSchemaBool)
-  final bool success;
-  @JsonKey(fromJson: parseSchemaString)
-  final String message;
-
-  const CourseErrorResponse({
-    required this.success,
-    required this.message,
-  });
-
-  factory CourseErrorResponse.fromJson(Map<String, dynamic> json) =>
-      _$CourseErrorResponseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CourseErrorResponseToJson(this);
-}
-
-@JsonSerializable(explicitToJson: true)
-class CourseResultResponse {
-  @JsonKey(fromJson: parseSchemaBool)
-  final bool success;
-  @JsonKey(fromJson: _courseListFromJson)
-  final List<CourseModel> data;
-  @JsonKey(includeIfNull: false)
-  final String? expirationTime;
-
-  const CourseResultResponse({
-    required this.success,
-    required this.data,
-    this.expirationTime,
-  });
-
-  factory CourseResultResponse.fromJson(Map<String, dynamic> json) =>
-      _$CourseResultResponseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CourseResultResponseToJson(this);
-}
 
 @JsonSerializable(explicitToJson: true)
 class ErrorResponse {
@@ -227,15 +187,6 @@ class TimeModel {
       _$TimeModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$TimeModelToJson(this);
-}
-
-List<CourseModel> _courseListFromJson(dynamic value) {
-  if (value is List) {
-    return value
-        .map((item) => CourseModel.fromJson(Map<String, dynamic>.from(item)))
-        .toList();
-  }
-  return <CourseModel>[];
 }
 
 List<ExamItem> _examListFromJson(dynamic value) {

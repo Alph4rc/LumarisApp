@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
 
-import 'bus_api.dart';
+import '../apis/bus_api.dart';
 
 class BusService {
   static Future<BusModel> getBus({

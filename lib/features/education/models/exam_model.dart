@@ -5,6 +5,7 @@ import 'schema_parsers.dart';
 part 'exam_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
+/// Maps to v1.yaml schema: ExamInfo
 class ExamItem {
   @JsonKey(fromJson: parseSchemaString)
   final String name;

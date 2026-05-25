@@ -1,7 +1,7 @@
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/education/models/raw_string_response.dart';
 import '../../../core/services/network_exception.dart';
-import 'edu_http_client_manager.dart';
+import '../services/edu_http_client_manager.dart';
 
 /// Payment相关API
 class PaymentApi {
