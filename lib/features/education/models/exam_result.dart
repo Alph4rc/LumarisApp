@@ -43,7 +43,7 @@ class ExamResult {
     return ExamResult._(
       isSuccess: false,
       exams: [],
-      errorMessage: message ?? '网络连接失败，请检查网络设置',
+      errorMessage: message ?? 'network_error',
       isNetworkError: true,
     );
   }

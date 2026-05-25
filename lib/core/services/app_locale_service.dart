@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 
 enum AppLocaleCode {
   system,
@@ -171,5 +173,28 @@ class AppLocaleService {
     return options
         .firstWhere((option) => option.code == code)
         .labelBuilder(l10n);
+  }
+
+  static Locale resolveLocale([Locale? preferredLocale]) {
+    final locale =
+        preferredLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+
+    if (locale.languageCode == 'zh' && locale.scriptCode == 'Hant') {
+      return const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant');
+    }
+
+    for (final supportedLocale in supportedLocales) {
+      if (supportedLocale.languageCode == locale.languageCode) {
+        return supportedLocale;
+      }
+    }
+
+    return supportedLocales.first;
+  }
+
+  static AppLocalizations currentL10n() {
+    final preference = PrefsService.instance.getString(PrefsKeys.LOCALE_CODE);
+    final configuredLocale = localeOf(fromPreference(preference));
+    return lookupAppLocalizations(resolveLocale(configuredLocale));
   }
 }

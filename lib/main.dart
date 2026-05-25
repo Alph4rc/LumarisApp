@@ -81,15 +81,16 @@ void main() async {
 
   if (PlatformUtils.isDesktop) {
     await windowManager.ensureInitialized();
+    final appName = AppLocaleService.currentL10n().appName;
 
     if (PlatformUtils.isMacOS) {
-      WindowOptions windowOptions = const WindowOptions(
+      WindowOptions windowOptions = WindowOptions(
         minimumSize: Size(800, 600),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.hidden,
-        title: '光序',
+        title: appName,
       );
 
       windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -187,7 +188,8 @@ class _AppLauncher extends ConsumerWidget {
 
     if (PlatformUtils.isMacOS) {
       return MacosApp.router(
-        title: '光序',
+        title: AppLocaleService.currentL10n().appName,
+        onGenerateTitle: (context) => context.l10n.appName,
         debugShowCheckedModeBanner: false,
         locale: locale,
         supportedLocales: AppLocaleService.supportedLocales,
@@ -210,7 +212,8 @@ class _AppLauncher extends ConsumerWidget {
     }
 
     return MaterialApp.router(
-      title: '光序',
+      title: AppLocaleService.currentL10n().appName,
+      onGenerateTitle: (context) => context.l10n.appName,
       debugShowCheckedModeBanner: false,
       locale: locale,
       supportedLocales: AppLocaleService.supportedLocales,

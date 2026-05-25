@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
@@ -163,7 +164,7 @@ class UpdateManager {
     // 显示进度对话框
     PlatformDialog.showCustomDialog<void>(
       context,
-      title: '正在下载更新 $version',
+      title: context.l10n.downloadingUpdateTitle(version),
       barrierDismissible: false,
       content: ValueListenableBuilder<DownloadProgress>(
         valueListenable: progressNotifier,
@@ -194,8 +195,8 @@ class UpdateManager {
           );
         },
       ),
-      actions: const [
-        PlatformDialogAction<void>(label: '取消'),
+      actions: [
+        PlatformDialogAction<void>(label: context.l10n.cancel),
       ],
     );
 
@@ -218,7 +219,7 @@ class UpdateManager {
         Navigator.of(context).pop();
         showClubSnackBar(
           context,
-          const Text('下载完成，正在安装...'),
+          Text(context.l10n.downloadCompletedInstalling),
         );
       }
     } catch (e) {
@@ -226,7 +227,7 @@ class UpdateManager {
         Navigator.of(context).pop();
         showClubSnackBar(
           context,
-          Text('下载失败: $e'),
+          Text(context.l10n.downloadFailed(e.toString())),
         );
       }
     } finally {

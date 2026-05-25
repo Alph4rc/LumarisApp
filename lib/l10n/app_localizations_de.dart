@@ -204,6 +204,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get cancel => 'Abbrechen';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return 'Update $version wird heruntergeladen';
+  }
+
+  @override
+  String get downloadCompletedInstalling =>
+      'Download abgeschlossen, Installation wird gestartet...';
+
+  @override
+  String downloadFailed(Object error) {
+    return 'Download fehlgeschlagen: $error';
+  }
+
+  @override
   String get confirm => 'Bestätigen';
 
   @override
@@ -332,6 +346,66 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get courseConflict =>
       'Mehrere Kurse überschneiden sich zu dieser Zeit';
+
+  @override
+  String get notificationCourseChannelName => 'Kurs-Erinnerungen';
+
+  @override
+  String get notificationCourseChannelDescription =>
+      'Benachrichtigungen für den täglichen Stundenplan';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return 'Benachrichtigungen für den täglichen Stundenplan, $minutes Minuten im Voraus';
+  }
+
+  @override
+  String get notificationTodoChannelName => 'Aufgaben-Erinnerungen';
+
+  @override
+  String get notificationTodoChannelDescription =>
+      'Erinnerungen an fällige Aufgaben';
+
+  @override
+  String get courseReminderTitle => 'Kurs-Erinnerung';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return 'beginnt in $minutes Minuten';
+  }
+
+  @override
+  String get todoReminderTitle => 'Aufgaben-Erinnerung';
+
+  @override
+  String todoReminderBody(Object title) {
+    return 'Ihre Aufgabe $title ist fällig';
+  }
+
+  @override
+  String get allowBackgroundRun => 'Hintergrundausführung erlauben';
+
+  @override
+  String get allowBackgroundRunContent =>
+      'Damit Kurserinnerungen pünktlich ausgelöst werden, erlauben Sie bitte die Ausführung im Hintergrund und ignorieren Sie die Akkuoptimierung.';
+
+  @override
+  String get allowScheduleAlarm => 'Alarme erlauben';
+
+  @override
+  String get allowScheduleAlarmContent =>
+      'Sie müssen Alarme erlauben, um Benachrichtigungen zu verwenden.';
+
+  @override
+  String get saveFailedRetry =>
+      'Speichern fehlgeschlagen, bitte erneut versuchen';
+
+  @override
+  String get toggleTileVisibilityFailed =>
+      'Sichtbarkeit konnte nicht geändert werden';
+
+  @override
+  String get resetFailed => 'Zurücksetzen fehlgeschlagen';
 
   @override
   String get networkError => 'Netzwerkfehler. Verbindung überprüfen';

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/services/app_locale_service.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -16,6 +19,10 @@ import 'package:ios_club_app/core/utils/platform_utils.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
+  static const String _courseChannelNameZh = '课程通知';
+  static const String _courseChannelDescriptionZh = '进行每日课表的课程通知';
+  static const String _todoChannelNameZh = '待办事务提醒';
+  static const String _todoChannelDescriptionZh = '待办事务截止提醒';
 
   static NotificationService get instance => _instance;
   bool isInit = false;
@@ -24,6 +31,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   NotificationService._();
+
+  AppLocalizations get _l10n => AppLocaleService.currentL10n();
 
   Future<void> initialize() async {
     tz.initializeTimeZones();
@@ -48,7 +57,7 @@ class NotificationService {
 
     final WindowsInitializationSettings initializationSettingsWindows =
         WindowsInitializationSettings(
-      appName: '光序',
+      appName: _l10n.appName,
       appUserModelId: 'DA45F98E-38F0-F574-4192-36EB8C8DA0CA',
       guid: 'DA45F98E-38F0-F574-4192-36EB8C8DA0CA',
     );
@@ -67,20 +76,20 @@ class NotificationService {
     await notifications
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(const AndroidNotificationChannel(
+        ?.createNotificationChannel(AndroidNotificationChannel(
           'ios_club_app_course_reminders',
-          '课程通知',
-          description: '进行每日课表的课程通知',
+          _courseChannelNameZh,
+          description: _courseChannelDescriptionZh,
           importance: Importance.max,
         ));
 
     await notifications
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(const AndroidNotificationChannel(
+        ?.createNotificationChannel(AndroidNotificationChannel(
           'ios_club_app_todo_reminders',
-          '待办事务提醒',
-          description: '待办事务截止提醒',
+          _todoChannelNameZh,
+          description: _todoChannelDescriptionZh,
           importance: Importance.max,
         ));
 
@@ -123,6 +132,7 @@ class NotificationService {
     }
 
     AppLogger.debug('Scheduling notification at $tzDateTime with id=$id');
+    final l10n = _l10n;
 
     try {
       // 增加安全检查：如果待处理通知接近 500 个，停止安排
@@ -137,13 +147,13 @@ class NotificationService {
       await notifications.zonedSchedule(
         id: id,
         title: title,
-        body: '$body 将在$notificationTime分钟后开始',
+        body: '$body ${l10n.courseReminderStartsIn(notificationTime)}',
         scheduledDate: tzDateTime,
         notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_course_reminders',
-            '课程通知',
-            channelDescription: '进行每日课表的课程通知，提前$notificationTime分钟进行通知',
+            _courseChannelNameZh,
+            channelDescription: _courseChannelDescriptionZh,
             importance: Importance.max,
             priority: Priority.high,
             playSound: true,
@@ -213,16 +223,17 @@ class NotificationService {
     final tzNotificationTime = tz.TZDateTime.from(notificationTime, tz.local);
 
     try {
+      final l10n = _l10n;
       await notifications.zonedSchedule(
         id: todo.id.hashCode, // 使用唯一ID作为通知ID
-        title: '待办事务提醒',
-        body: '您的待办事务 ${todo.title} 已到期',
+        title: l10n.todoReminderTitle,
+        body: l10n.todoReminderBody(todo.title),
         scheduledDate: tzNotificationTime,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'ios_club_app_todo_reminders',
-            '待办事务提醒',
-            channelDescription: '待办事务截止提醒',
+            _todoChannelNameZh,
+            channelDescription: _todoChannelDescriptionZh,
             importance: Importance.max,
             priority: Priority.high,
             playSound: true,
@@ -265,17 +276,17 @@ class NotificationService {
           await PermissionService.request(
             Permission.ignoreBatteryOptimizations,
             context: context,
-            dialogTitle: '允许后台运行',
-            dialogContent: '为了确保课程提醒能准时响铃，请允许应用在后台运行（忽略电池优化）。',
-            settingsText: '去设置',
+            dialogTitle: context.l10n.allowBackgroundRun,
+            dialogContent: context.l10n.allowBackgroundRunContent,
+            settingsText: context.l10n.goToSettings,
           );
         }
         await remind();
       },
       context: context,
-      dialogTitle: '请允许使用闹钟',
-      dialogContent: '您需要允许使用闹钟才能使用通知功能',
-      settingsText: '去设置',
+      dialogTitle: context.l10n.allowScheduleAlarm,
+      dialogContent: context.l10n.allowScheduleAlarmContent,
+      settingsText: context.l10n.goToSettings,
     );
   }
 
@@ -326,7 +337,7 @@ class NotificationService {
 
       await NotificationService.instance.scheduleCourseReminder(
         id: target.notificationId,
-        title: '课程提醒',
+        title: NotificationService.instance._l10n.courseReminderTitle,
         body: course.courseName,
         courseTime: target.courseTime,
       );

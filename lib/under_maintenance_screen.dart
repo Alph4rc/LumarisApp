@@ -92,7 +92,7 @@ class ErrorInfo extends StatelessWidget {
                       foregroundColor: colors.inverseLabel,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8)))),
-                  child: Text(btnText ?? "Back"),
+                  child: Text(btnText ?? context.l10n.back),
                 ),
             const SizedBox(height: 16),
           ],

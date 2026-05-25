@@ -198,6 +198,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cancel => 'キャンセル';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return '更新 $version をダウンロード中';
+  }
+
+  @override
+  String get downloadCompletedInstalling => 'ダウンロードが完了しました。インストールを開始します...';
+
+  @override
+  String downloadFailed(Object error) {
+    return 'ダウンロードに失敗しました: $error';
+  }
+
+  @override
   String get confirm => '確認';
 
   @override
@@ -318,6 +331,61 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get courseConflict => 'この時間帯に複数の授業が重複しています';
+
+  @override
+  String get notificationCourseChannelName => '授業リマインダー';
+
+  @override
+  String get notificationCourseChannelDescription => '毎日の時間割に関する通知';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return '毎日の時間割に関する通知を $minutes 分前に送信します';
+  }
+
+  @override
+  String get notificationTodoChannelName => 'ToDo リマインダー';
+
+  @override
+  String get notificationTodoChannelDescription => 'ToDo の期限リマインダー';
+
+  @override
+  String get courseReminderTitle => '授業リマインダー';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return '$minutes 分後に開始します';
+  }
+
+  @override
+  String get todoReminderTitle => 'ToDo リマインダー';
+
+  @override
+  String todoReminderBody(Object title) {
+    return 'ToDo「$title」の期限です';
+  }
+
+  @override
+  String get allowBackgroundRun => 'バックグラウンド実行を許可';
+
+  @override
+  String get allowBackgroundRunContent =>
+      '授業リマインダーを時間どおりに鳴らすため、アプリのバックグラウンド実行とバッテリー最適化の除外を許可してください。';
+
+  @override
+  String get allowScheduleAlarm => 'アラームを許可';
+
+  @override
+  String get allowScheduleAlarmContent => '通知機能を使うにはアラームの許可が必要です。';
+
+  @override
+  String get saveFailedRetry => '保存に失敗しました。もう一度お試しください';
+
+  @override
+  String get toggleTileVisibilityFailed => '表示状態の切り替えに失敗しました';
+
+  @override
+  String get resetFailed => 'リセットに失敗しました';
 
   @override
   String get networkError => 'ネットワーク接続に失敗しました。ネットワーク設定を確認してください';

@@ -198,6 +198,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancel => '取消';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return '正在下载更新 $version';
+  }
+
+  @override
+  String get downloadCompletedInstalling => '下载完成，正在安装...';
+
+  @override
+  String downloadFailed(Object error) {
+    return '下载失败: $error';
+  }
+
+  @override
   String get confirm => '确认';
 
   @override
@@ -318,6 +331,60 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get courseConflict => '当前时间存在多个冲突课程';
+
+  @override
+  String get notificationCourseChannelName => '课程通知';
+
+  @override
+  String get notificationCourseChannelDescription => '进行每日课表的课程通知';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return '进行每日课表的课程通知，提前$minutes分钟进行通知';
+  }
+
+  @override
+  String get notificationTodoChannelName => '待办事务提醒';
+
+  @override
+  String get notificationTodoChannelDescription => '待办事务截止提醒';
+
+  @override
+  String get courseReminderTitle => '课程提醒';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return '将在$minutes分钟后开始';
+  }
+
+  @override
+  String get todoReminderTitle => '待办事务提醒';
+
+  @override
+  String todoReminderBody(Object title) {
+    return '您的待办事务 $title 已到期';
+  }
+
+  @override
+  String get allowBackgroundRun => '允许后台运行';
+
+  @override
+  String get allowBackgroundRunContent => '为了确保课程提醒能准时响铃，请允许应用在后台运行（忽略电池优化）。';
+
+  @override
+  String get allowScheduleAlarm => '请允许使用闹钟';
+
+  @override
+  String get allowScheduleAlarmContent => '您需要允许使用闹钟才能使用通知功能';
+
+  @override
+  String get saveFailedRetry => '保存失败，请重试';
+
+  @override
+  String get toggleTileVisibilityFailed => '切换显示状态失败';
+
+  @override
+  String get resetFailed => '重置失败';
 
   @override
   String get networkError => '网络连接失败，请检查网络设置';
@@ -2209,6 +2276,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get cancel => '取消';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return '正在下載更新 $version';
+  }
+
+  @override
+  String get downloadCompletedInstalling => '下載完成，正在安裝...';
+
+  @override
+  String downloadFailed(Object error) {
+    return '下載失敗: $error';
+  }
+
+  @override
   String get confirm => '確認';
 
   @override
@@ -2329,6 +2409,61 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get courseConflict => '目前時間存在多個衝突課程';
+
+  @override
+  String get notificationCourseChannelName => '課程通知';
+
+  @override
+  String get notificationCourseChannelDescription => '進行每日課表的課程通知';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return '進行每日課表的課程通知，提前$minutes分鐘進行通知';
+  }
+
+  @override
+  String get notificationTodoChannelName => '待辦事項提醒';
+
+  @override
+  String get notificationTodoChannelDescription => '待辦事項截止提醒';
+
+  @override
+  String get courseReminderTitle => '課程提醒';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return '將在$minutes分鐘後開始';
+  }
+
+  @override
+  String get todoReminderTitle => '待辦事項提醒';
+
+  @override
+  String todoReminderBody(Object title) {
+    return '您的待辦事項 $title 已到期';
+  }
+
+  @override
+  String get allowBackgroundRun => '允許背景執行';
+
+  @override
+  String get allowBackgroundRunContent =>
+      '為了確保課程提醒能準時響鈴，請允許應用程式在背景執行（忽略電池最佳化）。';
+
+  @override
+  String get allowScheduleAlarm => '請允許使用鬧鐘';
+
+  @override
+  String get allowScheduleAlarmContent => '您需要允許使用鬧鐘才能使用通知功能';
+
+  @override
+  String get saveFailedRetry => '儲存失敗，請重試';
+
+  @override
+  String get toggleTileVisibilityFailed => '切換顯示狀態失敗';
+
+  @override
+  String get resetFailed => '重設失敗';
 
   @override
   String get networkError => '網路連線失敗，請檢查網路設定';

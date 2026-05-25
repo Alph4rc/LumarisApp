@@ -487,6 +487,24 @@ abstract class AppLocalizations {
   /// **'取消'**
   String get cancel;
 
+  /// 更新下载弹窗标题
+  ///
+  /// In zh, this message translates to:
+  /// **'正在下载更新 {version}'**
+  String downloadingUpdateTitle(Object version);
+
+  /// 更新下载成功提示
+  ///
+  /// In zh, this message translates to:
+  /// **'下载完成，正在安装...'**
+  String get downloadCompletedInstalling;
+
+  /// 更新下载失败提示
+  ///
+  /// In zh, this message translates to:
+  /// **'下载失败: {error}'**
+  String downloadFailed(Object error);
+
   ///
   ///
   /// In zh, this message translates to:
@@ -726,6 +744,102 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'当前时间存在多个冲突课程'**
   String get courseConflict;
+
+  /// 课程提醒通知渠道名称
+  ///
+  /// In zh, this message translates to:
+  /// **'课程通知'**
+  String get notificationCourseChannelName;
+
+  /// 课程提醒通知渠道描述
+  ///
+  /// In zh, this message translates to:
+  /// **'进行每日课表的课程通知'**
+  String get notificationCourseChannelDescription;
+
+  /// 课程提醒通知渠道描述
+  ///
+  /// In zh, this message translates to:
+  /// **'进行每日课表的课程通知，提前{minutes}分钟进行通知'**
+  String notificationCourseAdvanceDescription(Object minutes);
+
+  /// 待办提醒通知渠道名称
+  ///
+  /// In zh, this message translates to:
+  /// **'待办事务提醒'**
+  String get notificationTodoChannelName;
+
+  /// 待办提醒通知渠道描述
+  ///
+  /// In zh, this message translates to:
+  /// **'待办事务截止提醒'**
+  String get notificationTodoChannelDescription;
+
+  /// 课程提醒标题
+  ///
+  /// In zh, this message translates to:
+  /// **'课程提醒'**
+  String get courseReminderTitle;
+
+  /// 课程提醒正文后缀
+  ///
+  /// In zh, this message translates to:
+  /// **'将在{minutes}分钟后开始'**
+  String courseReminderStartsIn(Object minutes);
+
+  /// 待办提醒标题
+  ///
+  /// In zh, this message translates to:
+  /// **'待办事务提醒'**
+  String get todoReminderTitle;
+
+  /// 待办提醒正文
+  ///
+  /// In zh, this message translates to:
+  /// **'您的待办事务 {title} 已到期'**
+  String todoReminderBody(Object title);
+
+  /// 后台运行权限标题
+  ///
+  /// In zh, this message translates to:
+  /// **'允许后台运行'**
+  String get allowBackgroundRun;
+
+  /// 后台运行权限说明
+  ///
+  /// In zh, this message translates to:
+  /// **'为了确保课程提醒能准时响铃，请允许应用在后台运行（忽略电池优化）。'**
+  String get allowBackgroundRunContent;
+
+  /// 闹钟权限标题
+  ///
+  /// In zh, this message translates to:
+  /// **'请允许使用闹钟'**
+  String get allowScheduleAlarm;
+
+  /// 闹钟权限说明
+  ///
+  /// In zh, this message translates to:
+  /// **'您需要允许使用闹钟才能使用通知功能'**
+  String get allowScheduleAlarmContent;
+
+  /// 保存失败提示
+  ///
+  /// In zh, this message translates to:
+  /// **'保存失败，请重试'**
+  String get saveFailedRetry;
+
+  /// 切换显示状态失败提示
+  ///
+  /// In zh, this message translates to:
+  /// **'切换显示状态失败'**
+  String get toggleTileVisibilityFailed;
+
+  /// 重置失败提示
+  ///
+  /// In zh, this message translates to:
+  /// **'重置失败'**
+  String get resetFailed;
 
   ///
   ///

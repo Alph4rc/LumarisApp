@@ -16,6 +16,8 @@ String resolveErrorMessage(String code, AppLocalizations l10n) {
       return l10n.examFetchFailed;
     case 'stale_data':
       return l10n.busRefreshStale;
+    case 'network_error':
+      return l10n.networkError;
     default:
       return code;
   }

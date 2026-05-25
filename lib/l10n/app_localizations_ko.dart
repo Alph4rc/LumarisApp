@@ -199,6 +199,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get cancel => '취소';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return '업데이트 $version 다운로드 중';
+  }
+
+  @override
+  String get downloadCompletedInstalling => '다운로드가 완료되었습니다. 설치를 시작합니다...';
+
+  @override
+  String downloadFailed(Object error) {
+    return '다운로드 실패: $error';
+  }
+
+  @override
   String get confirm => '확인';
 
   @override
@@ -321,6 +334,61 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get courseConflict => '현재 시간에 여러 수업이 충돌합니다';
+
+  @override
+  String get notificationCourseChannelName => '수업 알림';
+
+  @override
+  String get notificationCourseChannelDescription => '일일 시간표 알림';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return '$minutes분 전에 보내는 일일 시간표 알림';
+  }
+
+  @override
+  String get notificationTodoChannelName => '할 일 알림';
+
+  @override
+  String get notificationTodoChannelDescription => '할 일 마감 알림';
+
+  @override
+  String get courseReminderTitle => '수업 알림';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return '$minutes분 후에 시작합니다';
+  }
+
+  @override
+  String get todoReminderTitle => '할 일 알림';
+
+  @override
+  String todoReminderBody(Object title) {
+    return '할 일 $title의 마감 시간이 되었습니다';
+  }
+
+  @override
+  String get allowBackgroundRun => '백그라운드 실행 허용';
+
+  @override
+  String get allowBackgroundRunContent =>
+      '수업 알림이 제시간에 울리도록 하려면 앱의 백그라운드 실행과 배터리 최적화 예외를 허용해 주세요.';
+
+  @override
+  String get allowScheduleAlarm => '알람 허용';
+
+  @override
+  String get allowScheduleAlarmContent => '알림 기능을 사용하려면 알람 권한이 필요합니다.';
+
+  @override
+  String get saveFailedRetry => '저장에 실패했습니다. 다시 시도해 주세요';
+
+  @override
+  String get toggleTileVisibilityFailed => '표시 상태를 변경하지 못했습니다';
+
+  @override
+  String get resetFailed => '초기화에 실패했습니다';
 
   @override
   String get networkError => '네트워크 연결 실패, 네트워크 설정을 확인해 주세요';

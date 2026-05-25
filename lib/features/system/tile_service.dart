@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:ios_club_app/core/services/app_locale_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'package:ios_club_app/core/models/tile_configuration.dart';
@@ -20,6 +22,8 @@ class TileConfigurationException implements Exception {
 }
 
 class TileService {
+  static AppLocalizations get _l10n => AppLocaleService.currentL10n();
+
   static Future<bool> isTileVisible(String tileId) async {
     final config = await getTileConfigurations();
     return config.configurations.any((t) => t.id == tileId && t.isVisible);
@@ -116,7 +120,7 @@ class TileService {
         AppLogger.error('Failed to save tile configuration: $e');
       }
       throw TileConfigurationException(
-        '保存失败，请重试',
+        _l10n.saveFailedRetry,
         details: e.toString(),
       );
     }
@@ -134,7 +138,7 @@ class TileService {
         AppLogger.error('Failed to reorder tile: $e');
       }
       throw TileConfigurationException(
-        '重新排序失败',
+        _l10n.reorderFailed,
         details: e.toString(),
       );
     }
@@ -151,7 +155,7 @@ class TileService {
         AppLogger.error('Failed to toggle tile visibility: $e');
       }
       throw TileConfigurationException(
-        '切换显示状态失败',
+        _l10n.toggleTileVisibilityFailed,
         details: e.toString(),
       );
     }
@@ -167,7 +171,7 @@ class TileService {
         AppLogger.error('Failed to reset tile configuration: $e');
       }
       throw TileConfigurationException(
-        '重置失败',
+        _l10n.resetFailed,
         details: e.toString(),
       );
     }

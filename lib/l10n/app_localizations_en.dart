@@ -203,6 +203,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return 'Downloading update $version';
+  }
+
+  @override
+  String get downloadCompletedInstalling => 'Download complete, installing...';
+
+  @override
+  String downloadFailed(Object error) {
+    return 'Download failed: $error';
+  }
+
+  @override
   String get confirm => 'Confirm';
 
   @override
@@ -329,6 +342,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courseConflict => 'Multiple courses conflict at this time';
+
+  @override
+  String get notificationCourseChannelName => 'Course reminders';
+
+  @override
+  String get notificationCourseChannelDescription =>
+      'Notifications for your daily course schedule';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return 'Notifications for your daily course schedule, sent $minutes minutes in advance';
+  }
+
+  @override
+  String get notificationTodoChannelName => 'Todo reminders';
+
+  @override
+  String get notificationTodoChannelDescription =>
+      'Deadline reminders for todos';
+
+  @override
+  String get courseReminderTitle => 'Course reminder';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return 'starts in $minutes minutes';
+  }
+
+  @override
+  String get todoReminderTitle => 'Todo reminder';
+
+  @override
+  String todoReminderBody(Object title) {
+    return 'Your todo $title is due';
+  }
+
+  @override
+  String get allowBackgroundRun => 'Allow background run';
+
+  @override
+  String get allowBackgroundRunContent =>
+      'To make sure course reminders ring on time, please allow the app to run in the background and ignore battery optimization.';
+
+  @override
+  String get allowScheduleAlarm => 'Allow alarms';
+
+  @override
+  String get allowScheduleAlarmContent =>
+      'You need to allow alarms before you can use notifications.';
+
+  @override
+  String get saveFailedRetry => 'Save failed, please try again';
+
+  @override
+  String get toggleTileVisibilityFailed => 'Failed to change visibility';
+
+  @override
+  String get resetFailed => 'Reset failed';
 
   @override
   String get networkError =>

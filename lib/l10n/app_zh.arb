@@ -74,6 +74,22 @@
   "widgetSetupTip": "提示：小组件可以显示今日课程等信息，方便快速查看",
 
   "cancel": "取消",
+  "downloadingUpdateTitle": "正在下载更新 {version}",
+  "@downloadingUpdateTitle": {
+    "description": "更新下载弹窗标题",
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "downloadCompletedInstalling": "下载完成，正在安装...",
+  "@downloadCompletedInstalling": {"description": "更新下载成功提示"},
+  "downloadFailed": "下载失败: {error}",
+  "@downloadFailed": {
+    "description": "更新下载失败提示",
+    "placeholders": {
+      "error": {}
+    }
+  },
   "confirm": "确认",
   "back": "返回",
   "collapseSidebar": "收起侧边栏",
@@ -119,6 +135,53 @@
   "completionRate": "完成度",
   "itemizedCredits": "分项学分",
   "courseConflict": "当前时间存在多个冲突课程",
+  "notificationCourseChannelName": "课程通知",
+  "@notificationCourseChannelName": {"description": "课程提醒通知渠道名称"},
+  "notificationCourseChannelDescription": "进行每日课表的课程通知",
+  "@notificationCourseChannelDescription": {"description": "课程提醒通知渠道描述"},
+  "notificationCourseAdvanceDescription": "进行每日课表的课程通知，提前{minutes}分钟进行通知",
+  "@notificationCourseAdvanceDescription": {
+    "description": "课程提醒通知渠道描述",
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "notificationTodoChannelName": "待办事务提醒",
+  "@notificationTodoChannelName": {"description": "待办提醒通知渠道名称"},
+  "notificationTodoChannelDescription": "待办事务截止提醒",
+  "@notificationTodoChannelDescription": {"description": "待办提醒通知渠道描述"},
+  "courseReminderTitle": "课程提醒",
+  "@courseReminderTitle": {"description": "课程提醒标题"},
+  "courseReminderStartsIn": "将在{minutes}分钟后开始",
+  "@courseReminderStartsIn": {
+    "description": "课程提醒正文后缀",
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "todoReminderTitle": "待办事务提醒",
+  "@todoReminderTitle": {"description": "待办提醒标题"},
+  "todoReminderBody": "您的待办事务 {title} 已到期",
+  "@todoReminderBody": {
+    "description": "待办提醒正文",
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "allowBackgroundRun": "允许后台运行",
+  "@allowBackgroundRun": {"description": "后台运行权限标题"},
+  "allowBackgroundRunContent": "为了确保课程提醒能准时响铃，请允许应用在后台运行（忽略电池优化）。",
+  "@allowBackgroundRunContent": {"description": "后台运行权限说明"},
+  "allowScheduleAlarm": "请允许使用闹钟",
+  "@allowScheduleAlarm": {"description": "闹钟权限标题"},
+  "allowScheduleAlarmContent": "您需要允许使用闹钟才能使用通知功能",
+  "@allowScheduleAlarmContent": {"description": "闹钟权限说明"},
+  "saveFailedRetry": "保存失败，请重试",
+  "@saveFailedRetry": {"description": "保存失败提示"},
+  "toggleTileVisibilityFailed": "切换显示状态失败",
+  "@toggleTileVisibilityFailed": {"description": "切换显示状态失败提示"},
+  "resetFailed": "重置失败",
+  "@resetFailed": {"description": "重置失败提示"},
 
   "networkError": "网络连接失败，请检查网络设置",
   "requestTimeout": "请求超时，请检查网络连接",

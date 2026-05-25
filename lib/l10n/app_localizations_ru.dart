@@ -204,6 +204,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cancel => 'Отмена';
 
   @override
+  String downloadingUpdateTitle(Object version) {
+    return 'Загрузка обновления $version';
+  }
+
+  @override
+  String get downloadCompletedInstalling =>
+      'Загрузка завершена, начинается установка...';
+
+  @override
+  String downloadFailed(Object error) {
+    return 'Не удалось загрузить: $error';
+  }
+
+  @override
   String get confirm => 'Подтвердить';
 
   @override
@@ -329,6 +343,64 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get courseConflict => 'Несколько курсов пересекаются в это время';
+
+  @override
+  String get notificationCourseChannelName => 'Напоминания о занятиях';
+
+  @override
+  String get notificationCourseChannelDescription =>
+      'Уведомления о ежедневном расписании';
+
+  @override
+  String notificationCourseAdvanceDescription(Object minutes) {
+    return 'Уведомления о ежедневном расписании за $minutes минут до начала';
+  }
+
+  @override
+  String get notificationTodoChannelName => 'Напоминания о задачах';
+
+  @override
+  String get notificationTodoChannelDescription =>
+      'Напоминания о сроке выполнения задач';
+
+  @override
+  String get courseReminderTitle => 'Напоминание о занятии';
+
+  @override
+  String courseReminderStartsIn(Object minutes) {
+    return 'начнётся через $minutes мин.';
+  }
+
+  @override
+  String get todoReminderTitle => 'Напоминание о задаче';
+
+  @override
+  String todoReminderBody(Object title) {
+    return 'Срок выполнения задачи $title наступил';
+  }
+
+  @override
+  String get allowBackgroundRun => 'Разрешить работу в фоне';
+
+  @override
+  String get allowBackgroundRunContent =>
+      'Чтобы напоминания о занятиях срабатывали вовремя, разрешите приложению работать в фоне и игнорировать оптимизацию батареи.';
+
+  @override
+  String get allowScheduleAlarm => 'Разрешить будильники';
+
+  @override
+  String get allowScheduleAlarmContent =>
+      'Чтобы использовать уведомления, необходимо разрешить будильники.';
+
+  @override
+  String get saveFailedRetry => 'Не удалось сохранить, попробуйте ещё раз';
+
+  @override
+  String get toggleTileVisibilityFailed => 'Не удалось изменить видимость';
+
+  @override
+  String get resetFailed => 'Сброс не удался';
 
   @override
   String get networkError => 'Ошибка сети. Проверьте подключение';
