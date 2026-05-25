@@ -26,7 +26,7 @@ class SchoolListNotifier extends AsyncNotifier<List<School>> {
   Future<List<School>> build() async {
     try {
       final data = await SchoolApi.listSchools();
-      return data.items;
+      return data.items.where((s) => s.supports(Feature.login)).toList();
     } catch (e) {
       return ApiConfig.fallbackSchools;
     }

@@ -1,5 +1,5 @@
 enum Feature {
-  /// 课表显示
+  /// 日历添加显示
   timetable('timetable'),
 
   /// 成绩查询
@@ -8,7 +8,7 @@ enum Feature {
   /// 课表显示
   gpaCalculation('gpa_calculation'),
 
-  /// 选课信息
+  /// 课程信息
   courseSelection('course_selection'),
 
   /// 考试安排
