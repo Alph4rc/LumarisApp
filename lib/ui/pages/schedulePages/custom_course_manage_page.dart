@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_menu.dart';
@@ -13,7 +12,6 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/state/course_store.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -169,9 +167,6 @@ class _CustomCourseManagePageState
     final l10n = context.l10n;
     final colors = context.clubColors;
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final canEdit =
-        ref.watch(currentSchoolProvider)?.supports(Feature.timetable) ?? false;
-
     return Scaffold(
       appBar: ClubAppBar(
         titleWidget: Column(
@@ -200,7 +195,6 @@ class _CustomCourseManagePageState
           ],
         ),
         actions: [
-          if (canEdit)
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: _showAddCourseDialog,
@@ -210,24 +204,6 @@ class _CustomCourseManagePageState
       ),
       body: Column(
         children: [
-          if (!canEdit)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: colors.warning.withValues(alpha: 0.1),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 18, color: colors.warning),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.schoolNotSupported,
-                      style: TextStyle(fontSize: 13, color: colors.warning),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           Expanded(
             child: isLoading
                 ? Center(
@@ -288,14 +264,7 @@ class _CustomCourseManagePageState
                                 customBorder:
                                     ClubSmoothCorners.shape(ClubRadii.card),
                                 onTap: () {
-                                  if (canEdit) {
-                                    _showEditCourseDialog(course);
-                                  } else {
-                                    showClubSnackBar(
-                                      context,
-                                      Text(l10n.schoolNotSupported),
-                                    );
-                                  }
+                                  _showEditCourseDialog(course);
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
@@ -335,32 +304,30 @@ class _CustomCourseManagePageState
                                           ],
                                         ),
                                       ),
-                                      if (canEdit) ...[
-                                        const SizedBox(width: 12),
-                                        ClubMenu<String>(
-                                          tooltip: l10n.moreFunctions,
-                                          items: <ClubMenuItem<String>>[
-                                            ClubMenuItem<String>(
-                                              value: 'edit',
-                                              label: l10n.editCourse,
-                                              icon: Icons.edit_outlined,
-                                            ),
-                                            ClubMenuItem<String>(
-                                              value: 'delete',
-                                              label: l10n.deleteCourse,
-                                              icon: Icons.delete_outline,
-                                              isDestructive: true,
-                                            ),
-                                          ],
-                                          onSelected: (String value) {
-                                            if (value == 'edit') {
-                                              _showEditCourseDialog(course);
-                                            } else if (value == 'delete') {
-                                              _deleteCourse(course);
-                                            }
-                                          },
-                                        ),
-                                      ],
+                                      const SizedBox(width: 12),
+                                      ClubMenu<String>(
+                                        tooltip: l10n.moreFunctions,
+                                        items: <ClubMenuItem<String>>[
+                                          ClubMenuItem<String>(
+                                            value: 'edit',
+                                            label: l10n.editCourse,
+                                            icon: Icons.edit_outlined,
+                                          ),
+                                          ClubMenuItem<String>(
+                                            value: 'delete',
+                                            label: l10n.deleteCourse,
+                                            icon: Icons.delete_outline,
+                                            isDestructive: true,
+                                          ),
+                                        ],
+                                        onSelected: (String value) {
+                                          if (value == 'edit') {
+                                            _showEditCourseDialog(course);
+                                          } else if (value == 'delete') {
+                                            _deleteCourse(course);
+                                          }
+                                        },
+                                      ),
                                     ],
                                   ),
                                 ),

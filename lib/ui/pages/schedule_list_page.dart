@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/image_helper.dart';
@@ -371,12 +370,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                   onCourseTap: (course) => _showCourseDetail(course),
                   onCourseLongPress: (course) {
                     if (course.isCustom) {
-                      final school = ref.read(currentSchoolProvider);
-                      if (school?.supports(Feature.timetable) ?? false) {
-                        _showCourseActions(course);
-                      } else {
-                        showClubSnackBar(context, Text(context.l10n.schoolNotSupported));
-                      }
+                      _showCourseActions(course);
                     }
                   },
                   onConflictCourseTap: (courses) =>
@@ -452,13 +446,11 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   }
 
   void _showCourseDetail(CourseModel course) {
-    final school = ref.read(currentSchoolProvider);
-    final canEdit = school?.supports(Feature.timetable) ?? false;
     CourseDetailSheet.show(
       context,
       course,
-      onEdit: (course.isCustom && canEdit) ? () => _editCustomCourse(course) : null,
-      onDelete: (course.isCustom && canEdit) ? () => _deleteCustomCourse(course) : null,
+      onEdit: course.isCustom ? () => _editCustomCourse(course) : null,
+      onDelete: course.isCustom ? () => _deleteCustomCourse(course) : null,
     );
   }
 
