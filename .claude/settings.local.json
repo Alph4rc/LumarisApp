@@ -41,7 +41,8 @@
       "Bash(grep -r \"evaluateJavascript\\\\|runJavaScript\\\\|runJavaScriptReturningResult\" /Users/luckyfish/.pub-cache/hosted/pub.dev/webview_flutter-4.10.0/lib/ 2>/dev/null | head -20)",
       "Read(//Users/luckyfish/.pub-cache/hosted/pub.dev/webview_flutter-4.10.0/**)",
       "Bash(find /Users/luckyfish/.pub-cache -path \"*/webview_flutter-*/lib/webview_flutter.dart\" 2>/dev/null | head -3)",
-      "Read(//Users/luckyfish/.pub-cache/**)"
+      "Read(//Users/luckyfish/.pub-cache/**)",
+      "Bash(xargs cat -n)"
     ]
   }
 }

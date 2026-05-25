@@ -9,7 +9,6 @@ import 'package:ios_club_app/core/services/app_locale_service.dart';
 import '../core/config/api_config.dart';
 import '../features/basic/services/school_api.dart';
 import '../features/education/services/edu_http_client_manager.dart';
-import '../features/education/services/education_cache_service.dart';
 import 'prefs_keys.dart';
 import 'school_store.dart';
 
@@ -212,27 +211,10 @@ class SettingsStore extends Notifier<SettingsState> {
     }
 
     ref.read(schoolStoreProvider.notifier).fetchSchool(schoolId);
-
-    await EducationCacheService.clearEduCache();
-    await _clearSchoolRelatedData();
   }
 
   Future<void> setHasAcceptedAgreement(bool value) async {
     state = state.copyWith(hasAcceptedAgreement: value);
     await PrefsService.instance.setBool(PrefsKeys.AGREEMENT_ACCEPTED, value);
-  }
-
-  Future<void> _clearSchoolRelatedData() async {
-    final prefs = PrefsService.instance;
-
-    await prefs.remove(PrefsKeys.USER_DATA);
-    await prefs.remove(PrefsKeys.LAST_FETCH_TIME);
-    await prefs.remove(PrefsKeys.COURSE_DATA);
-    await prefs.remove(PrefsKeys.COURSE_LAST_FETCH_TIME);
-    await prefs.remove(PrefsKeys.ALL_SCORE_DATA);
-    await prefs.remove(PrefsKeys.EXAM_DATA);
-    await prefs.remove(PrefsKeys.INFO_DATA);
-    await prefs.remove(PrefsKeys.SEMESTER_DATA);
-    await prefs.remove(PrefsKeys.TIME_DATA);
   }
 }

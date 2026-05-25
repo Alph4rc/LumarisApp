@@ -171,13 +171,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ) &&
         saveSuccess;
 
+    // Read before setSchoolId() clears school-related prefs data
+    final userDataString = prefs.getString(PrefsKeys.USER_DATA);
+
     // 保存选中的学校
     await ref
         .read(settingsStoreProvider.notifier)
         .setSchoolId(_selectedSchool.code);
 
-    final userDataString = prefs.getString(PrefsKeys.USER_DATA);
     if (userDataString != null) {
+      // Re-save because setSchoolId() → _clearSchoolRelatedData() removes USER_DATA
+      // await prefs.setString(PrefsKeys.USER_DATA, userDataString);
       final userData = jsonDecode(userDataString);
       await ref
           .read(userStoreProvider.notifier)
