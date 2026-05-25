@@ -6,7 +6,9 @@ import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
 import 'package:ios_club_app/ui/components/tiles/editable_tile_wrapper.dart';
 
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/ui/components/tiles/bus_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/electricity_tile.dart';
 import 'package:ios_club_app/ui/components/tiles/payment_tile.dart';
@@ -60,7 +62,11 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
     super.build(context); // Required for AutomaticKeepAliveClientMixin
     final tileEditState = ref.watch(tileEditControllerProvider);
     final controller = ref.read(tileEditControllerProvider.notifier);
-    final visibleTiles = tileEditState.config.getVisibleTiles();
+    final school = ref.watch(schoolStoreProvider).school;
+    final visibleTiles = tileEditState.config
+        .getVisibleTiles()
+        .where((t) => _isTileSupported(t.id, school))
+        .toList();
     final isEditMode = tileEditState.isEditMode;
 
     return Column(
@@ -173,4 +179,24 @@ Widget buildTile(String tile, BuildContext context) {
   content ??= Container();
 
   return content;
+}
+
+Feature? _tileFeature(String tileId) {
+  switch (tileId) {
+    case '电费':
+      return Feature.electricity;
+    case '校车':
+      return Feature.busSchedule;
+    case '饭卡':
+      return Feature.payment;
+    default:
+      return null;
+  }
+}
+
+bool _isTileSupported(String tileId, School? school) {
+  if (school == null) return true;
+  final feature = _tileFeature(tileId);
+  if (feature == null) return true;
+  return school.supports(feature);
 }

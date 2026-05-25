@@ -26,9 +26,14 @@ enum Feature {
   /// 学习进度
   studyProgress('study_progress'),
 
+  /// 电费查询
   electricity('electricity'),
 
-  payment('payment');
+  /// 校园卡查询
+  payment('payment'),
+
+  /// 校园地图
+  map('map');
 
    /// 其他功能
 

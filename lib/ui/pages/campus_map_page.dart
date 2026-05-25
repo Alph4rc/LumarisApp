@@ -11,8 +11,10 @@ import 'package:ios_club_app/state/map_state.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
+import 'package:ios_club_app/state/school_store.dart';
 
 /// Maps POI display names to their localized translations.
 String _resolvePoiName(String name, AppLocalizations l10n) {
@@ -108,6 +110,15 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final padding = MediaQuery.of(context).padding;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final isLogin = ref.watch(userStoreProvider).isLogin;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canMap = school?.supports(Feature.map) ?? true;
+
+    if (school != null && !canMap) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schoolBus)),
+        body: Center(child: Text(context.l10n.schoolNotSupported)),
+      );
+    }
 
     if (!isLogin) {
       return Scaffold(

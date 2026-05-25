@@ -24,6 +24,7 @@ class ApiConfig {
             Feature.studyProgress,
             Feature.electricity,
             Feature.payment,
+            Feature.map,
           ],
           enabled: true,
           createdAt: DateTime(2024, 1, 1),

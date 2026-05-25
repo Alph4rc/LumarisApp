@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
@@ -159,8 +161,11 @@ class AvailableTilesList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tileEditState = ref.watch(tileEditControllerProvider);
     final controller = ref.read(tileEditControllerProvider.notifier);
+    final school = ref.watch(schoolStoreProvider).school;
     final allTiles = tileEditState.config.configurations;
-    final hiddenTiles = allTiles.where((t) => !t.isVisible).toList();
+    final hiddenTiles = allTiles
+        .where((t) => !t.isVisible && _isTileSupported(t.id, school))
+        .toList();
     final colors = context.clubColors;
 
     if (hiddenTiles.isEmpty) {
@@ -220,4 +225,16 @@ class AvailableTilesList extends ConsumerWidget {
       ),
     );
   }
+}
+
+bool _isTileSupported(String tileId, School? school) {
+  if (school == null) return true;
+  final feature = switch (tileId) {
+    '电费' => Feature.electricity,
+    '校车' => Feature.busSchedule,
+    '饭卡' => Feature.payment,
+    _ => null,
+  };
+  if (feature == null) return true;
+  return school.supports(feature);
 }

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -14,15 +12,9 @@ final schoolStoreProvider =
 class SchoolStore extends Notifier<SchoolStoreState> {
   @override
   SchoolStoreState build() {
-    School? school = _loadCachedSchool();
-    if (school == null) {
-      if (_hasLoginData()) {
-        school = ApiConfig.fallbackSchools.first;
-        _cacheSchool(school);
-      } else {
-        school = _fallbackSchool();
-      }
-    }
+    final school = _hasLoginData()
+        ? ApiConfig.fallbackSchools.first
+        : _fallbackSchool();
     return SchoolStoreState(isLoading: false, school: school);
   }
 
@@ -36,7 +28,6 @@ class SchoolStore extends Notifier<SchoolStoreState> {
 
     try {
       final school = await SchoolApi.getSchool(code);
-      _cacheSchool(school);
       state = state.copyWith(isLoading: false, school: school);
 
       try {
@@ -47,23 +38,6 @@ class SchoolStore extends Notifier<SchoolStoreState> {
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
-  }
-
-  School? _loadCachedSchool() {
-    final jsonStr = PrefsService.instance.getString(PrefsKeys.SCHOOL_DATA);
-    if (jsonStr == null || jsonStr.isEmpty) return null;
-    try {
-      return School.fromJson(jsonDecode(jsonStr) as Map<String, dynamic>);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  void _cacheSchool(School school) {
-    PrefsService.instance.setString(
-      PrefsKeys.SCHOOL_DATA,
-      jsonEncode(school.toJson()),
-    );
   }
 
   School _fallbackSchool() {

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -22,6 +24,15 @@ class PaymentPage extends ConsumerWidget {
     final controller = ref.read(paymentStoreProvider.notifier);
     final colors = context.clubColors;
     final l10n = context.l10n;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canPayment = school?.supports(Feature.payment) ?? true;
+
+    if (school != null && !canPayment) {
+      return Scaffold(
+        appBar: ClubAppBar(title: l10n.payment),
+        body: Center(child: Text(l10n.schoolNotSupported)),
+      );
+    }
 
     return Scaffold(
       appBar: ClubAppBar(

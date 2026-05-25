@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
@@ -59,6 +61,15 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final electricityState = ref.watch(electricityStoreProvider);
     final l10n = context.l10n;
     final isLogin = ref.watch(userStoreProvider).isLogin;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canElectricity = school?.supports(Feature.electricity) ?? true;
+
+    if (school != null && !canElectricity) {
+      return Scaffold(
+        appBar: ClubAppBar(title: l10n.electricityManagement),
+        body: Center(child: Text(l10n.schoolNotSupported)),
+      );
+    }
 
     if (!isLogin) {
       return Scaffold(

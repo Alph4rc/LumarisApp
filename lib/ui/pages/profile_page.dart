@@ -165,6 +165,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final colors = context.clubColors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isLogin = ref.watch(userStoreProvider).isLogin;
+    final school = ref.watch(schoolStoreProvider).school;
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -198,7 +199,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           maxLines: 1,
                         ),
                         Text(
-                          isLogin ? l10n.academicAccount : l10n.guest,
+                          isLogin ? '${school?.name ?? ""} ${l10n.academicAccount}' : l10n.guest,
                           style: TextStyle(
                             fontSize: 14,
                             color: colors.secondaryLabel,
