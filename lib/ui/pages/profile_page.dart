@@ -11,6 +11,8 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/info_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
@@ -236,7 +238,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           if (isLogin) const SizedBox(height: 16),
-          if (isLogin)
+          if (isLogin && (ref.watch(schoolStoreProvider).school?.supports(Feature.studyProgress) ?? true))
             FutureBuilder(
                 key: ValueKey('info_data_$_dataRefreshKey'),
                 // 添加超时保护：最多10秒

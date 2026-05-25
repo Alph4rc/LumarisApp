@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
@@ -26,6 +28,15 @@ class SchoolBusPage extends ConsumerWidget {
     final busController = ref.read(busControllerProvider.notifier);
     final colors = context.clubColors;
     final isLogin = ref.watch(userStoreProvider).isLogin;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canBusSchedule = school?.supports(Feature.busSchedule) ?? true;
+
+    if (school != null && !canBusSchedule) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schoolBus)),
+        body: Center(child: Text(context.l10n.schoolNotSupported)),
+      );
+    }
 
     if (!isLogin) {
       return Scaffold(

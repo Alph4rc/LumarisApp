@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/user_store.dart';
@@ -48,6 +50,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final userState = ref.watch(userStoreProvider);
     final isLogin = userState.isLogin;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canExamSchedule = school?.supports(Feature.examSchedule) ?? true;
 
     return PopScope(
       canPop: false,
@@ -64,7 +68,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: [
             const ScheduleWidget(),
             if (isLogin) const TilesWidget(),
-            if (isLogin) const ExamCard(),
+            if (isLogin && canExamSchedule) const ExamCard(),
           ],
         ),
       ),

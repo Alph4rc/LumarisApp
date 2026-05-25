@@ -28,6 +28,8 @@ import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/ui/pages/schedulePages/custom_course_manage_page.dart';
 
 // 条件导入 dart:io，仅在非 Web 环境中使用
@@ -88,6 +90,16 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = PlatformUtils.isDesktop;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canCourseSchedule = school?.supports(Feature.courseSelection) ?? true;
+
+    if (school != null && !canCourseSchedule) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.schedule)),
+        body: Center(child: Text(context.l10n.schoolNotSupported)),
+      );
+    }
+
     final systemIsDark = Theme.of(context).brightness == Brightness.dark;
     final settings = ref.watch(settingsStoreProvider);
     final scheduleState = ref.watch(scheduleStoreProvider);

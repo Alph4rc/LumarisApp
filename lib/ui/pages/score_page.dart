@@ -23,6 +23,8 @@ import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/config/api_config.dart';
+import 'package:ios_club_app/state/school_store.dart';
 
 class ScorePage extends ConsumerStatefulWidget {
   const ScorePage({super.key});
@@ -202,6 +204,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
   @override
   Widget build(BuildContext context) {
     final colors = context.clubColors;
+    final school = ref.watch(schoolStoreProvider).school;
+    final canGradeQuery = school?.supports(Feature.gradeQuery) ?? true;
+
+    if (school != null && !canGradeQuery) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.scoresAndGpa)),
+        body: Center(child: Text(context.l10n.schoolNotSupported)),
+      );
+    }
+
     // 检查是否为游客模式
     if (!ref.watch(userStoreProvider).isLogin) {
       return Scaffold(
@@ -363,18 +375,20 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildStatsPadding({ScoreList? scoreList}) {
+    final canGpa = ref.read(schoolStoreProvider).school?.supports(Feature.gpaCalculation) ?? true;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildStatItem(
-            icon: Icons.credit_score,
-            value: scoreList == null
-                ? ScoreList.getTotalGpa(_scoreList).toStringAsFixed(2)
-                : scoreList.totalGpa.toStringAsFixed(2),
-            label: 'GPA',
-          ),
+          if (canGpa)
+            _buildStatItem(
+              icon: Icons.credit_score,
+              value: scoreList == null
+                  ? ScoreList.getTotalGpa(_scoreList).toStringAsFixed(2)
+                  : scoreList.totalGpa.toStringAsFixed(2),
+              label: 'GPA',
+            ),
           _buildStatItem(
             icon: Icons.library_books,
             value: scoreList == null
@@ -643,6 +657,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildScoreMeta(ScoreModel item) {
     final colors = context.clubColors;
+    final canGpa = ref.read(schoolStoreProvider).school?.supports(Feature.gpaCalculation) ?? true;
     return Wrap(
       spacing: 16,
       children: [
@@ -665,15 +680,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
                 style: TextStyle(color: colors.secondaryLabel))
           ],
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(CupertinoIcons.star, size: 16, color: colors.secondaryLabel),
-            const SizedBox(width: 4),
-            Text(context.l10n.gpaLabel(item.gpa),
-                style: TextStyle(color: colors.secondaryLabel))
-          ],
-        ),
+        if (canGpa)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(CupertinoIcons.star, size: 16, color: colors.secondaryLabel),
+              const SizedBox(width: 4),
+              Text(context.l10n.gpaLabel(item.gpa),
+                  style: TextStyle(color: colors.secondaryLabel))
+            ],
+          ),
       ],
     );
   }
@@ -694,6 +710,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildScoreDetailsContent(ScoreModel score, bool isTablet) {
     final colors = context.clubColors;
+    final canGpa = ref.read(schoolStoreProvider).school?.supports(Feature.gpaCalculation) ?? true;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
@@ -717,13 +734,15 @@ class _ScorePageState extends ConsumerState<ScorePage>
             content: score.grade,
             color: colors.danger,
           ),
-          const ModalSpacing(),
-          ModalInfoRow(
-            icon: CupertinoIcons.star_circle_fill,
-            label: context.l10n.courseGpaLabel,
-            content: score.gpa,
-            color: colors.success,
-          ),
+          if (canGpa) ...[
+            const ModalSpacing(),
+            ModalInfoRow(
+              icon: CupertinoIcons.star_circle_fill,
+              label: context.l10n.courseGpaLabel,
+              content: score.gpa,
+              color: colors.success,
+            ),
+          ],
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.doc_text_fill,

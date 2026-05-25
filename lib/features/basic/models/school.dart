@@ -5,7 +5,7 @@ enum Feature {
   /// 成绩查询
   gradeQuery('grade_query'),
 
-  /// 课表显示
+  /// gpa 计算
   gpaCalculation('gpa_calculation'),
 
   /// 课程信息
