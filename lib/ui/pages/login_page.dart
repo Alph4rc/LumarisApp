@@ -8,6 +8,7 @@ import 'package:ios_club_app/core/config/api_config.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -126,21 +127,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   /// 登录教务系统
+  /// 返回 true 表示登录 API 调用成功（数据刷新失败不影响登录状态）
   Future<bool> _loginToEduSystem() async {
     await EducationCacheService.clearEduCache();
-    final result = await EducationRefreshService.loginAndRefresh(
+    await PrefsService.instance.remove(PrefsKeys.GUEST_COURSE_DATA);
+
+    final loginResult = await AuthService.loginFromData(
       _usernameController.text,
       _passwordController.text,
     );
 
-    if (!result && mounted) {
-      showClubSnackBar(
-        context,
-        Text(context.l10n.loginFailed),
-      );
+    if (!loginResult) {
+      if (mounted) {
+        showClubSnackBar(
+          context,
+          Text(context.l10n.loginFailed),
+        );
+      }
+      return false;
     }
 
-    return result;
+    // 数据刷新失败不影响登录结果
+    await EducationRefreshService.refreshWithExistingSession();
+
+    return true;
   }
 
   /// 保存登录信息
