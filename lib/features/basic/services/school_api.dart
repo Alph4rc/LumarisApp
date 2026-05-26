@@ -10,7 +10,7 @@ class SchoolApi {
   }
 
   /// 需求2：根据代号返回学校详情及支持功能
-  /// GET /api/schools/:code
+  /// GET /api/v1/schools/:code
   static Future<School> getSchool(String code) async {
     code = code.toUpperCase();
     final response = await BasicHttpClientManager.instance.get('/api/v1/schools/$code');

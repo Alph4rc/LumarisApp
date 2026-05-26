@@ -49,11 +49,11 @@ enum Feature {
 }
 
 class School {
-  static const String defaultCode = 'xauat';
+  static const String defaultCode = 'XAUAT';
 
   static List<School> get fallbackList => [
         School(
-          code: 'xauat',
+          code: 'XAUAT',
           name: '西安建筑科技大学',
           website: 'https://xauatapi.xauat.site',
           features: [

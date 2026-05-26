@@ -58,20 +58,22 @@ void main() async {
       providerContainer.read(authStateNotifierProvider.notifier);
   final courseStore = providerContainer.read(courseStoreProvider.notifier);
 
+  BasicHttpClientManager.initialize();
+
+  // 在首帧渲染前完成学校配置加载，避免首页请求落到默认教务 API。
+  final schoolStore = providerContainer.read(schoolStoreProvider.notifier);
+  await schoolStore.fetchSchool(settingsStore.schoolId);
+  final initialSchool = providerContainer.read(schoolStoreProvider).school ??
+      settingsStore.currentSchool;
+
   EduHttpClientManager.initialize(
-    school: settingsStore.currentSchool,
+    school: initialSchool,
     authStateCallbacks: AuthStateCallbacks(
       onRelogging: authStateNotifier.startRelogging,
       onRelogSuccess: authStateNotifier.relogSuccess,
       onRelogFailed: authStateNotifier.relogFailed,
     ),
   );
-  BasicHttpClientManager.initialize();
-
-  // 触发学校信息获取，确保 SchoolStore 在首帧渲染前开始加载
-  providerContainer
-      .read(schoolStoreProvider.notifier)
-      .fetchSchool(settingsStore.schoolId);
 
   EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
