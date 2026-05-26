@@ -10,7 +10,7 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'auth_service.dart';
 import '../models/edu_fetch_models.dart';
-import 'score_api.dart';
+import '../apis/score_api.dart';
 
 class ScoreService {
   static Future<void> getThisSemester({UserData? userData}) async {

@@ -1,11 +1,12 @@
 import 'package:ios_club_app/features/education/models/api_response.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
+import 'package:ios_club_app/features/education/models/exam_model.dart';
 import '../../../core/services/network_exception.dart';
 import '../services/edu_http_client_manager.dart';
 
 /// Exam相关API — v1.yaml tag: ExamV1
 class ExamApi {
-  /// GET /v1/exam → ApiResponseOfExamResponse
+  /// GET /v1/exam → ApiResponseOfListOfExamInfo
   static Future<ExamResponse> getExam(
     String studentId, {
     bool forceRefresh = false,
@@ -16,9 +17,11 @@ class ExamApi {
         queryParameters: {'studentId': studentId},
         bypassCache: forceRefresh,
       );
-      final apiResponse = ApiResponse<ExamResponse>.parsed(
+      final apiResponse = ApiResponse<List<ExamItem>>.parsed(
         rawResponse,
-        (data) => ExamResponse.fromJson(Map<String, dynamic>.from(data as Map)),
+        (data) => (data as List<dynamic>)
+            .map((e) => ExamItem.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
       );
       if (!apiResponse.isSuccess) {
         throw NetworkException(
@@ -26,7 +29,10 @@ class ExamApi {
           -1,
         );
       }
-      return apiResponse.data ?? const ExamResponse(exams: [], canClick: false);
+      return ExamResponse(
+        exams: apiResponse.data ?? [],
+        canClick: true,
+      );
     } catch (e) {
       _handleError(e);
       rethrow;

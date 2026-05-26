@@ -65,7 +65,11 @@ void main() {
               Response<dynamic>(
                 requestOptions: options,
                 statusCode: 200,
-                data: 23.5,
+                data: <String, dynamic>{
+                  'data': 23.5,
+                  'code': 0,
+                  'message': 'ok',
+                },
               ),
             );
           },
@@ -167,7 +171,11 @@ void main() {
               Response<dynamic>(
                 requestOptions: options,
                 statusCode: 200,
-                data: 'https://example.com/wxCharge?id=1',
+                data: <String, dynamic>{
+                  'data': 'https://example.com/wxCharge?id=1',
+                  'code': 0,
+                  'message': 'ok',
+                },
               ),
             );
           },

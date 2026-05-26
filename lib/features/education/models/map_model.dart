@@ -49,4 +49,8 @@ class MapModel {
   static MapModel fromJson(Map<String, dynamic> map) {
     return _$MapModelFromJson(map);
   }
+
+  static Map<String, dynamic> toJson(MapModel instance) {
+    return _$MapModelToJson(instance);
+  }
 }

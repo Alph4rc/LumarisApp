@@ -6,7 +6,7 @@ import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/apis/bus_api.dart';
-import 'package:ios_club_app/features/education/services/course_api.dart';
+import 'package:ios_club_app/features/education/apis/course_api.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/apis/electricity_api.dart';
@@ -15,7 +15,7 @@ import 'package:ios_club_app/features/education/apis/info_api.dart';
 import 'package:ios_club_app/features/education/apis/login_api.dart';
 import 'package:ios_club_app/features/education/apis/payment_api.dart';
 import 'package:ios_club_app/features/education/apis/program_api.dart';
-import 'package:ios_club_app/features/education/services/score_api.dart';
+import 'package:ios_club_app/features/education/apis/score_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

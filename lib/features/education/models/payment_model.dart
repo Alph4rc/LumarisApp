@@ -34,10 +34,10 @@ class PaymentModel {
 class PaymentData {
   @JsonKey(name: 'records', fromJson: _paymentsFromJson)
   final List<PaymentModel> payments;
-  @JsonKey(fromJson: _totalFromJson)
-  final double total;
+  @JsonKey(name: 'balance', fromJson: _balanceFromJson)
+  final double balance;
 
-  const PaymentData(this.payments, this.total);
+  const PaymentData(this.payments, this.balance);
 
   factory PaymentData.fromJson(Map<String, dynamic> json) =>
       _$PaymentDataFromJson(json);
@@ -52,11 +52,11 @@ double _amountFromJson(dynamic tranamt) {
   return double.parse(tranamt.toString());
 }
 
-double _totalFromJson(dynamic total) {
-  if (total is! num && total is! String) {
-    throw ArgumentError.value(total, 'total', 'Expected number or string');
+double _balanceFromJson(dynamic balance) {
+  if (balance is! num && balance is! String) {
+    throw ArgumentError.value(balance, 'balance', 'Expected number or string');
   }
-  return double.parse(total.toString());
+  return double.parse(balance.toString());
 }
 
 List<PaymentModel> _paymentsFromJson(dynamic value) {

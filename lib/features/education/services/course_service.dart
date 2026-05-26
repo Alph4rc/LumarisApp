@@ -11,7 +11,7 @@ import 'package:ios_club_app/features/education/models/week_info.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 import 'auth_service.dart';
-import 'course_api.dart';
+import '../apis/course_api.dart';
 import '../models/edu_fetch_models.dart';
 import 'edu_time_service.dart';
 

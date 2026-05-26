@@ -112,11 +112,11 @@ void main() {
             'tranamt': '1500',
           }
         ],
-        'total': '88.5',
+        'balance': '88.5',
       });
 
       expect(result.payments.single.amount, 1500);
-      expect(result.total, 88.5);
+      expect(result.balance, 88.5);
     });
   });
 

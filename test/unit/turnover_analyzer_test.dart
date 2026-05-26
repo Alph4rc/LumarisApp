@@ -155,7 +155,7 @@ void main() {
       final paymentData = PaymentData(payments, 100.0);
 
       expect(paymentData.payments, payments);
-      expect(paymentData.total, 100.0);
+      expect(paymentData.balance, 100.0);
     });
 
     test('should create instance from JSON', () {
@@ -168,7 +168,7 @@ void main() {
             'tranamt': 15.50,
           }
         ],
-        'total': 100.0,
+        'balance': 100.0,
       };
 
       final paymentData = PaymentData.fromJson(json);
@@ -176,19 +176,19 @@ void main() {
       expect(paymentData.payments, isNotEmpty);
       expect(paymentData.payments.length, 1);
       expect(paymentData.payments[0].turnoverType, '消费');
-      expect(paymentData.total, 100.0);
+      expect(paymentData.balance, 100.0);
     });
 
     test('should handle empty records list in JSON', () {
       final json = {
         'records': [],
-        'total': 0.0,
+        'balance': 0.0,
       };
 
       final paymentData = PaymentData.fromJson(json);
 
       expect(paymentData.payments, isEmpty);
-      expect(paymentData.total, 0.0);
+      expect(paymentData.balance, 0.0);
     });
 
     test('should handle large number of records in JSON', () {
@@ -203,13 +203,13 @@ void main() {
 
       final json = {
         'records': records,
-        'total': 1000.0,
+        'balance': 1000.0,
       };
 
       final paymentData = PaymentData.fromJson(json);
 
       expect(paymentData.payments.length, 100);
-      expect(paymentData.total, 1000.0);
+      expect(paymentData.balance, 1000.0);
       expect(paymentData.payments[0].resume, '交易0');
       expect(paymentData.payments[99].resume, '交易99');
     });
@@ -226,7 +226,7 @@ void main() {
 
       final json = {
         'records': records,
-        'total': 49995000.0,
+        'balance': 49995000.0,
       };
 
       final paymentData = PaymentData.fromJson(json);
@@ -245,7 +245,7 @@ void main() {
             'tranamt': 15.50,
           }
         ],
-        // 'total' field missing
+        // 'balance' field missing
       };
 
       expect(() => PaymentData.fromJson(json), throwsArgumentError);
@@ -261,7 +261,7 @@ void main() {
             'tranamt': 15.50,
           }
         ],
-        'total': 'not_a_number',
+        'balance': 'not_a_number',
       };
 
       expect(() => PaymentData.fromJson(json), throwsA(isA<FormatException>()));
@@ -270,7 +270,7 @@ void main() {
     test('should throw when records type is invalid', () {
       final json = {
         'records': 'invalid-records',
-        'total': 1.0,
+        'balance': 1.0,
       };
 
       expect(() => PaymentData.fromJson(json), throwsA(isA<TypeError>()));
@@ -279,22 +279,22 @@ void main() {
     test('should handle zero total correctly', () {
       final json = {
         'records': [],
-        'total': 0.0,
+        'balance': 0.0,
       };
 
       final paymentData = PaymentData.fromJson(json);
-      expect(paymentData.total, 0.0);
+      expect(paymentData.balance, 0.0);
       expect(paymentData.payments, isEmpty);
     });
 
     test('should handle negative total correctly', () {
       final json = {
         'records': [],
-        'total': -100.0,
+        'balance': -100.0,
       };
 
       final paymentData = PaymentData.fromJson(json);
-      expect(paymentData.total, -100.0);
+      expect(paymentData.balance, -100.0);
     });
   });
 }

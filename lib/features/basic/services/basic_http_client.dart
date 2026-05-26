@@ -9,7 +9,7 @@ class BasicHttpClient {
 
     void _setupDio(){
       _dio.options = BaseOptions(
-      baseUrl: "https://luminoustest.zeabur.app",
+      baseUrl: "https://luminous.xauat.site",
       // 增加超时时间以适应重登录场景
       // 重登录可能需要3-5秒，加上原请求时间，总共需要更长的超时
       connectTimeout: const Duration(seconds: 10),

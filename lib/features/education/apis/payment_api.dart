@@ -1,3 +1,4 @@
+import 'package:ios_club_app/features/education/models/api_response.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/features/education/models/raw_string_response.dart';
 import '../../../core/services/network_exception.dart';
@@ -8,10 +9,20 @@ class PaymentApi {
   /// 获取缴费信息
   static Future<RawStringResponse> getPayment(String id) async {
     try {
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Payment/$id',
       );
-      return RawStringResponse.fromResponse(response);
+      final apiResponse = ApiResponse<String>.parsed(
+        rawResponse,
+        (data) => data?.toString() ?? '',
+      );
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '缴费信息请求失败',
+          -1,
+        );
+      }
+      return RawStringResponse(apiResponse.data ?? '');
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -21,17 +32,28 @@ class PaymentApi {
   /// 获取缴费流水
   static Future<PaymentData> getPaymentTurnover(String id) async {
     try {
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Payment/$id/turnover',
       );
 
-      if (response is! Map) {
-        throw NetworkException('缴费流水返回格式错误: ${response.runtimeType}', -1);
+      final apiResponse = ApiResponse<Map<String, dynamic>>.parsed(
+        rawResponse,
+        (data) => Map<String, dynamic>.from(data as Map),
+      );
+      if (!apiResponse.isSuccess || apiResponse.data == null) {
+        throw NetworkException(
+          apiResponse.message ?? '缴费流水请求失败',
+          -1,
+        );
       }
-      // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse =
-          Map<String, dynamic>.from(response);
-      return PaymentData.fromJson(typedResponse);
+
+      final turnoverData = apiResponse.data!;
+      final records = (turnoverData['records'] as List<dynamic>? ?? [])
+          .map((e) => PaymentModel.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+      final balance =
+          double.tryParse(turnoverData['balance']?.toString() ?? '0') ?? 0;
+      return PaymentData(records, balance);
     } catch (e) {
       _handleError(e);
       rethrow;

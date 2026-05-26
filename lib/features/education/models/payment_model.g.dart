@@ -23,11 +23,11 @@ Map<String, dynamic> _$PaymentModelToJson(PaymentModel instance) =>
 
 PaymentData _$PaymentDataFromJson(Map<String, dynamic> json) => PaymentData(
       _paymentsFromJson(json['records']),
-      _totalFromJson(json['total']),
+      _balanceFromJson(json['balance']),
     );
 
 Map<String, dynamic> _$PaymentDataToJson(PaymentData instance) =>
     <String, dynamic>{
       'records': instance.payments.map((e) => e.toJson()).toList(),
-      'total': instance.total,
+      'balance': instance.balance,
     };

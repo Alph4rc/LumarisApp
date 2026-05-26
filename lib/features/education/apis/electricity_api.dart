@@ -1,3 +1,4 @@
+import '../models/api_response.dart';
 import '../models/electric_data.dart';
 import '../models/edu_api_models.dart';
 import '../../../core/services/network_exception.dart';
@@ -9,21 +10,29 @@ class ElectricityApi {
   static Future<double?> getCurrentBalance({String? url}) async {
     try {
       final trimmedUrl = url?.trim();
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Electricity',
         queryParameters: trimmedUrl == null || trimmedUrl.isEmpty
             ? null
             : <String, dynamic>{'url': trimmedUrl},
       );
 
-      if (response is num) {
-        return response.toDouble();
-      }
-      if (response is String) {
-        return double.parse(response);
-      }
+      final apiResponse = ApiResponse<double>.parsed(
+        rawResponse,
+        (data) {
+          if (data is num) return data.toDouble();
+          if (data is String) return double.parse(data);
+          throw NetworkException('电费余额格式错误: ${data.runtimeType}', -1);
+        },
+      );
 
-      throw NetworkException('电费余额返回格式错误: ${response.runtimeType}', -1);
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '电费余额请求失败',
+          -1,
+        );
+      }
+      return apiResponse.data;
     } on NotFoundException {
       return null;
     } catch (e) {
@@ -37,26 +46,28 @@ class ElectricityApi {
     try {
       final trimmedUrl = url?.trim();
 
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Electricity/WeeklyData',
         queryParameters: trimmedUrl == null || trimmedUrl.isEmpty
             ? null
             : <String, dynamic>{'url': trimmedUrl},
       );
 
-      if (response is! List) {
-        throw NetworkException('电费周明细返回格式错误: ${response.runtimeType}', -1);
-      }
+      final apiResponse = ApiResponse<List<ElectricData>>.parsed(
+        rawResponse,
+        (data) => (data as List<dynamic>)
+            .map((item) =>
+                ElectricData.fromJson(Map<String, dynamic>.from(item)))
+            .toList(),
+      );
 
-      return response.map((item) {
-        if (item is! Map) {
-          throw NetworkException(
-            '电费周明细项格式错误: ${item.runtimeType}',
-            -1,
-          );
-        }
-        return ElectricData.fromJson(Map<String, dynamic>.from(item));
-      }).toList();
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '电费周明细请求失败',
+          -1,
+        );
+      }
+      return apiResponse.data ?? [];
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -68,18 +79,25 @@ class ElectricityApi {
     try {
       final trimmedUrl = url?.trim();
 
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Electricity/RechargeUrl',
         queryParameters: trimmedUrl == null || trimmedUrl.isEmpty
             ? null
             : <String, dynamic>{'url': trimmedUrl},
       );
 
-      if (response is String) {
-        return response;
-      }
+      final apiResponse = ApiResponse<String>.parsed(
+        rawResponse,
+        (data) => data as String,
+      );
 
-      throw NetworkException('电费充值地址返回格式错误: ${response.runtimeType}', -1);
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '电费充值地址请求失败',
+          -1,
+        );
+      }
+      return apiResponse.data;
     } on NotFoundException {
       return null;
     } catch (e) {
@@ -93,18 +111,25 @@ class ElectricityApi {
     CreateElectricitySubscriptionRequest request,
   ) async {
     try {
-      final response = await EduHttpClientManager.instance.post(
+      final rawResponse = await EduHttpClientManager.instance.post(
         '/Electricity/Subscriptions',
         data: request.toJson(),
       );
 
-      if (response is! Map) {
-        throw NetworkException('电费订阅创建返回格式错误: ${response.runtimeType}', -1);
-      }
-
-      return ElectricitySubscriptionResponse.fromJson(
-        Map<String, dynamic>.from(response),
+      final apiResponse = ApiResponse<ElectricitySubscriptionResponse>.parsed(
+        rawResponse,
+        (data) => ElectricitySubscriptionResponse.fromJson(
+          Map<String, dynamic>.from(data as Map),
+        ),
       );
+
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '电费订阅创建失败',
+          -1,
+        );
+      }
+      return apiResponse.data!;
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -116,19 +141,27 @@ class ElectricityApi {
     String email,
   ) async {
     try {
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Electricity/Subscriptions',
         queryParameters: <String, dynamic>{'email': email.trim()},
         bypassCache: true,
       );
 
-      if (response is! Map) {
-        throw NetworkException('电费订阅查询返回格式错误: ${response.runtimeType}', -1);
-      }
-
-      return ElectricitySubscriptionQueryResponse.fromJson(
-        Map<String, dynamic>.from(response),
+      final apiResponse =
+          ApiResponse<ElectricitySubscriptionQueryResponse>.parsed(
+        rawResponse,
+        (data) => ElectricitySubscriptionQueryResponse.fromJson(
+          Map<String, dynamic>.from(data as Map),
+        ),
       );
+
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '电费订阅查询失败',
+          -1,
+        );
+      }
+      return apiResponse.data!;
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -138,9 +171,21 @@ class ElectricityApi {
   /// 删除电费订阅
   static Future<void> deleteSubscription(String id) async {
     try {
-      await EduHttpClientManager.instance.delete(
+      final rawResponse = await EduHttpClientManager.instance.delete(
         '/Electricity/Subscriptions/${id.trim()}',
       );
+
+      final apiResponse = ApiResponse.parsed(
+        rawResponse,
+        (data) => data,
+      );
+
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '电费订阅删除失败',
+          -1,
+        );
+      }
     } catch (e) {
       _handleError(e);
       rethrow;

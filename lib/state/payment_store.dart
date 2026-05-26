@@ -86,7 +86,7 @@ class PaymentStore extends Notifier<PaymentState> {
 
       state = state.copyWith(
         records: recordsResult.payments,
-        totalRecharge: recordsResult.total,
+        totalRecharge: recordsResult.balance,
         isShowTile: isVisible,
         hasData: true,
       );

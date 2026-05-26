@@ -1,3 +1,4 @@
+import 'package:ios_club_app/features/education/models/api_response.dart';
 import 'package:ios_club_app/features/education/models/bus_model.dart';
 import '../../../core/services/network_exception.dart';
 import '../services/edu_http_client_manager.dart';
@@ -10,17 +11,26 @@ class BusApi {
     bool forceRefresh = false,
   }) async {
     try {
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Bus/${dayDate ?? ''}',
         bypassCache: forceRefresh,
       );
-      if (response is! Map) {
-        throw NetworkException('校巴返回格式错误: ${response.runtimeType}', -1);
+      final apiResponse = ApiResponse<List<BusItem>>.parsed(
+        rawResponse,
+        (data) => (data as List<dynamic>)
+            .map((e) => BusItem.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '校巴请求失败',
+          -1,
+        );
       }
-      // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse =
-          Map<String, dynamic>.from(response);
-      return BusModel.fromJson(typedResponse);
+      return BusModel(
+        records: apiResponse.data ?? [],
+        total: apiResponse.total ?? (apiResponse.data?.length ?? 0),
+      );
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -31,18 +41,27 @@ class BusApi {
   static Future<BusModel> getBusNewData(String time,
       {String loc = 'ALL', bool forceRefresh = false}) async {
     try {
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Bus/NewData/$time',
         queryParameters: {'loc': loc},
         bypassCache: forceRefresh,
       );
-      if (response is! Map) {
-        throw NetworkException('新校巴返回格式错误: ${response.runtimeType}', -1);
+      final apiResponse = ApiResponse<List<BusItem>>.parsed(
+        rawResponse,
+        (data) => (data as List<dynamic>)
+            .map((e) => BusItem.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '新校巴请求失败',
+          -1,
+        );
       }
-      // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse =
-          Map<String, dynamic>.from(response);
-      return BusModel.fromJson(typedResponse);
+      return BusModel(
+        records: apiResponse.data ?? [],
+        total: apiResponse.total ?? (apiResponse.data?.length ?? 0),
+      );
     } catch (e) {
       _handleError(e);
       rethrow;
@@ -53,18 +72,27 @@ class BusApi {
   static Future<BusModel> getBusOldData(String time,
       {bool isShow = false, bool forceRefresh = false}) async {
     try {
-      final response = await EduHttpClientManager.instance.get(
+      final rawResponse = await EduHttpClientManager.instance.get(
         '/Bus/OldData/$time',
         queryParameters: {'isShow': isShow},
         bypassCache: forceRefresh,
       );
-      if (response is! Map) {
-        throw NetworkException('旧校巴返回格式错误: ${response.runtimeType}', -1);
+      final apiResponse = ApiResponse<List<BusItem>>.parsed(
+        rawResponse,
+        (data) => (data as List<dynamic>)
+            .map((e) => BusItem.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
+      if (!apiResponse.isSuccess) {
+        throw NetworkException(
+          apiResponse.message ?? '旧校巴请求失败',
+          -1,
+        );
       }
-      // 转换为 Map<String, dynamic> 以确保类型安全
-      final Map<String, dynamic> typedResponse =
-          Map<String, dynamic>.from(response);
-      return BusModel.fromJson(typedResponse);
+      return BusModel(
+        records: apiResponse.data ?? [],
+        total: apiResponse.total ?? (apiResponse.data?.length ?? 0),
+      );
     } catch (e) {
       _handleError(e);
       rethrow;

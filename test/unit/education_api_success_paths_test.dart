@@ -122,19 +122,36 @@ void main() {
             dynamic data;
             switch (options.path) {
               case '/Info/Completion':
-                data = <Map<String, dynamic>>[];
+                data = <String, dynamic>{
+                  'data': <Map<String, dynamic>>[],
+                  'code': 0,
+                  'message': 'ok',
+                };
               case '/Exam':
                 data = <String, dynamic>{
-                  'exams': <Map<String, dynamic>>[],
-                  'canClick': false,
-                  'error': null,
+                  'data': <Map<String, dynamic>>[],
+                  'code': 0,
+                  'message': 'ok',
                 };
               case '/Program':
-                data = <Map<String, dynamic>>[];
+                data = <String, dynamic>{
+                  'data': <Map<String, dynamic>>[],
+                  'code': 0,
+                  'message': 'ok',
+                };
               case '/Program/GetDic':
-                data = <String, dynamic>{};
+                data = <String, dynamic>{
+                  'data': <String, dynamic>{},
+                  'code': 0,
+                  'message': 'ok',
+                };
               case '/Bus/2026-04-27':
-                data = <String, dynamic>{'records': <dynamic>[], 'total': 0};
+                data = <String, dynamic>{
+                  'data': <dynamic>[],
+                  'code': 0,
+                  'message': 'ok',
+                  'total': 0,
+                };
               default:
                 fail('Unexpected path ${options.path}');
             }
@@ -177,7 +194,7 @@ void main() {
                 requestOptions: options,
                 statusCode: 200,
                 data: {
-                  'records': [
+                  'data': [
                     {
                       'lineName': '雁塔-草堂',
                       'description': 'A1',
@@ -187,6 +204,8 @@ void main() {
                       'arrivalStationTime': '01:00',
                     }
                   ],
+                  'code': 0,
+                  'message': 'ok',
                   'total': 1,
                 },
               ),
@@ -211,7 +230,12 @@ void main() {
               Response<dynamic>(
                 requestOptions: options,
                 statusCode: 200,
-                data: {'records': <dynamic>[], 'total': 0},
+                data: {
+                  'data': <dynamic>[],
+                  'code': 0,
+                  'message': 'ok',
+                  'total': 0,
+                },
               ),
             );
           },
@@ -234,7 +258,11 @@ void main() {
                 Response<dynamic>(
                   requestOptions: options,
                   statusCode: 200,
-                  data: 'card-bound',
+                  data: {
+                    'data': 'card-bound',
+                    'code': 0,
+                    'message': 'ok',
+                  },
                 ),
               );
               return;
@@ -245,15 +273,19 @@ void main() {
                   requestOptions: options,
                   statusCode: 200,
                   data: {
-                    'records': [
-                      {
-                        'turnoverType': '充值',
-                        'datetimeStr': '2026-04-27 10:00:00',
-                        'resume': '测试',
-                        'tranamt': '1000',
-                      }
-                    ],
-                    'total': '1000',
+                    'data': {
+                      'records': [
+                        {
+                          'turnoverType': '充值',
+                          'datetimeStr': '2026-04-27 10:00:00',
+                          'resume': '测试',
+                          'tranamt': '1000',
+                        }
+                      ],
+                      'balance': '1000',
+                    },
+                    'code': 0,
+                    'message': 'ok',
                   },
                 ),
               );
@@ -269,7 +301,7 @@ void main() {
 
       expect(raw.value, 'card-bound');
       expect(turnover.payments.single.amount, 1000);
-      expect(turnover.total, 1000);
+      expect(turnover.balance, 1000);
     });
 
     test('PaymentApi.getPaymentTurnover should throw on invalid response',
@@ -357,7 +389,7 @@ void main() {
                 requestOptions: options,
                 statusCode: 200,
                 data: {
-                  'records': [
+                  'data': [
                     {
                       'lineName': 'past',
                       'description': '',
@@ -375,6 +407,8 @@ void main() {
                       'arrivalStationTime': '01:00',
                     },
                   ],
+                  'code': 0,
+                  'message': 'ok',
                   'total': 2,
                 },
               ),
@@ -397,7 +431,7 @@ void main() {
                 requestOptions: options,
                 statusCode: 200,
                 data: {
-                  'records': [
+                  'data': [
                     {
                       'lineName': 'early',
                       'description': '',
@@ -407,6 +441,8 @@ void main() {
                       'arrivalStationTime': '01:00',
                     },
                   ],
+                  'code': 0,
+                  'message': 'ok',
                   'total': 1,
                 },
               ),

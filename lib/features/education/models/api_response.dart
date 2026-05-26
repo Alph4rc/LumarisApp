@@ -62,6 +62,9 @@ class ApiResponse<T> {
     dynamic rawResponse,
     T Function(Object? json) fromJsonT,
   ) {
+    if (rawResponse == null) {
+      return ApiResponse<T>(data: null, code: 0, message: null, total: null);
+    }
     if (rawResponse is Map) {
       final Map<String, dynamic> json = Map<String, dynamic>.from(rawResponse);
       return ApiResponse<T>.fromJson(json, fromJsonT);
