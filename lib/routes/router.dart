@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ios_club_app/ui/pages/campus_map_page.dart';
 
-import '../under_maintenance_screen.dart';
+import '../ui/pages/under_maintenance_screen.dart';
 import '../ui/pages/agreement_page.dart';
 import '../ui/pages/author_page.dart';
 import '../ui/pages/easter_egg_page.dart';
