@@ -43,7 +43,8 @@
       "Bash(find /Users/luckyfish/.pub-cache -path \"*/webview_flutter-*/lib/webview_flutter.dart\" 2>/dev/null | head -3)",
       "Read(//Users/luckyfish/.pub-cache/**)",
       "Bash(xargs cat -n)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(sips *)"
     ]
   }
 }
