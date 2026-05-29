@@ -42,6 +42,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>应用需要您的同意才能使用相机，以便扫描二维码或拍摄照片用于设置课程表背景等。</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>应用需要您的同意才能始终获取位置信息，以便提供持续的后台定位服务。</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

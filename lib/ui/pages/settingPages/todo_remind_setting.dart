@@ -28,9 +28,19 @@ class TodoRemindSetting extends ConsumerWidget {
       trailing: CupertinoSwitch(
         value: settings.todoRemindEnabled,
         onChanged: (bool value) async {
-          await settingsStore.setTodoRemindEnabled(value);
-          if (value && context.mounted) {
-            await NotificationService.set(context);
+          if (!value) {
+            await settingsStore.setTodoRemindEnabled(false);
+            return;
+          }
+
+          if (!context.mounted) {
+            return;
+          }
+
+          final granted =
+              await NotificationService.ensureReminderPermission(context);
+          if (granted) {
+            await settingsStore.setTodoRemindEnabled(true);
           }
         },
       ),

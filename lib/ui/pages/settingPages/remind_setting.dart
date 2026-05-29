@@ -33,9 +33,19 @@ class RemindSetting extends ConsumerWidget {
           trailing: CupertinoSwitch(
             value: settings.isRemind,
             onChanged: (bool value) async {
-              await settingsStore.setIsRemind(value);
-              if (value && context.mounted) {
-                await NotificationService.set(context);
+              if (!value) {
+                await settingsStore.setIsRemind(false);
+                return;
+              }
+
+              if (!context.mounted) {
+                return;
+              }
+
+              final granted =
+                  await NotificationService.ensureReminderPermission(context);
+              if (granted) {
+                await settingsStore.setIsRemind(true);
               }
             },
           ),

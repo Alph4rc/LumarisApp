@@ -34,6 +34,12 @@ class NotificationService {
 
   AppLocalizations get _l10n => AppLocaleService.currentL10n();
 
+  static bool _isGranted(PermissionStatus status) {
+    return status == PermissionStatus.granted ||
+        status == PermissionStatus.limited ||
+        status == PermissionStatus.provisional;
+  }
+
   Future<void> initialize() async {
     tz.initializeTimeZones();
 
@@ -189,6 +195,16 @@ class NotificationService {
       await initialize();
     }
 
+    final android = notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      final canScheduleExact = await android.canScheduleExactNotifications();
+      if (canScheduleExact == null || !canScheduleExact) {
+        AppLogger.debug('Exact alarm scheduling not allowed for todo reminder');
+        return;
+      }
+    }
+
     // 解析截止日期
     DateTime? deadline;
     try {
@@ -266,28 +282,40 @@ class NotificationService {
     await scheduleTodoNotification(todo, todoRemindEnabled);
   }
 
-  static Future<void> set(BuildContext context) async {
-    // 请求精确闹钟权限
-    await PermissionService.request(
+  static Future<bool> ensureReminderPermission(BuildContext context) async {
+    final l10n = context.l10n;
+    final status = await PermissionService.request(
       Permission.scheduleExactAlarm,
-      onGranted: () async {
-        // 在 Android 上进一步请求忽略电池优化权限，以确保后台任务存活
-        if (PlatformUtils.isAndroid) {
-          await PermissionService.request(
-            Permission.ignoreBatteryOptimizations,
-            context: context,
-            dialogTitle: context.l10n.allowBackgroundRun,
-            dialogContent: context.l10n.allowBackgroundRunContent,
-            settingsText: context.l10n.goToSettings,
-          );
-        }
-        await remind();
-      },
       context: context,
-      dialogTitle: context.l10n.allowScheduleAlarm,
-      dialogContent: context.l10n.allowScheduleAlarmContent,
-      settingsText: context.l10n.goToSettings,
+      dialogTitle: l10n.allowScheduleAlarm,
+      dialogContent: l10n.allowScheduleAlarmContent,
+      settingsText: l10n.goToSettings,
     );
+
+    if (!_isGranted(status)) {
+      return false;
+    }
+
+    // 在 Android 上进一步请求忽略电池优化权限，以确保后台任务存活
+    if (PlatformUtils.isAndroid) {
+      if (!context.mounted) {
+        return false;
+      }
+      await PermissionService.request(
+        Permission.ignoreBatteryOptimizations,
+        context: context,
+        dialogTitle: l10n.allowBackgroundRun,
+        dialogContent: l10n.allowBackgroundRunContent,
+        settingsText: l10n.goToSettings,
+      );
+    }
+
+    await remind();
+    return true;
+  }
+
+  static Future<void> set(BuildContext context) async {
+    await ensureReminderPermission(context);
   }
 
   static Future<void> remind() async {

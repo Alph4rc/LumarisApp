@@ -89,7 +89,7 @@ UPDATE_CHANNEL=gitee
    
 6. iOS (ipa):
    ```bash
-   flutter build ipa
+   flutter build ipa --no-tree-shake-icons
    ```
 
 7. Linux
