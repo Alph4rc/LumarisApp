@@ -240,8 +240,7 @@ void main() {
 
       expect(scoreList.totalCredit, 0.0);
       expect(scoreList.totalCourse, 0);
-      // The code returns NaN instead of throwing an exception
-      expect(scoreList.totalGpa, isNaN);
+      expect(scoreList.totalGpa, 0.0);
     });
 
     test('should ignore minor courses in GPA calculation', () {
@@ -302,7 +301,7 @@ void main() {
 
       expect(scoreList.totalCredit, 0.0);
       expect(scoreList.totalCourse, 0);
-      expect(scoreList.totalGpa, isNaN);
+      expect(scoreList.totalGpa, 0.0);
     });
 
     test('should convert to JSON correctly', () {
@@ -359,28 +358,27 @@ void main() {
 
       final totalGpa = ScoreList.getTotalGpa([scoreList1, scoreList2]);
 
-      // Each semester has a GPA of 3.6, so average is 3.6
       expect(totalGpa, 3.6);
     });
 
-    test('should handle semesters with NaN GPA correctly', () {
+    test('should calculate total GPA across semesters with weights', () {
       final scoreList1 = ScoreList(
         semester: semester1,
         list: [
-          ScoreModel(credit: '3.0', gpa: '4.0'),
-          ScoreModel(credit: '2.0', gpa: '3.0'),
+          ScoreModel(credit: '6.0', gpa: '2.0'),
         ],
       );
 
       final scoreList2 = ScoreList(
         semester: semester2,
-        list: [], // Empty list, will have NaN GPA
+        list: [
+          ScoreModel(credit: '1.0', gpa: '4.0'),
+        ],
       );
 
       final totalGpa = ScoreList.getTotalGpa([scoreList1, scoreList2]);
 
-      // The code will return NaN because one of the semesters has NaN GPA
-      expect(totalGpa, isNaN);
+      expect(totalGpa, closeTo(2.29, 0.01));
     });
 
     test('should calculate total credit across semesters correctly', () {
@@ -407,8 +405,7 @@ void main() {
     });
 
     test('should handle empty list in static methods', () {
-      // The code returns NaN instead of throwing an exception for empty list
-      expect(ScoreList.getTotalGpa([]), isNaN);
+      expect(ScoreList.getTotalGpa([]), 0.0);
       expect(ScoreList.getTotalCredit([]), 0.0);
     });
 

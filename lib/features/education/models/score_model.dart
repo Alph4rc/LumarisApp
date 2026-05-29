@@ -8,6 +8,7 @@ part 'score_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 @HiveType(typeId: 1)
+
 /// Maps to v1.yaml schema: ScoreResponse
 class ScoreModel {
   @JsonKey(fromJson: parseSchemaString)
@@ -73,6 +74,50 @@ class ScoreList {
     return double.tryParse(value);
   }
 
+  static double _calculateGpaFromCourses(List<ScoreModel> courses) {
+    double totalCredits = 0;
+    double weightedPoints = 0;
+
+    final courseDic = <String, ScoreModel>{};
+
+    for (final item in courses) {
+      if (item.lessonCode.isEmpty) continue;
+      if (!courseDic.containsKey(item.lessonCode)) {
+        courseDic[item.lessonCode] = item;
+      } else {
+        final existing = courseDic[item.lessonCode]!;
+        final existingGpa = _tryParse(existing.gpa);
+        final newGpa = _tryParse(item.gpa);
+        if (existingGpa == null || newGpa == null) continue;
+        if (newGpa > existingGpa) {
+          courseDic[item.lessonCode] = item;
+        }
+      }
+    }
+
+    for (final item in courseDic.values) {
+      final gpaVal = _tryParse(item.gpa);
+      final credVal = _tryParse(item.credit);
+      if (gpaVal == null || credVal == null || credVal == 0) continue;
+
+      totalCredits += credVal;
+      weightedPoints += credVal * gpaVal;
+    }
+
+    for (final item in courses) {
+      if (item.isMinor) continue;
+
+      final gpaVal = _tryParse(item.gpa);
+      final credVal = _tryParse(item.credit);
+      if (gpaVal == null || credVal == null || credVal == 0) continue;
+
+      totalCredits += credVal;
+      weightedPoints += credVal * gpaVal;
+    }
+
+    return totalCredits > 0 ? weightedPoints / totalCredits : 0.0;
+  }
+
   /// 总学分
   double get totalCredit {
     double credit = 0;
@@ -88,17 +133,7 @@ class ScoreList {
 
   /// 总绩点
   double get totalGpa {
-    double total = 0;
-    double credit = 0;
-    for (var item in list) {
-      if (item.isMinor) continue;
-      final gpaVal = _tryParse(item.gpa);
-      final credVal = _tryParse(item.credit);
-      if (gpaVal == null || credVal == null || credVal == 0) continue;
-      total += credVal;
-      credit += credVal * gpaVal;
-    }
-    return total > 0 ? credit / total : 0.0;
+    return _calculateGpaFromCourses(list);
   }
 
   /// 总课程数
@@ -114,11 +149,11 @@ class ScoreList {
 
   static double getTotalGpa(List<ScoreList> scoreList) {
     if (scoreList.isEmpty) return 0.0;
-    double total = 0;
-    for (var item in scoreList) {
-      total += item.totalGpa;
+    final courses = <ScoreModel>[];
+    for (final item in scoreList) {
+      courses.addAll(item.list);
     }
-    return total / scoreList.length;
+    return _calculateGpaFromCourses(courses);
   }
 
   static double getTotalCredit(List<ScoreList> scoreList) {
