@@ -210,13 +210,31 @@ class ScoreBuilder extends StatelessWidget {
 
 // 单独的链接项组件
 class _LinkItem extends StatelessWidget {
-  final dynamic link;
+  final LinkModel link;
   final VoidCallback onTap;
 
   const _LinkItem({
     required this.link,
     required this.onTap,
   });
+
+  Widget _buildIconPlaceholder(BuildContext context) {
+    final colors = context.clubColors;
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: ShapeDecoration(
+        color: colors.surfaceRaised,
+        shape: ClubSmoothCorners.shape(ClubRadii.control),
+      ),
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.link_rounded,
+        size: 20,
+        color: colors.secondaryLabel,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,24 +253,14 @@ class _LinkItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // 图标
-              FutureBuilder(
+              FutureBuilder<Widget>(
                 future: IconUtil.getIconFont(link),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return IconTheme(
-                      data: const IconThemeData(
-                        size: 24,
-                      ),
-                      child: snapshot.data!,
-                    );
+                    return snapshot.data!;
                   }
-                  return Container(
-                    width: 44,
-                    height: 44,
-                    decoration: ShapeDecoration(
-                      shape: ClubSmoothCorners.shape(ClubRadii.control),
-                    ),
-                  );
+
+                  return _buildIconPlaceholder(context);
                 },
               ),
               const SizedBox(height: 8),

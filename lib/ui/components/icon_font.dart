@@ -1,38 +1,79 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ios_club_app/features/education/models/link_model.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
-import 'package:ios_club_app/ui/components/optimized_image.dart';
+import 'package:ios_club_app/features/education/models/link_model.dart';
 
 class IconUtil {
-  static Future<Widget> getIconFont(LinkModel model) async {
-    if (model.icon == null || model.icon!.isEmpty) {
-      return LazyLoadImage.network(
-        'https://${model.url.replaceAll("https://", "").replaceAll("http://", "").split('/').first}/favicon.ico',
+  static Widget _buildNetworkImage(String imageUrl) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.network(
+        imageUrl,
         width: 40,
         height: 40,
-      );
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(
+              Icons.link_rounded,
+              size: 20,
+              color: Colors.grey,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  static Future<Widget?> getFontIcon(LinkModel model) async {
+    final String? icon = model.icon;
+    if (icon == null || icon.isEmpty || icon.startsWith('http')) {
+      return null;
     }
 
-    if (model.icon!.startsWith('http')) {
-      return LazyLoadImage.network(
-        model.icon!,
-        width: 40,
-        height: 40,
-      );
-    }
     final dateList =
         await rootBundle.loadString('assets/iconfont/iconfont.json');
-    var iconMap = jsonDecode(dateList);
-    var a = iconMap['glyphs'] as List<dynamic>;
-    var re = a.firstWhere((element) => element['font_class'] == model.icon);
+    final dynamic iconMap = jsonDecode(dateList);
+    final List<dynamic> glyphs = iconMap['glyphs'] as List<dynamic>;
+    final dynamic matchedGlyph =
+        glyphs.cast<Map<String, dynamic>?>().firstWhere(
+              (element) => element?['font_class'] == icon,
+              orElse: () => null,
+            );
+
+    if (matchedGlyph == null) {
+      return null;
+    }
+
     return Icon(
-      createIconData(re['unicode_decimal']), // 使用静态方法创建 IconData
+      createIconData(matchedGlyph['unicode_decimal'] as int),
       size: 35,
       color: CourseColorManager.generateSoftColor(model, isDark: true),
     );
+  }
+
+  static Future<Widget> getIconFont(LinkModel model) async {
+    final String? rawIcon = model.icon;
+    final String icon = rawIcon?.trim() ?? '';
+    if (icon.isEmpty) {
+      final Uri? uri = Uri.tryParse(model.url);
+      final String? host = uri?.host;
+      if (host == null || host.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return _buildNetworkImage('https://$host/favicon.ico');
+    }
+
+    if (icon.startsWith('http')) {
+      return _buildNetworkImage(icon);
+    }
+
+    return (await getFontIcon(model)) ?? const SizedBox.shrink();
   }
 
   // 添加一个静态方法来创建 IconData 实例，以解决 tree shaking 问题
