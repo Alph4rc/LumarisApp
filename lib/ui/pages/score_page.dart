@@ -505,11 +505,11 @@ class _ScorePageState extends ConsumerState<ScorePage>
       return Container();
     }
 
-    if (_selectorList.length > 6) {
+    if (_selectorList.length > 4) {
       return _buildDropdownSelector();
     }
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: CupertinoSlidingSegmentedControl<int>(
         proportionalWidth: true,
