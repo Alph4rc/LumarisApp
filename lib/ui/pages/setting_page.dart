@@ -4,6 +4,9 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/core/services/permission_service.dart';
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/routes/router.dart';
@@ -11,9 +14,10 @@ import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/pages/settingPages/version_setting.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/features/system/notifications/notification_service.dart';
+import 'package:ios_club_app/features/system/widget_settings_service.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/club_app_bar.dart';
@@ -67,8 +71,7 @@ class SettingPage extends ConsumerWidget {
                   _buildThemeModeTile(context, settings, settingsStore),
                   const LanguageSetting(),
                   const ShowTomorrowSetting(),
-                  if (PlatformUtils.isMobile)
-                    const RemindSetting(),
+                  if (PlatformUtils.isMobile) const RemindSetting(),
                   const TodoRemindSetting(),
                   const HomePageSetting(),
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
@@ -385,25 +388,106 @@ class SettingPage extends ConsumerWidget {
       title: Text(context.l10n.addToDesktop),
       showChevron: true,
       onTap: () {
-        _openWidgetSettings(context);
+        _handleWidgetSetup(context);
       },
     );
   }
 
-  void _openWidgetSettings(BuildContext context) async {
-    try {
-      if (PlatformUtils.isAndroid) {
-        final intent = AndroidIntent(
-          action: 'android.settings.ACTION_APPLICATION_DETAILS_SETTINGS',
-          data: Uri.encodeFull('package: com.example.ios_club_app'),
-        );
-        await intent.launch();
-      }
-    } catch (e) {
-      if (context.mounted) {
-        _showWidgetInstructions(context);
-      }
+  Future<void> _handleWidgetSetup(BuildContext context) async {
+    if (PlatformUtils.isAndroid) {
+      final ready = await _ensureAndroidWidgetPrerequisites(context);
+      if (!ready || !context.mounted) return;
+
+      final type = await _showWidgetTypePicker(context);
+      if (type == null || !context.mounted) return;
+      await _openWidgetSettings(context, type: type);
+      return;
     }
+
+    await _openWidgetSettings(context);
+  }
+
+  Future<bool> _ensureAndroidWidgetPrerequisites(BuildContext context) async {
+    final exactAlarmStatus =
+        await permission_handler.Permission.scheduleExactAlarm.status;
+    final batteryOptimizationStatus =
+        await permission_handler.Permission.ignoreBatteryOptimizations.status;
+
+    final hasExactAlarm = _isPermissionGranted(exactAlarmStatus);
+    final hasBackgroundPermission =
+        _isPermissionGranted(batteryOptimizationStatus);
+
+    if (hasExactAlarm && hasBackgroundPermission) {
+      return true;
+    }
+
+    if (!context.mounted) return false;
+
+    final shouldRequest = await PlatformDialog.showConfirmDialog(
+      context,
+      title: context.l10n.addToDesktop,
+      content:
+          '${context.l10n.allowScheduleAlarm}\n${context.l10n.allowScheduleAlarmContent}\n\n'
+          '${context.l10n.allowBackgroundRun}\n${context.l10n.allowBackgroundRunContent}',
+      confirmText: context.l10n.goAuthorize,
+      cancelText: context.l10n.cancel,
+    );
+
+    if (shouldRequest != true || !context.mounted) {
+      return false;
+    }
+
+    return NotificationService.ensureReminderPermission(context);
+  }
+
+  bool _isPermissionGranted(PermissionStatus status) {
+    return status == PermissionStatus.granted ||
+        status == PermissionStatus.limited ||
+        status == PermissionStatus.provisional;
+  }
+
+  Future<void> _openWidgetSettings(
+    BuildContext context, {
+    WidgetSetupType type = WidgetSetupType.today,
+  }) async {
+    final result = await WidgetSettingsService.openWidgetSetup(type: type);
+
+    if (!context.mounted) return;
+
+    if (result == WidgetSetupLaunchResult.unavailable ||
+        result == WidgetSetupLaunchResult.failed) {
+      _showWidgetInstructions(context);
+    }
+  }
+
+  Future<WidgetSetupType?> _showWidgetTypePicker(BuildContext context) async {
+    return showCupertinoModalPopup<WidgetSetupType>(
+      context: context,
+      builder: (popupContext) {
+        return CupertinoActionSheet(
+          title: Text(context.l10n.addToDesktop),
+          message: Text(context.l10n.widgetSetupTitle),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(popupContext).pop(WidgetSetupType.today);
+              },
+              child: Text(context.l10n.todayScheduleLabel),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(popupContext).pop(WidgetSetupType.tomorrow);
+              },
+              child: Text(context.l10n.tomorrowSchedule),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(popupContext).pop(),
+            child: Text(context.l10n.cancel),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildClearCacheTile(BuildContext context) {
