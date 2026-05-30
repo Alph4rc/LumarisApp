@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,6 @@ import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/language_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/todo_remind_setting.dart';
 
 class SettingPage extends ConsumerWidget {
   const SettingPage({super.key});
@@ -72,7 +72,7 @@ class SettingPage extends ConsumerWidget {
                   const LanguageSetting(),
                   const ShowTomorrowSetting(),
                   if (PlatformUtils.isMobile) const RemindSetting(),
-                  const TodoRemindSetting(),
+                  // const TodoRemindSetting(),
                   const HomePageSetting(),
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
                     const FontFamilySetting(),
@@ -408,12 +408,15 @@ class SettingPage extends ConsumerWidget {
   }
 
   Future<bool> _ensureAndroidWidgetPrerequisites(BuildContext context) async {
-    final exactAlarmStatus =
-        await permission_handler.Permission.scheduleExactAlarm.status;
+    final exactAlarmPlugin = NotificationService.instance.notifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    final canScheduleExact =
+        await exactAlarmPlugin?.canScheduleExactNotifications() ?? false;
     final batteryOptimizationStatus =
         await permission_handler.Permission.ignoreBatteryOptimizations.status;
 
-    final hasExactAlarm = _isPermissionGranted(exactAlarmStatus);
+    final hasExactAlarm = canScheduleExact;
     final hasBackgroundPermission =
         _isPermissionGranted(batteryOptimizationStatus);
 

@@ -278,13 +278,13 @@ class _ScorePageState extends ConsumerState<ScorePage>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
+                    padding: const EdgeInsets.all(0),
                     decoration: BoxDecoration(
                       color: colors.cardBackground,
-                      borderRadius: BorderRadius.circular(25.0), 
+                      borderRadius: BorderRadius.circular(25.0),
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              colors.shadowColor.withValues(alpha: 0.1), 
+                          color: colors.shadowColor.withValues(alpha: 0.1),
                           blurRadius: 12,
                         ),
                       ],
