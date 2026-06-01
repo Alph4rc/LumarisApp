@@ -1433,7 +1433,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileReadingSubtitle => 'ログイン状態とプロフィールデータを同期中';
 
   @override
-  String get campusNavigation => 'キャンパスナビゲーション';
+  String get campusNavigation => 'キャンパスツールボックス';
 
   @override
   String get settingsAbout => '設定 / について';

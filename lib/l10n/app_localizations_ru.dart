@@ -1503,7 +1503,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Синхронизация статуса входа и данных профиля';
 
   @override
-  String get campusNavigation => 'Навигация по кампусу';
+  String get campusNavigation => 'Навигация Ящик с инструментами';
 
   @override
   String get settingsAbout => 'Настройки / О приложении';

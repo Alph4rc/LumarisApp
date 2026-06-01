@@ -2825,7 +2825,7 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
-  /// **'校园导航'**
+  /// **'校园工具箱'**
   String get campusNavigation;
 
   ///

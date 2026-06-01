@@ -1517,7 +1517,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Synchronisation du statut de connexion et des données du profil';
 
   @override
-  String get campusNavigation => 'Navigation du campus';
+  String get campusNavigation => 'Boîte à outils du campus';
 
   @override
   String get settingsAbout => 'Paramètres / À propos';

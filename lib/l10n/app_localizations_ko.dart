@@ -1481,7 +1481,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '로컬 로그인 상태와 프로필 항목을 동기화하는 중입니다. 잠시만 기다려 주세요';
 
   @override
-  String get campusNavigation => '캠퍼스 내비게이션';
+  String get campusNavigation => '캠퍼스 툴박스';
 
   @override
   String get settingsAbout => '설정/정보';

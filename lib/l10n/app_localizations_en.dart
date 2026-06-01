@@ -1503,7 +1503,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileReadingSubtitle => 'Syncing login status and profile data';
 
   @override
-  String get campusNavigation => 'Campus Navigation';
+  String get campusNavigation => 'Campus Toolbox';
 
   @override
   String get settingsAbout => 'Settings / About';

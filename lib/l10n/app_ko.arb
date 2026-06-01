@@ -506,7 +506,7 @@
 
   "profileReading": "계정 정보 로딩 중",
   "profileReadingSubtitle": "로컬 로그인 상태와 프로필 항목을 동기화하는 중입니다. 잠시만 기다려 주세요",
-  "campusNavigation": "캠퍼스 내비게이션",
+  "campusNavigation": "캠퍼스 툴박스",
   "settingsAbout": "설정/정보",
   "schoolBus": "스쿨버스",
   "programLabel": "교육 과정",

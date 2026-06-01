@@ -1523,7 +1523,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anmeldestatus und Profildaten synchronisieren';
 
   @override
-  String get campusNavigation => 'Campus-Navigation';
+  String get campusNavigation => 'Campus-Toolbox';
 
   @override
   String get settingsAbout => 'Einstellungen / Über';

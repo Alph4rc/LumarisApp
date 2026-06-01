@@ -1463,7 +1463,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profileReadingSubtitle => '正在同步本地登录状态和个人资料入口，请稍等一下';
 
   @override
-  String get campusNavigation => '校园导航';
+  String get campusNavigation => '校园工具箱';
 
   @override
   String get settingsAbout => '设置/关于';
@@ -3542,7 +3542,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get profileReadingSubtitle => '正在同步本地登入狀態和個人資料入口，請稍等一下';
 
   @override
-  String get campusNavigation => '校園導覽';
+  String get campusNavigation => '校園工具箱';
 
   @override
   String get settingsAbout => '設定／關於';
