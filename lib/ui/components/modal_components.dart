@@ -151,29 +151,32 @@ class ModalInfoRow extends StatelessWidget {
         const SizedBox(width: 14),
         // 文本内容
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colors.secondaryLabel,
-                  fontWeight: FontWeight.w500,
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.secondaryLabel,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                content,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.label,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(height: 4),
+                Text(
+                  content,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: colors.label,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: maxLines,
+                  overflow: maxLines != null ? TextOverflow.ellipsis : null,
                 ),
-                maxLines: maxLines,
-                overflow: maxLines != null ? TextOverflow.ellipsis : null,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

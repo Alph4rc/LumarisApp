@@ -786,9 +786,36 @@ class _ScorePageState extends ConsumerState<ScorePage>
     final content = _buildScoreDetailsContent(score, isTablet);
 
     if (isTablet) {
-      await PlatformDialog.showCustomDialog<void>(
-        context,
-        content: content,
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext dialogContext) {
+          final screenSize = MediaQuery.sizeOf(dialogContext);
+          final dialogWidth =
+              (screenSize.width * 0.36).clamp(420.0, 560.0).toDouble();
+          final maxDialogHeight = screenSize.height * 0.78;
+
+          return Dialog(
+            insetPadding:
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: dialogWidth,
+                maxHeight: maxDialogHeight,
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+                child: content,
+              ),
+            ),
+          );
+        },
       );
     } else {
       await showClubModalBottomSheet(context, content);
@@ -802,47 +829,49 @@ class _ScorePageState extends ConsumerState<ScorePage>
             .school
             ?.supports(Feature.gpaCalculation) ??
         true;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ModalHeader(
-            title: score.name,
-            subtitle: score.isMinor ? context.l10n.minorCourse : null,
-          ),
-          ModalInfoRow(
-            icon: CupertinoIcons.star_fill,
-            label: context.l10n.courseCreditLabel,
-            content: context.l10n.creditUnit(score.credit),
-            color: colors.yellow,
-          ),
-          const ModalSpacing(),
-          ModalInfoRow(
-            icon: CupertinoIcons.chart_bar_fill,
-            label: context.l10n.courseScoreLabel,
-            content: score.grade,
-            color: colors.danger,
-          ),
-          if (canGpa) ...[
+    return SizedBox(
+      width: isTablet ? 420 : double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ModalHeader(
+              title: score.name,
+              subtitle: score.isMinor ? context.l10n.minorCourse : null,
+            ),
+            ModalInfoRow(
+              icon: CupertinoIcons.star_fill,
+              label: context.l10n.courseCreditLabel,
+              content: context.l10n.creditUnit(score.credit),
+              color: colors.yellow,
+            ),
             const ModalSpacing(),
             ModalInfoRow(
-              icon: CupertinoIcons.star_circle_fill,
-              label: context.l10n.courseGpaLabel,
-              content: score.gpa,
-              color: colors.success,
+              icon: CupertinoIcons.chart_bar_fill,
+              label: context.l10n.courseScoreLabel,
+              content: score.grade,
+              color: colors.danger,
+            ),
+            if (canGpa) ...[
+              const ModalSpacing(),
+              ModalInfoRow(
+                icon: CupertinoIcons.star_circle_fill,
+                label: context.l10n.courseGpaLabel,
+                content: score.gpa,
+                color: colors.success,
+              ),
+            ],
+            const ModalSpacing(),
+            ModalInfoRow(
+              icon: CupertinoIcons.doc_text_fill,
+              label: context.l10n.scoreDetail,
+              content: score.gradeDetail,
+              color: colors.primary,
             ),
           ],
-          const ModalSpacing(),
-          ModalInfoRow(
-            icon: CupertinoIcons.doc_text_fill,
-            label: context.l10n.scoreDetail,
-            content: score.gradeDetail,
-            color: colors.primary,
-            maxLines: 5,
-          ),
-        ],
+        ),
       ),
     );
   }
