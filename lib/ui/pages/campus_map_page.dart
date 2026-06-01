@@ -23,6 +23,10 @@ class CampusMapPage extends ConsumerStatefulWidget {
 }
 
 class _CampusMapPageState extends ConsumerState<CampusMapPage> {
+  static const double _minMapZoom = 4.0;
+  static const double _maxMapZoom = 19.0;
+  static const int _maxNativeTileZoom = 18;
+
   late final MapController _mapController;
   late final TextEditingController _searchController;
   CampusPOI? _selectedPOI;
@@ -50,7 +54,14 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   void _moveToLocation(LatLng loc, {double zoom = 17.5}) {
-    _mapController.move(loc, zoom);
+    _mapController.move(loc, zoom.clamp(_minMapZoom, _maxMapZoom));
+    HapticFeedback.lightImpact();
+  }
+
+  void _zoomBy(double delta) {
+    final nextZoom =
+        (_mapController.camera.zoom + delta).clamp(_minMapZoom, _maxMapZoom);
+    _mapController.move(_mapController.camera.center, nextZoom);
     HapticFeedback.lightImpact();
   }
 
@@ -140,7 +151,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       ? mapState.campusPOIs.first.position
                       : const LatLng(34.2312, 108.9632),
                   initialZoom: 16.0,
-                  maxZoom: 19.0,
+                  maxZoom: _maxMapZoom,
                   onTap: (_, __) {
                     setState(() => _selectedPOI = null);
                     _sheetController.animateTo(
@@ -155,7 +166,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                     urlTemplate:
                         'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
                     subdomains: const ['1', '2', '3', '4'],
-                    maxZoom: 19,
+                    maxZoom: _maxMapZoom,
+                    maxNativeZoom: _maxNativeTileZoom,
                     tileBuilder: isDarkMode
                         ? (context, tileWidget, tile) {
                             return ColorFiltered(
@@ -511,9 +523,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 children: [
                   _buildControlItem(
                     icon: Icons.add_rounded,
-                    onTap: () => _mapController.move(
-                        _mapController.camera.center,
-                        _mapController.camera.zoom + 1),
+                    onTap: () => _zoomBy(1),
                     colors: colors,
                   ),
                   Divider(
@@ -521,9 +531,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       color: colors.separator.withValues(alpha: 0.1)),
                   _buildControlItem(
                     icon: Icons.remove_rounded,
-                    onTap: () => _mapController.move(
-                        _mapController.camera.center,
-                        _mapController.camera.zoom - 1),
+                    onTap: () => _zoomBy(-1),
                     colors: colors,
                   ),
                 ],
