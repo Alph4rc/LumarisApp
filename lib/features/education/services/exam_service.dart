@@ -59,8 +59,7 @@ class ExamService {
     );
     if (result.$1 && result.$2 != null) {
       await _updateCache(prefs, result.$2!, now);
-      final exams = _parseExamItemsFromResponse(result.$2!, now);
-      return exams.isEmpty ? ExamResult.empty() : ExamResult.success(exams);
+      return result.$3;
     }
 
     return result.$3;
@@ -104,7 +103,11 @@ class ExamService {
       final prefs = PrefsService.instance;
       final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
       final mergedData = _mergeExamData(existingData, response, now);
-      return (true, mergedData, ExamResult.success(mergedData.exams));
+      final parsedExams = _parseExamItemsFromResponse(mergedData, now);
+      final result = parsedExams.isEmpty
+          ? ExamResult.empty()
+          : ExamResult.success(parsedExams);
+      return (true, mergedData, result);
     } on AuthenticationException catch (e) {
       AppLogger.debug('认证失败: $e');
       return (false, null, ExamResult.error('auth_failed'));

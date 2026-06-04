@@ -19,6 +19,7 @@ import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
+import 'package:ios_club_app/features/education/services/exam_service.dart';
 import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/features/education/services/score_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -470,6 +471,65 @@ void main() {
         '2025-2',
         '2024-1',
       ]);
+    });
+
+    test(
+        'ExamService.getExamResult should return filtered merged exams on refresh',
+        () async {
+      await PrefsService.instance.setString(
+        PrefsKeys.USER_DATA,
+        '{"studentId":"2026001","cookie":"session"}',
+      );
+      await PrefsService.instance.setInt(
+        PrefsKeys.LAST_FETCH_TIME,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+      await PrefsService.instance.setString(
+        PrefsKeys.EXAM_DATA,
+        '{"exams":[{"name":"缓存考试","time":"2099-06-10 09:00-11:00","location":"A101","seat":"01"}],"canClick":true}',
+      );
+
+      mockEduResponse(
+        path: '/Exam',
+        data: <String, dynamic>{
+          'data': <Map<String, dynamic>>[
+            {
+              'name': '缓存考试',
+              'time': '2099-06-10 09:00-11:00',
+              'location': 'A101',
+              'seat': '01',
+            },
+            {
+              'name': '新增考试',
+              'time': '2099-06-11 14:00-16:00',
+              'location': 'B202',
+              'seat': '02',
+            },
+            {
+              'name': '过期考试',
+              'time': '2000-06-11 08:00-10:00',
+              'location': 'C303',
+              'seat': '03',
+            },
+          ],
+          'code': 0,
+          'message': 'ok',
+        },
+      );
+
+      final result = await ExamService.getExamResult(isRefresh: true);
+
+      expect(result.isSuccess, isTrue);
+      expect(result.exams.map((item) => item.name).toList(), [
+        '缓存考试',
+        '新增考试',
+      ]);
+
+      final cachedExamData =
+          PrefsService.instance.getString(PrefsKeys.EXAM_DATA);
+      expect(cachedExamData, isNotNull);
+      expect(cachedExamData, isNot(contains('过期考试')));
+      expect(cachedExamData, contains('新增考试'));
     });
 
     test('ScoreService.sortScores should order semesters descending', () {
