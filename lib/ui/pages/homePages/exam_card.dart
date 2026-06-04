@@ -33,13 +33,19 @@ class _ExamCardState extends State<ExamCard> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      isLoading = true;
+    isLoading = true;
+    ExamService.getExamResult().then((result) {
+      if (!mounted) {
+        return;
+      }
+      setExam(result);
     });
-    ExamService.getExamResult().then((result) => setExam(result));
   }
 
   void setExam(ExamResult result) {
+    if (!mounted) {
+      return;
+    }
     setState(() {
       if (result.isSuccess) {
         examItems = result.exams
@@ -63,11 +69,17 @@ class _ExamCardState extends State<ExamCard> {
   }
 
   Future<void> getExam() async {
+    if (!mounted) {
+      return;
+    }
     setState(() {
       isLoading = true;
       errorMessage = null;
     });
     final result = await ExamService.getExamResult(isRefresh: true);
+    if (!mounted) {
+      return;
+    }
     setExam(result);
   }
 

@@ -104,7 +104,7 @@ class ExamService {
       final prefs = PrefsService.instance;
       final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
       final mergedData = _mergeExamData(existingData, response, now);
-      return (true, mergedData, ExamResult.empty());
+      return (true, mergedData, ExamResult.success(mergedData.exams));
     } on AuthenticationException catch (e) {
       AppLogger.debug('认证失败: $e');
       return (false, null, ExamResult.error('auth_failed'));
