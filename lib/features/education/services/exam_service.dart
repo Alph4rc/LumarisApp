@@ -59,7 +59,6 @@ class ExamService {
     );
     if (result.$1 && result.$2 != null) {
       await _updateCache(prefs, result.$2!, now);
-      return result.$3;
     }
 
     return result.$3;
