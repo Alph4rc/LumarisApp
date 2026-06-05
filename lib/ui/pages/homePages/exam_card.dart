@@ -321,7 +321,7 @@ class _ExamCardState extends State<ExamCard> {
         ModalHeader(title: exam.title),
         ModalInfoRow(
           icon: CupertinoIcons.clock,
-          label: l10n.classTime,
+          label: l10n.examTime,
           content: exam.time,
           color: colors.success,
         ),
@@ -329,7 +329,7 @@ class _ExamCardState extends State<ExamCard> {
           const ModalSpacing(),
           ModalInfoRow(
             icon: CupertinoIcons.placemark,
-            label: l10n.classroom,
+            label: l10n.examLocation,
             content: exam.location,
             color: colors.warning,
           ),
