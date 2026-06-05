@@ -154,18 +154,19 @@ class ExamService {
     ExamResponse response,
     DateTime now,
   ) {
-    final list = <ExamItem>[];
+    final list = <ExamItemAndEndTime>[];
     for (final item in response.exams) {
       try {
         final endTime = _parseExamTime(item.examTime, now);
         if (endTime != null && !now.isAfter(endTime)) {
-          list.add(item);
+          list.add(ExamItemAndEndTime(name: item.name, examTime: item.examTime, room: item.room, seatNo: item.seatNo, endTime: endTime));
         }
       } catch (e) {
         AppLogger.debug('时间解析失败: $e');
       }
     }
     AppLogger.debug('解析完成，找到${list.length}个有效考试');
+    list.sort((a, b) => a.endTime.compareTo(b.endTime));
     return list;
   }
 
@@ -192,14 +193,7 @@ class ExamService {
         examMap['${exam.name}_${exam.examTime}_${exam.room}'] = exam;
       }
 
-      final validExams = examMap.values.where((exam) {
-        try {
-          final endTime = _parseExamTime(exam.examTime, now);
-          return endTime != null && !now.isAfter(endTime);
-        } catch (e) {
-          return false;
-        }
-      }).toList();
+      final validExams = examMap.values.toList();
 
       return ExamResponse(exams: validExams, canClick: newExams.canClick);
     } catch (e) {
@@ -213,7 +207,20 @@ class ExamService {
         RegExp(r'(\d{4})-(\d{2})-(\d{2}).*?(\d{2}):(\d{2})-(\d{2}):(\d{2})')
             .firstMatch(examTime);
     if (match == null) {
-      return null;
+      final matchType2 =
+          RegExp(r'(\d{4})-(\d{2})-(\d{2}).*?(\d{2}):(\d{2})~(\d{2}):(\d{2})')
+              .firstMatch(examTime);
+      if (matchType2 == null) {
+        return null;
+      }
+
+      return DateTime(
+        int.parse(matchType2.group(1)!),
+        int.parse(matchType2.group(2)!),
+        int.parse(matchType2.group(3)!),
+        int.parse(matchType2.group(6)!),
+        int.parse(matchType2.group(7)!),
+      );
     }
 
     return DateTime(
@@ -224,4 +231,16 @@ class ExamService {
       int.parse(match.group(7)!),
     );
   }
+}
+
+class ExamItemAndEndTime extends ExamItem {
+  DateTime endTime;
+
+  ExamItemAndEndTime({
+    required super.name,
+    required super.examTime,
+    required super.room,
+    required super.seatNo,
+    required this.endTime,
+  });
 }
