@@ -84,7 +84,7 @@ UPDATE_CHANNEL=gitee
 5. macOS
 
    ```bash
-   flutter build macos
+   flutter build macos --no-tree-shake-icons --release
    ```
    
 6. iOS (ipa):
