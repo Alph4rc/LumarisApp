@@ -2051,4 +2051,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get urlHint => 'ウェブサイトのURLを入力';
+
+  @override
+  String get icp => 'ICP';
 }

@@ -36,6 +36,7 @@ import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
 import 'package:ios_club_app/ui/pages/settingPages/language_setting.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingPage extends ConsumerWidget {
   const SettingPage({super.key});
@@ -99,6 +100,7 @@ class SettingPage extends ConsumerWidget {
                   _buildLicenseTile(context),
                   _buildPrivacyPolicyTile(context),
                   _buildUserAgreementTile(context),
+                  _buildICPTile(context)
                 ]),
                 const SizedBox(height: 24),
                 _buildSectionTitle(context, context.l10n.other),
@@ -316,6 +318,24 @@ class SettingPage extends ConsumerWidget {
       subtitle: Text(context.l10n.mitLicense),
       onTap: () {
         AppRouter.push(AppRoutes.license);
+      },
+    );
+  }
+
+  Widget _buildICPTile(BuildContext context) {
+    return ClubListTile(
+      leading: Icon(
+        CupertinoIcons.checkmark_shield_fill,
+        size: 20,
+        color: context.clubColors.success,
+      ),
+      title: Text(context.l10n.icp),
+      subtitle: Text("陕ICP备2024031872号-2A"),
+      onTap: () async {
+        final Uri url = Uri.parse('https://beian.miit.gov.cn/');
+        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+          throw Exception('Could not launch $url');
+        }
       },
     );
   }

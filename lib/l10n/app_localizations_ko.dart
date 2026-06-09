@@ -2105,4 +2105,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get urlHint => '웹사이트 URL 입력';
+
+  @override
+  String get icp => 'ICP';
 }

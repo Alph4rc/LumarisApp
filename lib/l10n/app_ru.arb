@@ -721,5 +721,6 @@
   "switchSchool": "Сменить учебное заведение",
   "selectSchool": "Выбрать школу",
   "enterCustomUrl": "Или введите свой URL",
-  "urlHint": "Введите URL веб-сайта"
+  "urlHint": "Введите URL веб-сайта",
+  "icp" : "ICP"
 }

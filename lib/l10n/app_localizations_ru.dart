@@ -2159,4 +2159,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get urlHint => 'Введите URL веб-сайта';
+
+  @override
+  String get icp => 'ICP';
 }

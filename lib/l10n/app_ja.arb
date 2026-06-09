@@ -726,5 +726,6 @@
   "switchSchool": "学校を切り替える",
   "selectSchool": "学校を選択",
   "enterCustomUrl": "またはカスタムURLを入力",
-  "urlHint": "ウェブサイトのURLを入力"
+  "urlHint": "ウェブサイトのURLを入力",
+  "icp" : "ICP"
 }

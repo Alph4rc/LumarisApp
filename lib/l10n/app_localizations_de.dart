@@ -2188,4 +2188,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get urlHint => 'Website-URL eingeben';
+
+  @override
+  String get icp => 'ICP';
 }

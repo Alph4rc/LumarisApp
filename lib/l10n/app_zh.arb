@@ -767,6 +767,7 @@
   "selectSchool": "选择学校",
   "enterCustomUrl": "或输入自定义网址",
   "urlHint": "请输入网址",
+  "icp" : "ICP备案号",
   "@appName": {"description": ""},
   "@appSlogan": {"description": ""},
   "@tagline": {"description": ""},
@@ -1402,5 +1403,6 @@
   "@switchSchool": {"description": ""},
   "@selectSchool": {"description": ""},
   "@enterCustomUrl": {"description": ""},
-  "@urlHint": {"description": ""}
+  "@urlHint": {"description": ""},
+  "@icp": {"description": ""}
 }

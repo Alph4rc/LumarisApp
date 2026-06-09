@@ -2080,6 +2080,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get urlHint => '请输入网址';
+
+  @override
+  String get icp => 'ICP备案号';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4159,4 +4162,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get urlHint => '請輸入網址';
+
+  @override
+  String get icp => 'ICP';
 }

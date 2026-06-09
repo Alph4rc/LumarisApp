@@ -725,5 +725,6 @@
   "noCoursesParsed": "No courses parsed",
   "selectSchool": "Select School",
   "enterCustomUrl": "Or enter a custom URL",
-  "urlHint": "Enter website URL"
+  "urlHint": "Enter website URL",
+  "icp" : "ICP"
 }

@@ -4039,6 +4039,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'请输入网址'**
   String get urlHint;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'ICP备案号'**
+  String get icp;
 }
 
 class _AppLocalizationsDelegate

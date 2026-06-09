@@ -724,5 +724,6 @@
   "enterCustomUrl": "或輸入自訂網址",
   "urlHint": "請輸入網址",
 
-  "traditionalChinese": "繁體中文"
+  "traditionalChinese": "繁體中文",
+  "icp" : "ICP"
 }

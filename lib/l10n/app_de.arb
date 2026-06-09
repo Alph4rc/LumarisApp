@@ -722,5 +722,6 @@
   "switchSchool": "Hochschule wechseln",
   "selectSchool": "Schule auswählen",
   "enterCustomUrl": "Oder eigene URL eingeben",
-  "urlHint": "Website-URL eingeben"
+  "urlHint": "Website-URL eingeben",
+  "icp" : "ICP"
 }
