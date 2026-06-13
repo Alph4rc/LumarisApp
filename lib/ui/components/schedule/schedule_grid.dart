@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
+import 'package:ios_club_app/core/utils/week_start_utils.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
@@ -19,6 +21,7 @@ class ScheduleGrid extends StatelessWidget {
     required this.courses,
     required this.cellHeight,
     this.periodCount = 12,
+    this.weekStartDay = School.defaultWeekStartDay,
     this.isYanTa = false,
     this.cardStyle = CourseCardStyle.normal,
     this.showGrid = true,
@@ -30,6 +33,7 @@ class ScheduleGrid extends StatelessWidget {
   final List<CourseModel> courses;
   final double cellHeight;
   final int periodCount;
+  final int weekStartDay;
   final bool isYanTa;
   final CourseCardStyle cardStyle;
   final bool showGrid;
@@ -52,15 +56,15 @@ class ScheduleGrid extends StatelessWidget {
         // 右侧课程网格
         Expanded(
           child: Row(
-            children: List.generate(7, (dayIndex) {
-              final weekday = dayIndex == 0 ? 7 : dayIndex;
+            children:
+                WeekStartUtils.orderedWeekdays(weekStartDay).map((weekday) {
               return Expanded(
                 child: _buildDayColumn(
                   context,
                   weekday,
                 ),
               );
-            }),
+            }).toList(),
           ),
         ),
       ],

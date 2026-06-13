@@ -35,7 +35,7 @@ enum Feature {
   /// 校园地图
   map('map');
 
-   /// 其他功能
+  /// 其他功能
 
   const Feature(this.value);
   final String value;
@@ -50,6 +50,7 @@ enum Feature {
 
 class School {
   static const String defaultCode = 'XAUAT';
+  static const int defaultWeekStartDay = DateTime.sunday;
 
   static List<School> get fallbackList => [
         School(
@@ -83,6 +84,7 @@ class School {
   final bool enabled;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int weekStartDay;
 
   School({
     required this.code,
@@ -90,9 +92,10 @@ class School {
     required this.website,
     required this.features,
     this.enabled = true,
+    int? weekStartDay,
     required this.createdAt,
     required this.updatedAt,
-  });
+  }) : weekStartDay = _normalizeWeekStartDay(weekStartDay);
 
   bool supports(Feature feature) => features.contains(feature);
 
@@ -114,27 +117,42 @@ class School {
         .toList();
   }
 
+  static int _normalizeWeekStartDay(int? weekStartDay) {
+    return switch (weekStartDay) {
+      DateTime.monday => DateTime.monday,
+      DateTime.sunday => DateTime.sunday,
+      _ => defaultWeekStartDay,
+    };
+  }
+
+  static int? _readWeekStartDay(Map<String, dynamic> json) {
+    final value = json['week_start_day'];
+    return value is int ? value : null;
+  }
+
   factory School.fromJson(Map<String, dynamic> json) => School(
-    code: json['code'] as String,
-    name: json['name'] as String,
-    website: json['website'] as String,
-    features: (json['features'] as List<dynamic>)
-        .map((f) => Feature.fromValue(f as String))
-        .toList(),
-    enabled: json['enabled'] as bool? ?? true,
-    createdAt: DateTime.parse(json['created_at'] as String),
-    updatedAt: DateTime.parse(json['updated_at'] as String),
-  );
+        code: json['code'] as String,
+        name: json['name'] as String,
+        website: json['website'] as String,
+        features: (json['features'] as List<dynamic>)
+            .map((f) => Feature.fromValue(f as String))
+            .toList(),
+        enabled: json['enabled'] as bool? ?? true,
+        weekStartDay: _readWeekStartDay(json),
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+      );
 
   Map<String, dynamic> toJson() => {
-    'code': code,
-    'name': name,
-    'website': website,
-    'features': features.map((f) => f.value).toList(),
-    'enabled': enabled,
-    'created_at': createdAt.toIso8601String(),
-    'updated_at': updatedAt.toIso8601String(),
-  };
+        'code': code,
+        'name': name,
+        'website': website,
+        'features': features.map((f) => f.value).toList(),
+        'enabled': enabled,
+        'week_start_day': weekStartDay,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+      };
 }
 
 class SchoolListData {
@@ -144,9 +162,9 @@ class SchoolListData {
   SchoolListData({required this.total, required this.items});
 
   factory SchoolListData.fromJson(Map<String, dynamic> json) => SchoolListData(
-    total: json['total'] as int,
-    items: (json['items'] as List<dynamic>)
-        .map((e) => School.fromJson(Map<String, dynamic>.from(e)))
-        .toList(),
-  );
+        total: json['total'] as int,
+        items: (json['items'] as List<dynamic>)
+            .map((e) => School.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
 }

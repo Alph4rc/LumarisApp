@@ -40,6 +40,9 @@ class EduHttpClientManager {
   /// 获取当前的 HTTP 客户端实例。
   static EduHttpClient get instance => current._client;
 
+  /// 当前学校配置；如果管理器尚未初始化，则返回 null。
+  static School? get currentSchoolOrNull => _shared?._school;
+
   /// 重置全局管理器，主要用于测试隔离。
   static void resetForTest() {
     _shared?.dispose();

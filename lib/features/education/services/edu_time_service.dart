@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/utils/week_start_utils.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/models/time_info.dart';
 import 'package:ios_club_app/features/education/models/week_info.dart';
@@ -63,7 +65,10 @@ class EduTimeService {
     }
   }
 
-  static Future<WeekInfo> getWeek({bool isRefresh = false}) async {
+  static Future<WeekInfo> getWeek({
+    bool isRefresh = false,
+    int weekStartDay = School.defaultWeekStartDay,
+  }) async {
     final time = await getTimeInfo(
       policy: isRefresh ? FetchPolicy.refresh : FetchPolicy.localFirst,
     );
@@ -75,33 +80,26 @@ class EduTimeService {
     final endTime = DateTime.parse(time.endTime!);
     final now = DateTime.now();
 
-    DateTime getWeekStart(DateTime date) {
-      final daysSinceWeekStart = date.weekday == 7 ? 0 : date.weekday;
-      return DateTime(date.year, date.month, date.day)
-          .subtract(Duration(days: daysSinceWeekStart));
-    }
+    final startWeek = WeekStartUtils.getWeekStart(startTime, weekStartDay);
+    final currentWeek = WeekStartUtils.getWeekStart(now, weekStartDay);
+    final endWeek = WeekStartUtils.getWeekStart(endTime, weekStartDay);
 
-    final startWeekSunday = getWeekStart(startTime);
-    final currentWeekSunday = getWeekStart(now);
-    final endWeekSunday = getWeekStart(endTime);
-
-    final week = currentWeekSunday.difference(startWeekSunday).inDays ~/ 7 + 1;
-    final maxWeek = endWeekSunday.difference(startWeekSunday).inDays ~/ 7 + 1;
+    final week = currentWeek.difference(startWeek).inDays ~/ 7 + 1;
+    final maxWeek = endWeek.difference(startWeek).inDays ~/ 7 + 1;
     return WeekInfo(week: week, maxWeek: maxWeek);
   }
 
   /// 统一的周数计算工具方法
-  static int getWeekIndexByStartTime(DateTime date, DateTime startTime) {
-    DateTime getWeekStart(DateTime d) {
-      final daysSinceWeekStart = d.weekday == 7 ? 0 : d.weekday;
-      return DateTime(d.year, d.month, d.day)
-          .subtract(Duration(days: daysSinceWeekStart));
-    }
-
-    final startWeekSunday = getWeekStart(startTime);
-    final targetWeekSunday = getWeekStart(date);
-
-    return targetWeekSunday.difference(startWeekSunday).inDays ~/ 7 + 1;
+  static int getWeekIndexByStartTime(
+    DateTime date,
+    DateTime startTime, {
+    int weekStartDay = School.defaultWeekStartDay,
+  }) {
+    return WeekStartUtils.getWeekIndexByStartTime(
+      date,
+      startTime,
+      weekStartDay: weekStartDay,
+    );
   }
 
   static TimeInfo readTimeInfoFromPrefs() {

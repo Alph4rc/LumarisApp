@@ -5,6 +5,8 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/week_start_utils.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/week_info.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
@@ -14,6 +16,7 @@ import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/course_store.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 
@@ -34,6 +37,16 @@ class ScheduleStore extends Notifier<ScheduleState> {
         }
       },
     );
+    ref.listen<int>(
+      schoolStoreProvider.select(
+        (value) => value.school?.weekStartDay ?? School.defaultWeekStartDay,
+      ),
+      (previous, next) {
+        if (previous != null && previous != next) {
+          Future<void>.microtask(initializeData);
+        }
+      },
+    );
     Future<void>.microtask(initializeData);
     return const ScheduleState();
   }
@@ -49,9 +62,15 @@ class ScheduleStore extends Notifier<ScheduleState> {
   bool get isShowTomorrow => ref.read(settingsStoreProvider).isShowTomorrow;
   int get weekNow => state.weekNow;
 
+  int get _weekStartDay =>
+      ref.read(schoolStoreProvider).school?.weekStartDay ??
+      School.defaultWeekStartDay;
+
   Future<void> initializeData() async {
     try {
-      final weekData = await EduTimeService.getWeek();
+      final weekData = await EduTimeService.getWeek(
+        weekStartDay: _weekStartDay,
+      );
       _handleWeekData(weekData);
       final isLogin = ref.read(userStoreProvider).isLogin;
       if (isLogin) {
@@ -153,7 +172,10 @@ class ScheduleStore extends Notifier<ScheduleState> {
     try {
       AppLogger.debug('[ScheduleStore] 调用 CourseService.getCourse');
 
-      final weekData = await EduTimeService.getWeek(isRefresh: true);
+      final weekData = await EduTimeService.getWeek(
+        isRefresh: true,
+        weekStartDay: _weekStartDay,
+      );
 
       if (currentRefreshId != _refreshCount) return;
 
@@ -295,7 +317,13 @@ class ScheduleStore extends Notifier<ScheduleState> {
         tomorrowWeekDay = 1;
       }
 
-      final targetWeek = tomorrowWeekDay == 7 ? weekIndex + 1 : weekIndex;
+      final todayWeekStart = WeekStartUtils.getWeekStart(now, _weekStartDay);
+      final tomorrowWeekStart = WeekStartUtils.getWeekStart(
+        tomorrow,
+        _weekStartDay,
+      );
+      final targetWeek =
+          tomorrowWeekStart == todayWeekStart ? weekIndex : weekIndex + 1;
 
       if (targetWeek >= state.allCourses.length) {
         return [];

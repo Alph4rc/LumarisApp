@@ -87,6 +87,7 @@ class PrefsKeys {
 
   /// 学校配置相关
   static const String SCHOOL_ID = 'school_id';
+  static const String SCHOOL_DATA = 'school_data';
 
   /// 游客课程数据（HTML 导入等）
   static const String GUEST_COURSE_DATA = 'guest_course_data';

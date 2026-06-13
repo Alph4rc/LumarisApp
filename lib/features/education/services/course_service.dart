@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/repositories/course_repository.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/models/week_info.dart';
@@ -13,9 +14,15 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'auth_service.dart';
 import '../apis/course_api.dart';
 import '../models/edu_fetch_models.dart';
+import 'edu_http_client_manager.dart';
 import 'edu_time_service.dart';
 
 class CourseService {
+  static int get _weekStartDay {
+    return EduHttpClientManager.currentSchoolOrNull?.weekStartDay ??
+        School.defaultWeekStartDay;
+  }
+
   static Future<FetchSnapshot<List<CourseModel>>> getCourses({
     FetchPolicy policy = FetchPolicy.localFirst,
     bool includeIgnored = false,
@@ -127,10 +134,11 @@ class CourseService {
       if (time.startTime == null) {
         return [];
       }
-      week =
-          DateTime.now().difference(DateTime.parse(time.startTime!)).inDays ~/
-                  7 +
-              1;
+      week = EduTimeService.getWeekIndexByStartTime(
+        DateTime.now(),
+        DateTime.parse(time.startTime!),
+        weekStartDay: _weekStartDay,
+      );
     }
 
     return allCourse
@@ -149,7 +157,11 @@ class CourseService {
     }
 
     final startTime = DateTime.parse(time.startTime!);
-    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(
+      now,
+      startTime,
+      weekStartDay: _weekStartDay,
+    );
 
     var filteredCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekNow) &&
@@ -161,8 +173,11 @@ class CourseService {
         return (false, filteredCourses);
       }
       final tomorrow = now.add(const Duration(days: 1));
-      var weekTomorrow =
-          EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+      var weekTomorrow = EduTimeService.getWeekIndexByStartTime(
+        tomorrow,
+        startTime,
+        weekStartDay: _weekStartDay,
+      );
       var tomorrowWeekday = tomorrow.weekday;
 
       filteredCourses = allCourse.where((course) {
@@ -207,7 +222,11 @@ class CourseService {
     }
 
     final startTime = DateTime.parse(time.startTime!);
-    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(
+      now,
+      startTime,
+      weekStartDay: _weekStartDay,
+    );
 
     var todayCourses = allCourse.where((course) {
       return course.weekIndexes.contains(weekNow) &&
@@ -230,8 +249,11 @@ class CourseService {
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
     final tomorrow = now.add(const Duration(days: 1));
-    var weekTomorrow =
-        EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var weekTomorrow = EduTimeService.getWeekIndexByStartTime(
+      tomorrow,
+      startTime,
+      weekStartDay: _weekStartDay,
+    );
     var tomorrowWeekday = tomorrow.weekday;
 
     final tomorrowCourses = allCourse.where((course) {
@@ -245,7 +267,7 @@ class CourseService {
 
   static Future<List<CourseTime>> getAllTime() async {
     final allCourse = await getAllCourse();
-    final weekData = await EduTimeService.getWeek();
+    final weekData = await EduTimeService.getWeek(weekStartDay: _weekStartDay);
     var now = DateTime.now();
 
     final timeList = <CourseTime>[];
@@ -301,7 +323,10 @@ class CourseService {
   }
 
   static Future<WeekInfo> getWeek({bool isRefresh = false}) {
-    return EduTimeService.getWeek(isRefresh: isRefresh);
+    return EduTimeService.getWeek(
+      isRefresh: isRefresh,
+      weekStartDay: _weekStartDay,
+    );
   }
 
   static Future<List<CourseModel>> _readCoursesFromLocal({

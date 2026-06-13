@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/widgets.dart';
+import 'package:ios_club_app/core/models/schedule_item.dart';
+import 'package:ios_club_app/core/services/hive_manager.dart';
+import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/core/services/time_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/basic/services/school_config_cache.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/time_info.dart';
-import 'package:ios_club_app/core/models/schedule_item.dart';
-import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/features/system/widget_service.dart';
-import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:flutter/widgets.dart';
-import 'package:ios_club_app/core/services/hive_manager.dart';
-import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 
 /// 任务执行器 - 实际的业务逻辑
 @pragma('vm:entry-point')
@@ -24,6 +25,7 @@ class TaskExecutor {
   /// 缓存的课程数据
   static List<CourseModel>? _cachedCourses;
   static TimeInfo? _cachedTime;
+  static int _cachedWeekStartDay = DateTime.sunday;
   static DateTime? _cacheTimestamp;
 
   /// 缓存有效期（5分钟）
@@ -42,6 +44,7 @@ class TaskExecutor {
   /// 预加载数据到缓存
   static Future<void> _preloadData() async {
     if (_isCacheValid()) {
+      _cachedWeekStartDay = SchoolConfigCache.readWeekStartDay();
       return;
     }
 
@@ -59,6 +62,7 @@ class TaskExecutor {
 
       _cachedCourses = results[0] as List<CourseModel>;
       _cachedTime = results[1] as TimeInfo;
+      _cachedWeekStartDay = SchoolConfigCache.readWeekStartDay();
       _cacheTimestamp = DateTime.now();
       AppLogger.debug('后台任务数据预加载完成');
     } catch (e) {
@@ -81,7 +85,11 @@ class TaskExecutor {
     }
 
     final startTime = DateTime.parse(time.startTime!);
-    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(
+      now,
+      startTime,
+      weekStartDay: _cachedWeekStartDay,
+    );
     var filteredCourses = _cachedCourses!.where((course) {
       return course.weekIndexes.contains(weekNow) &&
           course.weekday == now.weekday;
@@ -90,8 +98,11 @@ class TaskExecutor {
     if (filteredCourses.isEmpty) {
       if (isTomorrow) {
         final tomorrow = now.add(const Duration(days: 1));
-        var weekTomorrow =
-            EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+        var weekTomorrow = EduTimeService.getWeekIndexByStartTime(
+          tomorrow,
+          startTime,
+          weekStartDay: _cachedWeekStartDay,
+        );
         var tomorrowWeekday = tomorrow.weekday;
 
         filteredCourses = _cachedCourses!.where((course) {
@@ -131,7 +142,11 @@ class TaskExecutor {
     }
 
     final startTime = DateTime.parse(time.startTime!);
-    var weekNow = EduTimeService.getWeekIndexByStartTime(now, startTime);
+    var weekNow = EduTimeService.getWeekIndexByStartTime(
+      now,
+      startTime,
+      weekStartDay: _cachedWeekStartDay,
+    );
 
     // 获取今天的课程
     var todayCourses = _cachedCourses!.where((course) {
@@ -152,8 +167,11 @@ class TaskExecutor {
 
     // 计算明天日期和周数
     final tomorrow = now.add(const Duration(days: 1));
-    var weekTomorrow =
-        EduTimeService.getWeekIndexByStartTime(tomorrow, startTime);
+    var weekTomorrow = EduTimeService.getWeekIndexByStartTime(
+      tomorrow,
+      startTime,
+      weekStartDay: _cachedWeekStartDay,
+    );
     var tomorrowWeekday = tomorrow.weekday;
 
     // 获取明天的课程
@@ -248,8 +266,11 @@ class TaskExecutor {
       DateTime? scheduledDate;
       for (int i = 0; i < 2; i++) {
         final targetDate = now.add(Duration(days: i));
-        final targetWeek =
-            EduTimeService.getWeekIndexByStartTime(targetDate, startTime);
+        final targetWeek = EduTimeService.getWeekIndexByStartTime(
+          targetDate,
+          startTime,
+          weekStartDay: _cachedWeekStartDay,
+        );
         final targetWeekday = targetDate.weekday;
 
         var dailyCourses = _cachedCourses!.where((course) {

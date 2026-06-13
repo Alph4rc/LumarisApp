@@ -8,6 +8,7 @@ import 'package:ios_club_app/core/services/app_locale_service.dart';
 
 import '../features/basic/models/school.dart';
 import '../features/basic/services/school_api.dart';
+import '../features/basic/services/school_config_cache.dart';
 import '../features/education/services/edu_http_client_manager.dart';
 import 'prefs_keys.dart';
 import 'school_store.dart';
@@ -90,8 +91,7 @@ class SettingsStore extends Notifier<SettingsState> {
           prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE) ?? '',
       customBackgroundIsDark:
           prefs.getBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK),
-      schoolId:
-          prefs.getString(PrefsKeys.SCHOOL_ID) ?? School.defaultCode,
+      schoolId: prefs.getString(PrefsKeys.SCHOOL_ID) ?? School.defaultCode,
       hasAcceptedAgreement:
           prefs.getBool(PrefsKeys.AGREEMENT_ACCEPTED) ?? false,
     );
@@ -203,6 +203,7 @@ class SettingsStore extends Notifier<SettingsState> {
 
     state = state.copyWith(schoolId: schoolId);
     await PrefsService.instance.setString(PrefsKeys.SCHOOL_ID, schoolId);
+    await SchoolConfigCache.save(school);
 
     try {
       EduHttpClientManager.current.updateSchoolConfig(school);

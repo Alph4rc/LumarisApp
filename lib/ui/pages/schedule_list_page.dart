@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/image_helper.dart';
+import 'package:ios_club_app/core/utils/week_start_utils.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
@@ -348,15 +349,19 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   Widget _buildSchedulePage(BuildContext context, int weekIndex) {
     final scheduleState = ref.watch(scheduleStoreProvider);
     final settings = ref.watch(settingsStoreProvider);
+    final weekStartDay = ref.watch(
+      schoolStoreProvider.select(
+        (value) => value.school?.weekStartDay ?? School.defaultWeekStartDay,
+      ),
+    );
     final courses = scheduleState.allCourses[weekIndex];
     final now = DateTime.now();
-    int weekday = now.weekday;
-    if (weekday == 7) weekday = 0;
 
     final weekStartDate = weekIndex == 0
         ? DateTime(now.year, 1, 1)
-        : now.subtract(Duration(
-            days: weekday + (scheduleState.currentWeek - weekIndex) * 7));
+        : WeekStartUtils.getWeekStart(now, weekStartDay).add(
+            Duration(days: (weekIndex - scheduleState.currentWeek) * 7),
+          );
 
     return Builder(builder: (context) {
       final scheduleContent = Column(
@@ -376,6 +381,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
                 child: ScheduleGrid(
                   courses: courses,
                   cellHeight: scheduleState.height,
+                  weekStartDay: weekStartDay,
                   isYanTa: scheduleState.isYanTa,
                   cardStyle: _cardStyle,
                   showGrid: settings.showCourseGrid,

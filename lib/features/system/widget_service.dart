@@ -1,9 +1,11 @@
 import 'dart:convert';
+
 import 'package:home_widget/home_widget.dart';
 
 import 'package:ios_club_app/core/models/schedule_item.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/features/basic/services/school_config_cache.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 
 class WidgetService {
@@ -37,7 +39,9 @@ class WidgetService {
 
     final now = DateTime.now();
 
-    final week = await EduTimeService.getWeek();
+    final week = await EduTimeService.getWeek(
+      weekStartDay: SchoolConfigCache.readWeekStartDay(),
+    );
     const a = ['日', '一', '二', '三', '四', '五', '六', '日'];
     final weekNow = week.week;
 

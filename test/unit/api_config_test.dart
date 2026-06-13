@@ -6,7 +6,7 @@ void main() {
     test('should have default school', () {
       final defaultSchool = School.fallbackList.first;
       expect(defaultSchool, isNotNull);
-      expect(defaultSchool.code, equals('xauat'));
+      expect(defaultSchool.code, equals(School.defaultCode));
       expect(defaultSchool.name, equals('西安建筑科技大学'));
       expect(defaultSchool.website, equals('https://xauatapi.xauat.site'));
     });
@@ -14,10 +14,10 @@ void main() {
     test('should find school by code', () {
       final school = School.findByCode(
         School.fallbackList,
-        'xauat',
+        School.defaultCode,
       );
       expect(school, isNotNull);
-      expect(school!.code, equals('xauat'));
+      expect(school!.code, equals(School.defaultCode));
     });
 
     test('should return null for invalid school code', () {
@@ -51,6 +51,7 @@ void main() {
         'website': 'https://api.test.edu.cn',
         'features': <String>['timetable'],
         'enabled': true,
+        'week_start_day': DateTime.monday,
         'created_at': '2024-01-01T00:00:00.000',
         'updated_at': '2024-01-01T00:00:00.000',
       };
@@ -60,6 +61,54 @@ void main() {
       expect(school.name, equals('测试大学'));
       expect(school.website, equals('https://api.test.edu.cn'));
       expect(school.features, equals([Feature.timetable]));
+      expect(school.weekStartDay, equals(DateTime.monday));
+    });
+
+    test('should default missing week start day to Sunday', () {
+      final json = {
+        'code': 'test',
+        'name': '测试大学',
+        'website': 'https://api.test.edu.cn',
+        'features': <String>['timetable'],
+        'enabled': true,
+        'created_at': '2024-01-01T00:00:00.000',
+        'updated_at': '2024-01-01T00:00:00.000',
+      };
+
+      final school = School.fromJson(json);
+      expect(school.weekStartDay, equals(DateTime.sunday));
+    });
+
+    test('should default invalid week start day to Sunday', () {
+      final json = {
+        'code': 'test',
+        'name': '测试大学',
+        'website': 'https://api.test.edu.cn',
+        'features': <String>['timetable'],
+        'enabled': true,
+        'week_start_day': DateTime.wednesday,
+        'created_at': '2024-01-01T00:00:00.000',
+        'updated_at': '2024-01-01T00:00:00.000',
+      };
+
+      final school = School.fromJson(json);
+      expect(school.weekStartDay, equals(DateTime.sunday));
+    });
+
+    test('should default non integer week start day to Sunday', () {
+      final json = {
+        'code': 'test',
+        'name': '测试大学',
+        'website': 'https://api.test.edu.cn',
+        'features': <String>['timetable'],
+        'enabled': true,
+        'week_start_day': '1',
+        'created_at': '2024-01-01T00:00:00.000',
+        'updated_at': '2024-01-01T00:00:00.000',
+      };
+
+      final school = School.fromJson(json);
+      expect(school.weekStartDay, equals(DateTime.sunday));
     });
 
     test('should convert to json', () {
@@ -68,6 +117,7 @@ void main() {
         name: '测试大学',
         website: 'https://api.test.edu.cn',
         features: [Feature.timetable],
+        weekStartDay: DateTime.monday,
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
       );
@@ -77,6 +127,7 @@ void main() {
       expect(json['name'], equals('测试大学'));
       expect(json['website'], equals('https://api.test.edu.cn'));
       expect(json['features'], equals(['timetable']));
+      expect(json['week_start_day'], equals(DateTime.monday));
     });
   });
 }

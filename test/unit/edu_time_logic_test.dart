@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/core/utils/week_start_utils.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 
 void main() {
@@ -46,6 +47,102 @@ void main() {
 
       expect(EduTimeService.getWeekIndexByStartTime(sunday, startTime), 2);
       expect(EduTimeService.getWeekIndexByStartTime(monday, startTime), 2);
+    });
+
+    test('should keep Monday to Sunday in same week for Monday start', () {
+      final monday = DateTime(2024, 3, 4);
+      final sunday = DateTime(2024, 3, 10);
+      final nextMonday = DateTime(2024, 3, 11);
+
+      expect(
+        EduTimeService.getWeekIndexByStartTime(
+          monday,
+          startTime,
+          weekStartDay: DateTime.monday,
+        ),
+        1,
+      );
+      expect(
+        EduTimeService.getWeekIndexByStartTime(
+          sunday,
+          startTime,
+          weekStartDay: DateTime.monday,
+        ),
+        1,
+      );
+      expect(
+        EduTimeService.getWeekIndexByStartTime(
+          nextMonday,
+          startTime,
+          weekStartDay: DateTime.monday,
+        ),
+        2,
+      );
+    });
+
+    test('should align first week when semester does not start on week start',
+        () {
+      final wednesdayStart = DateTime(2024, 3, 6);
+      final monday = DateTime(2024, 3, 4);
+      final sunday = DateTime(2024, 3, 10);
+      final nextMonday = DateTime(2024, 3, 11);
+
+      expect(
+        EduTimeService.getWeekIndexByStartTime(
+          monday,
+          wednesdayStart,
+          weekStartDay: DateTime.monday,
+        ),
+        1,
+      );
+      expect(
+        EduTimeService.getWeekIndexByStartTime(
+          sunday,
+          wednesdayStart,
+          weekStartDay: DateTime.monday,
+        ),
+        1,
+      );
+      expect(
+        EduTimeService.getWeekIndexByStartTime(
+          nextMonday,
+          wednesdayStart,
+          weekStartDay: DateTime.monday,
+        ),
+        2,
+      );
+    });
+  });
+
+  group('WeekStartUtils.orderedWeekdays', () {
+    test('should order weekdays from Sunday by default', () {
+      expect(
+        WeekStartUtils.orderedWeekdays(DateTime.sunday),
+        [
+          DateTime.sunday,
+          DateTime.monday,
+          DateTime.tuesday,
+          DateTime.wednesday,
+          DateTime.thursday,
+          DateTime.friday,
+          DateTime.saturday,
+        ],
+      );
+    });
+
+    test('should order weekdays from Monday for Monday start', () {
+      expect(
+        WeekStartUtils.orderedWeekdays(DateTime.monday),
+        [
+          DateTime.monday,
+          DateTime.tuesday,
+          DateTime.wednesday,
+          DateTime.thursday,
+          DateTime.friday,
+          DateTime.saturday,
+          DateTime.sunday,
+        ],
+      );
     });
   });
 }
