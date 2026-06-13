@@ -52,10 +52,21 @@ class _CustomCourseManagePageState
     if (jsonString != null) {
       try {
         final List<dynamic> jsonList = jsonDecode(jsonString);
+        var migratedLegacySunday = false;
         customCourses = jsonList
             .map((json) => CourseModel.fromJson(json))
             .where((course) => course.isCustom)
+            .map((course) {
+              if (course.weekday == 0) {
+                migratedLegacySunday = true;
+                return _copyCourseWithWeekday(course, DateTime.sunday);
+              }
+              return course;
+            })
             .toList();
+        if (migratedLegacySunday) {
+          await _saveCustomCourses();
+        }
       } catch (e) {
         customCourses = [];
       }
@@ -373,8 +384,8 @@ class _CustomCourseManagePageState
 
   String _formatCourseTime(CourseModel course) {
     final l10n = context.l10n;
-    final weekdays = _getWeekdayNames(l10n);
-    return '${weekdays[course.weekday]} ${l10n.periodRange(course.startUnit, course.endUnit)}';
+    return '${_getWeekdayName(l10n, course.weekday)} '
+        '${l10n.periodRange(course.startUnit, course.endUnit)}';
   }
 }
 
@@ -387,7 +398,49 @@ List<String> _getWeekdayNames(dynamic l10n) {
     l10n.thursday,
     l10n.friday,
     l10n.saturday,
+    l10n.sunday,
   ];
+}
+
+const List<int> _weekdayDropdownValues = [
+  DateTime.sunday,
+  DateTime.monday,
+  DateTime.tuesday,
+  DateTime.wednesday,
+  DateTime.thursday,
+  DateTime.friday,
+  DateTime.saturday,
+];
+
+int _normalizeCourseWeekday(int weekday) {
+  if (weekday == 0) {
+    return DateTime.sunday;
+  }
+  if (weekday >= DateTime.monday && weekday <= DateTime.sunday) {
+    return weekday;
+  }
+  return DateTime.monday;
+}
+
+String _getWeekdayName(dynamic l10n, int weekday) {
+  return _getWeekdayNames(l10n)[_normalizeCourseWeekday(weekday)];
+}
+
+CourseModel _copyCourseWithWeekday(CourseModel course, int weekday) {
+  return CourseModel(
+    weekIndexes: course.weekIndexes,
+    teachers: course.teachers,
+    room: course.room,
+    courseName: course.courseName,
+    courseCode: course.courseCode,
+    weekday: weekday,
+    startUnit: course.startUnit,
+    endUnit: course.endUnit,
+    credits: course.credits,
+    lessonId: course.lessonId,
+    campus: course.campus,
+    isCustom: course.isCustom,
+  );
 }
 
 /// 添加/编辑课程对话框
@@ -427,7 +480,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
         TextEditingController(text: widget.course?.teachers.join(', ') ?? '');
     _creditsController =
         TextEditingController(text: widget.course?.credits ?? '');
-    _selectedWeekday = widget.course?.weekday ?? 1;
+    _selectedWeekday =
+        _normalizeCourseWeekday(widget.course?.weekday ?? DateTime.monday);
     _startUnit = widget.course?.startUnit ?? 1;
     _endUnit = widget.course?.endUnit ?? 2;
     _selectedWeeks =
@@ -583,12 +637,12 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                 child: DropdownButton<int>(
                   value: _selectedWeekday,
                   isExpanded: true,
-                  items: List.generate(7, (index) {
+                  items: _weekdayDropdownValues.map((weekday) {
                     return DropdownMenuItem(
-                      value: index,
-                      child: Text(weekdays[index]),
+                      value: weekday,
+                      child: Text(weekdays[weekday]),
                     );
-                  }),
+                  }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {

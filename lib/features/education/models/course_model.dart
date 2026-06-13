@@ -37,7 +37,7 @@ class CourseModel {
   @HiveField(4)
   String courseCode = '';
 
-  /// 星期几上课（0-6，0表示周一，6表示周日）
+  /// 星期几上课（1-7，1表示周一，7表示周日，与 DateTime.weekday 一致）
   @JsonKey(fromJson: parseSchemaInt)
   @HiveField(5)
   int weekday = 0;
@@ -79,7 +79,7 @@ class CourseModel {
   /// @param room 上课地点
   /// @param courseName 课程名称
   /// @param courseCode 课程代码
-  /// @param weekday 星期几上课（0-6）
+  /// @param weekday 星期几上课（1-7）
   /// @param startUnit 开始上课的节次
   /// @param endUnit 结束上课的节次
   /// @param credits 课程学分

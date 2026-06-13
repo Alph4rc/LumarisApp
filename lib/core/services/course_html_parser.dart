@@ -3,6 +3,12 @@ import 'package:html/dom.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 
 class CourseHtmlParser {
+  static int _weekdayFromColumnIndex(int index) {
+    // Imported timetable columns are Monday-first; CourseModel uses
+    // DateTime.weekday.
+    return index + 1;
+  }
+
   static String _cleanText(String? text) {
     if (text == null || text.isEmpty) {
       return '';
@@ -154,7 +160,7 @@ class CourseHtmlParser {
       final cards = col.querySelectorAll('.card-view');
 
       for (final card in cards) {
-        courses.add(parseCard(card, index));
+        courses.add(parseCard(card, _weekdayFromColumnIndex(index)));
       }
     }
 
