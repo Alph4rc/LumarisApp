@@ -197,6 +197,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           : l10n.currentWeek(scheduleState.currentWeek);
 
       return InkWell(
+        onLongPress: () => weekMenuPress(context),
+        onDoubleTap: () => _jumpToPage(0),
         onTap: () => _jumpToPage(scheduleState.currentWeek),
         borderRadius: ClubRadii.control,
         customBorder: ClubSmoothCorners.shape(ClubRadii.control),
@@ -229,6 +231,92 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
         ),
       );
     });
+  }
+
+  Future<void> weekMenuPress(BuildContext context) async {
+    final scheduleState = ref.read(scheduleStoreProvider);
+    final colors = context.clubColors;
+    final l10n = context.l10n;
+    final renderBox = context.findRenderObject() as RenderBox?;
+    final overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox?;
+
+    if (renderBox == null || overlay == null) return;
+
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        renderBox.localToGlobal(Offset.zero, ancestor: overlay),
+        renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    final selectedPage = await showMenu<int>(
+      context: context,
+      position: position,
+      color: colors.cardBackground.withValues(alpha: 0.96),
+      surfaceTintColor: Colors.transparent,
+      shadowColor: colors.shadowColor.withValues(alpha: 0.18),
+      elevation: 10,
+      constraints: const BoxConstraints(minWidth: 196, maxWidth: 240),
+      shape: ClubSmoothCorners.shape(
+        ClubRadii.card,
+        side: BorderSide(
+          color: colors.separator.withValues(alpha: 0.18),
+          width: 0.75,
+        ),
+      ),
+      menuPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      items: List<PopupMenuEntry<int>>.generate(
+        scheduleState.maxWeek + 1,
+        (index) {
+          final isSelected = index == scheduleState.currentPage;
+          final isCurrentWeek = index == scheduleState.currentWeek;
+          final label = index == 0
+              ? l10n.allSchedules
+              : '${l10n.weekUnit(index)}'
+                  '${isCurrentWeek ? " (${l10n.currentWeekLabel})" : ""}';
+
+          return PopupMenuItem<int>(
+            value: index,
+            padding: EdgeInsets.zero,
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: ShapeDecoration(
+                shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w600,
+                        color: colors.label,
+                      ),
+                    ),
+                  ),
+                  if (isSelected)
+                    Icon(
+                      CupertinoIcons.check_mark,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    if (!mounted || selectedPage == null) return;
+    _jumpToPage(selectedPage);
   }
 
   Widget _buildDesktopWeekNav(BuildContext context) {
@@ -358,7 +446,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final now = DateTime.now();
 
     final weekStartDate = weekIndex == 0
-        ? DateTime(now.year, 1, 1)
+        ? WeekStartUtils.getWeekStart(now, weekStartDay)
         : WeekStartUtils.getWeekStart(now, weekStartDay).add(
             Duration(days: (weekIndex - scheduleState.currentWeek) * 7),
           );
