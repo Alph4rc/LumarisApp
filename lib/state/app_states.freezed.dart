@@ -1323,6 +1323,7 @@ mixin _$PaymentState {
   List<PaymentModel> get records => throw _privateConstructorUsedError;
   double get totalRecharge => throw _privateConstructorUsedError;
   bool get isShowTile => throw _privateConstructorUsedError;
+  String get password => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $PaymentStateCopyWith<PaymentState> get copyWith =>
@@ -1341,7 +1342,8 @@ abstract class $PaymentStateCopyWith<$Res> {
       String errorMessage,
       List<PaymentModel> records,
       double totalRecharge,
-      bool isShowTile});
+      bool isShowTile,
+      String password});
 }
 
 /// @nodoc
@@ -1363,6 +1365,7 @@ class _$PaymentStateCopyWithImpl<$Res, $Val extends PaymentState>
     Object? records = null,
     Object? totalRecharge = null,
     Object? isShowTile = null,
+    Object? password = null,
   }) {
     return _then(_value.copyWith(
       isLoading: null == isLoading
@@ -1389,6 +1392,10 @@ class _$PaymentStateCopyWithImpl<$Res, $Val extends PaymentState>
           ? _value.isShowTile
           : isShowTile // ignore: cast_nullable_to_non_nullable
               as bool,
+      password: null == password
+          ? _value.password
+          : password // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -1407,7 +1414,8 @@ abstract class _$$PaymentStateImplCopyWith<$Res>
       String errorMessage,
       List<PaymentModel> records,
       double totalRecharge,
-      bool isShowTile});
+      bool isShowTile,
+      String password});
 }
 
 /// @nodoc
@@ -1427,6 +1435,7 @@ class __$$PaymentStateImplCopyWithImpl<$Res>
     Object? records = null,
     Object? totalRecharge = null,
     Object? isShowTile = null,
+    Object? password = null,
   }) {
     return _then(_$PaymentStateImpl(
       isLoading: null == isLoading
@@ -1453,6 +1462,10 @@ class __$$PaymentStateImplCopyWithImpl<$Res>
           ? _value.isShowTile
           : isShowTile // ignore: cast_nullable_to_non_nullable
               as bool,
+      password: null == password
+          ? _value.password
+          : password // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -1466,7 +1479,8 @@ class _$PaymentStateImpl implements _PaymentState {
       this.errorMessage = '',
       final List<PaymentModel> records = const <PaymentModel>[],
       this.totalRecharge = 0.0,
-      this.isShowTile = false})
+      this.isShowTile = false,
+      this.password = ''})
       : _records = records;
 
   @override
@@ -1493,10 +1507,13 @@ class _$PaymentStateImpl implements _PaymentState {
   @override
   @JsonKey()
   final bool isShowTile;
+  @override
+  @JsonKey()
+  final String password;
 
   @override
   String toString() {
-    return 'PaymentState(isLoading: $isLoading, hasData: $hasData, errorMessage: $errorMessage, records: $records, totalRecharge: $totalRecharge, isShowTile: $isShowTile)';
+    return 'PaymentState(isLoading: $isLoading, hasData: $hasData, errorMessage: $errorMessage, records: $records, totalRecharge: $totalRecharge, isShowTile: $isShowTile, password: $password)';
   }
 
   @override
@@ -1513,12 +1530,21 @@ class _$PaymentStateImpl implements _PaymentState {
             (identical(other.totalRecharge, totalRecharge) ||
                 other.totalRecharge == totalRecharge) &&
             (identical(other.isShowTile, isShowTile) ||
-                other.isShowTile == isShowTile));
+                other.isShowTile == isShowTile) &&
+            (identical(other.password, password) ||
+                other.password == password));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isLoading, hasData, errorMessage,
-      const DeepCollectionEquality().hash(_records), totalRecharge, isShowTile);
+  int get hashCode => Object.hash(
+      runtimeType,
+      isLoading,
+      hasData,
+      errorMessage,
+      const DeepCollectionEquality().hash(_records),
+      totalRecharge,
+      isShowTile,
+      password);
 
   @JsonKey(ignore: true)
   @override
@@ -1534,7 +1560,8 @@ abstract class _PaymentState implements PaymentState {
       final String errorMessage,
       final List<PaymentModel> records,
       final double totalRecharge,
-      final bool isShowTile}) = _$PaymentStateImpl;
+      final bool isShowTile,
+      final String password}) = _$PaymentStateImpl;
 
   @override
   bool get isLoading;
@@ -1548,6 +1575,8 @@ abstract class _PaymentState implements PaymentState {
   double get totalRecharge;
   @override
   bool get isShowTile;
+  @override
+  String get password;
   @override
   @JsonKey(ignore: true)
   _$$PaymentStateImplCopyWith<_$PaymentStateImpl> get copyWith =>

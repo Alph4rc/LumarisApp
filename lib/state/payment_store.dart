@@ -10,11 +10,16 @@ import 'package:ios_club_app/state/prefs_keys.dart' show PrefsKeys;
 import 'package:ios_club_app/state/tile_store_providers.dart';
 import 'package:ios_club_app/state/user_store.dart';
 
-typedef PaymentDataFetcher = Future<PaymentData> Function(String cardNumber);
+typedef PaymentDataFetcher = Future<PaymentData> Function(
+  String cardNumber,
+  String? password,
+);
 typedef StudentIsLoginReader = bool Function();
 typedef PaymentStudentIdReader = Future<String?> Function();
+typedef PaymentPasswordReader = Future<String?> Function();
 typedef TileVisibilityReader = Future<bool> Function(String tileId);
 typedef TileMutator = Future<void> Function(String tileId);
+typedef PaymentPasswordWriter = Future<bool> Function(String? password);
 
 final paymentDataFetcherProvider = Provider<PaymentDataFetcher>((ref) {
   return PaymentService.fetchData;
@@ -30,6 +35,34 @@ final paymentStudentIdReaderProvider = Provider<PaymentStudentIdReader>((ref) {
     final prefs = PrefsService.instance;
     return await secureStorage.read(key: PrefsKeys.USERNAME) ??
         prefs.getString(PrefsKeys.USERNAME);
+  };
+});
+
+final paymentPasswordReaderProvider = Provider<PaymentPasswordReader>((ref) {
+  return () async {
+    final secureStorage = SecureStorageService.instance;
+    final prefs = PrefsService.instance;
+    return await secureStorage.read(key: PrefsKeys.PAYMENT_PASSWORD) ??
+        prefs.getString(PrefsKeys.PAYMENT_PASSWORD);
+  };
+});
+
+final paymentPasswordWriterProvider = Provider<PaymentPasswordWriter>((ref) {
+  return (password) async {
+    final secureStorage = SecureStorageService.instance;
+    final normalizedPassword =
+        password == null || password.trim().isEmpty ? null : password.trim();
+    final writeSuccess = await secureStorage.write(
+      key: PrefsKeys.PAYMENT_PASSWORD,
+      value: normalizedPassword,
+    );
+    final prefs = PrefsService.instance;
+    if (normalizedPassword == null) {
+      await prefs.remove(PrefsKeys.PAYMENT_PASSWORD);
+    } else {
+      await prefs.setString(PrefsKeys.PAYMENT_PASSWORD, normalizedPassword);
+    }
+    return writeSuccess;
   };
 });
 
@@ -62,6 +95,7 @@ class PaymentStore extends Notifier<PaymentState> {
   List<PaymentModel> get records => List.unmodifiable(state.records);
   double get totalRecharge => state.totalRecharge;
   bool get isShowTile => state.isShowTile;
+  String get password => state.password;
 
   int _loadCount = 0;
 
@@ -71,15 +105,19 @@ class PaymentStore extends Notifier<PaymentState> {
       state = state.copyWith(isLoading: true, errorMessage: '');
 
       final studentId = await ref.read(paymentStudentIdReaderProvider)();
+      final password = await ref.read(paymentPasswordReaderProvider)();
 
       if (studentId == null || studentId.isEmpty) {
         if (currentLoadId != _loadCount) return;
-        state = state.copyWith(errorMessage: 'auth_required');
+        state = state.copyWith(
+          errorMessage: 'auth_required',
+          password: password ?? '',
+        );
         return;
       }
 
       final recordsResult =
-          await ref.read(paymentDataFetcherProvider)(studentId);
+          await ref.read(paymentDataFetcherProvider)(studentId, password);
       final isVisible = await ref.read(tileVisibilityReaderProvider)('饭卡');
 
       if (currentLoadId != _loadCount) return;
@@ -89,15 +127,29 @@ class PaymentStore extends Notifier<PaymentState> {
         totalRecharge: recordsResult.balance,
         isShowTile: isVisible,
         hasData: true,
+        password: password ?? '',
       );
     } catch (e) {
       if (currentLoadId != _loadCount) return;
-      state = state.copyWith(errorMessage: 'load_failed');
+      final password = await ref.read(paymentPasswordReaderProvider)();
+      state = state.copyWith(
+        errorMessage: 'load_failed',
+        password: password ?? '',
+      );
     } finally {
       if (currentLoadId == _loadCount) {
         state = state.copyWith(isLoading: false);
       }
     }
+  }
+
+  Future<bool> savePassword(String password) async {
+    final normalizedPassword = password.trim();
+    final success = await ref.read(paymentPasswordWriterProvider)(
+      normalizedPassword.isEmpty ? null : normalizedPassword,
+    );
+    state = state.copyWith(password: normalizedPassword);
+    return success;
   }
 
   Future<void> toggleTileShow(bool value) async {

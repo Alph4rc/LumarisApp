@@ -2978,6 +2978,24 @@ abstract class AppLocalizations {
   /// **'正在获取最新流水，请稍候...'**
   String get paymentLoadingSubtitle;
 
+  /// 饭卡查询用的可选密码标题
+  ///
+  /// In zh, this message translates to:
+  /// **'饭卡密码'**
+  String get paymentPasswordTitle;
+
+  /// 饭卡密码输入说明
+  ///
+  /// In zh, this message translates to:
+  /// **'可选，留空则按默认方式查询'**
+  String get paymentPasswordSubtitle;
+
+  /// 保存饭卡密码并立即刷新
+  ///
+  /// In zh, this message translates to:
+  /// **'保存并刷新'**
+  String get paymentSaveAndRefresh;
+
   ///
   ///
   /// In zh, this message translates to:

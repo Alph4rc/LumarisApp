@@ -1541,6 +1541,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get paymentLoadingSubtitle => '正在获取最新流水，请稍候...';
 
   @override
+  String get paymentPasswordTitle => '饭卡密码';
+
+  @override
+  String get paymentPasswordSubtitle => '可选，留空则按默认方式查询';
+
+  @override
+  String get paymentSaveAndRefresh => '保存并刷新';
+
+  @override
   String get campusCard => '校园一卡通';
 
   @override
@@ -3627,6 +3636,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get paymentLoadingSubtitle => '正在取得最新交易明細，請稍候...';
+
+  @override
+  String get paymentPasswordTitle => '飯卡密碼';
+
+  @override
+  String get paymentPasswordSubtitle => '可選，留空則以預設方式查詢';
+
+  @override
+  String get paymentSaveAndRefresh => '儲存並重新整理';
 
   @override
   String get campusCard => '校園一卡通';

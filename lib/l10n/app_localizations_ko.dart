@@ -1560,6 +1560,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paymentLoadingSubtitle => '최신 거래 내역을 가져오는 중입니다. 잠시만 기다려 주세요...';
 
   @override
+  String get paymentPasswordTitle => '식권 비밀번호';
+
+  @override
+  String get paymentPasswordSubtitle => '선택 사항입니다. 비워 두면 기본 방식으로 조회합니다.';
+
+  @override
+  String get paymentSaveAndRefresh => '저장 후 새로고침';
+
+  @override
   String get campusCard => '캠퍼스 카드';
 
   @override

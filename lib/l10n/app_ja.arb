@@ -511,6 +511,12 @@
 
   "paymentLoading": "カード残高を同期中",
   "paymentLoadingSubtitle": "最新の取引を取得中",
+  "paymentPasswordTitle": "カードパスワード",
+  "@paymentPasswordTitle": {"description": "Optional password title for card lookup"},
+  "paymentPasswordSubtitle": "任意です。空欄の場合は既定の方法で照会します。",
+  "@paymentPasswordSubtitle": {"description": "Helper text for optional card password"},
+  "paymentSaveAndRefresh": "保存して更新",
+  "@paymentSaveAndRefresh": {"description": "Save card password and refresh data"},
   "campusCard": "学内カード",
   "currentBalance": "現在の残高",
   "recentTransactions": "最近の取引",

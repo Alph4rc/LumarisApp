@@ -6,11 +6,23 @@ import '../services/edu_http_client_manager.dart';
 
 /// Payment相关API
 class PaymentApi {
+  static Map<String, dynamic>? _passwordQueryParameters(String? password) {
+    final normalizedPassword = password?.trim();
+    if (normalizedPassword == null || normalizedPassword.isEmpty) {
+      return null;
+    }
+    return {'password': normalizedPassword};
+  }
+
   /// 获取缴费信息
-  static Future<RawStringResponse> getPayment(String id) async {
+  static Future<RawStringResponse> getPayment(
+    String id, [
+    String? password,
+  ]) async {
     try {
       final rawResponse = await EduHttpClientManager.instance.get(
         '/Payment/$id',
+        queryParameters: _passwordQueryParameters(password),
       );
       final apiResponse = ApiResponse<String>.parsed(
         rawResponse,
@@ -30,10 +42,14 @@ class PaymentApi {
   }
 
   /// 获取缴费流水
-  static Future<PaymentData> getPaymentTurnover(String id) async {
+  static Future<PaymentData> getPaymentTurnover(
+    String id, [
+    String? password,
+  ]) async {
     try {
       final rawResponse = await EduHttpClientManager.instance.get(
         '/Payment/$id/turnover',
+        queryParameters: _passwordQueryParameters(password),
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.parsed(

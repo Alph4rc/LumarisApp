@@ -507,6 +507,12 @@
 
   "paymentLoading": "Синхронизация баланса карты",
   "paymentLoadingSubtitle": "Получение последних транзакций",
+  "paymentPasswordTitle": "Пароль карты",
+  "@paymentPasswordTitle": {"description": "Optional password title for card lookup"},
+  "paymentPasswordSubtitle": "Необязательно. Оставьте пустым для стандартного запроса.",
+  "@paymentPasswordSubtitle": {"description": "Helper text for optional card password"},
+  "paymentSaveAndRefresh": "Сохранить и обновить",
+  "@paymentSaveAndRefresh": {"description": "Save card password and refresh data"},
   "campusCard": "Кампусная карта",
   "currentBalance": "Текущий баланс",
   "recentTransactions": "Последние транзакции",

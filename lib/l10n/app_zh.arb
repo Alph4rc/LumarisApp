@@ -580,6 +580,12 @@
 
   "paymentLoading": "正在同步饭卡余额",
   "paymentLoadingSubtitle": "正在获取最新流水，请稍候...",
+  "paymentPasswordTitle": "饭卡密码",
+  "@paymentPasswordTitle": {"description": "饭卡查询用的可选密码标题"},
+  "paymentPasswordSubtitle": "可选，留空则按默认方式查询",
+  "@paymentPasswordSubtitle": {"description": "饭卡密码输入说明"},
+  "paymentSaveAndRefresh": "保存并刷新",
+  "@paymentSaveAndRefresh": {"description": "保存饭卡密码并立即刷新"},
   "campusCard": "校园一卡通",
   "currentBalance": "当前余额",
   "recentTransactions": "最近交易",

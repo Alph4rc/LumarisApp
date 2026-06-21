@@ -5,6 +5,7 @@ import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
@@ -30,7 +31,7 @@ List<Override> _overrides() => [
       studentIsLoginReaderProvider.overrideWithValue(() => true),
       paymentStudentIdReaderProvider.overrideWithValue(() async => 'student-1'),
       paymentDataFetcherProvider.overrideWithValue(
-        (_) async => const PaymentData(
+        (_, __) async => const PaymentData(
           [
             PaymentModel(
               turnoverType: '充值',
@@ -57,8 +58,11 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: _overrides(),
-        child: const MaterialApp(
-          home: Scaffold(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const Scaffold(
             body: Column(
               children: [
                 SizedBox(width: 180, height: 180, child: ElectricityTile()),

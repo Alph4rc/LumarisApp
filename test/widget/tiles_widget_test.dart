@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
@@ -25,7 +26,7 @@ List<Override> _overrides() => [
       studentIsLoginReaderProvider.overrideWithValue(() => true),
       paymentStudentIdReaderProvider.overrideWithValue(() async => 'student-1'),
       paymentDataFetcherProvider.overrideWithValue(
-        (_) async => const PaymentData([], 20),
+        (_, __) async => const PaymentData([], 20),
       ),
       tileVisibilityReaderProvider.overrideWithValue((_) async => true),
     ];
@@ -47,7 +48,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: _overrides(),
-        child: const MaterialApp(home: Scaffold(body: TilesWidget())),
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const Scaffold(body: TilesWidget()),
+        ),
       ),
     );
     await tester.pump();

@@ -6,6 +6,7 @@ import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'package:ios_club_app/features/education/services/electricity_service.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/state/tile_store_providers.dart';
@@ -19,6 +20,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _wrapWithApp(Widget child) {
   return MaterialApp(
+    locale: const Locale('zh'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ClubTheme.lightTheme(),
     darkTheme: ClubTheme.darkTheme(),
     home: child,

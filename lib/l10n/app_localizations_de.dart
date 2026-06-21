@@ -1606,6 +1606,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get paymentLoadingSubtitle => 'Neueste Transaktionen werden abgerufen';
 
   @override
+  String get paymentPasswordTitle => 'Kartenpasswort';
+
+  @override
+  String get paymentPasswordSubtitle =>
+      'Optional. Leer lassen, um die Standardsuche zu verwenden.';
+
+  @override
+  String get paymentSaveAndRefresh => 'Speichern und aktualisieren';
+
+  @override
   String get campusCard => 'Campus-Karte';
 
   @override

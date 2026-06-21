@@ -534,6 +534,12 @@
 
   "paymentLoading": "식권 잔액 동기화 중",
   "paymentLoadingSubtitle": "최신 거래 내역을 가져오는 중입니다. 잠시만 기다려 주세요...",
+  "paymentPasswordTitle": "식권 비밀번호",
+  "@paymentPasswordTitle": {"description": "Optional password title for card lookup"},
+  "paymentPasswordSubtitle": "선택 사항입니다. 비워 두면 기본 방식으로 조회합니다.",
+  "@paymentPasswordSubtitle": {"description": "Helper text for optional card password"},
+  "paymentSaveAndRefresh": "저장 후 새로고침",
+  "@paymentSaveAndRefresh": {"description": "Save card password and refresh data"},
   "campusCard": "캠퍼스 카드",
   "currentBalance": "현재 잔액",
   "recentTransactions": "최근 거래",

@@ -57,6 +57,7 @@ void main() {
     test('should_set_login_error_when_student_id_is_empty', () async {
       final container = _container([
         paymentStudentIdReaderProvider.overrideWithValue(() async => ''),
+        paymentPasswordReaderProvider.overrideWithValue(() async => null),
       ]);
       final store = container.read(paymentStoreProvider.notifier);
 
@@ -64,13 +65,14 @@ void main() {
 
       final state = container.read(paymentStoreProvider);
       expect(state.isLoading, isFalse);
-      expect(state.errorMessage, '请先登录教务处账号');
+      expect(state.errorMessage, 'auth_required');
       expect(state.records, isEmpty);
     });
 
     test('should_set_login_error_when_student_id_is_null', () async {
       final container = _container([
         paymentStudentIdReaderProvider.overrideWithValue(() async => null),
+        paymentPasswordReaderProvider.overrideWithValue(() async => null),
       ]);
       final store = container.read(paymentStoreProvider.notifier);
 
@@ -78,7 +80,7 @@ void main() {
 
       final state = container.read(paymentStoreProvider);
       expect(state.isLoading, isFalse);
-      expect(state.errorMessage, '请先登录教务处账号');
+      expect(state.errorMessage, 'auth_required');
       expect(state.records, isEmpty);
     });
 
@@ -88,8 +90,12 @@ void main() {
         studentIsLoginReaderProvider.overrideWithValue(() => true),
         paymentStudentIdReaderProvider
             .overrideWithValue(() async => 'student-1'),
-        paymentDataFetcherProvider.overrideWithValue((cardNumber) async {
+        paymentPasswordReaderProvider
+            .overrideWithValue(() async => 'meal-card-secret'),
+        paymentDataFetcherProvider
+            .overrideWithValue((cardNumber, password) async {
           expect(cardNumber, 'student-1');
+          expect(password, 'meal-card-secret');
           return const PaymentData(
             [
               PaymentModel(
@@ -118,6 +124,7 @@ void main() {
       expect(state.totalRecharge, 1000);
       expect(state.isShowTile, isTrue);
       expect(state.hasData, isTrue);
+      expect(state.password, 'meal-card-secret');
     });
 
     test('should_set_error_message_when_fetch_throws', () async {
@@ -125,7 +132,9 @@ void main() {
         studentIsLoginReaderProvider.overrideWithValue(() => true),
         paymentStudentIdReaderProvider
             .overrideWithValue(() async => 'student-1'),
-        paymentDataFetcherProvider.overrideWithValue((_) async {
+        paymentPasswordReaderProvider
+            .overrideWithValue(() async => 'meal-card-secret'),
+        paymentDataFetcherProvider.overrideWithValue((_, __) async {
           throw Exception('network error');
         }),
         tileVisibilityReaderProvider.overrideWithValue((_) async => true),
@@ -136,8 +145,9 @@ void main() {
 
       final state = container.read(paymentStoreProvider);
       expect(state.isLoading, isFalse);
-      expect(state.errorMessage, '加载失败，点击重试');
+      expect(state.errorMessage, 'load_failed');
       expect(state.hasData, isFalse);
+      expect(state.password, 'meal-card-secret');
     });
 
     test('should_toggle_tile_and_reload_tile_edit_controller', () async {
@@ -156,6 +166,23 @@ void main() {
 
       expect(container.read(paymentStoreProvider).isShowTile, isFalse);
       expect(touchedTiles, ['add:饭卡', 'remove:饭卡']);
+    });
+
+    test('should_save_trimmed_payment_password', () async {
+      String? savedPassword;
+      final container = _container([
+        paymentPasswordWriterProvider.overrideWithValue((password) async {
+          savedPassword = password;
+          return true;
+        }),
+      ]);
+      final store = container.read(paymentStoreProvider.notifier);
+
+      final success = await store.savePassword('  card-pass  ');
+
+      expect(success, isTrue);
+      expect(savedPassword, 'card-pass');
+      expect(container.read(paymentStoreProvider).password, 'card-pass');
     });
   });
 

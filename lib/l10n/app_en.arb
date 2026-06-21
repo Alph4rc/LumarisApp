@@ -544,6 +544,12 @@
 
   "paymentLoading": "Syncing card balance",
   "paymentLoadingSubtitle": "Fetching latest transactions",
+  "paymentPasswordTitle": "Card Password",
+  "@paymentPasswordTitle": {"description": "Optional password title for card lookup"},
+  "paymentPasswordSubtitle": "Optional. Leave blank to use the default lookup.",
+  "@paymentPasswordSubtitle": {"description": "Helper text for optional card password"},
+  "paymentSaveAndRefresh": "Save and Refresh",
+  "@paymentSaveAndRefresh": {"description": "Save card password and refresh data"},
   "campusCard": "Campus Card",
   "currentBalance": "Current Balance",
   "recentTransactions": "Recent Transactions",

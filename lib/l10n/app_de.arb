@@ -509,6 +509,12 @@
 
   "paymentLoading": "Kartenguthaben wird synchronisiert",
   "paymentLoadingSubtitle": "Neueste Transaktionen werden abgerufen",
+  "paymentPasswordTitle": "Kartenpasswort",
+  "@paymentPasswordTitle": {"description": "Optional password title for card lookup"},
+  "paymentPasswordSubtitle": "Optional. Leer lassen, um die Standardsuche zu verwenden.",
+  "@paymentPasswordSubtitle": {"description": "Helper text for optional card password"},
+  "paymentSaveAndRefresh": "Speichern und aktualisieren",
+  "@paymentSaveAndRefresh": {"description": "Save card password and refresh data"},
   "campusCard": "Campus-Karte",
   "currentBalance": "Aktuelles Guthaben",
   "recentTransactions": "Letzte Transaktionen",

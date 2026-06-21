@@ -1585,6 +1585,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get paymentLoadingSubtitle => 'Получение последних транзакций';
 
   @override
+  String get paymentPasswordTitle => 'Пароль карты';
+
+  @override
+  String get paymentPasswordSubtitle =>
+      'Необязательно. Оставьте пустым для стандартного запроса.';
+
+  @override
+  String get paymentSaveAndRefresh => 'Сохранить и обновить';
+
+  @override
   String get campusCard => 'Кампусная карта';
 
   @override

@@ -1584,6 +1584,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentLoadingSubtitle => 'Fetching latest transactions';
 
   @override
+  String get paymentPasswordTitle => 'Card Password';
+
+  @override
+  String get paymentPasswordSubtitle =>
+      'Optional. Leave blank to use the default lookup.';
+
+  @override
+  String get paymentSaveAndRefresh => 'Save and Refresh';
+
+  @override
   String get campusCard => 'Campus Card';
 
   @override

@@ -7,19 +7,68 @@ import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
+import 'package:ios_club_app/ui/components/platform_dialog.dart';
+import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/payment_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
+import 'package:ios_club_app/ui/theme/club_theme.dart';
 
-class PaymentPage extends ConsumerWidget {
+class PaymentPage extends ConsumerStatefulWidget {
   const PaymentPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PaymentPage> createState() => _PaymentPageState();
+}
+
+class _PaymentPageState extends ConsumerState<PaymentPage> {
+  Future<void> _savePasswordAndReload(
+    PaymentStore controller,
+    String password,
+  ) async {
+    final l10n = context.l10n;
+    final saveSuccess = await controller.savePassword(password);
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!saveSuccess) {
+      showClubSnackBar(context, Text(l10n.saveFailedRetry));
+      return;
+    }
+
+    showClubSnackBar(context, Text(l10n.save));
+    await controller.loadData();
+  }
+
+  Future<void> _showPasswordDialog(
+    PaymentStore controller,
+    PaymentState payment,
+  ) async {
+    final l10n = context.l10n;
+    final result = await PlatformDialog.showInputDialog(
+      context,
+      title: l10n.paymentPasswordTitle,
+      content: l10n.paymentPasswordSubtitle,
+      hintText: l10n.password,
+      confirmText: l10n.paymentSaveAndRefresh,
+      initialValue: payment.password,
+      obscureText: true,
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    await _savePasswordAndReload(controller, result);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final payment = ref.watch(paymentStoreProvider);
     final controller = ref.read(paymentStoreProvider.notifier);
     final colors = context.clubColors;
@@ -75,18 +124,20 @@ class PaymentPage extends ConsumerWidget {
           )
         else if (payment.errorMessage.isNotEmpty)
           _buildLoginPrompt(colors, l10n)
-        else ...[
+        else
           _buildRecentTransactionsSection(payment, colors, l10n),
-          const SizedBox(height: 24),
-          _buildSettingsSection(payment, controller, colors, l10n),
-        ],
+        const SizedBox(height: 24),
+        _buildSettingsSection(payment, controller, colors, l10n),
         const SizedBox(height: 32),
       ],
     );
   }
 
   Widget _buildBalanceCard(
-      PaymentState payment, ClubColors colors, AppLocalizations l10n) {
+    PaymentState payment,
+    ClubColors colors,
+    AppLocalizations l10n,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -157,7 +208,10 @@ class PaymentPage extends ConsumerWidget {
   }
 
   Widget _buildRecentTransactionsSection(
-      PaymentState payment, ClubColors colors, AppLocalizations l10n) {
+    PaymentState payment,
+    ClubColors colors,
+    AppLocalizations l10n,
+  ) {
     final recentRecords = payment.records
         .where((r) =>
             r.turnoverType.contains('支付') ||
@@ -293,14 +347,36 @@ class PaymentPage extends ConsumerWidget {
           ),
         ),
         ClubCard(
-          child: ClubListTile(
-            leading: Icon(Icons.apps_rounded, color: colors.primary),
-            title: Text(l10n.showPaymentTile),
-            subtitle: Text(l10n.showPaymentTileSubtitle),
-            trailing: CupertinoSwitch(
-              value: payment.isShowTile,
-              onChanged: (value) => controller.toggleTileShow(value),
-            ),
+          child: Column(
+            children: [
+              ClubListTile(
+                leading:
+                    Icon(Icons.lock_outline_rounded, color: colors.primary),
+                title: Text(l10n.paymentPasswordTitle),
+                subtitle: Text(
+                  payment.password.isEmpty
+                      ? l10n.paymentPasswordSubtitle
+                      : '••••••••',
+                ),
+                trailing: Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 18,
+                  color: colors.tertiaryLabel,
+                ),
+                onTap: payment.isLoading
+                    ? null
+                    : () => _showPasswordDialog(controller, payment),
+              ),
+              ClubListTile(
+                leading: Icon(Icons.apps_rounded, color: colors.primary),
+                title: Text(l10n.showPaymentTile),
+                subtitle: Text(l10n.showPaymentTileSubtitle),
+                trailing: CupertinoSwitch(
+                  value: payment.isShowTile,
+                  onChanged: (value) => controller.toggleTileShow(value),
+                ),
+              ),
+            ],
           ),
         ),
       ],

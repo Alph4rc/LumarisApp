@@ -533,6 +533,12 @@
 
   "paymentLoading": "正在同步飯卡餘額",
   "paymentLoadingSubtitle": "正在取得最新交易明細，請稍候...",
+  "paymentPasswordTitle": "飯卡密碼",
+  "@paymentPasswordTitle": {"description": "飯卡查詢用的可選密碼標題"},
+  "paymentPasswordSubtitle": "可選，留空則以預設方式查詢",
+  "@paymentPasswordSubtitle": {"description": "飯卡密碼輸入說明"},
+  "paymentSaveAndRefresh": "儲存並重新整理",
+  "@paymentSaveAndRefresh": {"description": "儲存飯卡密碼並立即重新整理"},
   "campusCard": "校園一卡通",
   "currentBalance": "目前餘額",
   "recentTransactions": "最近交易",

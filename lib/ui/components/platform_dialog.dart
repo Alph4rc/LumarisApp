@@ -63,6 +63,8 @@ class PlatformDialog {
     String? hintText,
     String? confirmText,
     String? cancelText,
+    String? initialValue,
+    bool obscureText = false,
   }) async {
     if (_useCupertino) {
       return _showCupertinoInputDialog(
@@ -72,6 +74,8 @@ class PlatformDialog {
         hintText: hintText,
         confirmText: confirmText,
         cancelText: cancelText,
+        initialValue: initialValue,
+        obscureText: obscureText,
       );
     }
     return _showMaterialInputDialog(
@@ -81,6 +85,8 @@ class PlatformDialog {
       hintText: hintText,
       confirmText: confirmText,
       cancelText: cancelText,
+      initialValue: initialValue,
+      obscureText: obscureText,
     );
   }
 
@@ -178,8 +184,12 @@ class PlatformDialog {
     String? hintText,
     String? confirmText,
     String? cancelText,
+    String? initialValue,
+    bool obscureText = false,
   }) async {
-    final TextEditingController controller = TextEditingController();
+    final TextEditingController controller = TextEditingController(
+      text: initialValue ?? '',
+    );
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) {
@@ -192,6 +202,7 @@ class PlatformDialog {
               TextField(
                 controller: controller,
                 decoration: InputDecoration(hintText: hintText),
+                obscureText: obscureText,
               ),
             ],
           ),
@@ -218,8 +229,12 @@ class PlatformDialog {
     String? hintText,
     String? confirmText,
     String? cancelText,
+    String? initialValue,
+    bool obscureText = false,
   }) async {
-    final TextEditingController controller = TextEditingController();
+    final TextEditingController controller = TextEditingController(
+      text: initialValue ?? '',
+    );
     return showCupertinoDialog<String>(
       context: context,
       builder: (BuildContext context) {
@@ -238,6 +253,7 @@ class PlatformDialog {
                 child: CupertinoTextField(
                   controller: controller,
                   placeholder: hintText,
+                  obscureText: obscureText,
                 ),
               ),
             ],

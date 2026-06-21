@@ -509,6 +509,12 @@
 
   "paymentLoading": "Synchronisation du solde de la carte",
   "paymentLoadingSubtitle": "Récupération des dernières transactions",
+  "paymentPasswordTitle": "Mot de passe de la carte",
+  "@paymentPasswordTitle": {"description": "Optional password title for card lookup"},
+  "paymentPasswordSubtitle": "Facultatif. Laissez vide pour la recherche par défaut.",
+  "@paymentPasswordSubtitle": {"description": "Helper text for optional card password"},
+  "paymentSaveAndRefresh": "Enregistrer et actualiser",
+  "@paymentSaveAndRefresh": {"description": "Save card password and refresh data"},
   "campusCard": "Carte du campus",
   "currentBalance": "Solde actuel",
   "recentTransactions": "Transactions récentes",

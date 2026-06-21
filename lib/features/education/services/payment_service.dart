@@ -8,9 +8,10 @@ class PaymentService {
   /// 根据指定卡号获取支付数据
   ///
   /// [cardId] 卡号
-  static Future<PaymentData> fetchData(String cardId) async {
+  /// [password] 密码
+  static Future<PaymentData> fetchData(String cardId, String? password) async {
     try {
-      return await PaymentApi.getPaymentTurnover(cardId);
+      return await PaymentApi.getPaymentTurnover(cardId, password);
     } catch (_) {
       return PaymentData([], 0);
     }

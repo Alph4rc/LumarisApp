@@ -1511,6 +1511,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get paymentLoadingSubtitle => '最新の取引を取得中';
 
   @override
+  String get paymentPasswordTitle => 'カードパスワード';
+
+  @override
+  String get paymentPasswordSubtitle => '任意です。空欄の場合は既定の方法で照会します。';
+
+  @override
+  String get paymentSaveAndRefresh => '保存して更新';
+
+  @override
   String get campusCard => '学内カード';
 
   @override

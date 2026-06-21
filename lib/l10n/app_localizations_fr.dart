@@ -1602,6 +1602,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Récupération des dernières transactions';
 
   @override
+  String get paymentPasswordTitle => 'Mot de passe de la carte';
+
+  @override
+  String get paymentPasswordSubtitle =>
+      'Facultatif. Laissez vide pour la recherche par défaut.';
+
+  @override
+  String get paymentSaveAndRefresh => 'Enregistrer et actualiser';
+
+  @override
   String get campusCard => 'Carte du campus';
 
   @override
