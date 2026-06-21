@@ -562,6 +562,12 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
+  /// **'显示窗口'**
+  String get showWindow;
+
+  ///
+  ///
+  /// In zh, this message translates to:
   /// **'最小化到任务栏'**
   String get minimizeToTray;
 

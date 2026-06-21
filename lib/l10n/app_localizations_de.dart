@@ -245,6 +245,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get closeWindowChoice => 'Aktion wählen';
 
   @override
+  String get showWindow => 'Fenster anzeigen';
+
+  @override
   String get minimizeToTray => 'In Taskleiste minimieren';
 
   @override

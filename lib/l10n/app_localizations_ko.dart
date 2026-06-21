@@ -239,6 +239,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get closeWindowChoice => '실행할 작업을 선택하세요';
 
   @override
+  String get showWindow => '창 보기';
+
+  @override
   String get minimizeToTray => '트레이로 최소화';
 
   @override

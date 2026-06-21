@@ -238,6 +238,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get closeWindowChoice => '操作を選択してください';
 
   @override
+  String get showWindow => 'ウィンドウを表示';
+
+  @override
   String get minimizeToTray => 'タスクトレイに最小化';
 
   @override

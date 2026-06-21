@@ -238,6 +238,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get closeWindowChoice => '选择您要执行的操作';
 
   @override
+  String get showWindow => '显示窗口';
+
+  @override
   String get minimizeToTray => '最小化到任务栏';
 
   @override
@@ -2332,6 +2335,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get closeWindowChoice => '選擇您要執行的操作';
+
+  @override
+  String get showWindow => '顯示視窗';
 
   @override
   String get minimizeToTray => '最小化到工作列';

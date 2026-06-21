@@ -247,6 +247,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get closeWindowChoice => 'Choisissez une action';
 
   @override
+  String get showWindow => 'Afficher la fenêtre';
+
+  @override
   String get minimizeToTray => 'Réduire dans la barre';
 
   @override

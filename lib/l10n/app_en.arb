@@ -87,6 +87,7 @@
   "clickToLogin": "Tap to log in",
   "closeWindow": "Close Window",
   "closeWindowChoice": "Choose an action",
+  "showWindow": "Show Window",
   "minimizeToTray": "Minimize to system tray",
   "quitApp": "Quit",
   "goToSettings": "Settings",

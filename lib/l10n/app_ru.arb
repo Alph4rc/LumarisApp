@@ -87,6 +87,7 @@
   "clickToLogin": "Нажмите для входа",
   "closeWindow": "Закрыть окно",
   "closeWindowChoice": "Выберите действие",
+  "showWindow": "Показать окно",
   "minimizeToTray": "Свернуть в трей",
   "quitApp": "Выйти",
   "goToSettings": "Настройки",

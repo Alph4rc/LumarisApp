@@ -145,11 +145,13 @@ Future<void> _deferredInit() async {
     await BackgroundService.startService();
   }
 
-  if (PlatformUtils.isMobile) {
+  if (PlatformUtils.isMobile || PlatformUtils.isMacOS) {
     await NotificationService.instance.initialize();
     Future.delayed(const Duration(seconds: 2), () async {
       await TaskExecutor.checkAndSendCourseReminder();
-      await TaskExecutor.updateWidget();
+      if (PlatformUtils.isMobile) {
+        await TaskExecutor.updateWidget();
+      }
     });
   }
 }
@@ -171,7 +173,7 @@ class _AppLauncher extends ConsumerWidget {
   const _AppLauncher();
 
   Widget _buildAppShell(Widget child) {
-    if (PlatformUtils.isWindows) {
+    if (PlatformUtils.isWindows || PlatformUtils.isMacOS) {
       return WindowPage(child: child);
     }
 
@@ -283,7 +285,30 @@ class _WindowPageState extends State<WindowPage>
 
     await trayManager.setIcon(
       PlatformUtils.isWindows ? 'assets/icon.ico' : 'assets/icon.webp',
+      // isTemplate: PlatformUtils.isMacOS,
     );
+
+    final l10n = AppLocaleService.currentL10n();
+    final menu = Menu(
+      items: [
+        MenuItem(
+          key: 'show_window',
+          label: l10n.showWindow,
+          onClick: (_) {
+            unawaited(_showWindow());
+          },
+        ),
+        MenuItem.separator(),
+        MenuItem(
+          key: 'quit_app',
+          label: l10n.quitApp,
+          onClick: (_) {
+            unawaited(_exitApp());
+          },
+        ),
+      ],
+    );
+    await trayManager.setContextMenu(menu);
   }
 
   // 优化的退出方法
@@ -292,6 +317,11 @@ class _WindowPageState extends State<WindowPage>
     await windowManager.setPreventClose(false);
     // 使用 window_manager 的 destroy 方法代替 exit
     exit(0);
+  }
+
+  Future<void> _showWindow() async {
+    await windowManager.show();
+    await windowManager.focus();
   }
 
   @override
@@ -326,6 +356,18 @@ class _WindowPageState extends State<WindowPage>
 
   @override
   void onTrayIconMouseDown() {
-    windowManager.show();
+    if (PlatformUtils.isMacOS) {
+      unawaited(trayManager.popUpContextMenu());
+      return;
+    }
+
+    unawaited(_showWindow());
+  }
+
+  @override
+  void onTrayIconRightMouseUp() {
+    if (PlatformUtils.isMacOS) {
+      unawaited(trayManager.popUpContextMenu());
+    }
   }
 }

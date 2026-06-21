@@ -87,6 +87,7 @@
   "clickToLogin": "タップしてログイン",
   "closeWindow": "ウィンドウを閉じる",
   "closeWindowChoice": "操作を選択してください",
+  "showWindow": "ウィンドウを表示",
   "minimizeToTray": "タスクトレイに最小化",
   "quitApp": "終了",
   "goToSettings": "設定へ",

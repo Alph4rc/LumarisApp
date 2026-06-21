@@ -245,6 +245,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get closeWindowChoice => 'Выберите действие';
 
   @override
+  String get showWindow => 'Показать окно';
+
+  @override
   String get minimizeToTray => 'Свернуть в трей';
 
   @override
