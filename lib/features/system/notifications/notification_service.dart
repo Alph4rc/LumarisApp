@@ -170,6 +170,13 @@ class NotificationService {
             presentSound: true,
             threadIdentifier: 'ios_club_app_course_reminders',
           ),
+          macOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            threadIdentifier: 'ios_club_app_course_reminders',
+          ),
+          windows: WindowsNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
@@ -260,6 +267,13 @@ class NotificationService {
             presentSound: true,
             threadIdentifier: 'ios_club_app_todo_reminders',
           ),
+          macOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            threadIdentifier: 'ios_club_app_todo_reminders',
+          ),
+          windows: WindowsNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
