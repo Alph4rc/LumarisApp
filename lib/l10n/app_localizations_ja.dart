@@ -423,6 +423,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get disagree => '同意しない';
 
   @override
+  String get loginAgreementPrefix => 'ログインすることで、以下の規約に同意したものとみなされます：';
+
+  @override
+  String get loginAgreementRequired => '利用規約とプライバシーポリシーを必ずご確認の上、同意してください。';
+
+  @override
   String get privacyPolicyTitle => 'Lumaris プライバシーポリシー';
 
   @override

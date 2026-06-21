@@ -723,5 +723,8 @@
   "selectSchool": "Schule auswählen",
   "enterCustomUrl": "Oder eigene URL eingeben",
   "urlHint": "Website-URL eingeben",
-  "icp" : "ICP"
+  "icp" : "ICP",
+
+  "loginAgreementPrefix": "Mit der Anmeldung akzeptieren Sie die ",
+  "loginAgreementRequired": "Bitte lesen und akzeptieren Sie zuerst die Nutzungsbedingungen und die Datenschutzerklärung"
 }

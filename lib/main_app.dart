@@ -11,10 +11,8 @@ import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:macos_ui/macos_ui.dart';
 
 import 'platform/mobile/bottom_navigation.dart';
@@ -332,7 +330,6 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final settings = ref.watch(settingsStoreProvider);
     final routedChild = widget.child;
     final destinations = _buildDestinations(context);
     final primaryDestinations = _buildPrimaryNavigationDestinations(context);
@@ -415,16 +412,6 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
       );
     }
 
-    if (settings.hasAcceptedAgreement) {
-      return shell;
-    }
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        shell,
-        const AgreementPage(),
-      ],
-    );
+    return shell;
   }
 }

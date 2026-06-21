@@ -426,6 +426,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get disagree => '동의하지 않음';
 
   @override
+  String get loginAgreementPrefix => '계속 진행하면 귀하가 ';
+
+  @override
+  String get loginAgreementRequired => '이용 약관에 동의한 것으로 간주합니다';
+
+  @override
   String get privacyPolicyTitle => 'Lumaris 개인정보 처리방침';
 
   @override

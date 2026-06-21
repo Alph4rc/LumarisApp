@@ -910,6 +910,18 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
+  /// **'我已阅读并同意'**
+  String get loginAgreementPrefix;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'请先阅读并同意用户协议和隐私协议'**
+  String get loginAgreementRequired;
+
+  ///
+  ///
+  /// In zh, this message translates to:
   /// **'光序 隐私协议'**
   String get privacyPolicyTitle;
 

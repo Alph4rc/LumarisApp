@@ -153,6 +153,9 @@
   "agreeAndContinue": "Agree and Continue",
   "disagree": "Disagree",
 
+  "loginAgreementPrefix": "I have read and agree to",
+  "loginAgreementRequired": "Please read and agree to the User Agreement and Privacy Policy first",
+
   "privacyPolicyTitle": "Lumaris Privacy Policy",
   "privacyPolicyUpdatedAt": "Updated: May 5, 2026",
   "privacyPolicyEffectiveAt": "Effective: May 5, 2026",

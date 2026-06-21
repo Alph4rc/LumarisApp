@@ -440,6 +440,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disagree => 'Не согласен';
 
   @override
+  String get loginAgreementPrefix => 'Я прочитал и согласен с';
+
+  @override
+  String get loginAgreementRequired =>
+      'Пожалуйста, сначала прочитайте и согласитесь с Пользовательским соглашением и Политикой конфиденциальности';
+
+  @override
   String get privacyPolicyTitle => 'Политика конфиденциальности Lumaris';
 
   @override

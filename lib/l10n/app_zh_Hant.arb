@@ -725,5 +725,8 @@
   "urlHint": "請輸入網址",
 
   "traditionalChinese": "繁體中文",
-  "icp" : "ICP"
+  "icp" : "ICP",
+
+  "loginAgreementPrefix": "我已阅读并同意",
+  "loginAgreementRequired": "请先阅读并同意用户协议和隐私政策"
 }

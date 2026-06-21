@@ -196,6 +196,9 @@
   "agreeAndContinue": "同意并继续",
   "disagree": "不同意",
 
+  "loginAgreementPrefix": "我已阅读并同意",
+  "loginAgreementRequired": "请先阅读并同意用户协议和隐私协议",
+
   "privacyPolicyTitle": "光序 隐私协议",
   "privacyPolicyUpdatedAt": "更新日期：2026年5月5日",
   "privacyPolicyEffectiveAt": "生效日期：2026年5月5日",
@@ -882,6 +885,8 @@
   "@agreementReadTip": {"description": ""},
   "@agreeAndContinue": {"description": ""},
   "@disagree": {"description": ""},
+  "@loginAgreementPrefix": {"description": ""},
+  "@loginAgreementRequired": {"description": ""},
   "@privacyPolicyTitle": {"description": ""},
   "@privacyPolicyUpdatedAt": {"description": ""},
   "@privacyPolicyEffectiveAt": {"description": ""},

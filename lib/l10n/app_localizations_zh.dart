@@ -421,6 +421,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get disagree => '不同意';
 
   @override
+  String get loginAgreementPrefix => '我已阅读并同意';
+
+  @override
+  String get loginAgreementRequired => '请先阅读并同意用户协议和隐私协议';
+
+  @override
   String get privacyPolicyTitle => '光序 隐私协议';
 
   @override
@@ -2501,6 +2507,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get disagree => '不同意';
+
+  @override
+  String get loginAgreementPrefix => '我已阅读并同意';
+
+  @override
+  String get loginAgreementRequired => '请先阅读并同意用户协议和隐私政策';
 
   @override
   String get privacyPolicyTitle => '光序 隱私權政策';

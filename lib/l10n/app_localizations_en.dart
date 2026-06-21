@@ -441,6 +441,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disagree => 'Disagree';
 
   @override
+  String get loginAgreementPrefix => 'I have read and agree to';
+
+  @override
+  String get loginAgreementRequired =>
+      'Please read and agree to the User Agreement and Privacy Policy first';
+
+  @override
   String get privacyPolicyTitle => 'Lumaris Privacy Policy';
 
   @override

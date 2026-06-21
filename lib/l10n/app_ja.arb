@@ -727,5 +727,7 @@
   "selectSchool": "学校を選択",
   "enterCustomUrl": "またはカスタムURLを入力",
   "urlHint": "ウェブサイトのURLを入力",
-  "icp" : "ICP"
+  "icp" : "ICP",
+  "loginAgreementPrefix": "ログインすることで、以下の規約に同意したものとみなされます：",
+  "loginAgreementRequired": "利用規約とプライバシーポリシーを必ずご確認の上、同意してください。"
 }

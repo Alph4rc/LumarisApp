@@ -447,6 +447,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get disagree => 'Refuser';
 
   @override
+  String get loginAgreementPrefix => 'J\'ai lu et j\'accepte';
+
+  @override
+  String get loginAgreementRequired =>
+      'Veuillez lire et accepter les Conditions d\'Utilisation et la Politique de Confidentialité';
+
+  @override
   String get privacyPolicyTitle => 'Politique de confidentialité Lumaris';
 
   @override

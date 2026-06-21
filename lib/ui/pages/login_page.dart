@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -40,6 +41,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   bool _obscureText = true;
   bool _isLoading = false;
+  bool _hasAcceptedAgreement = false;
   late School _selectedSchool;
 
   @override
@@ -99,6 +101,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           Text(context.l10n.loginSecurityStorageUnavailable),
         );
       }
+
+      // 登录成功同时记录协议已同意
+      await ref
+          .read(settingsStoreProvider.notifier)
+          .setHasAcceptedAgreement(true);
 
       // 登录成功，返回上一页并传递成功标志
       if (mounted) {
@@ -333,12 +340,68 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 const SizedBox(height: 32),
 
+                // Agreement Checkbox
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Checkbox(
+                          value: _hasAcceptedAgreement,
+                          onChanged: (v) => setState(
+                              () => _hasAcceptedAgreement = v ?? false),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color
+                                  ?.withValues(alpha: 0.6),
+                            ),
+                            children: [
+                              TextSpan(text: l10n.loginAgreementPrefix),
+                              TextSpan(
+                                text: '《${l10n.userAgreement}》',
+                                style: TextStyle(color: colors.primary),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () =>
+                                      AppRouter.push(AppRoutes.userAgreement),
+                              ),
+                              const TextSpan(text: ' 和 '),
+                              TextSpan(
+                                text: '《${l10n.privacyPolicy}》',
+                                style: TextStyle(color: colors.primary),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => AppRouter.push(
+                                      AppRoutes.privacyPolicy),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
                 // Login Button
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: CupertinoButton.filled(
-                    onPressed: _login,
+                    onPressed: _hasAcceptedAgreement ? _login : null,
                     child: Text(
                       l10n.loginTitle,
                       style: const TextStyle(
