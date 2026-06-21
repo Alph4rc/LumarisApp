@@ -228,194 +228,179 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
       ),
       extendBodyBehindAppBar: true,
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-                // Logo
-                ClubSmoothCorners.clip(
-                  borderRadius: ClubRadii.tile,
-                  child: LazyLoadImage.assets(
-                    'assets/icon.webp',
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Title
-                Text(
-                  l10n.loginTitle,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.loginSubtitle,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.color
-                        ?.withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 40),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            // Logo
+            ClubSmoothCorners.clip(
+              borderRadius: ClubRadii.tile,
+              child: LazyLoadImage.assets(
+                'assets/icon.webp',
+                width: 100,
+                height: 100,
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Title
+            Text(
+              l10n.loginTitle,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.loginSubtitle,
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 40),
 
-                // School Selector
-                Container(
-                  decoration: BoxDecoration(
-                    color: groupBackgroundColor,
-                    borderRadius: ClubRadii.navigation,
-                  ),
-                  child: SchoolSelector(
-                    selectedSchool: _selectedSchool,
-                    onChanged: (school) {
-                      setState(() => _selectedSchool = school);
-                    },
-                  ),
-                ),
+            // School Selector
+            Container(
+              decoration: BoxDecoration(
+                color: groupBackgroundColor,
+                borderRadius: ClubRadii.navigation,
+              ),
+              child: SchoolSelector(
+                selectedSchool: _selectedSchool,
+                onChanged: (school) {
+                  setState(() => _selectedSchool = school);
+                },
+              ),
+            ),
 
-                const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-                // Grouped Inputs
-                Container(
-                  decoration: BoxDecoration(
-                    color: groupBackgroundColor,
-                    borderRadius: ClubRadii.navigation,
+            // Grouped Inputs
+            Container(
+              decoration: BoxDecoration(
+                color: groupBackgroundColor,
+                borderRadius: ClubRadii.navigation,
+              ),
+              child: Column(
+                children: [
+                  _buildCupertinoLikeTextField(
+                    context,
+                    controller: _usernameController,
+                    hintText: l10n.studentId,
+                    icon: Icons.person_outline,
+                    isFirst: true,
+                    isLast: false,
                   ),
-                  child: Column(
-                    children: [
-                      _buildCupertinoLikeTextField(
-                        context,
-                        controller: _usernameController,
-                        hintText: l10n.studentId,
-                        icon: Icons.person_outline,
-                        isFirst: true,
-                        isLast: false,
-                      ),
-                      _buildCupertinoLikeTextField(
-                        context,
-                        controller: _passwordController,
-                        hintText: l10n.password,
-                        icon: Icons.lock_outline,
-                        obscureText: _obscureText,
-                        isPassword: true,
-                        isFirst: false,
-                        isLast: true,
-                      ),
-                    ],
+                  _buildCupertinoLikeTextField(
+                    context,
+                    controller: _passwordController,
+                    hintText: l10n.password,
+                    icon: Icons.lock_outline,
+                    obscureText: _obscureText,
+                    isPassword: true,
+                    isFirst: false,
+                    isLast: true,
                   ),
-                ),
+                ],
+              ),
+            ),
 
-                const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-                // Options Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    TextButton(
-                      onPressed: () async {
-                        const url =
-                            'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
-                        if (await canLaunchUrl(Uri.parse(url))) {
-                          await launchUrl(
-                            Uri.parse(url),
-                            mode: LaunchMode.externalApplication,
-                          );
-                        }
-                      },
-                      child: Text(l10n.forgotPassword),
-                    )
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // Agreement Checkbox
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Checkbox(
-                          value: _hasAcceptedAgreement,
-                          onChanged: (v) => setState(
-                              () => _hasAcceptedAgreement = v ?? false),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.color
-                                  ?.withValues(alpha: 0.6),
-                            ),
-                            children: [
-                              TextSpan(text: l10n.loginAgreementPrefix),
-                              TextSpan(
-                                text: '《${l10n.userAgreement}》',
-                                style: TextStyle(color: colors.primary),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () =>
-                                      AppRouter.push(AppRoutes.userAgreement),
-                              ),
-                              const TextSpan(text: ' 和 '),
-                              TextSpan(
-                                text: '《${l10n.privacyPolicy}》',
-                                style: TextStyle(color: colors.primary),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () => AppRouter.push(
-                                      AppRoutes.privacyPolicy),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Login Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: CupertinoButton.filled(
-                    onPressed: _hasAcceptedAgreement ? _login : null,
-                    child: Text(
-                      l10n.loginTitle,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Checkbox(
+                        value: _hasAcceptedAgreement,
+                        onChanged: (v) =>
+                            setState(() => _hasAcceptedAgreement = v ?? false),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.color
+                                ?.withValues(alpha: 0.6),
+                          ),
+                          children: [
+                            TextSpan(text: l10n.loginAgreementPrefix),
+                            TextSpan(
+                              text: '《${l10n.userAgreement}》',
+                              style: TextStyle(color: colors.primary),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () =>
+                                    AppRouter.push(AppRoutes.userAgreement),
+                            ),
+                            const TextSpan(text: ' 和 '),
+                            TextSpan(
+                              text: '《${l10n.privacyPolicy}》',
+                              style: TextStyle(color: colors.primary),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () =>
+                                    AppRouter.push(AppRoutes.privacyPolicy),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+              TextButton(
+                onPressed: () async {
+                  const url =
+                      'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(
+                      Uri.parse(url),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  }
+                },
+                child: Text(l10n.forgotPassword),
+              )
+            ]),
+
+            const SizedBox(height: 24),
+
+            // Login Button
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: CupertinoButton.filled(
+                onPressed: _hasAcceptedAgreement ? _login : null,
+                child: Text(
+                  l10n.loginTitle,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-
-                const SizedBox(height: 40),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
