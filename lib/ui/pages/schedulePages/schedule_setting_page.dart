@@ -44,10 +44,36 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   List<String> totalList = [];
   List<String> ignoreList = [];
   late List<CourseIgnore> _ignores = [];
-  String url = "";
+  String? _calendarSubscriptionUrl;
   final ThemeMode _themeMode = ThemeMode.system;
 
   ThemeMode get themeMode => _themeMode;
+
+  String? get _httpsCalendarSubscriptionUrl => _calendarSubscriptionUrl;
+
+  String? get _webcalCalendarSubscriptionUrl {
+    final httpsUrl = _httpsCalendarSubscriptionUrl;
+    if (httpsUrl == null || httpsUrl.isEmpty) {
+      return null;
+    }
+    final uri = Uri.parse(httpsUrl);
+    return uri.replace(scheme: 'webcal').toString();
+  }
+
+  String _buildCalendarSubscriptionUrl({
+    required String username,
+    required String password,
+  }) {
+    return Uri.https(
+      'schedule.xauat.site',
+      '/class',
+      <String, dynamic>{
+        'school': 'xauat',
+        'username': username,
+        'password': password,
+      },
+    ).toString();
+  }
 
   @override
   void initState() {
@@ -70,8 +96,10 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
       if (username != null && password != null) {
         setState(() {
-          url =
-              '://schedule.xauat.site/class?school=xauat&username=$username&password=$password';
+          _calendarSubscriptionUrl = _buildCalendarSubscriptionUrl(
+            username: username,
+            password: password,
+          );
         });
       }
     } catch (e) {
@@ -145,7 +173,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
               if (_ignores.isNotEmpty) const SizedBox(height: 24),
               if (_ignores.isNotEmpty) _buildSectionTitle(l10n.ignoreCourses),
               if (_ignores.isNotEmpty) const SizedBox(height: 12),
-              if (_ignores.isNotEmpty) _buildIgnoreCourseSection(context, colors),
+              if (_ignores.isNotEmpty)
+                _buildIgnoreCourseSection(context, colors),
             ],
           ),
         ));
@@ -208,7 +237,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                     children: [
                       Expanded(
                         child: Text(
-                          'https$url',
+                          _httpsCalendarSubscriptionUrl ?? '',
                           style: TextStyle(
                             fontSize: 13,
                             color: colors.secondaryLabel,
@@ -221,7 +250,11 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                       IconButton(
                         icon: const Icon(Icons.copy, size: 18),
                         onPressed: () {
-                          Clipboard.setData(ClipboardData(text: 'webcal$url'));
+                          final webcalUrl = _webcalCalendarSubscriptionUrl;
+                          if (webcalUrl == null || webcalUrl.isEmpty) {
+                            return;
+                          }
+                          Clipboard.setData(ClipboardData(text: webcalUrl));
                           if (context.mounted) {
                             showClubSnackBar(context, Text(l10n.copiedSuccess));
                           }
@@ -432,14 +465,15 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   }
 
   Future<void> _launchCalendar(BuildContext context) async {
-    if (url == '') {
+    final webcalUrl = _webcalCalendarSubscriptionUrl;
+    if (webcalUrl == null || webcalUrl.isEmpty) {
       return;
     }
 
     if (PlatformUtils.isAndroid) {
       final intent = AndroidIntent(
         action: 'android.intent.action.VIEW',
-        data: 'webcal$url',
+        data: webcalUrl,
         type: 'text/calendar',
       );
       var result = await intent.canResolveActivity();
@@ -456,7 +490,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
       return;
     }
 
-    final Uri uri = Uri.parse('webcal$url');
+    final Uri uri = Uri.parse(webcalUrl);
 
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -519,7 +553,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
   }
 
   void showCalendarGuidanceDialog(BuildContext context) {
-    final httpsUrl = 'webcal$url';
+    final httpsUrl = _webcalCalendarSubscriptionUrl ?? '';
     final l10n = context.l10n;
 
     PlatformDialog.showCustomDialog<void>(

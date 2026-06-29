@@ -56,9 +56,10 @@ class BaseHttpClient {
     Options? options,
   }) async {
     try {
+      final requestTarget = _resolveRequestTarget(path, queryParameters);
       final response = await _dio.get(
-        path,
-        queryParameters: queryParameters,
+        requestTarget.path,
+        queryParameters: requestTarget.queryParameters,
         options: options,
       );
       return response.data;
@@ -75,10 +76,11 @@ class BaseHttpClient {
     Options? options,
   }) async {
     try {
+      final requestTarget = _resolveRequestTarget(path, queryParameters);
       final response = await _dio.post(
-        path,
+        requestTarget.path,
         data: data,
-        queryParameters: queryParameters,
+        queryParameters: requestTarget.queryParameters,
         options: options,
       );
       return response.data;
@@ -95,10 +97,11 @@ class BaseHttpClient {
     Options? options,
   }) async {
     try {
+      final requestTarget = _resolveRequestTarget(path, queryParameters);
       final response = await _dio.put(
-        path,
+        requestTarget.path,
         data: data,
-        queryParameters: queryParameters,
+        queryParameters: requestTarget.queryParameters,
         options: options,
       );
       return response.data;
@@ -115,10 +118,11 @@ class BaseHttpClient {
     Options? options,
   }) async {
     try {
+      final requestTarget = _resolveRequestTarget(path, queryParameters);
       final response = await _dio.delete(
-        path,
+        requestTarget.path,
         data: data,
-        queryParameters: queryParameters,
+        queryParameters: requestTarget.queryParameters,
         options: options,
       );
       return response.data;
@@ -134,9 +138,10 @@ class BaseHttpClient {
     Options? options,
   }) async {
     try {
+      final requestTarget = _resolveRequestTarget(url, queryParameters);
       final response = await _dio.get<List<int>>(
-        url,
-        queryParameters: queryParameters,
+        requestTarget.path,
+        queryParameters: requestTarget.queryParameters,
         options: (options ?? Options()).copyWith(
           responseType: ResponseType.bytes,
         ),
@@ -151,4 +156,42 @@ class BaseHttpClient {
   void dispose() {
     _dio.close();
   }
+
+  _ResolvedRequestTarget _resolveRequestTarget(
+    String path,
+    Map<String, dynamic>? queryParameters,
+  ) {
+    final uri = Uri.parse(path);
+    final mergedQueryParameters = <String, dynamic>{
+      ..._extractQueryParameters(uri),
+      ...?queryParameters,
+    };
+
+    return _ResolvedRequestTarget(
+      path: uri.hasQuery ? uri.replace(query: null).toString() : path,
+      queryParameters:
+          mergedQueryParameters.isEmpty ? null : mergedQueryParameters,
+    );
+  }
+
+  Map<String, dynamic> _extractQueryParameters(Uri uri) {
+    if (!uri.hasQuery) {
+      return <String, dynamic>{};
+    }
+
+    return <String, dynamic>{
+      for (final entry in uri.queryParametersAll.entries)
+        entry.key: entry.value.length == 1 ? entry.value.single : entry.value,
+    };
+  }
+}
+
+class _ResolvedRequestTarget {
+  const _ResolvedRequestTarget({
+    required this.path,
+    required this.queryParameters,
+  });
+
+  final String path;
+  final Map<String, dynamic>? queryParameters;
 }
