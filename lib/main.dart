@@ -264,6 +264,7 @@ class WindowPage extends StatefulWidget {
 class _WindowPageState extends State<WindowPage>
     with WindowListener, TrayListener {
   bool _isPreventClose = true;
+  bool _isExiting = false;
 
   @override
   void initState() {
@@ -313,10 +314,25 @@ class _WindowPageState extends State<WindowPage>
 
   // 优化的退出方法
   Future<void> _exitApp() async {
+    if (_isExiting) {
+      return;
+    }
+
+    _isExiting = true;
     _isPreventClose = false;
-    await windowManager.setPreventClose(false);
-    // 使用 window_manager 的 destroy 方法代替 exit
-    exit(0);
+
+    try {
+      await trayManager.destroy();
+      await windowManager.setPreventClose(false);
+      await windowManager.destroy();
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        '关闭桌面窗口失败，使用进程退出兜底',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      exit(0);
+    }
   }
 
   Future<void> _showWindow() async {
@@ -329,7 +345,11 @@ class _WindowPageState extends State<WindowPage>
 
   @override
   void onWindowClose() async {
-    if (_isPreventClose && mounted) {
+    if (_isExiting || !mounted) {
+      return;
+    }
+
+    if (_isPreventClose) {
       final l10n = context.l10n;
       // 显示退出选项
       PlatformDialog.showCustomDialog<void>(
