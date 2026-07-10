@@ -100,12 +100,13 @@ void main() async {
         await windowManager.focus();
       });
     } else {
-      WindowOptions windowOptions = const WindowOptions(
+      WindowOptions windowOptions = WindowOptions(
         minimumSize: Size(800, 600),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.normal,
+        title: appName,
       );
 
       windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -265,6 +266,7 @@ class _WindowPageState extends State<WindowPage>
     with WindowListener, TrayListener {
   bool _isPreventClose = true;
   bool _isExiting = false;
+  bool _isCloseDialogShowing = false;
 
   @override
   void initState() {
@@ -345,32 +347,43 @@ class _WindowPageState extends State<WindowPage>
 
   @override
   void onWindowClose() async {
-    if (_isExiting || !mounted) {
+    if (_isExiting || _isCloseDialogShowing || !mounted) {
       return;
     }
 
     if (_isPreventClose) {
-      final l10n = context.l10n;
-      // 显示退出选项
-      PlatformDialog.showCustomDialog<void>(
-        context,
-        title: l10n.closeWindow,
-        content: Text(l10n.closeWindowChoice),
-        actions: [
-          PlatformDialogAction<void>(label: l10n.cancel),
-          PlatformDialogAction<void>(
-            label: l10n.minimizeToTray,
-            onPressed: () async {
-              await windowManager.hide();
-            },
-          ),
-          PlatformDialogAction<void>(
-            label: l10n.quitApp,
-            isDestructiveAction: true,
-            onPressed: _exitApp,
-          ),
-        ],
-      );
+      final dialogContext = AppRouter.rootNavigatorKey.currentContext;
+      if (dialogContext == null) {
+        await _exitApp();
+        return;
+      }
+
+      _isCloseDialogShowing = true;
+      final l10n = dialogContext.l10n;
+      try {
+        // 显示退出选项
+        await PlatformDialog.showCustomDialog<void>(
+          dialogContext,
+          title: l10n.closeWindow,
+          content: Text(l10n.closeWindowChoice),
+          actions: [
+            PlatformDialogAction<void>(label: l10n.cancel),
+            PlatformDialogAction<void>(
+              label: l10n.minimizeToTray,
+              onPressed: () async {
+                await windowManager.hide();
+              },
+            ),
+            PlatformDialogAction<void>(
+              label: l10n.quitApp,
+              isDestructiveAction: true,
+              onPressed: _exitApp,
+            ),
+          ],
+        );
+      } finally {
+        _isCloseDialogShowing = false;
+      }
     }
   }
 
