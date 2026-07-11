@@ -1,11 +1,11 @@
 import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
-import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/education/apis/map_api.dart';
 import 'package:latlong2/latlong.dart';
+
 import 'map_state.dart';
 
 class MapNotifier extends Notifier<MapState> {
@@ -45,71 +45,92 @@ class MapNotifier extends Notifier<MapState> {
 
   Future<void> checkLocationPermission() async {
     if (state.isLoadingLocation) return; // Prevent concurrent requests
-    
+
     state = state.copyWith(isLoadingLocation: true);
     AppLogger.debug('MapNotifier: Starting location check...');
 
     try {
-      // On macOS, permission_handler doesn't handle location permissions
-      // properly — geolocator manages its own CoreLocation permission flow.
-      if (!PlatformUtils.isMacOS) {
-        final status = await PermissionService.request(Permission.location);
-        AppLogger.debug('MapNotifier: Permission status: $status');
+      // Use geolocator as the single source of truth. Mixing its permission
+      // state with permission_handler can report permission as granted while
+      // CoreLocation still rejects getCurrentPosition (notably on macOS).
+      var permission = await Geolocator.checkPermission();
+      AppLogger.debug('MapNotifier: Location permission: $permission');
 
-        if (status != PermissionStatus.granted &&
-            status != PermissionStatus.limited &&
-            status != PermissionStatus.provisional) {
-          state = state.copyWith(isLoadingLocation: false);
-          return;
-        }
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        AppLogger.debug(
+          'MapNotifier: Location permission after request: $permission',
+        );
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever ||
+          permission == LocationPermission.unableToDetermine) {
+        AppLogger.info(
+          'MapNotifier: Location unavailable because permission is $permission',
+        );
+        return;
       }
 
       // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       AppLogger.debug('MapNotifier: GPS service enabled: $serviceEnabled');
       if (!serviceEnabled) {
-        state = state.copyWith(isLoadingLocation: false);
+        AppLogger.info('MapNotifier: Location services are disabled');
         return;
       }
 
       // 3. Get position - try current position first, fallback to last known
       AppLogger.debug('MapNotifier: Attempting to get current position...');
       Position? position;
-      
+
       try {
         // Try to get current position (most accurate)
         position = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.medium, // Use medium accuracy for faster results
-            timeLimit: Duration(seconds: 8), 
+            // Use medium accuracy for faster results.
+            accuracy: LocationAccuracy.medium,
+            timeLimit: Duration(seconds: 8),
           ),
         );
         AppLogger.debug('MapNotifier: Current position obtained successfully');
+      } on PermissionDeniedException {
+        rethrow;
+      } on LocationServiceDisabledException {
+        rethrow;
       } catch (e) {
         // If current position fails (timeout, no signal, etc.), use last known position
-        AppLogger.debug('MapNotifier: Failed to get current position ($e), falling back to last known position...');
+        AppLogger.debug(
+          'MapNotifier: Failed to get current position ($e), falling back to last known position...',
+        );
         position = await Geolocator.getLastKnownPosition();
-        
+
         if (position != null) {
           AppLogger.debug('MapNotifier: Using last known position as fallback');
         }
       }
-      
+
       if (position == null) {
         throw Exception('Unable to get any location data');
       }
 
-      AppLogger.debug('MapNotifier: Position received: ${position.latitude}, ${position.longitude}');
+      AppLogger.debug(
+          'MapNotifier: Position received: ${position.latitude}, ${position.longitude}');
 
       final gcj02Location =
           _wgs84ToGcj02(position.latitude, position.longitude);
       state = state.copyWith(
         currentLocation: gcj02Location,
-        isLoadingLocation: false,
       );
       AppLogger.debug('MapNotifier: State updated with location');
+    } on PermissionDeniedException catch (e) {
+      // Permission denial is an expected user choice, not an application error.
+      AppLogger.info('MapNotifier: Location permission denied: $e');
+    } on LocationServiceDisabledException catch (e) {
+      AppLogger.info('MapNotifier: Location services are disabled: $e');
     } catch (e) {
       AppLogger.error('MapNotifier: Error during location check: $e');
+    } finally {
       state = state.copyWith(isLoadingLocation: false);
     }
   }

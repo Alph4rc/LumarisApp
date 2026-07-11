@@ -154,11 +154,13 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   maxZoom: _maxMapZoom,
                   onTap: (_, __) {
                     setState(() => _selectedPOI = null);
-                    _sheetController.animateTo(
-                      0.0,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeIn,
-                    );
+                    if (_sheetController.isAttached) {
+                      _sheetController.animateTo(
+                        0.0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      );
+                    }
                   },
                 ),
                 children: [
@@ -771,7 +773,15 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
       maxChildSize: 0.6,
       snap: true,
       builder: (context, scrollController) {
-        if (_selectedPOI == null) return const SizedBox.shrink();
+        // DraggableScrollableSheet requires the provided controller to stay
+        // attached. Without it, its controller may report isAttached while
+        // animateTo still fails because there is no ScrollPosition.
+        if (_selectedPOI == null) {
+          return ListView(
+            controller: scrollController,
+            padding: EdgeInsets.zero,
+          );
+        }
 
         return Container(
           decoration: ShapeDecoration(
