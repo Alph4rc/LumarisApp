@@ -451,19 +451,18 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
   Widget _buildIgnoreCourseSection(BuildContext context, ClubColors colors) {
     return ClubCard(
-      child: SizedBox(
-        height: math.min(_ignores.length * 56.0, 420.0),
-        child: ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: _ignores.length,
-          itemBuilder: (context, index) {
-            final ignore = _ignores[index];
-            return CourseIgnoreItem(
-              ignore: ignore,
-              onChanged: _handleIgnoreChange,
-            );
-          },
-        ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: _ignores.length,
+        itemBuilder: (context, index) {
+          final ignore = _ignores[index];
+          return CourseIgnoreItem(
+            ignore: ignore,
+            onChanged: _handleIgnoreChange,
+          );
+        },
       ),
     );
   }

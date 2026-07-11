@@ -684,8 +684,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildScoreItem(ScoreModel item) {
-    final isTablet = MediaQuery.of(context).size.width > 600;
-
     return Material(
       shape: ClubSmoothCorners.shape(ClubRadii.navigation),
       clipBehavior: Clip.antiAlias,
@@ -728,14 +726,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
                               _buildScoreMeta(item),
                             ]),
                       ),
-                      if (isTablet)
-                        Expanded(
-                          child: Text(
-                            item.gradeDetail,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
                     ]),
               ),
             ],
