@@ -570,7 +570,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   } else {
                     ref
                         .read(mapNotifierProvider.notifier)
-                        .checkLocationPermission();
+                        .checkLocationPermission(openSettingsOnFailure: true);
                   }
                 },
                 colors: colors,

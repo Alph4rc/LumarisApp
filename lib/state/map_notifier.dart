@@ -43,7 +43,8 @@ class MapNotifier extends Notifier<MapState> {
     }
   }
 
-  Future<void> checkLocationPermission() async {
+  Future<void> checkLocationPermission(
+      {bool openSettingsOnFailure = false}) async {
     if (state.isLoadingLocation) return; // Prevent concurrent requests
 
     state = state.copyWith(isLoadingLocation: true);
@@ -55,6 +56,16 @@ class MapNotifier extends Notifier<MapState> {
       // CoreLocation still rejects getCurrentPosition (notably on macOS).
       var permission = await Geolocator.checkPermission();
       AppLogger.debug('MapNotifier: Location permission: $permission');
+
+      if (permission == LocationPermission.deniedForever) {
+        AppLogger.info(
+          'MapNotifier: Location permission is permanently denied',
+        );
+        if (openSettingsOnFailure) {
+          await Geolocator.openAppSettings();
+        }
+        return;
+      }
 
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -77,6 +88,9 @@ class MapNotifier extends Notifier<MapState> {
       AppLogger.debug('MapNotifier: GPS service enabled: $serviceEnabled');
       if (!serviceEnabled) {
         AppLogger.info('MapNotifier: Location services are disabled');
+        if (openSettingsOnFailure) {
+          await Geolocator.openLocationSettings();
+        }
         return;
       }
 
