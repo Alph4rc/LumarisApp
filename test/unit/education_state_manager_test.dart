@@ -2,10 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/features/basic/services/school_config_cache.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
+import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/settings_store.dart';
+import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,6 +63,55 @@ void main() {
       expect(
         EduHttpClientManager.instance.baseUrl,
         School.fallbackList.first.website,
+      );
+    });
+
+    test('selectSchool should update persisted school and education client',
+        () async {
+      final container = createContainer();
+      final settings = container.read(settingsStoreProvider.notifier);
+      EduHttpClientManager.initialize(school: settings.currentSchool);
+      final selectedSchool = School(
+        code: School.defaultCode.toLowerCase(),
+        name: '自定义学校配置',
+        website: 'https://selected.edu.example',
+        features: [Feature.login],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
+      );
+
+      await settings.selectSchool(selectedSchool);
+
+      expect(settings.schoolId, School.defaultCode);
+      expect(
+        PrefsService.instance.getString(PrefsKeys.SCHOOL_ID),
+        School.defaultCode,
+      );
+      expect(
+        EduHttpClientManager.instance.baseUrl,
+        selectedSchool.website,
+      );
+    });
+
+    test('SchoolStore should restore the cached non-default school', () async {
+      final cachedSchool = School(
+        code: 'SECOND',
+        name: 'Second School',
+        website: 'https://second.example',
+        features: [Feature.login, Feature.timetable],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
+      );
+      await PrefsService.instance.setString(
+        PrefsKeys.SCHOOL_ID,
+        cachedSchool.code,
+      );
+      await SchoolConfigCache.save(cachedSchool);
+      final container = createContainer();
+
+      expect(
+        container.read(schoolStoreProvider).school?.code,
+        cachedSchool.code,
       );
     });
   });

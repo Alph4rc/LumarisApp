@@ -10,7 +10,6 @@ import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/auth_service.dart';
-import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -136,7 +135,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   /// 登录教务系统
   /// 返回 true 表示登录 API 调用成功（数据刷新失败不影响登录状态）
   Future<bool> _loginToEduSystem() async {
-    await EducationCacheService.clearEduCache();
+    await ref
+        .read(settingsStoreProvider.notifier)
+        .prepareSchoolForLogin(_selectedSchool);
     await PrefsService.instance.remove(PrefsKeys.GUEST_COURSE_DATA);
 
     final loginResult = await AuthService.loginFromData(
@@ -178,17 +179,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ) &&
         saveSuccess;
 
-    // Read before setSchoolId() clears school-related prefs data
     final userDataString = prefs.getString(PrefsKeys.USER_DATA);
 
-    // 保存选中的学校
-    await ref
-        .read(settingsStoreProvider.notifier)
-        .setSchoolId(_selectedSchool.code);
-
     if (userDataString != null) {
-      // Re-save because setSchoolId() → _clearSchoolRelatedData() removes USER_DATA
-      // await prefs.setString(PrefsKeys.USER_DATA, userDataString);
       final userData = jsonDecode(userDataString);
       await ref
           .read(userStoreProvider.notifier)
@@ -203,6 +196,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final l10n = context.l10n;
     final colors = context.clubColors;
     final groupBackgroundColor = colors.cardBackground;
+    final schools =
+        ref.watch(schoolListProvider).valueOrNull ?? School.fallbackList;
 
     if (_isLoading) {
       return Scaffold(
@@ -275,6 +270,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
               child: SchoolSelector(
                 selectedSchool: _selectedSchool,
+                schools: schools,
                 onChanged: (school) {
                   setState(() => _selectedSchool = school);
                 },
@@ -368,19 +364,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
                 ),
               )),
-              TextButton(
-                onPressed: () async {
-                  const url =
-                      'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(
-                      Uri.parse(url),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  }
-                },
-                child: Text(l10n.forgotPassword),
-              )
+              if (_selectedSchool.code.toUpperCase() == School.defaultCode)
+                TextButton(
+                  onPressed: () async {
+                    const url =
+                        'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(
+                        Uri.parse(url),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
+                  child: Text(l10n.forgotPassword),
+                )
             ]),
 
             const SizedBox(height: 24),

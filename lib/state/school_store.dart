@@ -13,14 +13,17 @@ final schoolStoreProvider =
 class SchoolStore extends Notifier<SchoolStoreState> {
   @override
   SchoolStoreState build() {
-    final school =
-        _hasLoginData() ? School.fallbackList.first : _fallbackSchool();
+    final school = _cachedSchool() ?? _fallbackSchool();
     return SchoolStoreState(isLoading: false, school: school);
   }
 
-  bool _hasLoginData() {
-    final userData = PrefsService.instance.getString(PrefsKeys.USER_DATA);
-    return userData != null && userData.isNotEmpty;
+  School? _cachedSchool() {
+    final school = SchoolConfigCache.read();
+    final schoolId = PrefsService.instance.getString(PrefsKeys.SCHOOL_ID);
+    if (school == null || schoolId == null) {
+      return null;
+    }
+    return school.code.toUpperCase() == schoolId.toUpperCase() ? school : null;
   }
 
   Future<void> fetchSchool(String code) async {

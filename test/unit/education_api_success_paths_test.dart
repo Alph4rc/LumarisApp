@@ -354,6 +354,38 @@ void main() {
       expect(stringResult['studentId'], '2026002');
     });
 
+    test('LoginService should use the current school client', () async {
+      final selectedSchool = School(
+        code: 'SECOND',
+        name: 'Second School',
+        website: 'https://second.example',
+        features: [Feature.login],
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
+      );
+      EduHttpClientManager.current.updateSchoolConfig(selectedSchool);
+      late String requestBaseUrl;
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requestBaseUrl = options.baseUrl;
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: {'success': true},
+              ),
+            );
+          },
+        ),
+      );
+
+      final result = await LoginService.login('user', 'password');
+
+      expect(result['success'], isTrue);
+      expect(requestBaseUrl, selectedSchool.website);
+    });
+
     test('LoginService should wrap invalid response as NetworkException',
         () async {
       final client = EduHttpClient(baseUrl: 'http://api.test');

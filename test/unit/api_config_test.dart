@@ -20,6 +20,14 @@ void main() {
       expect(school!.code, equals(School.defaultCode));
     });
 
+    test('should find school code case-insensitively', () {
+      final school = School.findByCode(
+        School.fallbackList,
+        School.defaultCode.toLowerCase(),
+      );
+      expect(school?.code, School.defaultCode);
+    });
+
     test('should return null for invalid school code', () {
       final school = School.findByCode(
         School.fallbackList,

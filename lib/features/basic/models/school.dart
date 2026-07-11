@@ -100,9 +100,10 @@ class School {
   bool supports(Feature feature) => features.contains(feature);
 
   static School? findByCode(List<School> schools, String code) {
+    final normalizedCode = code.toUpperCase();
     try {
-      return schools.firstWhere((s) => s.code == code);
-    } catch (e) {
+      return schools.firstWhere((s) => s.code.toUpperCase() == normalizedCode);
+    } catch (_) {
       return null;
     }
   }

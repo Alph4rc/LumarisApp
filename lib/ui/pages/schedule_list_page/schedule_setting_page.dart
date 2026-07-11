@@ -143,7 +143,10 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
     final schoolState = ref.watch(schoolStoreProvider);
     final school = schoolState.school;
-    final canSyncCalendar = school?.supports(Feature.timetable) ?? false;
+    // The current subscription service is XAUAT-specific. Other schools must
+    // provide their own endpoint before this entry can be enabled.
+    final canSyncCalendar = school?.code.toUpperCase() == School.defaultCode &&
+        (school?.supports(Feature.timetable) ?? false);
     final canEdit = school?.supports(Feature.timetable) ?? false;
 
     return Scaffold(

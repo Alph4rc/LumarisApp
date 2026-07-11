@@ -10,6 +10,7 @@ import '../features/basic/models/school.dart';
 import '../features/basic/services/school_api.dart';
 import '../features/basic/services/school_config_cache.dart';
 import '../features/education/services/edu_http_client_manager.dart';
+import '../features/education/services/education_cache_service.dart';
 import 'prefs_keys.dart';
 
 final settingsStoreProvider =
@@ -26,10 +27,30 @@ class SchoolListNotifier extends AsyncNotifier<List<School>> {
   Future<List<School>> build() async {
     try {
       final data = await SchoolApi.listSchools();
-      return data.items.where((s) => s.supports(Feature.login)).toList();
-    } catch (e) {
+      final schools = data.items
+          .where((s) => s.enabled && s.supports(Feature.login))
+          .toList();
+      return schools.isEmpty ? _localSchools() : schools;
+    } catch (_) {
+      return _localSchools();
+    }
+  }
+
+  List<School> _localSchools() {
+    final cachedSchool = SchoolConfigCache.read();
+    if (cachedSchool == null ||
+        !cachedSchool.enabled ||
+        !cachedSchool.supports(Feature.login)) {
       return School.fallbackList;
     }
+
+    return <School>[
+      cachedSchool,
+      ...School.fallbackList.where(
+        (school) =>
+            school.code.toUpperCase() != cachedSchool.code.toUpperCase(),
+      ),
+    ];
   }
 }
 
@@ -59,6 +80,11 @@ class SettingsStore extends Notifier<SettingsState> {
   Locale? get locale => AppLocaleService.localeOf(state.localeCode);
 
   School? get currentSchool {
+    final cachedSchool = SchoolConfigCache.read();
+    if (cachedSchool != null &&
+        cachedSchool.code.toUpperCase() == state.schoolId.toUpperCase()) {
+      return cachedSchool;
+    }
     final schools =
         ref.read(schoolListProvider).valueOrNull ?? School.fallbackList;
     return School.findByCode(schools, state.schoolId) ??
@@ -200,15 +226,37 @@ class SettingsStore extends Notifier<SettingsState> {
       throw ArgumentError('Invalid school code: $schoolId');
     }
 
-    state = state.copyWith(schoolId: schoolId);
-    await PrefsService.instance.setString(PrefsKeys.SCHOOL_ID, schoolId);
+    await selectSchool(school);
+  }
+
+  /// Applies a school before authentication so every education request uses
+  /// the selected school's API endpoint. Existing education data is cleared
+  /// only when the school actually changes.
+  Future<void> selectSchool(School school) async {
+    if (!school.enabled || !school.supports(Feature.login)) {
+      throw ArgumentError('School does not support login: ${school.code}');
+    }
+
+    final normalizedCode = school.code.toUpperCase();
+    final schoolChanged = state.schoolId.toUpperCase() != normalizedCode;
+    if (schoolChanged) {
+      await EducationCacheService.clearEduCache();
+    }
+
+    state = state.copyWith(schoolId: normalizedCode);
+    await PrefsService.instance.setString(
+      PrefsKeys.SCHOOL_ID,
+      normalizedCode,
+    );
     await SchoolConfigCache.save(school);
 
-    try {
-      EduHttpClientManager.current.updateSchoolConfig(school);
-    } catch (_) {
-      // The manager may not be initialized during early app startup or tests.
-    }
+    EduHttpClientManager.current.updateSchoolConfig(school);
+  }
+
+  /// Clears the previous education session and applies [school] before login.
+  Future<void> prepareSchoolForLogin(School school) async {
+    await EducationCacheService.clearEduCache();
+    await selectSchool(school);
   }
 
   Future<void> setHasAcceptedAgreement(bool value) async {

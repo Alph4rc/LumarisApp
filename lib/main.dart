@@ -61,9 +61,8 @@ void main() async {
 
   BasicHttpClientManager.initialize();
 
-  // 在首帧渲染前完成学校配置加载，避免首页请求落到默认教务 API。
+  // 先用本地学校配置初始化客户端，避免网络请求阻塞首帧。
   final schoolStore = providerContainer.read(schoolStoreProvider.notifier);
-  await schoolStore.fetchSchool(settingsStore.schoolId);
   final initialSchool = providerContainer.read(schoolStoreProvider).school ??
       settingsStore.currentSchool;
 
@@ -75,6 +74,9 @@ void main() async {
       onRelogFailed: authStateNotifier.relogFailed,
     ),
   );
+
+  // 远程配置在后台刷新，SchoolStore 会同步更新 API 基址。
+  unawaited(schoolStore.fetchSchool(settingsStore.schoolId));
 
   EducationRefreshService.setCourseRefreshCallback(courseStore.loadCourses);
 
