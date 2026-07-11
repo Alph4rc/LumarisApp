@@ -97,32 +97,33 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
         children: [
           // App 图标 - 更加圆润
           Container(
-            width: 28,
-            height: 28,
-            decoration: ShapeDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  colorScheme.primary,
-                  colorScheme.primary.withValues(alpha: 0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: ClubSmoothCorners.shape(ClubRadii.control),
-              shadows: [
-                BoxShadow(
-                  color: colorScheme.primary.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+              width: 28,
+              height: 28,
+              decoration: ShapeDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    colorScheme.primary,
+                    colorScheme.primary.withValues(alpha: 0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Icon(
-              Icons.apple, // 使用 Apple 图标或保持 dashboard
-              size: 18,
-              color: context.clubColors.onAccent,
-            ),
-          ),
+                shape: ClubSmoothCorners.shape(ClubRadii.control),
+                shadows: [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: const Image(
+                    image: AssetImage('assets/icon.webp'),
+                    fit: BoxFit.cover,
+                  ))),
           const SizedBox(width: 12),
           // App 名称
           Text(
