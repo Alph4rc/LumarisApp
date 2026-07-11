@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/cupertino.dart';
 
 import 'package:android_intent_plus/android_intent.dart';

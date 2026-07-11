@@ -8,9 +8,9 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/user_store.dart';
 
-import 'package:ios_club_app/ui/pages/homePages/exam_card.dart';
-import 'package:ios_club_app/ui/pages/homePages/schedule_widget.dart';
-import 'package:ios_club_app/ui/pages/homePages/tiles_widget.dart';
+import 'package:ios_club_app/ui/pages/home_page/exam_card.dart';
+import 'package:ios_club_app/ui/pages/home_page/schedule_widget.dart';
+import 'package:ios_club_app/ui/pages/home_page/tiles_widget.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});

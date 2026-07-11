@@ -12,7 +12,7 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/pages/settingPages/version_setting.dart';
+import 'package:ios_club_app/ui/pages/setting_page/version_setting.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
@@ -30,12 +30,12 @@ import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
-import 'package:ios_club_app/ui/pages/settingPages/show_tomorrow_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/remind_setting.dart';
+import 'package:ios_club_app/ui/pages/setting_page/show_tomorrow_setting.dart';
+import 'package:ios_club_app/ui/pages/setting_page/remind_setting.dart';
 
-import 'package:ios_club_app/ui/pages/settingPages/home_page_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/font_family_setting.dart';
-import 'package:ios_club_app/ui/pages/settingPages/language_setting.dart';
+import 'package:ios_club_app/ui/pages/setting_page/home_page_setting.dart';
+import 'package:ios_club_app/ui/pages/setting_page/font_family_setting.dart';
+import 'package:ios_club_app/ui/pages/setting_page/language_setting.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingPage extends ConsumerWidget {
