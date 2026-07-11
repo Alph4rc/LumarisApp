@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -13,6 +14,8 @@ import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/features/education/models/semester_model.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/features/education/apis/login_api.dart';
+import 'package:ios_club_app/features/education/models/login_response.dart';
 import 'package:ios_club_app/features/education/services/auth_service.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -20,7 +23,6 @@ import 'package:ios_club_app/features/education/services/edu_http_client_manager
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
 import 'package:ios_club_app/features/education/services/exam_service.dart';
-import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/features/education/services/score_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,7 +110,7 @@ void main() {
     await PrefsService.instance.clear();
     EduHttpClientManager.resetForTest();
     EducationRefreshService.resetForTest();
-    LoginService.setLoginOverrideForTest(null);
+    LoginApi.setLoginOverrideForTest(null);
 
     for (final boxName in <String>[
       'request_cache',
@@ -163,7 +165,7 @@ void main() {
   tearDown(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
-    LoginService.setLoginOverrideForTest(null);
+    LoginApi.setLoginOverrideForTest(null);
     EduHttpClientManager.resetForTest();
     EducationRefreshService.resetForTest();
   });
@@ -177,19 +179,28 @@ void main() {
 
   group('education domain services', () {
     test('AuthService.loginFromData should persist login payload', () async {
-      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
-            'success': true,
-            'studentId': '2026888',
-            'cookie': 'cookie-auth-service',
-          });
+      LoginApi.setLoginOverrideForTest(
+        (_, __) async => LoginResponse(
+          success: true,
+          studentId: '2026888',
+          cookie: 'cookie-auth-service',
+        ),
+      );
 
       final ok = await AuthService.loginFromData('u', 'p');
 
       expect(ok, isTrue);
-      expect(
-        PrefsService.instance.getString(PrefsKeys.USER_DATA),
-        contains('cookie-auth-service'),
-      );
+      final storedUserData = jsonDecode(
+        PrefsService.instance.getString(PrefsKeys.USER_DATA)!,
+      ) as Map<String, dynamic>;
+      expect(storedUserData, <String, dynamic>{
+        'success': true,
+        'studentId': '2026888',
+        'cookie': 'cookie-auth-service',
+      });
+      expect(storedUserData.containsKey('data'), isFalse);
+      expect(storedUserData.containsKey('code'), isFalse);
+      expect(storedUserData.containsKey('message'), isFalse);
       expect(
           PrefsService.instance.getInt(PrefsKeys.LAST_FETCH_TIME), isNotNull);
     });
@@ -231,11 +242,13 @@ void main() {
     test(
         'EducationRefreshService.loginAndRefresh should preload time and courses',
         () async {
-      LoginService.setLoginOverrideForTest((_, __) async => <String, dynamic>{
-            'success': true,
-            'studentId': '2026999',
-            'cookie': 'cookie-refresh-service',
-          });
+      LoginApi.setLoginOverrideForTest(
+        (_, __) async => LoginResponse(
+          success: true,
+          studentId: '2026999',
+          cookie: 'cookie-refresh-service',
+        ),
+      );
       mockEduResponse(
         path: '/Score/Semester',
         data: <String, dynamic>{

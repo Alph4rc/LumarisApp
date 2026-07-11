@@ -3,31 +3,17 @@ import 'package:ios_club_app/features/education/models/login_response.dart';
 
 void main() {
   group('LoginResponse', () {
-    test('should parse all known fields and extra values', () {
+    test('should parse the documented login payload', () {
       final model = LoginResponse.fromJson(<String, dynamic>{
-        'token': 't',
-        'userId': 'u',
-        'studentId': 's',
-        'username': 'name',
-        'name': 'real',
-        'department': 'dep',
-        'className': 'class',
-        'success': false,
-        'message': 'failed',
-        'unexpectedKey': 123,
+        'success': true,
+        'studentId': '59769',
+        'cookie': '**pstsid**=session-id; SESSION=session-token',
       });
 
-      expect(model.token, 't');
-      expect(model.userId, 'u');
-      expect(model.studentId, 's');
-      expect(model.username, 'name');
-      expect(model.name, 'real');
-      expect(model.department, 'dep');
-      expect(model.className, 'class');
-      expect(model.success, isFalse);
-      expect(model.message, 'failed');
-      expect(model.extra!['unexpectedKey'], 123);
-      expect(model.isSuccess, isFalse);
+      expect(model.success, isTrue);
+      expect(model.studentId, '59769');
+      expect(model.cookie, '**pstsid**=session-id; SESSION=session-token');
+      expect(model.isSuccess, isTrue);
     });
 
     test('should default isSuccess to true when success is null', () {
@@ -39,19 +25,13 @@ void main() {
 
     test('toJson should only include non-null fields', () {
       final model = LoginResponse(
-        token: 't',
-        userId: 'u',
         success: true,
-        message: 'ok',
-        extra: <String, dynamic>{'env': 'test'},
+        cookie: 'session-cookie',
       );
 
       final json = model.toJson();
-      expect(json['token'], 't');
-      expect(json['userId'], 'u');
       expect(json['success'], isTrue);
-      expect(json['message'], 'ok');
-      expect(json['env'], 'test');
+      expect(json['cookie'], 'session-cookie');
       expect(json.containsKey('studentId'), isFalse);
     });
   });

@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
+import 'package:ios_club_app/features/education/apis/login_api.dart';
 import 'package:ios_club_app/state/auth_state_notifier.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
-import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -124,7 +124,7 @@ void main() {
     });
   });
 
-  group('LoginService', () {
+  group('LoginApi', () {
     late Directory tempDir;
 
     setUpAll(() async {
@@ -143,7 +143,7 @@ void main() {
 
     test('should throw NetworkException when login request fails', () async {
       await expectLater(
-        () => LoginService.login('u1', 'p1'),
+        () => LoginApi.login('u1', 'p1'),
         throwsA(isA<NetworkException>()),
       );
     });

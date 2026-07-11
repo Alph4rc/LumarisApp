@@ -10,7 +10,7 @@ import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
 import '../../../core/services/retry_policy.dart';
 import '../../basic/models/school.dart';
-import 'login_service.dart';
+import '../apis/login_api.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
@@ -367,16 +367,26 @@ class EduHttpClient extends BaseHttpClient {
         return false;
       }
 
-      final loginResult = _loginHandlerForTest != null
-          ? await _loginHandlerForTest!(username, password)
-          : await LoginService.login(username, password);
-
-      if (loginResult['success'] == true) {
+      if (_loginHandlerForTest != null) {
+        final loginResult = await _loginHandlerForTest!(username, password);
+        if (loginResult['success'] != true) {
+          return false;
+        }
         await prefs.setString(PrefsKeys.USER_DATA, jsonEncode(loginResult));
         return true;
       }
 
-      return false;
+      final loginResponse = await LoginApi.login(username, password);
+      if (loginResponse.success != true) {
+        return false;
+      }
+
+      // USER_DATA intentionally stores the flat login payload, not ApiResponse.
+      await prefs.setString(
+        PrefsKeys.USER_DATA,
+        jsonEncode(loginResponse.toJson()),
+      );
+      return true;
     } catch (e) {
       AppLogger.debug('重登录失败: $e');
       return false;

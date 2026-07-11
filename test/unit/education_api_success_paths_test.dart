@@ -13,7 +13,7 @@ import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
 import 'package:ios_club_app/features/education/apis/exam_api.dart';
 import 'package:ios_club_app/features/education/apis/info_api.dart';
-import 'package:ios_club_app/features/education/services/login_service.dart';
+import 'package:ios_club_app/features/education/apis/login_api.dart';
 import 'package:ios_club_app/features/education/apis/payment_api.dart';
 import 'package:ios_club_app/features/education/apis/program_api.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
@@ -37,7 +37,7 @@ void main() {
     await PrefsService.instance.clear();
     await RequestCache.instance.clear();
     EduHttpClientManager.resetForTest();
-    LoginService.setLoginOverrideForTest(null);
+    LoginApi.setLoginOverrideForTest(null);
     final manager = EduHttpClientManager.initialize();
     manager.updateSchoolConfig(
       School(
@@ -52,8 +52,8 @@ void main() {
   });
 
   tearDown(() {
-    LoginService.setLoginOverrideForTest(null);
-    LoginService.resetClientForTest();
+    LoginApi.setLoginOverrideForTest(null);
+    LoginApi.resetClientForTest();
     EduHttpClientManager.resetForTest();
   });
 
@@ -326,7 +326,7 @@ void main() {
       );
     });
 
-    test('LoginService should parse map and string responses', () async {
+    test('LoginApi should parse map and string responses', () async {
       final client = EduHttpClient(baseUrl: 'http://api.test');
       var call = 0;
       client.dio.interceptors.add(
@@ -338,23 +338,31 @@ void main() {
                 requestOptions: options,
                 statusCode: 200,
                 data: call == 1
-                    ? {'success': true, 'studentId': '2026001'}
-                    : jsonEncode({'success': true, 'studentId': '2026002'}),
+                    ? {
+                        'success': true,
+                        'studentId': '2026001',
+                        'cookie': 'cookie-1',
+                      }
+                    : jsonEncode({
+                        'success': true,
+                        'studentId': '2026002',
+                        'cookie': 'cookie-2',
+                      }),
               ),
             );
           },
         ),
       );
-      LoginService.setClientForTest(client);
+      LoginApi.setClientForTest(client);
 
-      final mapResult = await LoginService.login('u1', 'p1');
-      final stringResult = await LoginService.login('u2', 'p2');
+      final mapResult = await LoginApi.login('u1', 'p1');
+      final stringResult = await LoginApi.login('u2', 'p2');
 
-      expect(mapResult['studentId'], '2026001');
-      expect(stringResult['studentId'], '2026002');
+      expect(mapResult.studentId, '2026001');
+      expect(stringResult.studentId, '2026002');
     });
 
-    test('LoginService should use the current school client', () async {
+    test('LoginApi should use the current school client', () async {
       final selectedSchool = School(
         code: 'SECOND',
         name: 'Second School',
@@ -373,21 +381,57 @@ void main() {
               Response<dynamic>(
                 requestOptions: options,
                 statusCode: 200,
-                data: {'success': true},
+                data: {
+                  'success': true,
+                  'studentId': '2026000',
+                  'cookie': 'school-cookie',
+                },
               ),
             );
           },
         ),
       );
 
-      final result = await LoginService.login('user', 'password');
+      final result = await LoginApi.login('user', 'password');
 
-      expect(result['success'], isTrue);
+      expect(result.success, isTrue);
       expect(requestBaseUrl, selectedSchool.website);
     });
 
-    test('LoginService should wrap invalid response as NetworkException',
-        () async {
+    test('LoginApi should unwrap the current API response envelope', () async {
+      LoginApi.setLoginOverrideForTest(null);
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      client.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: {
+                  'code': 0,
+                  'message': 'ok',
+                  'data': {
+                    'success': true,
+                    'studentId': '2026003',
+                    'cookie': 'session-cookie',
+                  },
+                },
+              ),
+            );
+          },
+        ),
+      );
+      LoginApi.setClientForTest(client);
+
+      final result = await LoginApi.login('user', 'password');
+
+      expect(result.success, isTrue);
+      expect(result.studentId, '2026003');
+      expect(result.cookie, 'session-cookie');
+    });
+
+    test('LoginApi should wrap invalid response as NetworkException', () async {
       final client = EduHttpClient(baseUrl: 'http://api.test');
       client.dio.interceptors.add(
         InterceptorsWrapper(
@@ -402,10 +446,10 @@ void main() {
           },
         ),
       );
-      LoginService.setClientForTest(client);
+      LoginApi.setClientForTest(client);
 
       expect(
-        () => LoginService.login('u', 'p'),
+        () => LoginApi.login('u', 'p'),
         throwsA(isA<NetworkException>()),
       );
     });

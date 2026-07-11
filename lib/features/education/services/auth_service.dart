@@ -3,10 +3,9 @@ import 'dart:convert' show jsonDecode, jsonEncode;
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/features/education/apis/login_api.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-
-import 'login_service.dart';
 
 class AuthService {
   static Future<void> migrateCredentials() async {
@@ -39,9 +38,12 @@ class AuthService {
     }
 
     final prefs = PrefsService.instance;
-    final response = await LoginService.login(username, password);
-    if (response['success'] == true) {
-      await prefs.setString(PrefsKeys.USER_DATA, jsonEncode(response));
+    final response = await LoginApi.login(username, password);
+    if (response.success == true) {
+      await prefs.setString(
+        PrefsKeys.USER_DATA,
+        jsonEncode(response.toJson()),
+      );
       await prefs.setInt(
         PrefsKeys.LAST_FETCH_TIME,
         DateTime.now().millisecondsSinceEpoch,
@@ -71,9 +73,12 @@ class AuthService {
         return false;
       }
 
-      final response = await LoginService.login(username, password);
-      if (response['success'] == true) {
-        await prefs.setString(PrefsKeys.USER_DATA, jsonEncode(response));
+      final response = await LoginApi.login(username, password);
+      if (response.success == true) {
+        await prefs.setString(
+          PrefsKeys.USER_DATA,
+          jsonEncode(response.toJson()),
+        );
         await prefs.setInt(
           PrefsKeys.LAST_FETCH_TIME,
           DateTime.now().millisecondsSinceEpoch,

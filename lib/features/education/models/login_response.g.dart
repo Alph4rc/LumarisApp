@@ -8,15 +8,9 @@ part of 'login_response.dart';
 
 LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
     LoginResponse(
-      token: json['token'] as String?,
-      userId: json['userId'] as String?,
-      studentId: json['studentId'] as String?,
-      username: json['username'] as String?,
-      name: json['name'] as String?,
-      department: json['department'] as String?,
-      className: json['className'] as String?,
       success: json['success'] as bool?,
-      message: json['message'] as String?,
+      studentId: json['studentId'] as String?,
+      cookie: json['cookie'] as String?,
     );
 
 Map<String, dynamic> _$LoginResponseToJson(LoginResponse instance) {
@@ -28,14 +22,8 @@ Map<String, dynamic> _$LoginResponseToJson(LoginResponse instance) {
     }
   }
 
-  writeNotNull('token', instance.token);
-  writeNotNull('userId', instance.userId);
-  writeNotNull('studentId', instance.studentId);
-  writeNotNull('username', instance.username);
-  writeNotNull('name', instance.name);
-  writeNotNull('department', instance.department);
-  writeNotNull('className', instance.className);
   writeNotNull('success', instance.success);
-  writeNotNull('message', instance.message);
+  writeNotNull('studentId', instance.studentId);
+  writeNotNull('cookie', instance.cookie);
   return val;
 }

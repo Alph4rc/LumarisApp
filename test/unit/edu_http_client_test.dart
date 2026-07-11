@@ -8,8 +8,9 @@ import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/services/network_exception.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/features/education/apis/login_api.dart';
+import 'package:ios_club_app/features/education/models/login_response.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
-import 'package:ios_club_app/features/education/services/login_service.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,7 +57,7 @@ void main() {
     secureStore.clear();
     await PrefsService.instance.clear();
     EduHttpClient.resetReloginStateForTest();
-    LoginService.setLoginOverrideForTest(null);
+    LoginApi.setLoginOverrideForTest(null);
     final box = await Hive.openBox('request_cache');
     await box.clear();
 
@@ -84,7 +85,7 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
     EduHttpClient.resetReloginStateForTest();
-    LoginService.setLoginOverrideForTest(null);
+    LoginApi.setLoginOverrideForTest(null);
   });
 
   tearDownAll(() async {
@@ -681,17 +682,17 @@ void main() {
     });
 
     test(
-        'reLoginWithLockForTest should use LoginService fallback when test handler unset',
+        'reLoginWithLockForTest should use LoginApi fallback when test handler unset',
         () async {
       secureStore[PrefsKeys.USERNAME] = 'u2';
       secureStore[PrefsKeys.PASSWORD] = 'p2';
-      LoginService.setLoginOverrideForTest((_, __) async {
-        return <String, dynamic>{
-          'success': true,
-          'studentId': '2026002',
-          'cookie': 'fallback-cookie',
-        };
-      });
+      LoginApi.setLoginOverrideForTest(
+        (_, __) async => LoginResponse(
+          success: true,
+          studentId: '2026002',
+          cookie: 'fallback-cookie',
+        ),
+      );
       final client = EduHttpClient(baseUrl: 'http://api.test');
 
       final ok = await client.reLoginWithLockForTest();
