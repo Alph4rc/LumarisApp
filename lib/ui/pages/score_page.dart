@@ -598,10 +598,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
         });
       },
       itemCount: _scoreList.length,
-      itemBuilder: (context, index) => SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: _buildSemesterCard(_scoreList[index]),
-      ),
+      itemBuilder: (context, index) => _buildSemesterCard(_scoreList[index]),
     );
   }
 
@@ -614,28 +611,24 @@ class _ScorePageState extends ConsumerState<ScorePage>
             _currentIndex = index;
           });
         },
-        itemBuilder: (context, index) => SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: _buildYearCard(_yearList[index], index),
-            ));
+        itemBuilder: (context, index) => _buildYearCard(_yearList[index]));
   }
 
-  Widget _buildYearCard(ScoreList score, int index) {
-    return ClubCard(
-        margin: const EdgeInsets.all(16),
-        borderRadius: ClubRadii.navigation,
-        child: Column(children: [
-          _buildStatsPadding(scoreList: score),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: score.list.length,
-            itemBuilder: (context, index) => AnimatedListItem(
-              index: index,
-              child: _buildScoreItem(score.list[index]),
+  Widget _buildYearCard(ScoreList score) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverToBoxAdapter(
+            child: ClubCard(
+              borderRadius: ClubRadii.navigation,
+              child: _buildStatsPadding(scoreList: score),
             ),
-          )
-        ]));
+          ),
+        ),
+        _buildScoreSliverList(score.list),
+      ],
+    );
   }
 
   Widget _buildEmptyState() {
@@ -659,17 +652,30 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildSemesterCard(ScoreList score) {
-    return AnimatedCard(
-      child: ClubCard(
-        margin: const EdgeInsets.all(16),
-        borderRadius: ClubRadii.navigation,
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: score.list.length,
-          itemBuilder: (context, index) => AnimatedListItem(
-            index: index,
-            child: _buildScoreItem(score.list[index]),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.only(top: 16),
+          sliver: _buildScoreSliverList(score.list),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScoreSliverList(List<ScoreModel> scores) {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      sliver: SliverList.builder(
+        itemCount: scores.length,
+        itemBuilder: (context, index) => AnimatedCard(
+          delay: Duration(milliseconds: 50 * index),
+          child: ClubCard(
+            margin: const EdgeInsets.only(bottom: 8),
+            borderRadius: ClubRadii.navigation,
+            child: AnimatedListItem(
+              index: index,
+              child: _buildScoreItem(scores[index]),
+            ),
           ),
         ),
       ),

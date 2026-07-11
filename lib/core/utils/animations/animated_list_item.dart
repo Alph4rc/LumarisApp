@@ -52,20 +52,22 @@ class AnimatedListItem extends StatelessWidget {
     final animCurve = curve ?? AppAnimations.easeOut;
     final offset = slideOffset ?? AppAnimations.slideOffset;
 
-    return TweenAnimationBuilder<double>(
-      duration: animDuration + animDelay,
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      curve: animCurve,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, offset * (1 - value)),
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
-        );
-      },
-      child: child,
+    return RepaintBoundary(
+      child: TweenAnimationBuilder<double>(
+        duration: animDuration + animDelay,
+        tween: Tween<double>(begin: 0.0, end: 1.0),
+        curve: animCurve,
+        builder: (context, value, child) {
+          return Transform.translate(
+            offset: Offset(0, offset * (1 - value)),
+            child: Opacity(
+              opacity: value,
+              child: child,
+            ),
+          );
+        },
+        child: child,
+      ),
     );
   }
 }
@@ -93,20 +95,22 @@ class AnimatedListItemSlideLeft extends StatelessWidget {
     final animDelay = delay ?? AppAnimations.getListItemDelay(index);
     final animCurve = curve ?? AppAnimations.easeOut;
 
-    return TweenAnimationBuilder<double>(
-      duration: animDuration + animDelay,
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      curve: animCurve,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(-30 * (1 - value), 0),
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
-        );
-      },
-      child: child,
+    return RepaintBoundary(
+      child: TweenAnimationBuilder<double>(
+        duration: animDuration + animDelay,
+        tween: Tween<double>(begin: 0.0, end: 1.0),
+        curve: animCurve,
+        builder: (context, value, child) {
+          return Transform.translate(
+            offset: Offset(-30 * (1 - value), 0),
+            child: Opacity(
+              opacity: value,
+              child: child,
+            ),
+          );
+        },
+        child: child,
+      ),
     );
   }
 }
@@ -134,20 +138,22 @@ class AnimatedListItemScale extends StatelessWidget {
     final animDelay = delay ?? AppAnimations.getListItemDelay(index);
     final animCurve = curve ?? AppAnimations.easeOut;
 
-    return TweenAnimationBuilder<double>(
-      duration: animDuration + animDelay,
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      curve: animCurve,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: 0.8 + (0.2 * value),
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
-        );
-      },
-      child: child,
+    return RepaintBoundary(
+      child: TweenAnimationBuilder<double>(
+        duration: animDuration + animDelay,
+        tween: Tween<double>(begin: 0.0, end: 1.0),
+        curve: animCurve,
+        builder: (context, value, child) {
+          return Transform.scale(
+            scale: 0.8 + (0.2 * value),
+            child: Opacity(
+              opacity: value,
+              child: child,
+            ),
+          );
+        },
+        child: child,
+      ),
     );
   }
 }

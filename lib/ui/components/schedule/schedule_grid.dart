@@ -55,16 +55,21 @@ class ScheduleGrid extends StatelessWidget {
         ),
         // 右侧课程网格
         Expanded(
-          child: Row(
-            children:
-                WeekStartUtils.orderedWeekdays(weekStartDay).map((weekday) {
-              return Expanded(
-                child: _buildDayColumn(
-                  context,
-                  weekday,
-                ),
-              );
-            }).toList(),
+          child: CustomPaint(
+            painter: showGrid
+                ? _ScheduleGridPainter(
+                    color: context.clubColors.separator,
+                    cellHeight: cellHeight,
+                    periodCount: periodCount,
+                  )
+                : null,
+            child: Row(
+              children: WeekStartUtils.orderedWeekdays(weekStartDay)
+                  .map((weekday) => Expanded(
+                        child: _buildDayColumn(context, weekday),
+                      ))
+                  .toList(),
+            ),
           ),
         ),
       ],
@@ -72,7 +77,6 @@ class ScheduleGrid extends StatelessWidget {
   }
 
   Widget _buildDayColumn(BuildContext context, int weekday) {
-    final colors = context.clubColors;
     // 获取当天的课程
     final dayCourses = courses.where((c) => c.weekday == weekday).toList();
     dayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
@@ -82,30 +86,6 @@ class ScheduleGrid extends StatelessWidget {
 
     return Stack(
       children: [
-        // 网格线
-        if (showGrid)
-          Positioned.fill(
-            child: Column(
-              children: List.generate(
-                periodCount,
-                (index) => Container(
-                  height: cellHeight,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      left: BorderSide(
-                        color: colors.separator,
-                        width: 0.5,
-                      ),
-                      bottom: BorderSide(
-                        color: colors.separator,
-                        width: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
         // 课程卡片
         ...conflictGroups.expand((group) {
           if (group.length == 1) {
@@ -347,5 +327,44 @@ class ScheduleGrid extends StatelessWidget {
     // 检查两个课程的上课节次是否有时间重叠
     // 注意：同名课程已经在 _mergeSameNameCourses 中合并了，这里不会出现同名课程
     return (a.startUnit <= b.endUnit && a.endUnit >= b.startUnit);
+  }
+}
+
+/// Draws the static timetable grid in one paint operation instead of creating
+/// a widget for every cell border.
+class _ScheduleGridPainter extends CustomPainter {
+  const _ScheduleGridPainter({
+    required this.color,
+    required this.cellHeight,
+    required this.periodCount,
+  });
+
+  final Color color;
+  final double cellHeight;
+  final int periodCount;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 0.5
+      ..style = PaintingStyle.stroke;
+
+    final dayWidth = size.width / 7;
+    for (var day = 0; day <= 7; day++) {
+      final x = day * dayWidth;
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (var period = 1; period <= periodCount; period++) {
+      final y = period * cellHeight;
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ScheduleGridPainter oldDelegate) {
+    return color != oldDelegate.color ||
+        cellHeight != oldDelegate.cellHeight ||
+        periodCount != oldDelegate.periodCount;
   }
 }

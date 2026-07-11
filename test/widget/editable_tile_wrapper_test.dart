@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/tiles/editable_tile_wrapper.dart';
 import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
@@ -31,6 +32,9 @@ void main() {
       ProviderScope(
         overrides: _tileOverrides(),
         child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('zh'),
           home: Scaffold(
             body: Column(
               children: [
@@ -47,6 +51,13 @@ void main() {
       ),
     );
     await tester.pump();
+    expect(
+      find.descendant(
+        of: find.byType(EditableTileWrapper),
+        matching: find.byType(RepaintBoundary),
+      ),
+      findsOneWidget,
+    );
     expect(find.byIcon(Icons.remove), findsNothing);
 
     await tester.tap(find.text('编辑'));

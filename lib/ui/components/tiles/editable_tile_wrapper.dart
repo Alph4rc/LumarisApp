@@ -84,48 +84,50 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
       _jiggleController.reset();
     }
 
-    Widget content = AnimatedBuilder(
-      animation: _jiggleAnimation,
-      builder: (context, child) {
-        return Transform.rotate(
-          angle: isEditMode ? _jiggleAnimation.value : 0.0,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: ShapeDecoration(
-              shape: ClubSmoothCorners.shape(ClubRadii.tile),
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Original tile content
-                ClubSmoothCorners.clip(
-                  borderRadius: ClubRadii.tile,
-                  child: widget.child,
-                ),
+    Widget content = RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _jiggleAnimation,
+        builder: (context, child) {
+          return Transform.rotate(
+            angle: isEditMode ? _jiggleAnimation.value : 0.0,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: ShapeDecoration(
+                shape: ClubSmoothCorners.shape(ClubRadii.tile),
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Original tile content
+                  ClubSmoothCorners.clip(
+                    borderRadius: ClubRadii.tile,
+                    child: widget.child,
+                  ),
 
-                // Make the whole card act as a drag handle in edit mode
-                if (isEditMode)
-                  Positioned.fill(
-                    child: ReorderableDragStartListener(
-                      index: widget.index,
-                      child: Container(
-                        color: Colors.transparent,
+                  // Make the whole card act as a drag handle in edit mode
+                  if (isEditMode)
+                    Positioned.fill(
+                      child: ReorderableDragStartListener(
+                        index: widget.index,
+                        child: Container(
+                          color: Colors.transparent,
+                        ),
                       ),
                     ),
-                  ),
 
-                // iOS style minus button on top left
-                if (isEditMode)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: _buildHideButton(controller),
-                  ),
-              ],
+                  // iOS style minus button on top left
+                  if (isEditMode)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: _buildHideButton(controller),
+                    ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
 
     return content;

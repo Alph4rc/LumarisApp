@@ -183,21 +183,36 @@ class ScoreBuilder extends StatelessWidget {
               ),
             ),
             // 链接网格
-            GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: isTablet ? 6 : 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.0,
-              ),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: categoryList.links.length,
-              itemBuilder: (context, index) {
-                final linkList = categoryList.links[index];
-                return _LinkItem(
-                  link: linkList,
-                  onTap: () => _launchURL(linkList.url),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const spacing = 12.0;
+                final crossAxisCount = isTablet ? 6 : 3;
+                final rows =
+                    (categoryList.links.length / crossAxisCount).ceil();
+                final itemWidth =
+                    (constraints.maxWidth - spacing * (crossAxisCount - 1)) /
+                        crossAxisCount;
+                final gridHeight = rows * itemWidth + spacing * (rows - 1);
+
+                return SizedBox(
+                  height: gridHeight,
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: spacing,
+                      mainAxisSpacing: spacing,
+                      childAspectRatio: 1.0,
+                    ),
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: categoryList.links.length,
+                    itemBuilder: (context, index) {
+                      final linkList = categoryList.links[index];
+                      return _LinkItem(
+                        link: linkList,
+                        onTap: () => _launchURL(linkList.url),
+                      );
+                    },
+                  ),
                 );
               },
             ),

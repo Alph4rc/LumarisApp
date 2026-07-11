@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/cupertino.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
@@ -449,17 +451,19 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
 
   Widget _buildIgnoreCourseSection(BuildContext context, ClubColors colors) {
     return ClubCard(
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _ignores.length,
-        itemBuilder: (context, index) {
-          final ignore = _ignores[index];
-          return CourseIgnoreItem(
-            ignore: ignore,
-            onChanged: _handleIgnoreChange,
-          );
-        },
+      child: SizedBox(
+        height: math.min(_ignores.length * 56.0, 420.0),
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: _ignores.length,
+          itemBuilder: (context, index) {
+            final ignore = _ignores[index];
+            return CourseIgnoreItem(
+              ignore: ignore,
+              onChanged: _handleIgnoreChange,
+            );
+          },
+        ),
       ),
     );
   }

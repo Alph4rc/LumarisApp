@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -236,76 +238,80 @@ class _ExamCardState extends State<ExamCard> {
           )
         : AnimatedCard(
             child: ClubCard(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: examItems.length,
-                itemBuilder: (context, index) {
-                  final exam = examItems[index];
+              child: SizedBox(
+                height: math.min(examItems.length * (isTablet ? 72.0 : 84.0),
+                    isTablet ? 420.0 : 360.0),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: examItems.length,
+                  itemBuilder: (context, index) {
+                    final exam = examItems[index];
 
-                  return AnimatedListItem(
-                    index: index,
-                    child: Material(
-                      color: Colors.transparent,
-                      shape: ClubSmoothCorners.shape(ClubRadii.card),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () {
-                          if (isTablet) {
-                            PlatformDialog.showCustomDialog<void>(
-                              context,
-                              content: _buildExamTip(exam),
-                            );
-                          } else {
-                            showClubModalBottomSheet(
-                              context,
-                              _buildExamTip(exam),
-                            );
-                          }
-                        },
-                        borderRadius: ClubRadii.card,
-                        customBorder: ClubSmoothCorners.shape(ClubRadii.card),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              Container(
-                                width: 5,
-                                height: isTablet ? 42 : 52,
-                                decoration: ShapeDecoration(
-                                  color: exam.color,
-                                  shape: ClubSmoothCorners.shape(
-                                      ClubRadii.xsBorder),
+                    return AnimatedListItem(
+                      index: index,
+                      child: Material(
+                        color: Colors.transparent,
+                        shape: ClubSmoothCorners.shape(ClubRadii.card),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () {
+                            if (isTablet) {
+                              PlatformDialog.showCustomDialog<void>(
+                                context,
+                                content: _buildExamTip(exam),
+                              );
+                            } else {
+                              showClubModalBottomSheet(
+                                context,
+                                _buildExamTip(exam),
+                              );
+                            }
+                          },
+                          borderRadius: ClubRadii.card,
+                          customBorder: ClubSmoothCorners.shape(ClubRadii.card),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                Container(
+                                  width: 5,
+                                  height: isTablet ? 42 : 52,
+                                  decoration: ShapeDecoration(
+                                    color: exam.color,
+                                    shape: ClubSmoothCorners.shape(
+                                        ClubRadii.xsBorder),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      exam.title,
-                                      style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500,
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        exam.title,
+                                        style: const TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4),
-                                      child: examWrap(exam),
-                                    ),
-                                  ],
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 4),
+                                        child: examWrap(exam),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                            ],
+                                const SizedBox(width: 16),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           );

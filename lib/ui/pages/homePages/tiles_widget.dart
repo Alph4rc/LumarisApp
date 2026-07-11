@@ -82,79 +82,120 @@ class _TilesWidgetState extends ConsumerState<TilesWidget>
         if (visibleTiles.isEmpty)
           const EmptyTilesMessage()
         else if (isEditMode)
-          _buildReorderableGrid(visibleTiles, controller,isTablet)
+          _buildReorderableGrid(visibleTiles, controller, isTablet)
         else
-          _buildNormalGrid(visibleTiles,isTablet),
+          _buildNormalGrid(visibleTiles, isTablet),
       ],
     );
   }
 
   /// Build reorderable grid for full Flutter platforms
-  Widget _buildReorderableGrid(List visibleTiles, TileEditNotifier controller, bool isTablet) {
+  Widget _buildReorderableGrid(
+    List visibleTiles,
+    TileEditNotifier controller,
+    bool isTablet,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-      child: ReorderableGridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: isTablet ? 3 : 2,
-          mainAxisSpacing: 16.0,
-          crossAxisSpacing: 16.0,
-          childAspectRatio: 1.0,
-        ),
-        itemCount: visibleTiles.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        onReorder: (oldIndex, newIndex) async {
-          try {
-            await controller.reorderTile(
-              visibleTiles[oldIndex].id,
-              oldIndex,
-              newIndex,
-            );
-          } catch (e) {
-            if (mounted) {
-              final l10n = context.l10n;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${l10n.reorderFailed}: $e'),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            }
-          }
-        },
-        itemBuilder: (context, index) {
-          final tile = visibleTiles[index];
-          return EditableTileWrapper(
-            key: ValueKey(tile.id),
-            tileId: tile.id,
-            index: index,
-            child: buildTile(tile.id, context),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final crossAxisCount = isTablet ? 3 : 2;
+          return SizedBox(
+            height: _gridHeight(
+              itemCount: visibleTiles.length,
+              crossAxisCount: crossAxisCount,
+              width: constraints.maxWidth,
+            ),
+            child: ReorderableGridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 16.0,
+                crossAxisSpacing: 16.0,
+                childAspectRatio: 1.0,
+              ),
+              itemCount: visibleTiles.length,
+              physics: const NeverScrollableScrollPhysics(),
+              onReorder: (oldIndex, newIndex) async {
+                final l10n = context.l10n;
+                final messenger = ScaffoldMessenger.of(context);
+                try {
+                  await controller.reorderTile(
+                    visibleTiles[oldIndex].id,
+                    oldIndex,
+                    newIndex,
+                  );
+                } catch (e) {
+                  if (mounted) {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text('${l10n.reorderFailed}: $e'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                }
+              },
+              itemBuilder: (context, index) {
+                final tile = visibleTiles[index];
+                return EditableTileWrapper(
+                  key: ValueKey(tile.id),
+                  tileId: tile.id,
+                  index: index,
+                  child: buildTile(tile.id, context),
+                );
+              },
+            ),
           );
         },
       ),
     );
   }
 
+  double _gridHeight({
+    required int itemCount,
+    required int crossAxisCount,
+    required double width,
+  }) {
+    const spacing = 16.0;
+    final rows = (itemCount / crossAxisCount).ceil();
+    if (rows == 0) {
+      return 0;
+    }
+    final itemWidth = (width - spacing * (crossAxisCount - 1)) / crossAxisCount;
+    return rows * itemWidth + spacing * (rows - 1);
+  }
+
   /// Build normal grid (non-edit mode)
   Widget _buildNormalGrid(List visibleTiles, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: isTablet ? 3 : 2,
-          mainAxisSpacing: 16.0,
-          crossAxisSpacing: 16.0,
-          childAspectRatio: 1.0,
-        ),
-        itemCount: visibleTiles.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          final tile = visibleTiles[index];
-          return AnimatedCard(
-            key: ValueKey(tile.id),
-            delay: Duration(milliseconds: 100 * index),
-            child: buildTile(tile.id, context),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final crossAxisCount = isTablet ? 3 : 2;
+          return SizedBox(
+            height: _gridHeight(
+              itemCount: visibleTiles.length,
+              crossAxisCount: crossAxisCount,
+              width: constraints.maxWidth,
+            ),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 16.0,
+                crossAxisSpacing: 16.0,
+                childAspectRatio: 1.0,
+              ),
+              itemCount: visibleTiles.length,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                final tile = visibleTiles[index];
+                return AnimatedCard(
+                  key: ValueKey(tile.id),
+                  delay: Duration(milliseconds: 100 * index),
+                  child: buildTile(tile.id, context),
+                );
+              },
+            ),
           );
         },
       ),

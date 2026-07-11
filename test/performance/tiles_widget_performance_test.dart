@@ -1,12 +1,16 @@
 @Tags(['performance'])
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
@@ -35,10 +39,22 @@ List<Override> _overrides() => [
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  late Directory tempDir;
 
   setUp(() async {
+    tempDir = await Directory.systemTemp.createTemp(
+      'tiles_widget_performance_test_',
+    );
+    Hive.init(tempDir.path);
     SharedPreferences.setMockInitialValues({'username': 'student-1'});
     await PrefsService.init();
+  });
+
+  tearDown(() async {
+    await Hive.close();
+    if (tempDir.existsSync()) {
+      tempDir.deleteSync(recursive: true);
+    }
   });
 
   testWidgets('tiles_widget_builds_without_excessive_frames', (tester) async {
@@ -51,7 +67,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: _overrides(),
-        child: const MaterialApp(home: Scaffold(body: TilesWidget())),
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('zh'),
+          home: Scaffold(body: TilesWidget()),
+        ),
       ),
     );
     await tester.pump();
