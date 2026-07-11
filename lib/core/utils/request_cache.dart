@@ -70,6 +70,10 @@ class RequestCache {
   /// 标记是否已初始化
   bool _isInitialized = false;
 
+  /// 缓存是否已由应用启动流程准备就绪。
+  /// 拦截器不应在请求链路中触发平台存储初始化。
+  bool get isInitialized => _isInitialized;
+
   /// URL模式到缓存策略的映射（按优先级从高到低排列，默认策略通过方法兜底）
   final Map<RegExp, CachePolicy> _urlCachePolicies = {
     // 课程相关API - 中短期缓存
@@ -458,18 +462,24 @@ class CacheInterceptor extends Interceptor {
     final bypassCache = options.extra[bypassCacheKey] == true;
 
     // 只有GET请求才使用缓存
-    if (options.method == 'GET' && !bypassCache) {
-      final cachedData = await _cache.get(options.uri.toString(),
-          params: options.queryParameters);
-      if (cachedData != null) {
-        // 使用缓存数据
-        final response = Response(
-          data: cachedData,
-          requestOptions: options,
-          statusCode: 200,
-          statusMessage: 'OK (from cache)',
-        );
-        return handler.resolve(response);
+    if (options.method == 'GET' && !bypassCache && _cache.isInitialized) {
+      try {
+        final cachedData = await _cache.get(options.uri.toString(),
+            params: options.queryParameters);
+        if (cachedData != null) {
+          // 使用缓存数据
+          final response = Response(
+            data: cachedData,
+            requestOptions: options,
+            statusCode: 200,
+            statusMessage: 'OK (from cache)',
+          );
+          return handler.resolve(response);
+        }
+      } catch (error, stackTrace) {
+        // 缓存是可选能力：初始化失败时必须继续走网络请求。
+        AppLogger.warning('读取请求缓存失败，已跳过缓存',
+            error: error, stackTrace: stackTrace);
       }
     }
     handler.next(options);
@@ -478,12 +488,19 @@ class CacheInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
     // 只有GET请求才缓存
-    if (response.requestOptions.method == 'GET' && response.statusCode == 200) {
-      await _cache.set(
-        response.requestOptions.uri.toString(),
-        response.data,
-        params: response.requestOptions.queryParameters,
-      );
+    if (_cache.isInitialized &&
+        response.requestOptions.method == 'GET' &&
+        response.statusCode == 200) {
+      try {
+        await _cache.set(
+          response.requestOptions.uri.toString(),
+          response.data,
+          params: response.requestOptions.queryParameters,
+        );
+      } catch (error, stackTrace) {
+        AppLogger.warning('写入请求缓存失败，已忽略缓存',
+            error: error, stackTrace: stackTrace);
+      }
     }
     handler.next(response);
   }

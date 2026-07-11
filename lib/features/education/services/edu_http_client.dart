@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
+import 'package:ios_club_app/core/services/base_http_client.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import '../../../state/prefs_keys.dart';
 import '../../../core/utils/request_cache.dart';
@@ -29,11 +30,14 @@ class AuthStateCallbacks {
   final RelogFailedCallback? onRelogFailed;
 }
 
-class EduHttpClient {
+/// 教务 API 的认证策略。
+///
+/// HTTP 传输、重试、缓存和错误转换由 [BaseHttpClient] 统一提供；此类只
+/// 保留教务域特有的 Cookie、限流与重登录行为。
+class EduHttpClient extends BaseHttpClient {
   static const String _rateLimitMessage = '已被限流，请稍后再试';
   static const int _rateLimitCooldownMs = 5000;
 
-  final Dio _dio;
   final AuthStateCallbacks _authStateCallbacks;
   final Map<String, int> _rateLimitCooldowns = <String, int>{};
   String _baseUrl;
@@ -53,36 +57,25 @@ class EduHttpClient {
   static int Function()? _nowProviderForTest;
 
   EduHttpClient({
-    Dio? dio,
+    super.dio,
     String? baseUrl,
     AuthStateCallbacks authStateCallbacks = AuthStateCallbacks.noop,
-  })  : _dio = dio ?? Dio(),
-        _authStateCallbacks = authStateCallbacks,
-        _baseUrl = baseUrl ?? School.fallbackList.first.website {
-    _setupDio();
+  })  : _authStateCallbacks = authStateCallbacks,
+        _baseUrl = baseUrl ?? School.fallbackList.first.website,
+        super(
+          baseUrl: baseUrl ?? School.fallbackList.first.website,
+          retryPolicy: const RetryPolicy(maxRetries: 2),
+          defaultHeaders: const <String, dynamic>{
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        ) {
+    _setupEducationInterceptors();
   }
 
-  void _setupDio() {
-    _dio.options = BaseOptions(
-      baseUrl: _baseUrl,
-      // 增加超时时间以适应重登录场景
-      // 重登录可能需要3-5秒，加上原请求时间，总共需要更长的超时
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      contentType: 'application/json',
-    );
-
-    // 添加重试拦截器（使用统一的重试策略）
-    _dio.interceptors.add(RetryInterceptor(
-      dio: _dio,
-      policy: const RetryPolicy(maxRetries: 2),
-    ));
-
-    // 添加缓存拦截器
-    _dio.interceptors.add(CacheInterceptor());
-
+  void _setupEducationInterceptors() {
     // 添加认证拦截器
-    _dio.interceptors.add(InterceptorsWrapper(
+    dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final rateLimitException = _createRateLimitExceptionIfCoolingDown(
           options,
@@ -136,7 +129,7 @@ class EduHttpClient {
                 e.requestOptions.headers['Cookie'] = cookie;
                 e.requestOptions.headers['xauat'] = cookie;
               }
-              final response = await _dio.request(
+              final response = await dio.request(
                 e.requestOptions.path,
                 options: Options(
                   method: e.requestOptions.method,
@@ -172,14 +165,12 @@ class EduHttpClient {
   String get baseUrl => _baseUrl;
 
   /// 暴露 Dio 实例，便于在测试中注入拦截器和验证请求。
-  Dio get dio => _dio;
-
   /// 更新基础 URL
   ///
   /// 用于切换学校时更新 API 地址
   void updateBaseUrl(String newBaseUrl) {
     _baseUrl = newBaseUrl;
-    _dio.options.baseUrl = newBaseUrl;
+    dio.options.baseUrl = newBaseUrl;
   }
 
   Future<String?> _getCookie() async {
@@ -421,6 +412,7 @@ class EduHttpClient {
   }
 
   // 通用GET请求方法
+  @override
   Future<dynamic> get(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -439,7 +431,7 @@ class EduHttpClient {
                 ? <String, dynamic>{CacheInterceptor.bypassCacheKey: true}
                 : null,
           );
-      final response = await _dio.get(
+      final response = await dio.get(
         path,
         queryParameters: queryParameters,
         options: mergedOptions,
@@ -451,6 +443,7 @@ class EduHttpClient {
   }
 
   // 通用POST请求方法
+  @override
   Future<dynamic> post(
     String path, {
     dynamic data,
@@ -458,7 +451,7 @@ class EduHttpClient {
     Options? options,
   }) async {
     try {
-      final response = await _dio.post(
+      final response = await dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -471,6 +464,7 @@ class EduHttpClient {
   }
 
   // 通用DELETE请求方法
+  @override
   Future<dynamic> delete(
     String path, {
     dynamic data,
@@ -478,7 +472,7 @@ class EduHttpClient {
     Options? options,
   }) async {
     try {
-      final response = await _dio.delete(
+      final response = await dio.delete(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -496,10 +490,6 @@ class EduHttpClient {
       DioErrorHandler.handleError(_buildRateLimitException(e.requestOptions));
     }
     DioErrorHandler.handleError(e);
-  }
-
-  void dispose() {
-    _dio.close();
   }
 
   static void setLoginHandlerForTest(

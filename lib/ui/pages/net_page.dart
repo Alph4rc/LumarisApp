@@ -16,6 +16,7 @@ class NetPage extends StatefulWidget {
 }
 
 class _NetPageState extends State<NetPage> {
+  final NetworkInfoService _networkInfoService = NetworkInfoService();
   Map<String, dynamic>? _data;
   bool _isLoading = true;
   String? _error;
@@ -34,7 +35,7 @@ class _NetPageState extends State<NetPage> {
     });
 
     try {
-      final data = await NetService.get(forceRefresh: forceRefresh);
+      final data = await _networkInfoService.get(forceRefresh: forceRefresh);
       if (!mounted) return;
       setState(() {
         _data = data;
@@ -58,6 +59,12 @@ class _NetPageState extends State<NetPage> {
         });
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _networkInfoService.dispose();
+    super.dispose();
   }
 
   @override

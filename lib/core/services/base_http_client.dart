@@ -13,6 +13,7 @@ class BaseHttpClient {
   final RetryPolicy _retryPolicy;
 
   BaseHttpClient({
+    Dio? dio,
     String? baseUrl,
     RetryPolicy retryPolicy = const RetryPolicy(),
     bool enableCache = true,
@@ -20,7 +21,7 @@ class BaseHttpClient {
     Duration receiveTimeout = const Duration(seconds: 10),
     Map<String, dynamic>? defaultHeaders,
   })  : _retryPolicy = retryPolicy,
-        _dio = Dio() {
+        _dio = dio ?? Dio() {
     _dio.options = BaseOptions(
       baseUrl: baseUrl ?? '',
       connectTimeout: connectTimeout,
