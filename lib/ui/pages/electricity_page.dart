@@ -58,10 +58,14 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
   @override
   Widget build(BuildContext context) {
-    final electricityState = ref.watch(electricityStoreProvider);
+    final hasElectricityData = ref.watch(
+      electricityStoreProvider.select((state) => state.hasData),
+    );
     final l10n = context.l10n;
-    final isLogin = ref.watch(userStoreProvider).isLogin;
-    final school = ref.watch(schoolStoreProvider).school;
+    final isLogin =
+        ref.watch(userStoreProvider.select((state) => state.isLogin));
+    final school =
+        ref.watch(schoolStoreProvider.select((state) => state.school));
     final canElectricity = school?.supports(Feature.electricity) ?? true;
 
     if (school != null && !canElectricity) {
@@ -82,7 +86,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       );
     }
 
-    if (electricityState.hasData &&
+    if (hasElectricityData &&
         !_hasLoadedSubscriptions &&
         !_isSubscriptionLoading) {
       Future<void>.microtask(_loadSubscriptions);
@@ -107,7 +111,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               onPressed: _handleElectricityAction,
               child: Icon(
-                electricityState.hasData
+                hasElectricityData
                     ? CupertinoIcons.arrow_2_circlepath
                     : CupertinoIcons.add,
                 color: Theme.of(context).colorScheme.primary,
@@ -132,18 +136,18 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 const SizedBox(height: 32),
 
                 // 电费图表卡片
-                if (electricityState.hasData) _buildChartCard(),
+                if (hasElectricityData) _buildChartCard(),
 
-                if (electricityState.hasData) const SizedBox(height: 24),
+                if (hasElectricityData) const SizedBox(height: 24),
 
                 // 设置选项
-                if (electricityState.hasData) _buildSettingsSection(),
+                if (hasElectricityData) _buildSettingsSection(),
 
                 const SizedBox(height: 24),
 
-                if (electricityState.hasData)
+                if (hasElectricityData)
                   _buildSubscriptionSection(
-                      hasElectricityData: electricityState.hasData),
+                      hasElectricityData: hasElectricityData),
               ],
             ),
           ),
@@ -168,199 +172,222 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   Widget _buildCurrentElectricityHeader() {
-    final electricityState = ref.watch(electricityStoreProvider);
-    final colorScheme = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
-    final statusColor = electricityState.electricity <= 10
-        ? colorScheme.error
-        : _successColor(context);
-
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 16),
-          Text(
-            l10n.currentBalance,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onSurfaceVariant,
+    return Consumer(
+      builder: (context, ref, child) {
+        final electricityState = ref.watch(
+          electricityStoreProvider.select(
+            (state) => (
+              hasData: state.hasData,
+              electricity: state.electricity,
             ),
           ),
-          const SizedBox(height: 8),
-          if (electricityState.hasData)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, right: 4.0),
-                  child: Text(
-                    '¥',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
+        );
+        final colorScheme = Theme.of(context).colorScheme;
+        final l10n = context.l10n;
+        final statusColor = electricityState.electricity <= 10
+            ? colorScheme.error
+            : _successColor(context);
+
+        return SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                l10n.currentBalance,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurfaceVariant,
                 ),
+              ),
+              const SizedBox(height: 8),
+              if (electricityState.hasData)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, right: 4.0),
+                      child: Text(
+                        '¥',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      electricityState.electricity.toStringAsFixed(2),
+                      style: TextStyle(
+                        fontSize: 56,
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                        color: colorScheme.onSurface,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ],
+                )
+              else
                 Text(
-                  electricityState.electricity.toStringAsFixed(2),
+                  l10n.electricityNoData,
                   style: TextStyle(
-                    fontSize: 56,
+                    fontSize: 36,
                     fontWeight: FontWeight.w700,
-                    height: 1.1,
                     color: colorScheme.onSurface,
                     letterSpacing: -1,
                   ),
                 ),
-              ],
-            )
-          else
-            Text(
-              l10n.electricityNoData,
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w700,
-                color: colorScheme.onSurface,
-                letterSpacing: -1,
+              const SizedBox(height: 16),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: ShapeDecoration(
+                  color: electricityState.hasData
+                      ? statusColor.withValues(alpha: 0.1)
+                      : colorScheme.surfaceContainerHighest,
+                  shape: ClubSmoothCorners.shape(BorderRadius.circular(20)),
+                ),
+                child: Text(
+                  electricityState.hasData
+                      ? (electricityState.electricity <= 10
+                          ? l10n.electricityLowBalance
+                          : l10n.electricitySufficient)
+                      : l10n.electricityAddTip,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: electricityState.hasData
+                        ? statusColor
+                        : colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: ShapeDecoration(
-              color: electricityState.hasData
-                  ? statusColor.withValues(alpha: 0.1)
-                  : colorScheme.surfaceContainerHighest,
-              shape: ClubSmoothCorners.shape(BorderRadius.circular(20)),
-            ),
-            child: Text(
-              electricityState.hasData
-                  ? (electricityState.electricity <= 10
-                      ? l10n.electricityLowBalance
-                      : l10n.electricitySufficient)
-                  : l10n.electricityAddTip,
-              style: TextStyle(
-                fontSize: 13,
-                color: electricityState.hasData
-                    ? statusColor
-                    : colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildChartCard() {
-    final electricityState = ref.watch(electricityStoreProvider);
-    final colorScheme = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
-    return AnimatedCard(
-      delay: const Duration(milliseconds: 150),
-      child: ClubCard(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Builder(builder: (context) {
-            if (electricityState.isLoading) {
-              return SizedBox(
-                height: 240,
-                child: Center(
-                  child: LoadingStateView(
-                    title: l10n.electricityLoading,
-                    subtitle: l10n.electricityLoadingSubtitle,
-                    compact: true,
-                    showCard: false,
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-              );
-            }
+    return Consumer(
+      builder: (context, ref, child) {
+        final electricityState = ref.watch(
+          electricityStoreProvider.select(
+            (state) => (
+              isLoading: state.isLoading,
+              weeklyData: state.weeklyData,
+            ),
+          ),
+        );
+        final colorScheme = Theme.of(context).colorScheme;
+        final l10n = context.l10n;
+        return AnimatedCard(
+          delay: const Duration(milliseconds: 150),
+          child: ClubCard(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Builder(builder: (context) {
+                if (electricityState.isLoading) {
+                  return SizedBox(
+                    height: 240,
+                    child: Center(
+                      child: LoadingStateView(
+                        title: l10n.electricityLoading,
+                        subtitle: l10n.electricityLoadingSubtitle,
+                        compact: true,
+                        showCard: false,
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
+                  );
+                }
 
-            final data = electricityState.weeklyData;
-            if (data.isEmpty) {
-              return SizedBox(
-                height: 220,
-                child: Center(
-                  child: EmptyWidget(
-                    title: l10n.noUsageDetails,
-                    subtitle: l10n.noUsageDetailsSubtitle,
-                    icon: CupertinoIcons.chart_bar_alt_fill,
-                  ),
-                ),
-              );
-            }
+                final data = electricityState.weeklyData;
+                if (data.isEmpty) {
+                  return SizedBox(
+                    height: 220,
+                    child: Center(
+                      child: EmptyWidget(
+                        title: l10n.noUsageDetails,
+                        subtitle: l10n.noUsageDetailsSubtitle,
+                        icon: CupertinoIcons.chart_bar_alt_fill,
+                      ),
+                    ),
+                  );
+                }
 
-            final dailySummaries = _buildDailySummaries(data);
-            final totalCost = data.fold<double>(
-              0,
-              (previousValue, item) => previousValue + item.value,
-            );
-            final todayCost = data
-                .where((item) => _isSameDay(item.timestamp, DateTime.now()))
-                .fold<double>(
+                final dailySummaries = _buildDailySummaries(data);
+                final totalCost = data.fold<double>(
                   0,
                   (previousValue, item) => previousValue + item.value,
                 );
-            final averageDailyCost = dailySummaries.isEmpty
-                ? 0.0
-                : totalCost / dailySummaries.length;
-            final peakData = data.reduce(
-              (currentPeak, item) =>
-                  item.value > currentPeak.value ? item : currentPeak,
-            );
+                final todayCost = data
+                    .where((item) => _isSameDay(item.timestamp, DateTime.now()))
+                    .fold<double>(
+                      0,
+                      (previousValue, item) => previousValue + item.value,
+                    );
+                final averageDailyCost = dailySummaries.isEmpty
+                    ? 0.0
+                    : totalCost / dailySummaries.length;
+                final peakData = data.reduce(
+                  (currentPeak, item) =>
+                      item.value > currentPeak.value ? item : currentPeak,
+                );
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      l10n.electricityCost,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: ShapeDecoration(
-                        color: colorScheme.surfaceContainerHighest,
-                        shape:
-                            ClubSmoothCorners.shape(BorderRadius.circular(12)),
-                      ),
-                      child: Text(
-                        l10n.lastNDays(dailySummaries.length),
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: colorScheme.onSurfaceVariant,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.electricityCost,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: ShapeDecoration(
+                            color: colorScheme.surfaceContainerHighest,
+                            shape: ClubSmoothCorners.shape(
+                                BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            l10n.lastNDays(dailySummaries.length),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 24),
+                    _buildCostOverview(
+                      totalCost: totalCost,
+                      todayCost: todayCost,
+                      averageDailyCost: averageDailyCost,
+                      peakData: peakData,
+                    ),
+                    const SizedBox(height: 32),
+                    _buildHourlyCostScroller(data),
                   ],
-                ),
-                const SizedBox(height: 24),
-                _buildCostOverview(
-                  totalCost: totalCost,
-                  todayCost: todayCost,
-                  averageDailyCost: averageDailyCost,
-                  peakData: peakData,
-                ),
-                const SizedBox(height: 32),
-                _buildHourlyCostScroller(data),
-              ],
-            );
-          }),
-        ),
-      ),
+                );
+              }),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -574,44 +601,52 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   Widget _buildSettingsSection() {
-    final electricityState = ref.watch(electricityStoreProvider);
-    final controller = ref.read(electricityStoreProvider.notifier);
-    final colorScheme = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
+    return Consumer(
+      builder: (context, ref, child) {
+        final tiles = ref.watch(
+          electricityStoreProvider.select((state) => state.tiles),
+        );
+        final controller = ref.read(electricityStoreProvider.notifier);
+        final colorScheme = Theme.of(context).colorScheme;
+        final l10n = context.l10n;
 
-    return AnimatedCard(
-      delay: const Duration(milliseconds: 300),
-      child: ClubCard(
-        child: Column(
-          children: [
-            ClubListTile(
-              leading: Icon(CupertinoIcons.square_grid_2x2,
-                  color: colorScheme.primary),
-              title: Text(l10n.addToHome,
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
-              subtitle: Text(l10n.showElectricityTile),
-              trailing: CupertinoSwitch(
-                value: electricityState.tiles.contains('电费'),
-                onChanged: (value) async {
-                  await controller.toggleTile('电费', value);
-                },
-              ),
+        return AnimatedCard(
+          delay: const Duration(milliseconds: 300),
+          child: ClubCard(
+            child: Column(
+              children: [
+                ClubListTile(
+                  leading: Icon(CupertinoIcons.square_grid_2x2,
+                      color: colorScheme.primary),
+                  title: Text(l10n.addToHome,
+                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                  subtitle: Text(l10n.showElectricityTile),
+                  trailing: CupertinoSwitch(
+                    value: tiles.contains('电费'),
+                    onChanged: (value) async {
+                      await controller.toggleTile('电费', value);
+                    },
+                  ),
+                ),
+                ClubListTile(
+                  leading: Icon(CupertinoIcons.money_yen_circle,
+                      color: colorScheme.primary),
+                  title: Text(l10n.electricityRecharge,
+                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                  subtitle: Text(l10n.electricityRechargeSubtitle),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      size: 16, color: colorScheme.onSurfaceVariant),
+                  onTap: () async {
+                    await ref
+                        .read(electricityServiceProvider)
+                        .openRechargePage();
+                  },
+                ),
+              ],
             ),
-            ClubListTile(
-              leading: Icon(CupertinoIcons.money_yen_circle,
-                  color: colorScheme.primary),
-              title: Text(l10n.electricityRecharge,
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
-              subtitle: Text(l10n.electricityRechargeSubtitle),
-              trailing: Icon(CupertinoIcons.chevron_right,
-                  size: 16, color: colorScheme.onSurfaceVariant),
-              onTap: () async {
-                await ref.read(electricityServiceProvider).openRechargePage();
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

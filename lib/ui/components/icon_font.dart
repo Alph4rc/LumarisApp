@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/link_model.dart';
@@ -9,8 +10,12 @@ class IconUtil {
   static Widget _buildNetworkImage(String imageUrl) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        imageUrl,
+      child: Image(
+        image: CachedNetworkImageProvider(
+          imageUrl,
+          maxWidth: 80,
+          maxHeight: 80,
+        ),
         width: 40,
         height: 40,
         fit: BoxFit.cover,

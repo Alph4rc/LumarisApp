@@ -1,6 +1,5 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/foundation.dart';
+import 'package:image/image.dart' as img;
 
 import 'image_brightness_stub.dart'
     if (dart.library.io) 'image_brightness_io.dart';
@@ -18,38 +17,31 @@ Future<bool?> computeImageIsDark(String imagePath) async {
       bytes = await loadLocalImageBytes(imagePath);
     }
     if (bytes == null) return null;
-    return await _computeIsDarkFromBytes(bytes);
+    return compute(_computeIsDarkFromBytes, bytes);
   } catch (e) {
     debugPrint('computeImageIsDark error: $e');
     return null;
   }
 }
 
-Future<bool?> _computeIsDarkFromBytes(Uint8List bytes) async {
-  final codec = await ui.instantiateImageCodec(
-    bytes,
-    targetWidth: 50,
-    targetHeight: 50,
-  );
-  final frame = await codec.getNextFrame();
-  final image = frame.image;
+bool? _computeIsDarkFromBytes(Uint8List bytes) {
+  final decodedImage = img.decodeImage(bytes);
+  if (decodedImage == null) return null;
 
-  final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-  image.dispose();
-
-  if (byteData == null) return null;
-
-  final pixels = byteData.buffer.asUint8List();
+  final image = img.copyResize(decodedImage, width: 50, height: 50);
   double totalLuminance = 0;
   int sampleCount = 0;
 
-  for (int i = 0; i < pixels.length; i += 4) {
-    final r = pixels[i];
-    final g = pixels[i + 1];
-    final b = pixels[i + 2];
-    // 基于人眼感知权重的相对亮度公式
-    totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b;
-    sampleCount++;
+  for (var y = 0; y < image.height; y++) {
+    for (var x = 0; x < image.width; x++) {
+      final pixel = image.getPixel(x, y);
+      final r = pixel.r.toInt();
+      final g = pixel.g.toInt();
+      final b = pixel.b.toInt();
+      // 基于人眼感知权重的相对亮度公式
+      totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b;
+      sampleCount++;
+    }
   }
 
   if (sampleCount == 0) return null;

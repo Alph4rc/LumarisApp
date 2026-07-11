@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 优化的图片加载组件
@@ -67,11 +68,20 @@ class OptimizedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheWidth = width == null ? null : (width! * pixelRatio).round();
+    final cacheHeight = height == null ? null : (height! * pixelRatio).round();
     return SizedBox(
       width: width,
       height: height,
       child: Image(
-        image: isAsset ? AssetImage(imageUrl) : NetworkImage(imageUrl),
+        image: isAsset
+            ? _assetProvider(imageUrl, cacheWidth, cacheHeight)
+            : CachedNetworkImageProvider(
+                imageUrl,
+                maxWidth: cacheWidth,
+                maxHeight: cacheHeight,
+              ),
         fit: fit,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) {
@@ -88,6 +98,16 @@ class OptimizedImage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  ImageProvider _assetProvider(
+    String assetPath,
+    int? cacheWidth,
+    int? cacheHeight,
+  ) {
+    final provider = AssetImage(assetPath);
+    if (cacheWidth == null && cacheHeight == null) return provider;
+    return ResizeImage(provider, width: cacheWidth, height: cacheHeight);
   }
 
   /// 默认占位符

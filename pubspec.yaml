@@ -55,6 +55,8 @@ dependencies:
   geolocator: ^14.0.2
   webview_flutter: ^4.10.0
   smooth_corner: ^1.1.1
+  cached_network_image: ^3.4.1
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:

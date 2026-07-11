@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/image_helper.dart';
@@ -496,8 +497,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   Widget _buildBackgroundImage(String imagePath) {
     // 检查是否为网络图片
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return Image.network(
-        imagePath,
+      return Image(
+        image: CachedNetworkImageProvider(imagePath),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           return Container(

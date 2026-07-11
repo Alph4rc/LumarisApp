@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 /// 图片加载工具类
 class ImageLoader {
@@ -25,12 +26,10 @@ class ImageLoader {
     double? width,
     double? height,
   }) {
-    // 根据设备像素比选择合适的图片分辨率
-    // 这里我们使用cacheWidth和cacheHeight来优化图片加载
-    // 实际项目中，可以根据不同分辨率准备不同大小的图片资源
+    final cacheSize = _cacheSizeFor(context, width: width, height: height);
 
     return Image(
-      image: AssetImage(assetName),
+      image: _assetProvider(assetName, cacheSize),
       fit: fit,
       width: width,
       height: height,
@@ -51,11 +50,40 @@ class ImageLoader {
     double? width,
     double? height,
   }) {
+    final cacheSize = _cacheSizeFor(context, width: width, height: height);
     return Image(
-      image: NetworkImage(url),
+      image: CachedNetworkImageProvider(
+        url,
+        maxWidth: cacheSize.width,
+        maxHeight: cacheSize.height,
+      ),
       fit: fit,
       width: width,
       height: height,
+    );
+  }
+
+  _ImageCacheSize _cacheSizeFor(
+    BuildContext context, {
+    double? width,
+    double? height,
+  }) {
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    return _ImageCacheSize(
+      width: width == null ? null : (width * pixelRatio).round(),
+      height: height == null ? null : (height * pixelRatio).round(),
+    );
+  }
+
+  ImageProvider _assetProvider(String assetName, _ImageCacheSize cacheSize) {
+    final provider = AssetImage(assetName);
+    if (cacheSize.width == null && cacheSize.height == null) {
+      return provider;
+    }
+    return ResizeImage(
+      provider,
+      width: cacheSize.width,
+      height: cacheSize.height,
     );
   }
 
@@ -103,7 +131,14 @@ class ImageLoader {
     BuildContext context,
   ) async {
     for (final url in urls) {
-      await precacheImage(NetworkImage(url), context);
+      await precacheImage(CachedNetworkImageProvider(url), context);
     }
   }
+}
+
+class _ImageCacheSize {
+  const _ImageCacheSize({this.width, this.height});
+
+  final int? width;
+  final int? height;
 }

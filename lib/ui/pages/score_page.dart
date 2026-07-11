@@ -665,7 +665,8 @@ class _ScorePageState extends ConsumerState<ScorePage>
   Widget _buildScoreSliverList(List<ScoreModel> scores) {
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      sliver: SliverList.builder(
+      sliver: SliverFixedExtentList.builder(
+        itemExtent: 72,
         itemCount: scores.length,
         itemBuilder: (context, index) => AnimatedCard(
           delay: Duration(milliseconds: 50 * index),
