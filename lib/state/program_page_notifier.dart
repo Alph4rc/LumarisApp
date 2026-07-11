@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
 import 'package:ios_club_app/features/education/services/program_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/core/utils/stale_request_guard.dart';
 
 typedef ProgramsFetcher = Future<List<PlanCourseList>> Function(
     {bool forceRefresh});
@@ -18,7 +19,7 @@ final programControllerProvider =
         ProgramPageNotifier.new);
 
 class ProgramPageNotifier extends Notifier<ProgramState> {
-  int _loadCount = 0;
+  final _loadGuard = StaleRequestGuard();
   final List<String> semesterNames = const [
     '大一上',
     '大一下',
@@ -47,7 +48,7 @@ class ProgramPageNotifier extends Notifier<ProgramState> {
   String get errorMessage => state.errorMessage;
 
   Future<void> loadPrograms({bool forceRefresh = false}) async {
-    final currentLoadId = ++_loadCount;
+    final requestId = _loadGuard.beginRequest();
     final previousPrograms = state.programs;
     try {
       state = state.copyWith(isLoading: true, isError: false);
@@ -55,7 +56,7 @@ class ProgramPageNotifier extends Notifier<ProgramState> {
         forceRefresh: forceRefresh,
       );
 
-      if (currentLoadId != _loadCount) return;
+      if (!_loadGuard.isCurrent(requestId)) return;
 
       state = state.copyWith(
         programs: result,
@@ -63,7 +64,7 @@ class ProgramPageNotifier extends Notifier<ProgramState> {
         errorMessage: '',
       );
     } catch (e) {
-      if (currentLoadId != _loadCount) return;
+      if (!_loadGuard.isCurrent(requestId)) return;
       if (previousPrograms.isNotEmpty) {
         state = state.copyWith(
           programs: previousPrograms,
@@ -74,7 +75,7 @@ class ProgramPageNotifier extends Notifier<ProgramState> {
         state = state.copyWith(isError: true, errorMessage: e.toString());
       }
     } finally {
-      if (currentLoadId == _loadCount) {
+      if (_loadGuard.isCurrent(requestId)) {
         state = state.copyWith(isLoading: false);
       }
     }

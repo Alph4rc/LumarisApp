@@ -3,6 +3,7 @@ import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/features/education/services/electricity_service.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
+import 'package:ios_club_app/core/utils/stale_request_guard.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/state/tile_store_providers.dart';
 
@@ -41,7 +42,7 @@ final electricityStoreProvider =
     NotifierProvider<ElectricityStore, ElectricityState>(ElectricityStore.new);
 
 class ElectricityStore extends Notifier<ElectricityState> {
-  int _loadCount = 0;
+  final _loadGuard = StaleRequestGuard();
 
   @override
   ElectricityState build() {
@@ -58,7 +59,7 @@ class ElectricityStore extends Notifier<ElectricityState> {
   List<ElectricData> get weeklyData => List.unmodifiable(state.weeklyData);
 
   Future<void> loadElectricityData() async {
-    final currentLoadId = ++_loadCount;
+    final requestId = _loadGuard.beginRequest();
     try {
       state = state.copyWith(isLoading: true);
 
@@ -67,7 +68,7 @@ class ElectricityStore extends Notifier<ElectricityState> {
           await ref.read(electricityTileVisibilityReaderProvider)('电费');
       final weekly = await ref.read(electricityWeeklyReaderProvider)();
 
-      if (currentLoadId != _loadCount) return;
+      if (!_loadGuard.isCurrent(requestId)) return;
 
       final nextTiles = [...state.tiles];
       if (isVisible) {
@@ -87,21 +88,21 @@ class ElectricityStore extends Notifier<ElectricityState> {
     } catch (_) {
       // Keep the last known values on transient failures.
     } finally {
-      if (currentLoadId == _loadCount) {
+      if (_loadGuard.isCurrent(requestId)) {
         state = state.copyWith(isLoading: false);
       }
     }
   }
 
   Future<void> refreshElectricityData() async {
-    final currentLoadId = ++_loadCount;
+    final requestId = _loadGuard.beginRequest();
     try {
       state = state.copyWith(isLoading: true);
 
       final value = await ref.read(electricityReaderProvider)();
       final weekly = await ref.read(electricityWeeklyReaderProvider)();
 
-      if (currentLoadId != _loadCount) return;
+      if (!_loadGuard.isCurrent(requestId)) return;
 
       state = state.copyWith(
         electricity: value ?? state.electricity,
@@ -111,7 +112,7 @@ class ElectricityStore extends Notifier<ElectricityState> {
     } catch (_) {
       // Keep the last known values on transient failures.
     } finally {
-      if (currentLoadId == _loadCount) {
+      if (_loadGuard.isCurrent(requestId)) {
         state = state.copyWith(isLoading: false);
       }
     }

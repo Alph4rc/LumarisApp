@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
+import 'package:ios_club_app/core/utils/stale_request_guard.dart';
 import 'package:ios_club_app/core/utils/week_start_utils.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -25,7 +26,7 @@ final scheduleStoreProvider =
 
 class ScheduleStore extends Notifier<ScheduleState> {
   List<CourseModel> _allCoursesRemind = [];
-  int _refreshCount = 0;
+  final _refreshGuard = StaleRequestGuard();
 
   @override
   ScheduleState build() {
@@ -148,7 +149,7 @@ class ScheduleStore extends Notifier<ScheduleState> {
   }
 
   Future<void> refreshCourses() async {
-    final currentRefreshId = ++_refreshCount;
+    final requestId = _refreshGuard.beginRequest();
     AppLogger.debug('[ScheduleStore] 开始刷新课程');
     state = state.copyWith(isLoading: true);
     try {
@@ -159,7 +160,7 @@ class ScheduleStore extends Notifier<ScheduleState> {
         weekStartDay: _weekStartDay,
       );
 
-      if (currentRefreshId != _refreshCount) return;
+      if (!_refreshGuard.isCurrent(requestId)) return;
 
       _handleWeekData(weekData);
 
@@ -171,7 +172,7 @@ class ScheduleStore extends Notifier<ScheduleState> {
         },
       );
 
-      if (currentRefreshId != _refreshCount) return;
+      if (!_refreshGuard.isCurrent(requestId)) return;
 
       AppLogger.debug('[ScheduleStore] CourseService.getCourse 完成');
 
@@ -190,11 +191,11 @@ class ScheduleStore extends Notifier<ScheduleState> {
 
       AppLogger.debug('[ScheduleStore] 刷新课程成功');
     } on TimeoutException catch (e) {
-      if (currentRefreshId != _refreshCount) return;
+      if (!_refreshGuard.isCurrent(requestId)) return;
       AppLogger.warning('[ScheduleStore] 刷新课程超时: $e');
       rethrow;
     } catch (e, stackTrace) {
-      if (currentRefreshId != _refreshCount) return;
+      if (!_refreshGuard.isCurrent(requestId)) return;
       AppLogger.error(
         '[ScheduleStore] 刷新课程失败',
         error: e,
@@ -202,7 +203,7 @@ class ScheduleStore extends Notifier<ScheduleState> {
       );
       rethrow;
     } finally {
-      if (currentRefreshId == _refreshCount) {
+      if (_refreshGuard.isCurrent(requestId)) {
         AppLogger.debug('[ScheduleStore] 设置 isLoading = false');
         state = state.copyWith(isLoading: false);
       }

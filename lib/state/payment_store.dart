@@ -5,6 +5,7 @@ import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/features/system/tile_service.dart';
+import 'package:ios_club_app/core/utils/stale_request_guard.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart' show PrefsKeys;
 import 'package:ios_club_app/state/tile_store_providers.dart';
@@ -97,10 +98,10 @@ class PaymentStore extends Notifier<PaymentState> {
   bool get isShowTile => state.isShowTile;
   String get password => state.password;
 
-  int _loadCount = 0;
+  final _loadGuard = StaleRequestGuard();
 
   Future<void> loadData() async {
-    final currentLoadId = ++_loadCount;
+    final requestId = _loadGuard.beginRequest();
     try {
       state = state.copyWith(isLoading: true, errorMessage: '');
 
@@ -108,7 +109,7 @@ class PaymentStore extends Notifier<PaymentState> {
       final password = await ref.read(paymentPasswordReaderProvider)();
 
       if (studentId == null || studentId.isEmpty) {
-        if (currentLoadId != _loadCount) return;
+        if (!_loadGuard.isCurrent(requestId)) return;
         state = state.copyWith(
           errorMessage: 'auth_required',
           password: password ?? '',
@@ -120,7 +121,7 @@ class PaymentStore extends Notifier<PaymentState> {
           await ref.read(paymentDataFetcherProvider)(studentId, password);
       final isVisible = await ref.read(tileVisibilityReaderProvider)('饭卡');
 
-      if (currentLoadId != _loadCount) return;
+      if (!_loadGuard.isCurrent(requestId)) return;
 
       state = state.copyWith(
         records: recordsResult.payments,
@@ -130,14 +131,14 @@ class PaymentStore extends Notifier<PaymentState> {
         password: password ?? '',
       );
     } catch (e) {
-      if (currentLoadId != _loadCount) return;
+      if (!_loadGuard.isCurrent(requestId)) return;
       final password = await ref.read(paymentPasswordReaderProvider)();
       state = state.copyWith(
         errorMessage: 'load_failed',
         password: password ?? '',
       );
     } finally {
-      if (currentLoadId == _loadCount) {
+      if (_loadGuard.isCurrent(requestId)) {
         state = state.copyWith(isLoading: false);
       }
     }
