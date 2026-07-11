@@ -11,7 +11,6 @@ import '../features/basic/services/school_api.dart';
 import '../features/basic/services/school_config_cache.dart';
 import '../features/education/services/edu_http_client_manager.dart';
 import 'prefs_keys.dart';
-import 'school_store.dart';
 
 final settingsStoreProvider =
     NotifierProvider<SettingsStore, SettingsState>(SettingsStore.new);
@@ -210,8 +209,6 @@ class SettingsStore extends Notifier<SettingsState> {
     } catch (_) {
       // The manager may not be initialized during early app startup or tests.
     }
-
-    ref.read(schoolStoreProvider.notifier).fetchSchool(schoolId);
   }
 
   Future<void> setHasAcceptedAgreement(bool value) async {

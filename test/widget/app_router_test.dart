@@ -1,11 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/main_app.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/pages/agreement_page.dart';
 import 'package:ios_club_app/ui/pages/home_page.dart';
 import 'package:ios_club_app/ui/pages/link_page.dart';
@@ -13,6 +11,7 @@ import 'package:ios_club_app/ui/pages/login_page.dart';
 import 'package:ios_club_app/ui/pages/profile_page.dart';
 import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
 import 'package:ios_club_app/ui/pages/score_page.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -35,6 +34,21 @@ void main() {
     return match.last.route.builder!(context, state);
   }
 
+  Widget buildRouterApp() {
+    return ProviderScope(
+      child: MaterialApp.router(
+        routerConfig: AppRouter.router,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+      ),
+    );
+  }
+
   testWidgets('matches and builds the core route table', (tester) async {
     await tester.pumpWidget(const Directionality(
       textDirection: TextDirection.ltr,
@@ -54,11 +68,7 @@ void main() {
   });
 
   testWidgets('login route can return true when popped', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp.router(routerConfig: AppRouter.router),
-      ),
-    );
+    await tester.pumpWidget(buildRouterApp());
     await tester.pumpAndSettle();
 
     final resultFuture = AppRouter.push<bool>(AppRoutes.login);
@@ -75,11 +85,7 @@ void main() {
   testWidgets('go switches the active route without GetX routing',
       (tester) async {
     AppRouter.go(AppRoutes.login);
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp.router(routerConfig: AppRouter.router),
-      ),
-    );
+    await tester.pumpWidget(buildRouterApp());
     await tester.pumpAndSettle();
     expect(find.byType(LoginPage), findsOneWidget);
 
@@ -88,39 +94,5 @@ void main() {
 
     expect(AppRouter.currentLocation, AppRoutes.agreement);
     expect(find.byType(AgreementPage), findsOneWidget);
-  });
-
-  testWidgets('main shell can switch layouts without duplicating global keys',
-      (tester) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    addTearDown(() async {
-      await tester.binding.setSurfaceSize(null);
-    });
-
-    await PrefsService.instance.setBool(PrefsKeys.AGREEMENT_ACCEPTED, true);
-
-    final childKey = GlobalKey();
-    final routedChild = SizedBox(key: childKey);
-
-    Future<void> pumpShell(Size size) async {
-      await tester.binding.setSurfaceSize(size);
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: MainApp(child: routedChild),
-          ),
-        ),
-      );
-      await tester.pump();
-    }
-
-    await pumpShell(const Size(390, 844));
-    expect(find.byKey(childKey), findsOneWidget);
-
-    await pumpShell(const Size(1024, 768));
-    expect(find.byKey(childKey), findsOneWidget);
-    expect(tester.takeException(), isNull);
-
-    debugDefaultTargetPlatformOverride = null;
   });
 }

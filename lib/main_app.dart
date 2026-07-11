@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
@@ -23,31 +24,20 @@ import 'platform/windows/windows_sidebar.dart';
 class MainApp extends ConsumerStatefulWidget {
   const MainApp({
     super.key,
-    required this.child,
+    required this.navigationShell,
   });
 
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
   @override
   ConsumerState<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
-  int _currentIndex = 0;
-  bool _showBottomNav = true;
-
-  static const _bottomNavRoutes = {
-    AppRoutes.home,
-    AppRoutes.schedule,
-    AppRoutes.score,
-    AppRoutes.profile,
-  };
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    AppRouter.router.routerDelegate.addListener(_syncNavigationState);
 
     if (PlatformUtils.isAndroid) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -63,23 +53,15 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
 
       final prefs = PrefsService.instance;
       final initialIndex = prefs.getInt(PrefsKeys.PAGE_DATA) ?? 0;
-      final initialRoute = _routeMap[initialIndex] ?? AppRoutes.home;
-
-      if (initialIndex != 0) {
+      if (initialIndex != 0 &&
+          GoRouterState.of(context).uri.path == AppRoutes.home) {
         _navigateToMainRoute(initialIndex);
-        return;
       }
-
-      setState(() {
-        _currentIndex = initialIndex;
-        _showBottomNav = _bottomNavRoutes.contains(initialRoute);
-      });
     });
   }
 
   @override
   void dispose() {
-    AppRouter.router.routerDelegate.removeListener(_syncNavigationState);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -282,55 +264,18 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     }).toList();
   }
 
-  static const Map<int, String> _routeMap = {
-    0: AppRoutes.home,
-    1: AppRoutes.schedule,
-    2: AppRoutes.score,
-    3: AppRoutes.profile,
-    4: AppRoutes.electricity,
-    5: AppRoutes.schoolBus,
-    6: AppRoutes.payment,
-    7: AppRoutes.campusMap,
-  };
-
-  void _syncNavigationState() {
-    final route = AppRouter.currentLocation;
-    final index = _routeMap.entries
-        .firstWhere(
-          (entry) => entry.value == route,
-          orElse: () => const MapEntry(0, AppRoutes.home),
-        )
-        .key;
-    final showBottomNav = _bottomNavRoutes.contains(route);
-
-    if (_currentIndex == index && _showBottomNav == showBottomNav) {
-      return;
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _currentIndex = index;
-        _showBottomNav = showBottomNav;
-      });
-    });
-  }
-
   void _navigateToMainRoute(int index) {
-    final route = _routeMap[index] ?? AppRoutes.home;
-    setState(() {
-      _currentIndex = index;
-      _showBottomNav = _bottomNavRoutes.contains(route);
-    });
-    AppRouter.go(route);
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final routedChild = widget.child;
+    final routedChild = widget.navigationShell;
+    final currentIndex = widget.navigationShell.currentIndex;
+    final showBottomNav = currentIndex < 4;
     final destinations = _buildDestinations(context);
     final primaryDestinations = _buildPrimaryNavigationDestinations(context);
 
@@ -350,7 +295,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
       shell = MacosWindow(
         sidebar: macosUISidebar(
           items: destinations,
-          selectedIndex: _currentIndex,
+          selectedIndex: currentIndex,
           onItemSelected: (int index) {
             _navigateToMainRoute(index);
           },
@@ -371,7 +316,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
             children: [
               WindowsSidebar(
                 items: destinations,
-                selectedIndex: _currentIndex,
+                selectedIndex: currentIndex,
                 onItemSelected: (int index) {
                   _navigateToMainRoute(index);
                 },
@@ -387,7 +332,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
       // 平板 - 使用 NavigationRail，并与手机端主导航保持一致
       shell = TabletNavigation(
         destinations: primaryDestinations,
-        selectedIndex: _currentIndex,
+        selectedIndex: currentIndex,
         onItemSelected: (int index) {
           _navigateToMainRoute(index);
         },
@@ -397,10 +342,10 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
       // 手机 - 使用底部导航栏（仅在四个主页面显示）
       shell = Scaffold(
         body: SafeArea(child: routedChild),
-        bottomNavigationBar: _showBottomNav
+        bottomNavigationBar: showBottomNav
             ? BottomNavigation(
                 destinations: primaryDestinations,
-                selectedIndex: _currentIndex,
+                selectedIndex: currentIndex,
                 onDestinationSelected: (int index) {
                   _navigateToMainRoute(index);
                 },

@@ -29,24 +29,6 @@ class ScheduleStore extends Notifier<ScheduleState> {
 
   @override
   ScheduleState build() {
-    ref.listen<List<String>>(
-      courseStoreProvider.select((value) => value.ignoreCourses),
-      (previous, next) {
-        if (previous != null && previous != next) {
-          refreshCourseData();
-        }
-      },
-    );
-    ref.listen<int>(
-      schoolStoreProvider.select(
-        (value) => value.school?.weekStartDay ?? School.defaultWeekStartDay,
-      ),
-      (previous, next) {
-        if (previous != null && previous != next) {
-          Future<void>.microtask(initializeData);
-        }
-      },
-    );
     Future<void>.microtask(initializeData);
     return const ScheduleState();
   }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/basic/services/basic_http_client_manager.dart';
 import 'package:ios_club_app/state/auth_state_notifier.dart';
+import 'package:ios_club_app/state/app_state_coordinator.dart';
 import 'package:ios_club_app/core/services/hive_manager.dart';
 import 'package:ios_club_app/core/services/permission_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -35,8 +36,6 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
 
-import 'main_app.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -53,6 +52,8 @@ void main() async {
   }
 
   final providerContainer = ProviderContainer();
+  // Keep cross-feature reactions in one app-level mediator, not in stores.
+  providerContainer.read(appStateCoordinatorProvider);
   final settingsStore = providerContainer.read(settingsStoreProvider.notifier);
   final authStateNotifier =
       providerContainer.read(authStateNotifierProvider.notifier);
@@ -178,7 +179,7 @@ class _AppLauncher extends ConsumerWidget {
       return WindowPage(child: child);
     }
 
-    return MainApp(child: child);
+    return child;
   }
 
   @override
@@ -343,7 +344,7 @@ class _WindowPageState extends State<WindowPage>
   }
 
   @override
-  Widget build(BuildContext context) => MainApp(child: widget.child);
+  Widget build(BuildContext context) => widget.child;
 
   @override
   void onWindowClose() async {

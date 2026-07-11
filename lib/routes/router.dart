@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ios_club_app/main_app.dart';
 import 'package:ios_club_app/ui/pages/campus_map_page.dart';
 
 import '../ui/pages/under_maintenance_screen.dart';
@@ -37,23 +38,24 @@ class AppRoutes {
   static const profile = '/Profile';
   static const login = '/Login';
   static const link = '/Link';
-  static const about = '/About';
-  static const scheduleSetting = '/ScheduleSetting';
-  static const customCourseManage = '/CustomCourseManage';
+  static const about = '/Profile/About';
+  static const scheduleSetting = '/Schedule/ScheduleSetting';
+  static const customCourseManage =
+      '/Schedule/ScheduleSetting/CustomCourseManage';
   static const schoolBus = '/SchoolBus';
-  static const program = '/Program';
+  static const program = '/Profile/Program';
   static const electricity = '/Electricity';
   static const payment = '/Payment';
-  static const net = '/Net';
-  static const helper = '/Helper';
-  static const egg = '/Egg';
-  static const license = '/License';
-  static const agreement = '/Agreement';
-  static const privacyPolicy = '/PrivacyPolicy';
-  static const userAgreement = '/UserAgreement';
-  static const author = '/Author';
-  static const htmlImport = '/HtmlImport';
-  static const htmlImportWebview = '/HtmlImportWebview';
+  static const net = '/Electricity/Net';
+  static const helper = '/Profile/Helper';
+  static const egg = '/Profile/About/Egg';
+  static const license = '/Profile/About/License';
+  static const agreement = '/Profile/About/Agreement';
+  static const privacyPolicy = '/Profile/About/PrivacyPolicy';
+  static const userAgreement = '/Profile/About/UserAgreement';
+  static const author = '/Profile/About/Author';
+  static const htmlImport = '/Schedule/HtmlImport';
+  static const htmlImportWebview = '/Schedule/HtmlImport/Webview';
   static const campusMap = '/CampusMap';
 }
 
@@ -67,101 +69,113 @@ class AppRouter {
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.home,
     routes: [
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomePage(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainApp(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.home,
+              builder: (context, state) => const HomePage(),
+              routes: [
+                _detailRoute('Login', (context, state) => const LoginPage()),
+                _detailRoute('Link', (context, state) => const LinkPage()),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.schedule,
+              builder: (context, state) => const ScheduleListPage(),
+              routes: [
+                GoRoute(
+                  path: 'ScheduleSetting',
+                  parentNavigatorKey: rootNavigatorKey,
+                  builder: (context, state) => const ScheduleSettingPage(),
+                  routes: [
+                    _detailRoute(
+                      'CustomCourseManage',
+                      (context, state) => const CustomCourseManagePage(),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'HtmlImport',
+                  parentNavigatorKey: rootNavigatorKey,
+                  builder: (context, state) => const HtmlImportPage(),
+                  routes: [
+                    _detailRoute(
+                      'Webview',
+                      (context, state) => HtmlImportWebViewPage(
+                        url: state.extra as String,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: AppRoutes.score,
+                builder: (context, state) => const ScorePage()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.profile,
+              builder: (context, state) => const ProfilePage(),
+              routes: [
+                _detailRoute(
+                    'Program', (context, state) => const ProgramPage()),
+                _detailRoute('Helper', (context, state) => const HelperPage()),
+                GoRoute(
+                  path: 'About',
+                  parentNavigatorKey: rootNavigatorKey,
+                  builder: (context, state) => const SettingPage(),
+                  routes: [
+                    _detailRoute(
+                        'Egg', (context, state) => const EasterEggPage()),
+                    _detailRoute(
+                        'License', (context, state) => const LicensePage()),
+                    _detailRoute(
+                        'Agreement', (context, state) => const AgreementPage()),
+                    _detailRoute('PrivacyPolicy',
+                        (context, state) => const PrivacyPolicyPage()),
+                    _detailRoute('UserAgreement',
+                        (context, state) => const UserAgreementPage()),
+                    _detailRoute(
+                        'Author', (context, state) => const AuthorPage()),
+                  ],
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: AppRoutes.electricity,
+              builder: (context, state) => const ElectricityPage(),
+              routes: [
+                _detailRoute('Net', (context, state) => const NetPage())
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: AppRoutes.schoolBus,
+                builder: (context, state) => const SchoolBusPage()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: AppRoutes.payment,
+                builder: (context, state) => PaymentPage()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: AppRoutes.campusMap,
+                builder: (context, state) => const CampusMapPage()),
+          ]),
+        ],
       ),
-      GoRoute(
-        path: AppRoutes.schedule,
-        builder: (context, state) => const ScheduleListPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.score,
-        builder: (context, state) => const ScorePage(),
-      ),
-      GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfilePage(),
-      ),
-      GoRoute(
-        path: AppRoutes.login,
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.link,
-        builder: (context, state) => const LinkPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.about,
-        builder: (context, state) => const SettingPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.scheduleSetting,
-        builder: (context, state) => const ScheduleSettingPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.customCourseManage,
-        builder: (context, state) => const CustomCourseManagePage(),
-      ),
-      GoRoute(
-        path: AppRoutes.htmlImport,
-        builder: (context, state) => const HtmlImportPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.htmlImportWebview,
-        builder: (context, state) =>
-            HtmlImportWebViewPage(url: state.extra as String),
-      ),
-      GoRoute(
-        path: AppRoutes.schoolBus,
-        builder: (context, state) => const SchoolBusPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.program,
-        builder: (context, state) => const ProgramPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.electricity,
-        builder: (context, state) => const ElectricityPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.payment,
-        builder: (context, state) => PaymentPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.net,
-        builder: (context, state) => const NetPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.helper,
-        builder: (context, state) => const HelperPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.egg,
-        builder: (context, state) => const EasterEggPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.license,
-        builder: (context, state) => const LicensePage(),
-      ),
-      GoRoute(
-        path: AppRoutes.agreement,
-        builder: (context, state) => const AgreementPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.privacyPolicy,
-        builder: (context, state) => const PrivacyPolicyPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.userAgreement,
-        builder: (context, state) => const UserAgreementPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.author,
-        builder: (context, state) => const AuthorPage(),
-      ),
-      GoRoute(path: AppRoutes.campusMap,
-      builder: (context, state) => const CampusMapPage())
     ],
     errorBuilder: (context, state) => const UnderMaintenanceScreen(),
   );
@@ -183,6 +197,15 @@ class AppRouter {
     if (router.canPop()) {
       router.pop<T>(result);
     }
+  }
+
+  static GoRoute _detailRoute(
+      String path, Widget Function(BuildContext, GoRouterState) builder) {
+    return GoRoute(
+      path: path,
+      parentNavigatorKey: rootNavigatorKey,
+      builder: builder,
+    );
   }
 }
 

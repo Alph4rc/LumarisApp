@@ -6,10 +6,7 @@ import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
-import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/state/schedule_store.dart';
-import 'package:ios_club_app/state/program_page_notifier.dart';
 
 final userStoreProvider = NotifierProvider<UserStore, UserState>(UserStore.new);
 
@@ -66,10 +63,6 @@ class UserStore extends Notifier<UserState> {
     await secureStorage.delete(key: PrefsKeys.PASSWORD);
 
     await EducationCacheService.clearEduCache();
-
-    ref.read(courseStoreProvider.notifier).clearCourseData();
-    ref.read(scheduleStoreProvider.notifier).clean();
-    ref.read(programControllerProvider.notifier).clean();
   }
 
   Future<void> logout() async {
