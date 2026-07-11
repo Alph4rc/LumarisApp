@@ -14,7 +14,7 @@ import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
-import 'package:ios_club_app/ui/pages/homePages/tiles_widget.dart';
+import 'package:ios_club_app/ui/pages/home_page/tiles_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<Override> _overrides() => [

@@ -11,10 +11,10 @@ import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/state/tile_store_providers.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
-import 'package:ios_club_app/ui/pages/electricity_page.dart';
-import 'package:ios_club_app/ui/pages/payment_page.dart';
-import 'package:ios_club_app/ui/pages/program_page.dart';
-import 'package:ios_club_app/ui/pages/school_bus_page.dart';
+import 'package:ios_club_app/ui/pages/electricity_page/electricity_page.dart';
+import 'package:ios_club_app/ui/pages/payment_page/payment_page.dart';
+import 'package:ios_club_app/ui/pages/program_page/program_page.dart';
+import 'package:ios_club_app/ui/pages/school_bus_page/school_bus_page.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

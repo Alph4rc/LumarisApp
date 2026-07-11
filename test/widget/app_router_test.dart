@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/ui/pages/agreement_page.dart';
-import 'package:ios_club_app/ui/pages/home_page.dart';
-import 'package:ios_club_app/ui/pages/link_page.dart';
-import 'package:ios_club_app/ui/pages/login_page.dart';
-import 'package:ios_club_app/ui/pages/profile_page.dart';
-import 'package:ios_club_app/ui/pages/schedule_list_page.dart';
-import 'package:ios_club_app/ui/pages/score_page.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
+import 'package:ios_club_app/ui/pages/agreement_page/agreement_page.dart';
+import 'package:ios_club_app/ui/pages/home_page/home_page.dart';
+import 'package:ios_club_app/ui/pages/link_page/link_page.dart';
+import 'package:ios_club_app/ui/pages/login_page/login_page.dart';
+import 'package:ios_club_app/ui/pages/profile_page/profile_page.dart';
+import 'package:ios_club_app/ui/pages/schedule_list_page/schedule_list_page.dart';
+import 'package:ios_club_app/ui/pages/score_page/score_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
