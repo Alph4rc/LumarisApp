@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
@@ -9,6 +11,10 @@ import 'package:latlong2/latlong.dart';
 import 'map_state.dart';
 
 class MapNotifier extends Notifier<MapState> {
+  static const Duration _locationTimeout = Duration(seconds: 8);
+  static const Duration _streamFallbackTimeout = Duration(seconds: 10);
+  static const Duration _maxLastKnownAge = Duration(minutes: 5);
+
   @override
   MapState build() {
     return const MapState();
@@ -96,16 +102,12 @@ class MapNotifier extends Notifier<MapState> {
 
       // 3. Get position - try current position first, fallback to last known
       AppLogger.debug('MapNotifier: Attempting to get current position...');
+      final locationSettings = _buildLocationSettings();
       Position? position;
 
       try {
-        // Try to get current position (most accurate)
         position = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            // Use medium accuracy for faster results.
-            accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 8),
-          ),
+          locationSettings: locationSettings,
         );
         AppLogger.debug('MapNotifier: Current position obtained successfully');
       } on PermissionDeniedException {
@@ -113,15 +115,12 @@ class MapNotifier extends Notifier<MapState> {
       } on LocationServiceDisabledException {
         rethrow;
       } catch (e) {
-        // If current position fails (timeout, no signal, etc.), use last known position
         AppLogger.debug(
-          'MapNotifier: Failed to get current position ($e), falling back to last known position...',
+          'MapNotifier: Failed to get current position ($e), trying stream fallback...',
         );
-        position = await Geolocator.getLastKnownPosition();
+        position = await _getPositionFromStream(locationSettings);
 
-        if (position != null) {
-          AppLogger.debug('MapNotifier: Using last known position as fallback');
-        }
+        position ??= await _getFreshLastKnownPosition();
       }
 
       if (position == null) {
@@ -147,6 +146,64 @@ class MapNotifier extends Notifier<MapState> {
     } finally {
       state = state.copyWith(isLoadingLocation: false);
     }
+  }
+
+  LocationSettings _buildLocationSettings() {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 0,
+        intervalDuration: const Duration(seconds: 2),
+        timeLimit: _locationTimeout,
+        // Prefer the Android framework provider on domestic Android devices.
+        forceLocationManager: true,
+      );
+    }
+
+    return const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 0,
+      timeLimit: _locationTimeout,
+    );
+  }
+
+  Future<Position?> _getPositionFromStream(
+    LocationSettings locationSettings,
+  ) async {
+    try {
+      final stream = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      );
+      final position = await stream.first.timeout(_streamFallbackTimeout);
+      AppLogger.debug('MapNotifier: Stream fallback returned a live position');
+      return position;
+    } on TimeoutException catch (e) {
+      AppLogger.info('MapNotifier: Stream fallback timed out: $e');
+      return null;
+    } catch (e) {
+      AppLogger.info('MapNotifier: Stream fallback failed: $e');
+      return null;
+    }
+  }
+
+  Future<Position?> _getFreshLastKnownPosition() async {
+    final position = await Geolocator.getLastKnownPosition();
+    if (position == null) {
+      AppLogger.info('MapNotifier: No last known position available');
+      return null;
+    }
+
+    final age = DateTime.now().difference(position.timestamp);
+    if (age > _maxLastKnownAge) {
+      AppLogger.info(
+        'MapNotifier: Ignoring stale last known position older than $_maxLastKnownAge',
+      );
+      return null;
+    }
+
+    AppLogger.debug(
+        'MapNotifier: Using recent last known position as fallback');
+    return position;
   }
 
   // ==========================================
