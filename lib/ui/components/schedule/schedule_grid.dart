@@ -10,7 +10,6 @@ import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import '../../../core/services/course_color_manager.dart';
-import '../../../core/utils/platform_utils.dart';
 
 /// 课表网格组件
 ///
@@ -216,53 +215,7 @@ class ScheduleGrid extends StatelessWidget {
 
   /// 合并同名且时间相同的课程（将不同老师合并到一个课程对象中）
   List<CourseModel> _mergeSameNameCourses(List<CourseModel> courses) {
-    final result = <CourseModel>[];
-    final used = List<bool>.filled(courses.length, false);
-
-    for (int i = 0; i < courses.length; i++) {
-      if (used[i]) continue;
-
-      final current = courses[i];
-      final teachersToMerge = <String>[...current.teachers];
-      used[i] = true;
-
-      // 查找同名且时间相同的课程
-      for (int j = i + 1; j < courses.length; j++) {
-        if (used[j]) continue;
-
-        final other = courses[j];
-        // 如果课程名相同且时间完全相同
-        if (current.courseName == other.courseName &&
-            current.startUnit == other.startUnit &&
-            current.endUnit == other.endUnit) {
-          // 合并老师信息（去重）
-          for (var teacher in other.teachers) {
-            if (!teachersToMerge.contains(teacher)) {
-              teachersToMerge.add(teacher);
-            }
-          }
-          used[j] = true;
-        }
-      }
-
-      // 创建合并后的课程对象
-      result.add(CourseModel(
-        weekIndexes: current.weekIndexes,
-        teachers: teachersToMerge,
-        room: current.room,
-        courseName: current.courseName,
-        courseCode: current.courseCode,
-        weekday: current.weekday,
-        startUnit: current.startUnit,
-        endUnit: current.endUnit,
-        credits: current.credits,
-        lessonId: current.lessonId,
-        campus: current.campus,
-        isCustom: current.isCustom,
-      ));
-    }
-
-    return result;
+    return CourseModel.mergeSameNameCourses(courses);
   }
 
   /// 检查两个课程是否有时间冲突

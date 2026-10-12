@@ -125,6 +125,57 @@ class CourseModel {
   /// @return JSON格式的课程数据
   Map<String, dynamic> toJson() => _$CourseModelToJson(this);
 
+  /// 合并课程名和节次相同的课程，并去重授课教师。
+  ///
+  /// 课程表和首页都使用这条规则，其他课程字段沿用每组中的第一条课程。
+  static List<CourseModel> mergeSameNameCourses(List<CourseModel> courses) {
+    final result = <CourseModel>[];
+    final used = List<bool>.filled(courses.length, false);
+
+    for (int i = 0; i < courses.length; i++) {
+      if (used[i]) continue;
+
+      final current = courses[i];
+      final teachersToMerge = <String>[...current.teachers];
+      used[i] = true;
+
+      for (int j = i + 1; j < courses.length; j++) {
+        if (used[j]) continue;
+
+        final other = courses[j];
+        if (current.courseName == other.courseName &&
+            current.startUnit == other.startUnit &&
+            current.endUnit == other.endUnit) {
+          for (final teacher in other.teachers) {
+            if (!teachersToMerge.contains(teacher)) {
+              teachersToMerge.add(teacher);
+            }
+          }
+          used[j] = true;
+        }
+      }
+
+      result.add(
+        CourseModel(
+          weekIndexes: current.weekIndexes,
+          teachers: teachersToMerge,
+          room: current.room,
+          courseName: current.courseName,
+          courseCode: current.courseCode,
+          weekday: current.weekday,
+          startUnit: current.startUnit,
+          endUnit: current.endUnit,
+          credits: current.credits,
+          lessonId: current.lessonId,
+          campus: current.campus,
+          isCustom: current.isCustom,
+        ),
+      );
+    }
+
+    return result;
+  }
+
   /// 格式化周次范围
   ///
   /// 将周次列表转换为易读的范围字符串，例如：[1, 2, 3, 5, 6] 转换为 "1-3,5-6"

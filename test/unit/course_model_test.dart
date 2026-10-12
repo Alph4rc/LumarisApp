@@ -161,4 +161,57 @@ void main() {
       expect(CourseModel.formatWeekRanges([1, 1, 2, 2, 3]), '1,1-2,2-3');
     });
   });
+
+  group('CourseModel.mergeSameNameCourses', () {
+    test('should_merge_courses_with_same_name_and_time', () {
+      final courses = [
+        CourseModel(
+          courseName: '数学',
+          teachers: ['老师甲'],
+          room: 'A101',
+          startUnit: 1,
+          endUnit: 2,
+        ),
+        CourseModel(
+          courseName: '数学',
+          teachers: ['老师乙', '老师甲'],
+          room: 'A101',
+          startUnit: 1,
+          endUnit: 2,
+        ),
+        CourseModel(
+          courseName: '英语',
+          teachers: ['老师丙'],
+          startUnit: 1,
+          endUnit: 2,
+        ),
+      ];
+
+      final merged = CourseModel.mergeSameNameCourses(courses);
+
+      expect(merged, hasLength(2));
+      expect(merged.first.courseName, '数学');
+      expect(merged.first.teachers, ['老师甲', '老师乙']);
+      expect(merged.last.courseName, '英语');
+    });
+
+    test('should_keep_courses_with_different_times_separate', () {
+      final courses = [
+        CourseModel(
+          courseName: '数学',
+          teachers: ['老师甲'],
+          startUnit: 1,
+          endUnit: 2,
+        ),
+        CourseModel(
+          courseName: '数学',
+          teachers: ['老师乙'],
+          startUnit: 3,
+          endUnit: 4,
+        ),
+      ];
+
+      expect(CourseModel.mergeSameNameCourses(courses), hasLength(2));
+    });
+  });
 }

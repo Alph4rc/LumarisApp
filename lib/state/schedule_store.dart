@@ -297,7 +297,8 @@ class ScheduleStore extends Notifier<ScheduleState> {
       return now.isBefore(end);
     }).toList();
 
-    filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+    filteredCourses = CourseModel.mergeSameNameCourses(filteredCourses)
+      ..sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
     if (isShowTomorrow && filteredCourses.isEmpty) {
       final tomorrow = now.add(const Duration(days: 1));
@@ -319,7 +320,8 @@ class ScheduleStore extends Notifier<ScheduleState> {
         isShowingTomorrow = true;
         filteredCourses = courses
             .where((course) => course.weekday == tomorrowWeekDay)
-            .toList()
+            .toList();
+        filteredCourses = CourseModel.mergeSameNameCourses(filteredCourses)
           ..sort((a, b) => a.startUnit.compareTo(b.startUnit));
       }
     }
