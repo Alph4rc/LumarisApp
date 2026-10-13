@@ -110,7 +110,7 @@ class TaskExecutor {
           return course.weekIndexes.contains(weekTomorrow) &&
               course.weekday == tomorrowWeekday;
         }).toList();
-        filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+        filteredCourses = _mergeAndSortCourses(filteredCourses);
         return (true, filteredCourses);
       } else {
         return (false, filteredCourses);
@@ -125,7 +125,7 @@ class TaskExecutor {
       return now.isBefore(end);
     }).toList();
 
-    filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+    filteredCourses = _mergeAndSortCourses(filteredCourses);
     return (false, filteredCourses);
   }
 
@@ -164,7 +164,7 @@ class TaskExecutor {
       return now.isBefore(end);
     }).toList();
 
-    todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+    todayCourses = _mergeAndSortCourses(todayCourses);
 
     // 计算明天日期和周数
     final tomorrow = now.add(const Duration(days: 1));
@@ -181,7 +181,7 @@ class TaskExecutor {
           course.weekday == tomorrowWeekday;
     }).toList();
 
-    tomorrowCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+    tomorrowCourses = _mergeAndSortCourses(tomorrowCourses);
 
     return {'today': todayCourses, 'tomorrow': tomorrowCourses};
   }
@@ -413,13 +413,15 @@ class TaskExecutor {
       try {
         final time = TimeService.getStartAndEnd(course);
 
-        items.add(ScheduleItem(
-          title: course.courseName,
-          time:
-              '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
-          location: course.room,
-          teacher: course.room,
-        ));
+        items.add(
+          ScheduleItem(
+            title: course.courseName,
+            time:
+                '第${course.startUnit}-${course.endUnit}节 ${time.start}-${time.end}',
+            location: course.room,
+            teacher: course.teachers.join(', '),
+          ),
+        );
       } catch (e) {
         AppLogger.debug('转换课程 ${course.courseName} 失败: $e');
         // 即使单个课程转换失败，也继续处理其他课程
@@ -428,5 +430,12 @@ class TaskExecutor {
     }
 
     return items;
+  }
+
+  /// 统一小组件课程展示规则：同名且节次相同的课程合并授课教师。
+  static List<CourseModel> _mergeAndSortCourses(List<CourseModel> courses) {
+    final mergedCourses = CourseModel.mergeSameNameCourses(courses);
+    mergedCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+    return mergedCourses;
   }
 }
