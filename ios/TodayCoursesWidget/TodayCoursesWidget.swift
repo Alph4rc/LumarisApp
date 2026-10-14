@@ -173,13 +173,13 @@ struct TodayCoursesCompactView: View {
             HStack {
                 VStack(alignment: .leading) {
                     Text(entry.todayTitle)
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     
                     if !entry.todayDateString.isEmpty {
                         Text(entry.todayDateString)
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
@@ -213,13 +213,13 @@ struct TodayCoursesCompactView: View {
 
                     if hiddenCoursesCount > 0 {
                         Text("还有\(hiddenCoursesCount)节课程")
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.secondary)
                     }
                 }
             }
         }
-        .padding(10)
+        .padding(8)
     }
 }
 
@@ -230,12 +230,12 @@ struct TodayCourseRowView: View {
         HStack(alignment: .top, spacing: 6) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(ultraCompactPeriodText(from: course.time))
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
 
                 Text(ultraCompactStartTime(from: course.time))
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .lineLimit(1)
             }
@@ -277,18 +277,17 @@ struct RecentCoursesView: View {
     let family: WidgetFamily
 
     private var maxVisibleCourses: Int {
-        family == .systemLarge ? 3 : 2
+        family == .systemLarge ? 4 : 1
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
+        VStack(alignment: .leading, spacing: 8) {
+            if family == .systemLarge {
                 Text(entry.recentTitle)
                     .font(.system(size: 20, weight: .bold))
-                Spacer()
             }
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 RecentDayColumnView(
                     title: "今天",
                     dateText: entry.recentTodayDateString,
@@ -304,7 +303,6 @@ struct RecentCoursesView: View {
                 )
             }
         }
-        .padding(12)
     }
 }
 
@@ -326,7 +324,7 @@ struct RecentDayColumnView: View {
         VStack(alignment: .leading, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title.uppercased())
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: 13, weight: .bold))
                     .foregroundColor(Color(.systemBlue))
 
                 Text(dateText)
@@ -451,6 +449,33 @@ struct ScheduleWidget_Previews: PreviewProvider {
                 )
             )
             .previewContext(WidgetPreviewContext(family: .systemSmall))
+            
+            ScheduleWidgetEntryView(
+                entry: CombinedCourseEntry(
+                    date: Date(),
+                    todayTitle: "今日课表",
+                    todayDateString: "第12周 周三",
+                    todayCourses: [
+                        Course(title: "大学英语", time: "第3-4节 10:00-11:30", location: "教学楼#123", teacher: "Lumaris"),
+                        Course(title: "计算机科学", time: "第5-6节 14:00-15:30", location: "实验楼#101", teacher: "Lumaris")
+                    ],
+                    recentTitle: "近日课表",
+                    recentTodayDateString: "05月20日 周三",
+                    recentTomorrowDateString: "05月21日 周四",
+                    recentTodayCourses: [
+                        Course(title: "计算力学", time: "第3-4节 10:10-12:00", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "大学体育", time: "第7-8节 14:30-16:20", location: "实验楼#101", teacher: "Lumaris")
+                    ],
+                    recentTomorrowCourses: [
+                        Course(title: "Lumaris开发", time: "第1-2节 08:00-09:50", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "数据结构", time: "第3-4节 10:10-12:00", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "计算力学", time: "第3-4节 10:10-12:00", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "大学体育", time: "第7-8节 14:30-16:20", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "大学体育", time: "第7-8节 14:30-16:20", location: "实验楼#101", teacher: "Lumaris")
+                    ]
+                )
+            )
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
 
             ScheduleWidgetEntryView(
                 entry: CombinedCourseEntry(
@@ -470,11 +495,14 @@ struct ScheduleWidget_Previews: PreviewProvider {
                     ],
                     recentTomorrowCourses: [
                         Course(title: "Lumaris开发", time: "第1-2节 08:00-09:50", location: "实验楼#101", teacher: "Lumaris"),
-                        Course(title: "数据结构", time: "第3-4节 10:10-12:00", location: "实验楼#101", teacher: "Lumaris")
+                        Course(title: "数据结构", time: "第3-4节 10:10-12:00", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "计算力学", time: "第3-4节 10:10-12:00", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "大学体育", time: "第7-8节 14:30-16:20", location: "实验楼#101", teacher: "Lumaris"),
+                        Course(title: "大学体育", time: "第7-8节 14:30-16:20", location: "实验楼#101", teacher: "Lumaris")
                     ]
                 )
             )
-            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .previewContext(WidgetPreviewContext(family: .systemLarge))
         }
     }
 }
