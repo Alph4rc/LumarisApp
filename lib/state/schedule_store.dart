@@ -63,8 +63,9 @@ class ScheduleStore extends Notifier<ScheduleState> {
         final guestCourses = await ref
             .read(courseStoreProvider.notifier)
             .loadGuestAndCustomCourses();
+        _allCoursesRemind = guestCourses;
         if (guestCourses.isNotEmpty) {
-          _applyCourses(guestCourses);
+          _applyCourses(_filterIgnored(guestCourses));
         } else {
           state = state.copyWith(isLoading: false);
         }
@@ -80,8 +81,9 @@ class ScheduleStore extends Notifier<ScheduleState> {
     final guestCourses = await ref
         .read(courseStoreProvider.notifier)
         .loadGuestAndCustomCourses();
+    _allCoursesRemind = guestCourses;
     if (guestCourses.isNotEmpty) {
-      _applyCourses(guestCourses);
+      _applyCourses(_filterIgnored(guestCourses));
     } else {
       state = state.copyWith(allCourses: const [], isLoading: false);
     }
@@ -101,17 +103,28 @@ class ScheduleStore extends Notifier<ScheduleState> {
     _allCoursesRemind = await CourseService.getAllCourse(isNeedIgnore: false);
   }
 
+  /// 按当前忽略名单重新过滤课表。
+  ///
+  /// 依据是内存里的未过滤快照，不读 prefs——忽略开关刚点下时，落盘可能还没
+  /// 完成。
   Future<void> refreshCourseData() async {
-    final ignoreCourses = ref.read(courseStoreProvider).ignoreCourses;
-    final courses = <CourseModel>[];
-    for (final item in _allCoursesRemind) {
-      if (ignoreCourses.isNotEmpty &&
-          ignoreCourses.any((x) => x == item.courseName)) {
-        continue;
-      }
-      courses.add(item);
+    // 快照只有校内账号登录后由 getRemindCourses() 填充。游客、以及初始化还
+    // 没跑完时它是空的，不能当成“一门课都没有”，否则会把整张课表清空。
+    if (_allCoursesRemind.isEmpty) {
+      await refreshLocalCourses();
+      return;
     }
-    _applyCourses(courses);
+
+    _applyCourses(_filterIgnored(_allCoursesRemind));
+  }
+
+  List<CourseModel> _filterIgnored(List<CourseModel> courses) {
+    final ignoreCourses = ref.read(courseStoreProvider).ignoreCourses;
+    if (ignoreCourses.isEmpty) return courses;
+
+    return courses
+        .where((course) => !ignoreCourses.contains(course.courseName))
+        .toList();
   }
 
   Future<void> _loadCourses() async {
@@ -334,6 +347,7 @@ class ScheduleStore extends Notifier<ScheduleState> {
   }
 
   void clean() {
+    _allCoursesRemind = [];
     state = state.copyWith(allCourses: const []);
   }
 }

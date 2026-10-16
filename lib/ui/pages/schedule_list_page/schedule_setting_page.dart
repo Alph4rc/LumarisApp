@@ -42,8 +42,6 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     with AutomaticKeepAliveClientMixin {
   late CourseStore courseStore;
   late SettingsStore settingsStore;
-  List<String> totalList = [];
-  List<String> ignoreList = [];
   late List<CourseIgnore> _ignores = [];
   String? _calendarSubscriptionUrl;
   final ThemeMode _themeMode = ThemeMode.system;
@@ -124,18 +122,17 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     try {
       await courseStore.loadIgnoreCourses();
       final courseNames = await CourseService.getCourseName();
+      final ignoredNames = courseStore.ignoreCourses;
 
       final ignores = courseNames
           .map((i) => CourseIgnore(
                 title: i,
-                isCompleted: courseStore.ignoreCourses.isNotEmpty &&
-                    courseStore.ignoreCourses.any((x) => x == i),
+                isCompleted: ignoredNames.contains(i),
               ))
           .toList();
 
+      if (!mounted) return;
       setState(() {
-        ignoreList = courseStore.ignoreCourses;
-        totalList = courseNames;
         _ignores = ignores;
       });
     } catch (e) {
@@ -555,18 +552,25 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     }
   }
 
-  void _handleIgnoreChange(CourseIgnore ignore, bool value) async {
+  Future<void> _handleIgnoreChange(CourseIgnore ignore, bool value) async {
     setState(() => ignore.isCompleted = value);
-    await Future.microtask(() {
-      if (value) {
-        ignoreList.add(ignore.title);
-      } else {
-        ignoreList.remove(ignore.title);
-      }
 
-      courseStore.setIgnoreCourses(ignoreList);
-      return CourseService.setIgnore(ignoreList);
-    });
+    try {
+      // 交给 CourseStore 一并改状态与落盘：它一变，appStateCoordinator 就会让
+      // 课表按新的忽略名单重新过滤。不要直接改 ignoreCourses 返回的列表，
+      // 那是 unmodifiable 的副本。
+      if (value) {
+        await courseStore.addIgnoreCourse(ignore.title);
+      } else {
+        await courseStore.removeIgnoreCourse(ignore.title);
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('切换忽略课程失败', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      setState(() => ignore.isCompleted = !value);
+      if (!mounted) return;
+      showClubSnackBar(context, Text(context.l10n.saveFailedRetry));
+    }
   }
 
   void showCalendarGuidanceDialog(BuildContext context) {
