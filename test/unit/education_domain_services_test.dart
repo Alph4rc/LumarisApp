@@ -175,7 +175,7 @@ void main() {
   group('education domain services', () {
     test('AuthService.loginFromData should persist login payload', () async {
       LoginApi.setLoginOverrideForTest(
-        (_, __) async => LoginResponse(
+        (_, _) async => LoginResponse(
           success: true,
           studentId: '2026888',
           cookie: 'cookie-auth-service',
@@ -238,7 +238,7 @@ void main() {
         'EducationRefreshService.loginAndRefresh should preload time and courses',
         () async {
       LoginApi.setLoginOverrideForTest(
-        (_, __) async => LoginResponse(
+        (_, _) async => LoginResponse(
           success: true,
           studentId: '2026999',
           cookie: 'cookie-refresh-service',

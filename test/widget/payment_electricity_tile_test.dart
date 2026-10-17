@@ -31,7 +31,7 @@ List<Override> _overrides() => [
       studentIsLoginReaderProvider.overrideWithValue(() => true),
       paymentStudentIdReaderProvider.overrideWithValue(() async => 'student-1'),
       paymentDataFetcherProvider.overrideWithValue(
-        (_, __) async => const PaymentData(
+        (_, _) async => const PaymentData(
           [
             PaymentModel(
               turnoverType: '充值',

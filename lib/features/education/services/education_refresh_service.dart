@@ -40,7 +40,7 @@ class EducationRefreshService {
       if (!loginResult) {
         return false;
       }
-      return refreshWithExistingSession(isForced: true);
+      return await refreshWithExistingSession(isForced: true);
     } catch (e, stackTrace) {
       AppLogger.error('刷新数据失败', error: e, stackTrace: stackTrace);
       return false;

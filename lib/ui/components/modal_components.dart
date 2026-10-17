@@ -99,7 +99,7 @@ class ModalHeader extends StatelessWidget {
                 ],
               ),
             ),
-            if (actions != null) actions!,
+            ?actions,
           ],
         ),
         SizedBox(height: isTablet ? 24 : 20),
@@ -215,7 +215,7 @@ class ModalActionMenu extends StatelessWidget {
           icon: CupertinoIcons.delete,
           isDestructive: true,
         ),
-      if (customActions != null) ...customActions!,
+      ...?customActions,
     ];
 
     return ClubMenu<String>(

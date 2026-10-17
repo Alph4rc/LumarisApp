@@ -283,7 +283,7 @@ void main() {
 
     test('should skip relogin during cooldown window', () async {
       var loginCalled = 0;
-      EduHttpClient.setLoginHandlerForTest((_, __) async {
+      EduHttpClient.setLoginHandlerForTest((_, _) async {
         loginCalled++;
         return <String, dynamic>{'success': true};
       });
@@ -549,7 +549,7 @@ void main() {
         () async {
       secureStore[PrefsKeys.USERNAME] = 'u1';
       secureStore[PrefsKeys.PASSWORD] = 'p1';
-      EduHttpClient.setLoginHandlerForTest((_, __) async {
+      EduHttpClient.setLoginHandlerForTest((_, _) async {
         return <String, dynamic>{
           'success': true,
           'studentId': '2026001',
@@ -589,7 +589,7 @@ void main() {
         () async {
       secureStore[PrefsKeys.USERNAME] = 'u1';
       secureStore[PrefsKeys.PASSWORD] = 'p1';
-      EduHttpClient.setLoginHandlerForTest((_, __) async {
+      EduHttpClient.setLoginHandlerForTest((_, _) async {
         return <String, dynamic>{
           'success': true,
           'studentId': '2026001',
@@ -625,7 +625,7 @@ void main() {
         () async {
       secureStore[PrefsKeys.USERNAME] = 'u1';
       secureStore[PrefsKeys.PASSWORD] = 'p1';
-      EduHttpClient.setLoginHandlerForTest((_, __) async {
+      EduHttpClient.setLoginHandlerForTest((_, _) async {
         return <String, dynamic>{
           'success': true,
           'studentId': '2026001',
@@ -670,7 +670,7 @@ void main() {
         () async {
       secureStore[PrefsKeys.USERNAME] = 'u1';
       secureStore[PrefsKeys.PASSWORD] = 'p1';
-      EduHttpClient.setLoginHandlerForTest((_, __) async {
+      EduHttpClient.setLoginHandlerForTest((_, _) async {
         throw Exception('forced failure');
       });
       final client = EduHttpClient(baseUrl: 'http://api.test');
@@ -687,7 +687,7 @@ void main() {
       secureStore[PrefsKeys.USERNAME] = 'u2';
       secureStore[PrefsKeys.PASSWORD] = 'p2';
       LoginApi.setLoginOverrideForTest(
-        (_, __) async => LoginResponse(
+        (_, _) async => LoginResponse(
           success: true,
           studentId: '2026002',
           cookie: 'fallback-cookie',

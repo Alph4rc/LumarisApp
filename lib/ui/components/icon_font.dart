@@ -84,6 +84,9 @@ class IconUtil {
   // 添加一个静态方法来创建 IconData 实例，以解决 tree shaking 问题
   static IconData createIconData(int codePoint) {
     return IconData(
+      // codePoint 来自运行时解析的 iconfont.json，无法是编译期常量。
+      // 项目构建已通过 --no-tree-shake-icons 关闭图标 tree-shaking，故此处可安全忽略。
+      // ignore: non_const_argument_for_const_parameter
       codePoint,
       fontFamily: 'IconFont',
       matchTextDirection: false,

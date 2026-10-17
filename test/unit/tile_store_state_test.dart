@@ -134,7 +134,7 @@ void main() {
             .overrideWithValue(() async => 'student-1'),
         paymentPasswordReaderProvider
             .overrideWithValue(() async => 'meal-card-secret'),
-        paymentDataFetcherProvider.overrideWithValue((_, __) async {
+        paymentDataFetcherProvider.overrideWithValue((_, _) async {
           throw Exception('network error');
         }),
         tileVisibilityReaderProvider.overrideWithValue((_) async => true),

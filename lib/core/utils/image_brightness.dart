@@ -17,7 +17,7 @@ Future<bool?> computeImageIsDark(String imagePath) async {
       bytes = await loadLocalImageBytes(imagePath);
     }
     if (bytes == null) return null;
-    return compute(_computeIsDarkFromBytes, bytes);
+    return await compute(_computeIsDarkFromBytes, bytes);
   } catch (e) {
     debugPrint('computeImageIsDark error: $e');
     return null;

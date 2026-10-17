@@ -26,7 +26,7 @@ List<Override> _overrides() => [
       studentIsLoginReaderProvider.overrideWithValue(() => true),
       paymentStudentIdReaderProvider.overrideWithValue(() async => 'student-1'),
       paymentDataFetcherProvider.overrideWithValue(
-        (_, __) async => const PaymentData([], 20),
+        (_, _) async => const PaymentData([], 20),
       ),
       tileVisibilityReaderProvider.overrideWithValue((_) async => true),
     ];

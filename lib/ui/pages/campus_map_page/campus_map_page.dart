@@ -152,7 +152,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       : const LatLng(34.2312, 108.9632),
                   initialZoom: 16.0,
                   maxZoom: _maxMapZoom,
-                  onTap: (_, __) {
+                  onTap: (_, _) {
                     setState(() => _selectedPOI = null);
                     if (_sheetController.isAttached) {
                       _sheetController.animateTo(
@@ -707,7 +707,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 child: ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   itemCount: filteredPOIs.length,
-                  separatorBuilder: (_, __) => Padding(
+                  separatorBuilder: (_, _) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Divider(
                         height: 1,
