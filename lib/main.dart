@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:display_mode/display_mode.dart';
 import 'package:feedback_sdk/feedback_sdk.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/basic/services/basic_http_client_manager.dart';
 import 'package:ios_club_app/state/auth_state_notifier.dart';
@@ -32,7 +32,6 @@ import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
@@ -187,16 +186,18 @@ class _AppLauncher extends ConsumerWidget {
       supportedLocales: AppLocaleService.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
       ],
       theme: ClubTheme.lightTheme(fontFamily: fontFamily, locale: locale),
       darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily, locale: locale),
       themeMode: settingsStore.themeMode,
       routerConfig: router,
-      builder: (context, child) =>
-          _buildAppShell(child ?? const SizedBox.shrink()),
+      // 部分第三方依赖仍引用旧 SDK 的 material/cupertino，兼容桥为其注入
+      // 旧版 Theme/Localizations，待依赖完成迁移后移除。
+      // ignore: deprecated_member_use
+      builder: (context, child) => MaterialUiCompatibilityBridge(
+        child: _buildAppShell(child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

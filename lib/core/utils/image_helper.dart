@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'image_helper_stub.dart'
     if (dart.library.io) 'image_helper_io.dart'

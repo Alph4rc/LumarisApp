@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -36,7 +36,10 @@ Future<ProviderContainer> _createLoggedInContainer(
 Widget _wrapWithApp(Widget child) {
   return MaterialApp(
     locale: const Locale('zh'),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      ...GlobalMaterialLocalizations.delegates,
+    ],
     supportedLocales: AppLocalizations.supportedLocales,
     theme: ClubTheme.lightTheme(),
     darkTheme: ClubTheme.darkTheme(),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class BottomNavigation extends StatelessWidget {

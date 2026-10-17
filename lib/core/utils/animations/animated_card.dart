@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
 
 /// 带有进入动画的卡片

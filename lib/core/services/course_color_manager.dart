@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CourseColorManager {
   static Color generateSoftColor(Object key, {bool isDark = false}) {

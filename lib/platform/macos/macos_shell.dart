@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/platform/macos/macos_sidebar.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
