@@ -1817,6 +1817,92 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get icp => 'ICP备案号';
+
+  @override
+  String get mcpTitle => '光序 MCP';
+
+  @override
+  String get mcpSubtitle => '在 AI 客户端中接入光序数据';
+
+  @override
+  String get mcpServerSection => '服务';
+
+  @override
+  String get mcpServerAddress => '服务地址';
+
+  @override
+  String get mcpTokenSection => '访问令牌';
+
+  @override
+  String get mcpTokenLabel => 'Bearer Token';
+
+  @override
+  String get mcpTokenHint => '留空则不发送 Authorization';
+
+  @override
+  String get mcpTokenSaved => '令牌已保存';
+
+  @override
+  String get mcpTokenNotSet => '未设置令牌';
+
+  @override
+  String get mcpTokenUnsaved => '未保存';
+
+  @override
+  String get mcpTokenSaveFailed => '令牌保存失败，请重试';
+
+  @override
+  String get mcpTokenClearConfirm => '确定要清除已保存的令牌吗？';
+
+  @override
+  String get mcpConfigSection => '配置';
+
+  @override
+  String get mcpConfigSubtitle => '将以下内容粘贴到支持 MCP 的客户端';
+
+  @override
+  String get mcpCopyJson => '复制 JSON 配置';
+
+  @override
+  String get mcpCopyCli => '复制 Claude Code 命令';
+
+  @override
+  String get mcpConnectionSection => '连通性';
+
+  @override
+  String get mcpTestConnection => '测试连接';
+
+  @override
+  String get mcpTesting => '正在测试连接…';
+
+  @override
+  String get mcpTestSuccess => '连接成功';
+
+  @override
+  String mcpToolCount(int count) {
+    return '可用工具（$count）';
+  }
+
+  @override
+  String get mcpNoTokenHint => '未填写令牌，将以匿名方式测试';
+
+  @override
+  String get mcpSecurityNote => '令牌仅保存在本机安全存储中；配置包含明文令牌，请勿分享';
+
+  @override
+  String get mcpErrorAuth => '鉴权失败，请检查令牌是否正确';
+
+  @override
+  String get mcpErrorRateLimited => '请求过于频繁，请稍后再试';
+
+  @override
+  String get mcpErrorNetwork => '连接超时或网络不可用';
+
+  @override
+  String get mcpErrorServer => '服务端暂时不可用，请稍后再试';
+
+  @override
+  String get mcpErrorProtocol => '响应格式异常，无法解析 MCP 服务';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3633,4 +3719,90 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => '光序 MCP';
+
+  @override
+  String get mcpSubtitle => '在 AI 用戶端中存取光序資料';
+
+  @override
+  String get mcpServerSection => '服務';
+
+  @override
+  String get mcpServerAddress => '服務位址';
+
+  @override
+  String get mcpTokenSection => '存取權杖';
+
+  @override
+  String get mcpTokenLabel => 'Bearer 權杖';
+
+  @override
+  String get mcpTokenHint => '留空則不傳送 Authorization';
+
+  @override
+  String get mcpTokenSaved => '權杖已儲存';
+
+  @override
+  String get mcpTokenNotSet => '未設定權杖';
+
+  @override
+  String get mcpTokenUnsaved => '未儲存';
+
+  @override
+  String get mcpTokenSaveFailed => '權杖儲存失敗，請重試';
+
+  @override
+  String get mcpTokenClearConfirm => '確定要清除已儲存的權杖嗎？';
+
+  @override
+  String get mcpConfigSection => '設定';
+
+  @override
+  String get mcpConfigSubtitle => '將以下內容貼到支援 MCP 的用戶端';
+
+  @override
+  String get mcpCopyJson => '複製 JSON 設定';
+
+  @override
+  String get mcpCopyCli => '複製 Claude Code 指令';
+
+  @override
+  String get mcpConnectionSection => '連線狀態';
+
+  @override
+  String get mcpTestConnection => '測試連線';
+
+  @override
+  String get mcpTesting => '正在測試連線…';
+
+  @override
+  String get mcpTestSuccess => '連線成功';
+
+  @override
+  String mcpToolCount(int count) {
+    return '可用工具（$count）';
+  }
+
+  @override
+  String get mcpNoTokenHint => '未填寫權杖，將以匿名方式測試';
+
+  @override
+  String get mcpSecurityNote => '權杖僅儲存在本機安全儲存區；設定含有明文權杖，請勿分享';
+
+  @override
+  String get mcpErrorAuth => '驗證失敗，請檢查權杖是否正確';
+
+  @override
+  String get mcpErrorRateLimited => '請求過於頻繁，請稍後再試';
+
+  @override
+  String get mcpErrorNetwork => '連線逾時或網路不可用';
+
+  @override
+  String get mcpErrorServer => '伺服器暫時無法使用，請稍後再試';
+
+  @override
+  String get mcpErrorProtocol => '回應格式異常，無法解析 MCP 服務';
 }

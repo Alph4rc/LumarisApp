@@ -1895,4 +1895,94 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => 'Lumaris MCP';
+
+  @override
+  String get mcpSubtitle => 'Подключите данные Lumaris к AI-клиентам';
+
+  @override
+  String get mcpServerSection => 'Сервер';
+
+  @override
+  String get mcpServerAddress => 'Адрес сервера';
+
+  @override
+  String get mcpTokenSection => 'Токен доступа';
+
+  @override
+  String get mcpTokenLabel => 'Bearer-токен';
+
+  @override
+  String get mcpTokenHint =>
+      'Оставьте пустым, чтобы не отправлять Authorization';
+
+  @override
+  String get mcpTokenSaved => 'Токен сохранён';
+
+  @override
+  String get mcpTokenNotSet => 'Токен не задан';
+
+  @override
+  String get mcpTokenUnsaved => 'Не сохранено';
+
+  @override
+  String get mcpTokenSaveFailed =>
+      'Не удалось сохранить токен. Повторите попытку.';
+
+  @override
+  String get mcpTokenClearConfirm => 'Удалить сохранённый токен?';
+
+  @override
+  String get mcpConfigSection => 'Конфигурация';
+
+  @override
+  String get mcpConfigSubtitle => 'Вставьте это в клиент с поддержкой MCP';
+
+  @override
+  String get mcpCopyJson => 'Копировать JSON-конфигурацию';
+
+  @override
+  String get mcpCopyCli => 'Копировать команду Claude Code';
+
+  @override
+  String get mcpConnectionSection => 'Подключение';
+
+  @override
+  String get mcpTestConnection => 'Проверить подключение';
+
+  @override
+  String get mcpTesting => 'Проверка подключения…';
+
+  @override
+  String get mcpTestSuccess => 'Подключение успешно';
+
+  @override
+  String mcpToolCount(int count) {
+    return 'Доступные инструменты ($count)';
+  }
+
+  @override
+  String get mcpNoTokenHint => 'Токен не указан; проверка выполняется анонимно';
+
+  @override
+  String get mcpSecurityNote =>
+      'Токен хранится только в защищённом хранилище устройства. Конфигурация содержит токен в открытом виде — не делитесь ею.';
+
+  @override
+  String get mcpErrorAuth => 'Ошибка авторизации. Проверьте токен.';
+
+  @override
+  String get mcpErrorRateLimited => 'Слишком много запросов. Повторите позже.';
+
+  @override
+  String get mcpErrorNetwork => 'Время подключения истекло или сеть недоступна';
+
+  @override
+  String get mcpErrorServer => 'Сервер временно недоступен. Повторите позже.';
+
+  @override
+  String get mcpErrorProtocol =>
+      'Неверный формат ответа; не удалось разобрать службу MCP';
 }

@@ -107,6 +107,17 @@ class SettingPage extends ConsumerWidget {
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
                   _buildClearCacheTile(context),
+                  ClubListTile(
+                    leading: Icon(
+                      CupertinoIcons.link,
+                      size: 20,
+                      color: colors.primary,
+                    ),
+                    title: Text(context.l10n.mcpTitle),
+                    subtitle: Text(context.l10n.mcpSubtitle),
+                    showChevron: true,
+                    onTap: () => AppRouter.push(AppRoutes.mcp),
+                  ),
                   if (userState.isLogin) _buildLogoutTile(context, userStore),
                   ClubListTile(
                     contentPadding: const EdgeInsets.symmetric(

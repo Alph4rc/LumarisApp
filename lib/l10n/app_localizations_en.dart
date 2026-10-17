@@ -1890,4 +1890,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => 'Lumaris MCP';
+
+  @override
+  String get mcpSubtitle => 'Connect Lumaris data to AI clients';
+
+  @override
+  String get mcpServerSection => 'Server';
+
+  @override
+  String get mcpServerAddress => 'Server address';
+
+  @override
+  String get mcpTokenSection => 'Access token';
+
+  @override
+  String get mcpTokenLabel => 'Bearer token';
+
+  @override
+  String get mcpTokenHint => 'Leave empty to omit the Authorization header';
+
+  @override
+  String get mcpTokenSaved => 'Token saved';
+
+  @override
+  String get mcpTokenNotSet => 'No token set';
+
+  @override
+  String get mcpTokenUnsaved => 'Not saved';
+
+  @override
+  String get mcpTokenSaveFailed => 'Failed to save token. Please try again.';
+
+  @override
+  String get mcpTokenClearConfirm => 'Clear the saved token?';
+
+  @override
+  String get mcpConfigSection => 'Configuration';
+
+  @override
+  String get mcpConfigSubtitle => 'Paste this into an MCP-capable client';
+
+  @override
+  String get mcpCopyJson => 'Copy JSON config';
+
+  @override
+  String get mcpCopyCli => 'Copy Claude Code command';
+
+  @override
+  String get mcpConnectionSection => 'Connectivity';
+
+  @override
+  String get mcpTestConnection => 'Test connection';
+
+  @override
+  String get mcpTesting => 'Testing connection…';
+
+  @override
+  String get mcpTestSuccess => 'Connection successful';
+
+  @override
+  String mcpToolCount(int count) {
+    return 'Available tools ($count)';
+  }
+
+  @override
+  String get mcpNoTokenHint => 'No token provided; testing anonymously';
+
+  @override
+  String get mcpSecurityNote =>
+      'The token is stored only in this device\'s secure storage. The config contains the token in plain text—do not share it.';
+
+  @override
+  String get mcpErrorAuth => 'Authentication failed. Check your token.';
+
+  @override
+  String get mcpErrorRateLimited =>
+      'Too many requests. Please try again later.';
+
+  @override
+  String get mcpErrorNetwork => 'Connection timed out or network unavailable';
+
+  @override
+  String get mcpErrorServer =>
+      'Server temporarily unavailable. Please try again later.';
+
+  @override
+  String get mcpErrorProtocol =>
+      'Unexpected response format; could not parse the MCP service';
 }

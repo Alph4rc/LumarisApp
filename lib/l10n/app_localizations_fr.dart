@@ -1914,4 +1914,98 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => 'Lumaris MCP';
+
+  @override
+  String get mcpSubtitle => 'Connectez les données Lumaris aux clients IA';
+
+  @override
+  String get mcpServerSection => 'Serveur';
+
+  @override
+  String get mcpServerAddress => 'Adresse du serveur';
+
+  @override
+  String get mcpTokenSection => 'Jeton d\'accès';
+
+  @override
+  String get mcpTokenLabel => 'Jeton Bearer';
+
+  @override
+  String get mcpTokenHint =>
+      'Laissez vide pour ne pas envoyer l\'en-tête Authorization';
+
+  @override
+  String get mcpTokenSaved => 'Jeton enregistré';
+
+  @override
+  String get mcpTokenNotSet => 'Aucun jeton défini';
+
+  @override
+  String get mcpTokenUnsaved => 'Non enregistré';
+
+  @override
+  String get mcpTokenSaveFailed =>
+      'Échec de l\'enregistrement du jeton. Veuillez réessayer.';
+
+  @override
+  String get mcpTokenClearConfirm => 'Effacer le jeton enregistré ?';
+
+  @override
+  String get mcpConfigSection => 'Configuration';
+
+  @override
+  String get mcpConfigSubtitle => 'Collez ceci dans un client compatible MCP';
+
+  @override
+  String get mcpCopyJson => 'Copier la configuration JSON';
+
+  @override
+  String get mcpCopyCli => 'Copier la commande Claude Code';
+
+  @override
+  String get mcpConnectionSection => 'Connectivité';
+
+  @override
+  String get mcpTestConnection => 'Tester la connexion';
+
+  @override
+  String get mcpTesting => 'Test de la connexion…';
+
+  @override
+  String get mcpTestSuccess => 'Connexion réussie';
+
+  @override
+  String mcpToolCount(int count) {
+    return 'Outils disponibles ($count)';
+  }
+
+  @override
+  String get mcpNoTokenHint => 'Aucun jeton fourni ; test anonyme';
+
+  @override
+  String get mcpSecurityNote =>
+      'Le jeton est stocké uniquement dans le stockage sécurisé de cet appareil. La configuration contient le jeton en clair — ne la partagez pas.';
+
+  @override
+  String get mcpErrorAuth =>
+      'Échec de l\'authentification. Vérifiez votre jeton.';
+
+  @override
+  String get mcpErrorRateLimited =>
+      'Trop de requêtes. Veuillez réessayer plus tard.';
+
+  @override
+  String get mcpErrorNetwork =>
+      'Délai de connexion dépassé ou réseau indisponible';
+
+  @override
+  String get mcpErrorServer =>
+      'Serveur temporairement indisponible. Veuillez réessayer plus tard.';
+
+  @override
+  String get mcpErrorProtocol =>
+      'Format de réponse inattendu ; impossible d\'analyser le service MCP';
 }

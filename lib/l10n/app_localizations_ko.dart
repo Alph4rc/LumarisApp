@@ -1836,4 +1836,91 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => 'Lumaris MCP';
+
+  @override
+  String get mcpSubtitle => 'AI 클라이언트에서 Lumaris 데이터에 연결';
+
+  @override
+  String get mcpServerSection => '서버';
+
+  @override
+  String get mcpServerAddress => '서버 주소';
+
+  @override
+  String get mcpTokenSection => '액세스 토큰';
+
+  @override
+  String get mcpTokenLabel => 'Bearer 토큰';
+
+  @override
+  String get mcpTokenHint => '비워 두면 Authorization을 보내지 않습니다';
+
+  @override
+  String get mcpTokenSaved => '토큰이 저장되었습니다';
+
+  @override
+  String get mcpTokenNotSet => '토큰이 설정되지 않았습니다';
+
+  @override
+  String get mcpTokenUnsaved => '저장되지 않음';
+
+  @override
+  String get mcpTokenSaveFailed => '토큰 저장에 실패했습니다. 다시 시도해 주세요.';
+
+  @override
+  String get mcpTokenClearConfirm => '저장된 토큰을 삭제할까요?';
+
+  @override
+  String get mcpConfigSection => '설정';
+
+  @override
+  String get mcpConfigSubtitle => 'MCP 지원 클라이언트에 아래 내용을 붙여넣으세요';
+
+  @override
+  String get mcpCopyJson => 'JSON 설정 복사';
+
+  @override
+  String get mcpCopyCli => 'Claude Code 명령 복사';
+
+  @override
+  String get mcpConnectionSection => '연결';
+
+  @override
+  String get mcpTestConnection => '연결 테스트';
+
+  @override
+  String get mcpTesting => '연결을 테스트하는 중…';
+
+  @override
+  String get mcpTestSuccess => '연결에 성공했습니다';
+
+  @override
+  String mcpToolCount(int count) {
+    return '사용 가능한 도구($count)';
+  }
+
+  @override
+  String get mcpNoTokenHint => '토큰을 입력하지 않아 익명으로 테스트합니다';
+
+  @override
+  String get mcpSecurityNote =>
+      '토큰은 이 기기의 보안 저장소에만 저장됩니다. 설정에 평문 토큰이 포함되므로 공유하지 마세요.';
+
+  @override
+  String get mcpErrorAuth => '인증에 실패했습니다. 토큰을 확인하세요.';
+
+  @override
+  String get mcpErrorRateLimited => '요청이 너무 많습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get mcpErrorNetwork => '연결 시간이 초과되었거나 네트워크를 사용할 수 없습니다';
+
+  @override
+  String get mcpErrorServer => '서버를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get mcpErrorProtocol => '응답 형식이 올바르지 않아 MCP 서비스를 해석할 수 없습니다';
 }

@@ -1927,4 +1927,98 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => 'Lumaris MCP';
+
+  @override
+  String get mcpSubtitle => 'Lumaris-Daten mit KI-Clients verbinden';
+
+  @override
+  String get mcpServerSection => 'Server';
+
+  @override
+  String get mcpServerAddress => 'Serveradresse';
+
+  @override
+  String get mcpTokenSection => 'Zugriffstoken';
+
+  @override
+  String get mcpTokenLabel => 'Bearer-Token';
+
+  @override
+  String get mcpTokenHint =>
+      'Leer lassen, um den Authorization-Header nicht zu senden';
+
+  @override
+  String get mcpTokenSaved => 'Token gespeichert';
+
+  @override
+  String get mcpTokenNotSet => 'Kein Token festgelegt';
+
+  @override
+  String get mcpTokenUnsaved => 'Nicht gespeichert';
+
+  @override
+  String get mcpTokenSaveFailed =>
+      'Token konnte nicht gespeichert werden. Bitte erneut versuchen.';
+
+  @override
+  String get mcpTokenClearConfirm => 'Gespeichertes Token löschen?';
+
+  @override
+  String get mcpConfigSection => 'Konfiguration';
+
+  @override
+  String get mcpConfigSubtitle => 'Füge dies in einen MCP-fähigen Client ein';
+
+  @override
+  String get mcpCopyJson => 'JSON-Konfiguration kopieren';
+
+  @override
+  String get mcpCopyCli => 'Claude-Code-Befehl kopieren';
+
+  @override
+  String get mcpConnectionSection => 'Konnektivität';
+
+  @override
+  String get mcpTestConnection => 'Verbindung testen';
+
+  @override
+  String get mcpTesting => 'Verbindung wird getestet…';
+
+  @override
+  String get mcpTestSuccess => 'Verbindung erfolgreich';
+
+  @override
+  String mcpToolCount(int count) {
+    return 'Verfügbare Tools ($count)';
+  }
+
+  @override
+  String get mcpNoTokenHint => 'Kein Token angegeben; Test erfolgt anonym';
+
+  @override
+  String get mcpSecurityNote =>
+      'Das Token wird nur im sicheren Speicher dieses Geräts gespeichert. Die Konfiguration enthält das Token im Klartext – bitte nicht weitergeben.';
+
+  @override
+  String get mcpErrorAuth =>
+      'Authentifizierung fehlgeschlagen. Prüfe das Token.';
+
+  @override
+  String get mcpErrorRateLimited =>
+      'Zu viele Anfragen. Bitte später erneut versuchen.';
+
+  @override
+  String get mcpErrorNetwork =>
+      'Zeitüberschreitung oder Netzwerk nicht verfügbar';
+
+  @override
+  String get mcpErrorServer =>
+      'Server vorübergehend nicht verfügbar. Bitte später erneut versuchen.';
+
+  @override
+  String get mcpErrorProtocol =>
+      'Unerwartetes Antwortformat; MCP-Dienst konnte nicht verarbeitet werden';
 }

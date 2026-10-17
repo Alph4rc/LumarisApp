@@ -1821,4 +1821,91 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get icp => 'ICP';
+
+  @override
+  String get mcpTitle => 'Lumaris MCP';
+
+  @override
+  String get mcpSubtitle => 'AI クライアントから Lumaris のデータに接続';
+
+  @override
+  String get mcpServerSection => 'サーバー';
+
+  @override
+  String get mcpServerAddress => 'サーバーアドレス';
+
+  @override
+  String get mcpTokenSection => 'アクセストークン';
+
+  @override
+  String get mcpTokenLabel => 'Bearer トークン';
+
+  @override
+  String get mcpTokenHint => '空欄の場合は Authorization を送信しません';
+
+  @override
+  String get mcpTokenSaved => 'トークンを保存しました';
+
+  @override
+  String get mcpTokenNotSet => 'トークン未設定';
+
+  @override
+  String get mcpTokenUnsaved => '未保存';
+
+  @override
+  String get mcpTokenSaveFailed => 'トークンの保存に失敗しました。もう一度お試しください。';
+
+  @override
+  String get mcpTokenClearConfirm => '保存したトークンを削除しますか？';
+
+  @override
+  String get mcpConfigSection => '設定';
+
+  @override
+  String get mcpConfigSubtitle => 'MCP 対応クライアントに以下を貼り付けてください';
+
+  @override
+  String get mcpCopyJson => 'JSON 設定をコピー';
+
+  @override
+  String get mcpCopyCli => 'Claude Code コマンドをコピー';
+
+  @override
+  String get mcpConnectionSection => '接続';
+
+  @override
+  String get mcpTestConnection => '接続テスト';
+
+  @override
+  String get mcpTesting => '接続をテストしています…';
+
+  @override
+  String get mcpTestSuccess => '接続に成功しました';
+
+  @override
+  String mcpToolCount(int count) {
+    return '利用可能なツール（$count）';
+  }
+
+  @override
+  String get mcpNoTokenHint => 'トークンが未入力のため、匿名でテストします';
+
+  @override
+  String get mcpSecurityNote =>
+      'トークンはこの端末のセキュアストレージにのみ保存されます。設定には平文のトークンが含まれるため、共有しないでください。';
+
+  @override
+  String get mcpErrorAuth => '認証に失敗しました。トークンを確認してください。';
+
+  @override
+  String get mcpErrorRateLimited => 'リクエストが多すぎます。しばらくしてから再試行してください。';
+
+  @override
+  String get mcpErrorNetwork => '接続がタイムアウトしたか、ネットワークを利用できません';
+
+  @override
+  String get mcpErrorServer => 'サーバーは一時的に利用できません。しばらくしてから再試行してください。';
+
+  @override
+  String get mcpErrorProtocol => '応答形式が不正です。MCP サービスを解析できませんでした';
 }

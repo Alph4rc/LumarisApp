@@ -3605,6 +3605,174 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'ICP备案号'**
   String get icp;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'光序 MCP'**
+  String get mcpTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'在 AI 客户端中接入光序数据'**
+  String get mcpSubtitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'服务'**
+  String get mcpServerSection;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'服务地址'**
+  String get mcpServerAddress;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'访问令牌'**
+  String get mcpTokenSection;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'Bearer Token'**
+  String get mcpTokenLabel;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'留空则不发送 Authorization'**
+  String get mcpTokenHint;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'令牌已保存'**
+  String get mcpTokenSaved;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'未设置令牌'**
+  String get mcpTokenNotSet;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'未保存'**
+  String get mcpTokenUnsaved;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'令牌保存失败，请重试'**
+  String get mcpTokenSaveFailed;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要清除已保存的令牌吗？'**
+  String get mcpTokenClearConfirm;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'配置'**
+  String get mcpConfigSection;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'将以下内容粘贴到支持 MCP 的客户端'**
+  String get mcpConfigSubtitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'复制 JSON 配置'**
+  String get mcpCopyJson;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'复制 Claude Code 命令'**
+  String get mcpCopyCli;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'连通性'**
+  String get mcpConnectionSection;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'测试连接'**
+  String get mcpTestConnection;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'正在测试连接…'**
+  String get mcpTesting;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'连接成功'**
+  String get mcpTestSuccess;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'可用工具（{count}）'**
+  String mcpToolCount(int count);
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'未填写令牌，将以匿名方式测试'**
+  String get mcpNoTokenHint;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'令牌仅保存在本机安全存储中；配置包含明文令牌，请勿分享'**
+  String get mcpSecurityNote;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'鉴权失败，请检查令牌是否正确'**
+  String get mcpErrorAuth;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'请求过于频繁，请稍后再试'**
+  String get mcpErrorRateLimited;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'连接超时或网络不可用'**
+  String get mcpErrorNetwork;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'服务端暂时不可用，请稍后再试'**
+  String get mcpErrorServer;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'响应格式异常，无法解析 MCP 服务'**
+  String get mcpErrorProtocol;
 }
 
 class _AppLocalizationsDelegate
