@@ -8,6 +8,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/services/schedule_time_service.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/basic/services/school_config_cache.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/models/time_info.dart';
@@ -335,15 +336,44 @@ class TaskExecutor {
       // 预加载数据（只请求一次）
       await _preloadData();
 
-      // 并行更新两个小组件
-      await Future.wait([
-        _updateTodayWidgetFromCache(),
-        _updateTodayAndTomorrowWidgetFromCache(),
-      ]);
+      if (PlatformUtils.isIOS) {
+        // iOS 小组件拿整学期快照自行推算时间线，不需要 App 预先筛好当天课程
+        await _updateIOSScheduleSnapshot();
+      } else {
+        // 并行更新两个小组件
+        await Future.wait([
+          _updateTodayWidgetFromCache(),
+          _updateTodayAndTomorrowWidgetFromCache(),
+        ]);
+      }
     } catch (e) {
       AppLogger.debug('更新小组件失败: $e');
     } finally {
       _isExecuting = false;
+    }
+  }
+
+  /// 推送整学期课表快照给 iOS 小组件。
+  ///
+  /// 课程数据拿不到时直接跳过：宁可让小组件继续用上一份快照，也不要用空数据把它刷白。
+  static Future<void> _updateIOSScheduleSnapshot() async {
+    final courses = _cachedCourses;
+    if (courses == null) {
+      AppLogger.debug('没有课程缓存，跳过 iOS 小组件快照更新');
+      return;
+    }
+
+    try {
+      await WidgetService.updateScheduleSnapshot(
+        courses: courses,
+        tables: TimeService.tables,
+        semesterStart: _cachedTime?.startTime,
+        semesterEnd: _cachedTime?.endTime,
+        weekStartDay: _cachedWeekStartDay,
+      );
+      AppLogger.debug('iOS 小组件课表快照更新成功');
+    } catch (e) {
+      AppLogger.debug('更新 iOS 小组件课表快照失败: $e');
     }
   }
 

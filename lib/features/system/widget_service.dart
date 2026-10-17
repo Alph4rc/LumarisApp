@@ -3,13 +3,19 @@ import 'dart:convert';
 import 'package:home_widget/home_widget.dart';
 
 import 'package:ios_club_app/core/models/schedule_item.dart';
+import 'package:ios_club_app/core/services/time_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/basic/services/school_config_cache.dart';
+import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/features/education/services/edu_time_service.dart';
+import 'package:ios_club_app/features/system/widget_schedule_snapshot.dart';
 
 class WidgetService {
   static const String iOSWidgetGroupId = 'group.com.example.iosClubApp.widget';
+
+  /// iOS 小组件读取整学期课表快照的 key。
+  static const String iOSScheduleSnapshotKey = 'flutter.schedule';
   static bool _isInitialized = false;
 
   static Future<void> initialize() async {
@@ -29,6 +35,40 @@ class WidgetService {
     } catch (e) {
       AppLogger.warning('iOS 小组件 App Group 初始化失败', error: e);
     }
+  }
+
+  /// 推送整学期课表快照（仅 iOS）。
+  ///
+  /// 小组件拿到快照后自行推算今日/明日课表并生成多条 timeline entry，
+  /// App 不在前台也能按节次自动切换，不再依赖 App 反复写入当天课程。
+  static Future<void> updateScheduleSnapshot({
+    required List<CourseModel> courses,
+    required List<ScheduleTable> tables,
+    required String? semesterStart,
+    required String? semesterEnd,
+    required int weekStartDay,
+  }) async {
+    if (!PlatformUtils.isIOS) {
+      return;
+    }
+
+    await initialize();
+
+    final snapshot = WidgetScheduleSnapshot.build(
+      courses: courses,
+      tables: tables,
+      semesterStart: semesterStart,
+      semesterEnd: semesterEnd,
+      weekStartDay: weekStartDay,
+    );
+
+    await HomeWidget.saveWidgetData<String>(
+      iOSScheduleSnapshotKey,
+      jsonEncode(snapshot),
+    );
+
+    await HomeWidget.updateWidget(iOSName: 'ScheduleWidget');
+    AppLogger.debug('iOS 小组件课表快照更新完成');
   }
 
   // 更新小组件数据
