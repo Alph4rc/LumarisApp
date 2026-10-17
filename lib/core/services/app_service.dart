@@ -6,6 +6,7 @@ import 'package:ios_club_app/features/education/models/release_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
+import 'package:ios_club_app/core/utils/target_abi.dart';
 
 class AppService {
   static Future<ReleaseModel> getReleases() async {
@@ -158,13 +159,7 @@ class ReleaseModel {
     return ReleaseModel(
       name: releaseInfo.name ?? '0.0.0',
       body: releaseInfo.body ?? '',
-      downloadUrl: releaseInfo.assets
-          ?.map((asset) => asset.browserDownloadUrl?.trim())
-          .whereType<String>()
-          .firstWhere(
-            (url) => url.isNotEmpty && url.toLowerCase().contains('apk'),
-            orElse: () => '',
-          ),
+      downloadUrl: _selectDownloadUrl(releaseInfo.assets),
     );
   }
 
@@ -175,4 +170,60 @@ class ReleaseModel {
       downloadUrl: json['downloadUrl'],
     );
   }
+}
+
+/// 服务端没有指定 ABI 时的兜底顺序；arm64 覆盖绝大多数真机。
+const _abiFallback = ['arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'];
+
+/// 从平台返回的 assets 里挑出适合当前设备的 APK。
+///
+/// 服务端已经把 arm64 排在前面（老版本只会取第一条），这里再按设备 ABI
+/// 精确匹配一次，避免 armeabi-v7a 或 x86 设备拿到装不上的包。
+String? _selectDownloadUrl(List<AssetInfo>? assets) {
+  final candidates = <_ApkAsset>[];
+  for (final asset in assets ?? const <AssetInfo>[]) {
+    final url = asset.browserDownloadUrl?.trim() ?? '';
+    if (url.isEmpty || !url.toLowerCase().contains('apk')) {
+      continue;
+    }
+    candidates.add(_ApkAsset(name: asset.name ?? '', url: url));
+  }
+  if (candidates.isEmpty) {
+    return null;
+  }
+
+  final deviceAbi = currentTargetAbi();
+  if (deviceAbi != null) {
+    for (final candidate in candidates) {
+      if (_matchesAbi(candidate.haystack, deviceAbi)) {
+        return candidate.url;
+      }
+    }
+  }
+  for (final abi in _abiFallback) {
+    for (final candidate in candidates) {
+      if (_matchesAbi(candidate.haystack, abi)) {
+        return candidate.url;
+      }
+    }
+  }
+  return candidates.first.url;
+}
+
+bool _matchesAbi(String haystack, String abi) {
+  if (abi == 'x86') {
+    // x86_64 也包含 "x86"，必须先排除掉 64 位包。
+    return haystack.contains('x86') &&
+        !haystack.contains('x86_64') &&
+        !haystack.contains('x86-64');
+  }
+  return haystack.contains(abi);
+}
+
+class _ApkAsset {
+  _ApkAsset({required String name, required this.url})
+    : haystack = '$name $url'.toLowerCase();
+
+  final String url;
+  final String haystack;
 }

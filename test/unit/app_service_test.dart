@@ -93,4 +93,59 @@ void main() {
       );
     });
   });
+
+  group('ReleaseModel ABI selection', () {
+    ReleaseInfo releaseWith(List<AssetInfo> assets) => ReleaseInfo(
+          id: 1,
+          name: '1.2.2',
+          body: 'release notes',
+          createdAt: DateTime.parse('2026-10-17T00:00:00Z'),
+          assets: assets,
+        );
+
+    AssetInfo apk(String fileName) => AssetInfo(
+          browserDownloadUrl: 'https://example.com/$fileName',
+          name: 'Downloader $fileName',
+        );
+
+    test('should_pick_arm64_when_server_lists_x86_first', () {
+      final release = ReleaseModel.fromReleaseInfo(releaseWith([
+        apk('app-x86_64-release.apk'),
+        apk('app-armeabi-v7a-release.apk'),
+        apk('app-arm64-v8a-release.apk'),
+      ]));
+
+      expect(
+        AppService.getReleaseDownloadUrl(release),
+        'https://example.com/app-arm64-v8a-release.apk',
+      );
+    });
+
+    test('should_fall_back_to_armeabi_v7a_when_arm64_is_absent', () {
+      final release = ReleaseModel.fromReleaseInfo(releaseWith([
+        apk('app-x86_64-release.apk'),
+        apk('app-armeabi-v7a-release.apk'),
+      ]));
+
+      expect(
+        AppService.getReleaseDownloadUrl(release),
+        'https://example.com/app-armeabi-v7a-release.apk',
+      );
+    });
+
+    test('should_ignore_non_apk_assets', () {
+      final release = ReleaseModel.fromReleaseInfo(releaseWith([
+        AssetInfo(
+          browserDownloadUrl: 'https://example.com/notes.txt',
+          name: 'notes.txt',
+        ),
+        apk('app-arm64-v8a-release.apk'),
+      ]));
+
+      expect(
+        AppService.getReleaseDownloadUrl(release),
+        'https://example.com/app-arm64-v8a-release.apk',
+      );
+    });
+  });
 }
