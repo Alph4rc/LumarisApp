@@ -124,7 +124,8 @@ void main() {
       expect(state.busData, hasLength(1));
       expect(state.todayBusData, hasLength(1));
       expect(state.busData.single.lineName, '草堂-雁塔');
-      expect(state.errorMessage, '刷新失败，已保留上次校车数据');
+      // notifier 层只暴露错误码，文案由 UI 层的 resolveErrorMessage 解析。
+      expect(state.errorMessage, 'stale_data');
     });
   });
 }

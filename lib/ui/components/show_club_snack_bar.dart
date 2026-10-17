@@ -69,6 +69,7 @@ Widget _frostedContent(ClubColors colors, Widget child) {
     child: BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
       child: Container(
+        key: const ValueKey('club_snack_bar_content'),
         constraints: const BoxConstraints(maxWidth: 520),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/models/tile_configuration.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
 import 'package:ios_club_app/ui/components/tiles/tile_edit_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +30,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: _tileOverrides(),
-        child: const MaterialApp(home: Scaffold(body: TileEditControls())),
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const Scaffold(body: TileEditControls()),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -45,7 +51,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: _tileOverrides(),
-        child: const MaterialApp(home: Scaffold(body: AvailableTilesList())),
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const Scaffold(body: AvailableTilesList()),
+        ),
       ),
     );
     await tester.pumpAndSettle();

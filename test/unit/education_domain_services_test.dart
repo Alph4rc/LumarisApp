@@ -288,6 +288,7 @@ void main() {
           'expirationTime': '2026-03-23T00:00:00.000',
         },
       );
+      mockEduResponse(path: '/course/ScheduleTime', data: <dynamic>[]);
 
       final ok = await EducationRefreshService.loginAndRefresh('u', 'p');
       final week = await EduTimeService.getWeek();
@@ -350,6 +351,8 @@ void main() {
                 };
               case '/Info/Completion':
                 data = <Map<String, dynamic>>[];
+              case '/course/ScheduleTime':
+                data = <dynamic>[];
               case '/Course':
                 data = <String, dynamic>{
                   'success': true,
@@ -383,7 +386,10 @@ void main() {
         ),
       );
 
-      final ok = await EducationRefreshService.refreshWithExistingSession();
+      // 只有强制刷新才会拉取全部数据并绕过缓存。
+      final ok = await EducationRefreshService.refreshWithExistingSession(
+        isForced: true,
+      );
 
       expect(ok, isTrue);
       expect(seenPaths, {

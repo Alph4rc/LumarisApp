@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'package:smooth_corner/smooth_corner.dart';
 
 import 'theme_test_helpers.dart';
+
+const _contentKey = ValueKey('club_snack_bar_content');
 
 void main() {
   group('showClubSnackBar', () {
@@ -65,13 +64,18 @@ void main() {
       await tester.pumpAndSettle();
 
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      final shape = snackBar.shape as SmoothRectangleBorder;
+      final content = tester.widget<Container>(find.byKey(_contentKey));
+      final decoration = content.decoration! as BoxDecoration;
 
       expect(snackBar.behavior, SnackBarBehavior.floating);
       expect(snackBar.duration, const Duration(seconds: 2));
-      expect(shape.borderRadius, ClubRadii.card);
-      expect(shape.smoothness, clubCompactCornerSmoothness);
-      expect(snackBar.backgroundColor, ClubColors.light.cardBackground);
+      // 毛玻璃效果：SnackBar 本体透明，背景由内部磨砂容器提供。
+      expect(snackBar.backgroundColor, Colors.transparent);
+      expect(snackBar.elevation, 0);
+      expect(
+        decoration.color,
+        ClubColors.light.cardBackground.withValues(alpha: 0.8),
+      );
     });
 
     testWidgets('should use dark theme colors when theme mode is dark',
@@ -98,8 +102,12 @@ void main() {
       await tester.tap(find.text('显示 SnackBar'));
       await tester.pumpAndSettle();
 
-      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      expect(snackBar.backgroundColor, ClubColors.dark.cardBackground);
+      final content = tester.widget<Container>(find.byKey(_contentKey));
+      final decoration = content.decoration! as BoxDecoration;
+      expect(
+        decoration.color,
+        ClubColors.dark.cardBackground.withValues(alpha: 0.8),
+      );
     });
   });
 }

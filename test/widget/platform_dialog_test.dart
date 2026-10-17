@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 Widget _testApp({
   required Widget child,
 }) {
   return MaterialApp(
+    locale: const Locale('zh'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(
       body: child,
     ),

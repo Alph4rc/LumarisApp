@@ -31,7 +31,8 @@ class EducationRefreshService {
     if (!loginResult) {
       return false;
     }
-    return refreshWithExistingSession();
+    // 登录成功后必须强制刷新一次，确保课程、成绩、考试等数据已预加载。
+    return refreshWithExistingSession(isForced: true);
   }
 
   static Future<bool> refresh() async {

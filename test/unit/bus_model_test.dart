@@ -23,7 +23,8 @@ void main() {
       expect(model.records.length, 1);
       expect(model.records.first.lineName, '1号线');
       expect(model.records.first.runTime, '01:20');
-      expect(model.records.first.arrivalStationTime, '01小时 50分钟');
+      // 时长格式化已移至 UI 层（按当前语言显示），模型层保留原始 HH:mm。
+      expect(model.records.first.arrivalStationTime, '01:50');
       expect(model.records.first.arrivalTime, '3:10');
 
       final encoded = model.toJson();

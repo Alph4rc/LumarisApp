@@ -101,7 +101,11 @@ class ExamService {
       );
       final prefs = PrefsService.instance;
       final existingData = prefs.getString(PrefsKeys.EXAM_DATA) ?? '';
-      final mergedData = _mergeExamData(existingData, response, now);
+      // 合并后再过滤掉已结束的考试，避免过期数据继续留在缓存里。
+      final mergedData = _filterExpiredExams(
+        _mergeExamData(existingData, response, now),
+        now,
+      );
       final parsedExams = _parseExamItemsFromResponse(mergedData, now);
       final result = parsedExams.isEmpty
           ? ExamResult.empty()
@@ -200,6 +204,21 @@ class ExamService {
       AppLogger.debug('合并考试数据失败: $e');
       return newExams;
     }
+  }
+
+  static ExamResponse _filterExpiredExams(
+    ExamResponse response,
+    DateTime now,
+  ) {
+    final validExams = response.exams.where((item) {
+      final endTime = _parseExamTime(item.examTime, now);
+      return endTime != null && !now.isAfter(endTime);
+    }).toList();
+    return ExamResponse(
+      exams: validExams,
+      canClick: response.canClick,
+      error: response.error,
+    );
   }
 
   static DateTime? _parseExamTime(String examTime, DateTime now) {

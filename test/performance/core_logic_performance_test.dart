@@ -74,7 +74,8 @@ void main() {
 
       final payload = <String, dynamic>{
         'records': records,
-        'total': 49995000.0,
+        // PaymentData 的余额字段名为 balance（历史字段 total 已废弃）。
+        'balance': 49995000.0,
       };
 
       final sw = Stopwatch()..start();

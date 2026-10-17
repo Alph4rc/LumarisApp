@@ -5,18 +5,33 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/education/models/electric_data.dart';
 import 'package:ios_club_app/features/education/models/edu_api_models.dart';
 import 'package:ios_club_app/features/education/models/plan_course.dart';
+import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/services/electricity_service.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/program_page_notifier.dart';
 import 'package:ios_club_app/state/tile_store_providers.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
+import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/pages/electricity_page/electricity_page.dart';
 import 'package:ios_club_app/ui/pages/payment_page/payment_page.dart';
 import 'package:ios_club_app/ui/pages/program_page/program_page.dart';
 import 'package:ios_club_app/ui/pages/school_bus_page/school_bus_page.dart';
 import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// 创建已登录的容器：电费页和校车页对游客会直接显示登录引导，
+/// 不登录就渲染不到下拉刷新所在的页面。
+Future<ProviderContainer> _createLoggedInContainer(
+  List<Override> overrides,
+) async {
+  final container = ProviderContainer(overrides: overrides);
+  addTearDown(container.dispose);
+  await container.read(userStoreProvider.notifier).setUserData(
+        UserData(studentId: '2026001', cookie: 'session'),
+      );
+  return container;
+}
 
 Widget _wrapWithApp(Widget child) {
   return MaterialApp(
@@ -86,11 +101,13 @@ void main() {
   });
 
   testWidgets('ElectricityPage should expose pull to refresh', (tester) async {
+    final container = await _createLoggedInContainer([
+      tileStoreAutoLoadProvider.overrideWithValue(false),
+    ]);
+
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          tileStoreAutoLoadProvider.overrideWithValue(false),
-        ],
+      UncontrolledProviderScope(
+        container: container,
         child: _wrapWithApp(const ElectricityPage()),
       ),
     );
@@ -114,6 +131,9 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+    await container.read(userStoreProvider.notifier).setUserData(
+          UserData(studentId: '2026001', cookie: 'session'),
+        );
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -156,6 +176,9 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+    await container.read(userStoreProvider.notifier).setUserData(
+          UserData(studentId: '2026001', cookie: 'session'),
+        );
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -197,6 +220,9 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+    await container.read(userStoreProvider.notifier).setUserData(
+          UserData(studentId: '2026001', cookie: 'session'),
+        );
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -213,7 +239,8 @@ void main() {
     await tester.tap(find.text('已开启低余额提醒'));
     await tester.pumpAndSettle();
 
-    expect(find.text('订阅内容'), findsOneWidget);
+    // 「低余额订阅」同时是分区标题和弹窗标题。
+    expect(find.text('低余额订阅'), findsNWidgets(2));
     expect(find.text('提醒邮箱'), findsOneWidget);
     expect(find.text('codex@example.com'), findsOneWidget);
     expect(find.text('提醒阈值'), findsOneWidget);
@@ -251,6 +278,9 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+    await container.read(userStoreProvider.notifier).setUserData(
+          UserData(studentId: '2026001', cookie: 'session'),
+        );
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -274,11 +304,13 @@ void main() {
   });
 
   testWidgets('SchoolBusPage should expose pull to refresh', (tester) async {
+    final container = await _createLoggedInContainer([
+      busPageAutoLoadProvider.overrideWithValue(false),
+    ]);
+
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          busPageAutoLoadProvider.overrideWithValue(false),
-        ],
+      UncontrolledProviderScope(
+        container: container,
         child: _wrapWithApp(const SchoolBusPage()),
       ),
     );
