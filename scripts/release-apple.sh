@@ -20,6 +20,9 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+# 与 release.sh 保持一致：调用者的 cwd 可能是 scripts/ 之类的子目录。
+cd "${PROJECT_ROOT}"
+
 TARGETS=()
 UPLOAD="false"
 OUTPUT_DIR="dist"

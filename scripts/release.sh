@@ -178,7 +178,7 @@ PLIST
 build_apple_signed() {
   local target="$1"
   local platform_dir="${target}"
-  local workspace="${platform_dir}/Runner.xcworkspace"
+  local workspace="${PROJECT_ROOT}/${platform_dir}/Runner.xcworkspace"
   local archive_path="${PROJECT_ROOT}/build/${platform_dir}/Runner.xcarchive"
   local export_dir="${PROJECT_ROOT}/build/${platform_dir}/asc-export"
   local options_plist="${PROJECT_ROOT}/build/${platform_dir}/ExportOptions.plist"
@@ -507,6 +507,15 @@ main() {
   if [[ "${OUTPUT_DIR}" != /* ]]; then
     OUTPUT_DIR="${PROJECT_ROOT}/${OUTPUT_DIR}"
   fi
+
+  # 允许从任意子目录调用（例如在 scripts/ 里执行）。注意 flutter 只会把「它自己
+  # 进程」的 cwd 向上切到项目根，脚本进程的 cwd 不变，所以脚本要自己切；否则下面
+  # 裸调 xcodebuild 的 "-workspace ios/Runner.xcworkspace" 会指向错误目录。
+  # 相对的 ASC_API_KEY_PATH 语义属于调用者，必须先按调用时的 cwd 解析成绝对路径。
+  if [[ -n "${ASC_API_KEY_PATH:-}" && "${ASC_API_KEY_PATH}" != /* && -e "${ASC_API_KEY_PATH}" ]]; then
+    ASC_API_KEY_PATH="$(cd "$(dirname "${ASC_API_KEY_PATH}")" && pwd)/$(basename "${ASC_API_KEY_PATH}")"
+  fi
+  cd "${PROJECT_ROOT}"
 
   if [[ "${SKIP_CLEAN}" != "true" && ( "${action}" == "build" || "${action}" == "release" ) ]]; then
     require_command flutter
