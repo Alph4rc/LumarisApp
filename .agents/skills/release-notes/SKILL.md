@@ -21,7 +21,7 @@ description: 为「光序」整理面向用户的版本更新日志（新增 / �
 用脚本收集提交，不要手搓 git 命令：
 
 ```bash
-bash .claude/skills/release-notes/scripts/collect_commits.sh
+bash .agents/skills/release-notes/scripts/collect_commits.sh
 ```
 
 默认范围是「最近的 tag .. HEAD」。脚本会打印 pubspec 版本、tag 列表、提交清单，以及**标题看不出类型**的提交（`123`、`update` 这类）各自改了哪些文件——这类提交只能靠文件路径判断该不该收进日志。需要指定区间时传参：`collect_commits.sh <起始 ref> <结束 ref>`。
