@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,13 +17,9 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/ui/components/school_selector.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/optimized_image.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
@@ -46,7 +43,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _selectedSchool = ref.read(settingsStoreProvider.notifier).currentSchool ??
+    _selectedSchool =
+        ref.read(settingsStoreProvider.notifier).currentSchool ??
         School.fallbackList.first;
   }
 
@@ -59,10 +57,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Future<void> _login() async {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-      showClubSnackBar(
-        context,
-        Text(context.l10n.emptyCredentials),
-      );
+      McFeedback.showMessage(context, message: context.l10n.emptyCredentials);
       return;
     }
 
@@ -80,7 +75,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         onTimeout: () {
           AppLogger.warning('[LoginPage] 教务系统登录超时');
           if (mounted) {
-            showClubSnackBar(context, Text(context.l10n.loginTimeoutEdu));
+            McFeedback.showMessage(
+              context,
+              message: context.l10n.loginTimeoutEdu,
+            );
           }
           return false;
         },
@@ -95,9 +93,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       final saveLoginInfoSuccess = await _saveLoginInfo();
 
       if (!saveLoginInfoSuccess && mounted) {
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(context.l10n.loginSecurityStorageUnavailable),
+          message: context.l10n.loginSecurityStorageUnavailable,
         );
       }
 
@@ -115,13 +113,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } on TimeoutException catch (e) {
       AppLogger.warning('[LoginPage] 登录超时: $e');
       if (mounted) {
-        showClubSnackBar(context, Text(context.l10n.loginTimeout));
+        McFeedback.showMessage(context, message: context.l10n.loginTimeout);
       }
     } catch (e, stackTrace) {
       AppLogger.error('[LoginPage] 登录失败', error: e, stackTrace: stackTrace);
       if (mounted) {
-        showClubSnackBar(
-            context, Text('${context.l10n.loginFailed}: ${e.toString()}'));
+        McFeedback.showMessage(
+          context,
+          message: '${context.l10n.loginFailed}: ${e.toString()}',
+        );
       }
     } finally {
       if (mounted) {
@@ -147,10 +147,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     if (!loginResult) {
       if (mounted) {
-        showClubSnackBar(
-          context,
-          Text(context.l10n.loginFailed),
-        );
+        McFeedback.showMessage(context, message: context.l10n.loginFailed);
       }
       return false;
     }
@@ -168,12 +165,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     var saveSuccess = true;
 
     await prefs.setString(PrefsKeys.USERNAME, _usernameController.text);
-    saveSuccess = await secureStorage.write(
+    saveSuccess =
+        await secureStorage.write(
           key: PrefsKeys.USERNAME,
           value: _usernameController.text,
         ) &&
         saveSuccess;
-    saveSuccess = await secureStorage.write(
+    saveSuccess =
+        await secureStorage.write(
           key: PrefsKeys.PASSWORD,
           value: _passwordController.text,
         ) &&
@@ -194,7 +193,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final groupBackgroundColor = colors.cardBackground;
     final schools =
         ref.watch(schoolListProvider).valueOrNull ?? School.fallbackList;
@@ -230,8 +229,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           children: [
             const SizedBox(height: 20),
             // Logo
-            ClubSmoothCorners.clip(
-              borderRadius: ClubRadii.tile,
+            McSmoothCorners.clip(
+              borderRadius: McRadii.tileBorder,
               child: LazyLoadImage.assets(
                 'assets/icon.webp',
                 width: 100,
@@ -253,11 +252,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               l10n.loginSubtitle,
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.color
-                    ?.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 40),
@@ -266,7 +263,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             Container(
               decoration: BoxDecoration(
                 color: groupBackgroundColor,
-                borderRadius: ClubRadii.navigation,
+                borderRadius: McRadii.navigationBorder,
               ),
               child: SchoolSelector(
                 selectedSchool: _selectedSchool,
@@ -283,7 +280,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             Container(
               decoration: BoxDecoration(
                 color: groupBackgroundColor,
-                borderRadius: ClubRadii.navigation,
+                borderRadius: McRadii.navigationBorder,
               ),
               child: Column(
                 children: [
@@ -311,74 +308,80 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             const SizedBox(height: 16),
 
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Expanded(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
                   child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Checkbox(
-                        value: _hasAcceptedAgreement,
-                        onChanged: (v) =>
-                            setState(() => _hasAcceptedAgreement = v ?? false),
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.color
-                                ?.withValues(alpha: 0.6),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: Checkbox(
+                            value: _hasAcceptedAgreement,
+                            onChanged: (v) => setState(
+                              () => _hasAcceptedAgreement = v ?? false,
+                            ),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                           ),
-                          children: [
-                            TextSpan(text: l10n.loginAgreementPrefix),
-                            TextSpan(
-                              text: '《${l10n.userAgreement}》',
-                              style: TextStyle(color: colors.primary),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () =>
-                                    AppRouter.push(AppRoutes.userAgreement),
-                            ),
-                            const TextSpan(text: ' 和 '),
-                            TextSpan(
-                              text: '《${l10n.privacyPolicy}》',
-                              style: TextStyle(color: colors.primary),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () =>
-                                    AppRouter.push(AppRoutes.privacyPolicy),
-                            ),
-                          ],
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.color
+                                    ?.withValues(alpha: 0.6),
+                              ),
+                              children: [
+                                TextSpan(text: l10n.loginAgreementPrefix),
+                                TextSpan(
+                                  text: '《${l10n.userAgreement}》',
+                                  style: TextStyle(color: colors.primary),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () =>
+                                        AppRouter.push(AppRoutes.userAgreement),
+                                ),
+                                const TextSpan(text: ' 和 '),
+                                TextSpan(
+                                  text: '《${l10n.privacyPolicy}》',
+                                  style: TextStyle(color: colors.primary),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () =>
+                                        AppRouter.push(AppRoutes.privacyPolicy),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              )),
-              if (_selectedSchool.code.toUpperCase() == School.defaultCode)
-                TextButton(
-                  onPressed: () async {
-                    const url =
-                        'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
-                    if (await canLaunchUrl(Uri.parse(url))) {
-                      await launchUrl(
-                        Uri.parse(url),
-                        mode: LaunchMode.externalApplication,
-                      );
-                    }
-                  },
-                  child: Text(l10n.forgotPassword),
-                )
-            ]),
+                if (_selectedSchool.code.toUpperCase() == School.defaultCode)
+                  TextButton(
+                    onPressed: () async {
+                      const url =
+                          'https://swjw.xauat.edu.cn/security-center/password-reset/identity-check-form';
+                      if (await canLaunchUrl(Uri.parse(url))) {
+                        await launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      }
+                    },
+                    child: Text(l10n.forgotPassword),
+                  ),
+              ],
+            ),
 
             const SizedBox(height: 24),
 
@@ -420,30 +423,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.color
-              ?.withValues(alpha: 0.4),
+          color: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
         ),
         prefixIcon: Icon(
           icon,
-          color: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.color
-              ?.withValues(alpha: 0.5),
+          color: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
           size: 22,
         ),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.color
-                      ?.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
                   size: 20,
                 ),
                 onPressed: () {
@@ -456,8 +453,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 16,
+        ),
         isDense: true,
       ),
     );

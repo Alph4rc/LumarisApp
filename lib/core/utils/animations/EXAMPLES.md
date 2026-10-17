@@ -57,7 +57,7 @@ AnimatedButton(
 // 1. 学期卡片动画
 Widget _buildSemesterCard(ScoreList score) {
   return AnimatedCard(
-    child: ClubCard(
+    child: McCard.elevated(
       child: Column(
         children: [
           Text('2023-2024学年 第1学期'),

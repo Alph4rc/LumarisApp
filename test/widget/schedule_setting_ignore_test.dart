@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,7 +13,6 @@ import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/pages/schedule_list_page/schedule_setting_page.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 测试环境没有安全存储插件，不装 handler 的话密码那一次读取会一直挂着，
@@ -79,7 +79,7 @@ void main() {
             ...GlobalMaterialLocalizations.delegates,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          theme: ClubTheme.lightTheme(),
+          theme: McThemeData.materialTheme(McColors.light),
           home: const ScheduleSettingPage(),
         ),
       ),

@@ -1,14 +1,11 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/error_message_resolver.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import '../../../state/payment_store.dart';
-import '../club_card.dart';
 
 class PaymentTile extends ConsumerWidget {
   const PaymentTile({super.key});
@@ -17,60 +14,103 @@ class PaymentTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final payment = ref.watch(paymentStoreProvider);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
-    return ClubCard(
-      borderRadius: ClubRadii.tile,
+    return McCard.elevated(
+      radius: McRadii.tile,
+      padding: EdgeInsets.zero,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: ClubRadii.tile,
-          customBorder: ClubSmoothCorners.shape(ClubRadii.tile),
+          borderRadius: McRadii.tileBorder,
+          customBorder: McSmoothCorners.shape(McRadii.tileBorder),
           onTap: () => AppRouter.push(AppRoutes.payment),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Builder(builder: (context) {
-              // Loading state
-              if (payment.isLoading) {
-                return Center(
-                  child: LoadingStateView(
-                    title: l10n.readingPaymentCard,
-                    subtitle: '',
-                    compact: true,
-                    padding: EdgeInsets.zero,
-                  ),
-                );
-              }
+            child: Builder(
+              builder: (context) {
+                // Loading state
+                if (payment.isLoading) {
+                  return Center(
+                    child: LoadingStateView(
+                      title: l10n.readingPaymentCard,
+                      subtitle: '',
+                      compact: true,
+                      padding: EdgeInsets.zero,
+                    ),
+                  );
+                }
 
-              // Has Data state
-              if (!payment.isLoading && payment.hasData) {
-                final amount = payment.totalRecharge;
-                final isLow = amount <= 10;
-                final primaryColor = isLow ? colors.danger : colors.warning;
+                // Has Data state
+                if (!payment.isLoading && payment.hasData) {
+                  final amount = payment.totalRecharge;
+                  final isLow = amount <= 10;
+                  final primaryColor = isLow ? colors.danger : colors.warning;
 
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.monetization_on_rounded,
+                              color: primaryColor,
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(
+                        l10n.currentBalance,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: colors.secondaryLabel,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '¥${amount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                          color: isLow ? colors.danger : colors.label,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  );
+                }
+
+                // Unsubscribed / Unbound state
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.monetization_on_rounded,
-                            color: primaryColor,
-                            size: 24,
-                          ),
-                        ),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceMuted,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.monetization_on_rounded,
+                        color: colors.secondaryLabel,
+                        size: 24,
+                      ),
                     ),
                     const Spacer(),
                     Text(
-                      l10n.currentBalance,
+                      l10n.campusCardBalance,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -79,64 +119,24 @@ class PaymentTile extends ConsumerWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '¥${amount.toStringAsFixed(2)}',
+                      payment.errorMessage.isNotEmpty
+                          ? resolveErrorMessage(payment.errorMessage, l10n)
+                          : l10n.tapToView,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
-                        color: isLow ? colors.danger : colors.label,
+                        color: payment.errorMessage.isNotEmpty
+                            ? colors.danger
+                            : colors.secondaryLabel,
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 );
-              }
-
-              // Unsubscribed / Unbound state
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceMuted,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.monetization_on_rounded,
-                      color: colors.secondaryLabel,
-                      size: 24,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    l10n.campusCardBalance,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: colors.secondaryLabel,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    payment.errorMessage.isNotEmpty
-                        ? resolveErrorMessage(payment.errorMessage, l10n)
-                        : l10n.tapToView,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
-                      color: payment.errorMessage.isNotEmpty
-                          ? colors.danger
-                          : colors.secondaryLabel,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              );
-            }),
+              },
+            ),
           ),
         ),
       ),

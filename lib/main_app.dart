@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +14,6 @@ import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 import 'platform/mobile/bottom_navigation.dart';
 import 'platform/tablet/tablet_navigation.dart';
@@ -21,10 +21,7 @@ import 'platform/macos/macos_shell.dart';
 import 'platform/windows/windows_sidebar.dart';
 
 class MainApp extends ConsumerStatefulWidget {
-  const MainApp({
-    super.key,
-    required this.navigationShell,
-  });
+  const MainApp({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
@@ -97,8 +94,9 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
         statusBarBrightness: brightness,
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
       ),
     );
   }
@@ -182,9 +180,9 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
                   !currentNavigatorContext.mounted) {
                 return;
               }
-              showClubSnackBar(
+              McFeedback.showMessage(
                 currentNavigatorContext,
-                Text(currentNavigatorContext.l10n.updateOpened),
+                message: currentNavigatorContext.l10n.updateOpened,
               );
             } catch (e) {
               final currentNavigatorContext = _currentNavigatorContext();
@@ -193,9 +191,9 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
                   !currentNavigatorContext.mounted) {
                 return;
               }
-              showClubSnackBar(
+              McFeedback.showMessage(
                 currentNavigatorContext,
-                Text('${currentNavigatorContext.l10n.openUpdateFailed}: $e'),
+                message: '${currentNavigatorContext.l10n.openUpdateFailed}: $e',
               );
             }
           },
@@ -310,9 +308,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
                   _navigateToMainRoute(index);
                 },
               ),
-              Expanded(
-                child: routedChild,
-              ),
+              Expanded(child: routedChild),
             ],
           ),
         ),
@@ -330,9 +326,7 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
     } else {
       // 手机 - 使用底部导航栏（仅在四个主页面显示）
       shell = Scaffold(
-        body: SafeArea(
-          child: routedChild,
-        ),
+        body: SafeArea(child: routedChild),
         bottomNavigationBar: showBottomNav
             ? SafeArea(
                 top: false,
@@ -342,9 +336,9 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
                   onDestinationSelected: (int index) {
                     _navigateToMainRoute(index);
                   },
-                  backgroundColor: Theme.of(context)
-                      .scaffoldBackgroundColor
-                      .withValues(alpha: 0.95),
+                  backgroundColor: Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor.withValues(alpha: 0.95),
                 ),
               )
             : null,

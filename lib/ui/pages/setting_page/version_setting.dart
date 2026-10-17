@@ -1,14 +1,12 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
@@ -74,21 +72,20 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
 
     return Column(
       children: [
-        ClubListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        McListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 16,
+          ),
           leading: isNeedUpdate
               ? Badge(
                   backgroundColor: colors.danger,
-                  child: Icon(
-                    Icons.update,
-                    size: 20,
-                  ),
+                  child: Icon(Icons.update, size: 20),
                 )
               : Icon(Icons.verified, size: 20, color: colors.success),
           title: Text(l10n.version),
@@ -119,16 +116,13 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
                 try {
                   await AppService.updateApp(release);
                   if (context.mounted) {
-                    showClubSnackBar(
-                      context,
-                      Text(l10n.updateOpened),
-                    );
+                    McFeedback.showMessage(context, message: l10n.updateOpened);
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    showClubSnackBar(
+                    McFeedback.showMessage(
                       context,
-                      Text('${l10n.openUpdateFailed}: $e'),
+                      message: '${l10n.openUpdateFailed}: $e',
                     );
                   }
                 }
@@ -137,14 +131,12 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
           },
         ),
         if (CheckUpdateManager.shouldCheckForUpdates())
-          ClubListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            leading: Icon(
-              Icons.update,
-              size: 20,
-              color: colors.warning,
+          McListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16,
             ),
+            leading: Icon(Icons.update, size: 20, color: colors.warning),
             title: Text(l10n.updateLog),
             subtitle: Text(l10n.ignoreVersionUpdate),
             subtitleTextStyle: TextStyle(

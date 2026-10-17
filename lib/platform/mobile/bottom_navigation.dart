@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 
 class BottomNavigation extends StatelessWidget {
   const BottomNavigation({
@@ -23,7 +23,7 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     // 定义颜色
     final bgColor = backgroundColor ?? colors.cardOverlay;
@@ -33,9 +33,7 @@ class BottomNavigation extends StatelessWidget {
     final bottom = MediaQuery.of(context).padding.bottom + 60;
 
     return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-      ),
+      decoration: BoxDecoration(color: bgColor),
       height: bottom,
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
       child: Row(
@@ -91,13 +89,9 @@ class _NavigationItemState extends State<_NavigationItem>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -108,8 +102,9 @@ class _NavigationItemState extends State<_NavigationItem>
 
   @override
   Widget build(BuildContext context) {
-    final itemColor =
-        widget.isSelected ? widget.selectedColor : widget.unselectedColor;
+    final itemColor = widget.isSelected
+        ? widget.selectedColor
+        : widget.unselectedColor;
 
     return Expanded(
       child: GestureDetector(
@@ -121,10 +116,7 @@ class _NavigationItemState extends State<_NavigationItem>
         child: AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: child,
-            );
+            return Transform.scale(scale: _scaleAnimation.value, child: child);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -140,13 +132,10 @@ class _NavigationItemState extends State<_NavigationItem>
                     duration: const Duration(milliseconds: 300),
                     child: IconTheme(
                       key: ValueKey(widget.isSelected),
-                      data: IconThemeData(
-                        color: itemColor,
-                        size: 24,
-                      ),
+                      data: IconThemeData(color: itemColor, size: 24),
                       child: widget.isSelected
                           ? (widget.destination.selectedIcon ??
-                              widget.destination.icon)
+                                widget.destination.icon)
                           : widget.destination.icon,
                     ),
                   ),

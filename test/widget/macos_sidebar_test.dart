@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,6 @@ import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/platform/macos/macos_sidebar.dart';
 import 'package:ios_club_app/platform/macos/macos_shell.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 这些常量是从 macos_ui 2.2.2 复刻过来的，一旦漂移 macOS 侧边栏就会变样。
@@ -45,8 +45,8 @@ Widget _wrap(Widget child, {ThemeMode themeMode = ThemeMode.light}) {
         ...GlobalMaterialLocalizations.delegates,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      theme: ClubTheme.lightTheme(),
-      darkTheme: ClubTheme.darkTheme(),
+      theme: McThemeData.materialTheme(McColors.light),
+      darkTheme: McThemeData.materialTheme(McColors.dark),
       themeMode: themeMode,
       home: child,
     ),
@@ -117,7 +117,7 @@ void main() {
       expect(_itemDecoration(tester, '课表').color, Colors.transparent);
 
       expect(_itemIcon(tester, '首页').color, const Color(0xFFFFFFFF));
-      expect(_itemIcon(tester, '课表').color, ClubColors.light.primary);
+      expect(_itemIcon(tester, '课表').color, McColors.light.primary);
 
       expect(_labelColor(tester, '首页'), const Color(0xFFFFFFFF));
       expect(_labelColor(tester, '课表'), _expectedLabelLight);
@@ -138,15 +138,12 @@ void main() {
       expect(_labelColor(tester, '首页'), _expectedLabelDark);
     });
 
-    testWidgets('should not inherit the MaterialApp error text style',
-        (WidgetTester tester) async {
+    testWidgets('should not inherit the MaterialApp error text style', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _wrap(
-          MacosSidebar(
-            items: _items,
-            selectedIndex: 0,
-            onItemSelected: (_) {},
-          ),
+          MacosSidebar(items: _items, selectedIndex: 0, onItemSelected: (_) {}),
         ),
       );
 

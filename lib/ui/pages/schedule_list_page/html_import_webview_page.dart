@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -7,8 +8,6 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 class HtmlImportWebViewPage extends ConsumerStatefulWidget {
   final String url;
@@ -16,11 +15,7 @@ class HtmlImportWebViewPage extends ConsumerStatefulWidget {
   /// 用户在导入页选中的学校代号（如 `XAUAT`）；手填网址时为 null。
   final String? schoolCode;
 
-  const HtmlImportWebViewPage({
-    super.key,
-    required this.url,
-    this.schoolCode,
-  });
+  const HtmlImportWebViewPage({super.key, required this.url, this.schoolCode});
 
   @override
   ConsumerState<HtmlImportWebViewPage> createState() =>
@@ -57,9 +52,9 @@ class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
 
       if (html.isEmpty) {
         if (mounted) {
-          showClubSnackBar(
+          McFeedback.showMessage(
             context,
-            Text(context.l10n.noCoursesParsed),
+            message: context.l10n.noCoursesParsed,
           );
         }
         return;
@@ -77,9 +72,9 @@ class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
           'url=${widget.url})\n${parsed.diagnosticReport}',
         );
         if (mounted) {
-          showClubSnackBar(
+          McFeedback.showMessage(
             context,
-            Text(context.l10n.noCoursesParsed),
+            message: context.l10n.noCoursesParsed,
           );
         }
         return;
@@ -91,20 +86,19 @@ class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
       ref.read(scheduleStoreProvider.notifier).loadGuestCourseData();
 
       if (mounted) {
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(
-            '${context.l10n.importCourses} ${courses.length} ${context.l10n.parseResult}',
-          ),
+          message:
+              '${context.l10n.importCourses} ${courses.length} ${context.l10n.parseResult}',
         );
         context.pop(true);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isImporting = false);
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text('${context.l10n.noCoursesParsed}: $e'),
+          message: '${context.l10n.noCoursesParsed}: $e',
         );
       }
     }
@@ -113,7 +107,7 @@ class _HtmlImportWebViewPageState extends ConsumerState<HtmlImportWebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClubAppBar(title: context.l10n.htmlImport),
+      appBar: McAppBar(title: context.l10n.htmlImport),
       body: Column(
         children: [
           Container(

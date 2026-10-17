@@ -1,11 +1,10 @@
 import 'dart:ui';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class LoadingStateView extends StatelessWidget {
   final String? title;
@@ -30,7 +29,7 @@ class LoadingStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     Widget content = AnimatedSwitcher(
       duration: AppAnimations.standard,
@@ -48,9 +47,7 @@ class LoadingStateView extends StatelessWidget {
 
     return Padding(
       padding: padding,
-      child: Center(
-        child: content,
-      ),
+      child: Center(child: content),
     );
   }
 
@@ -149,7 +146,7 @@ class _GlassContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     // 现代毛玻璃效果：大幅增加模糊半径（VisionOS 风格），优化边框和背景
     final radius = BorderRadius.circular(compact ? 100 : 28);
-    return ClubSmoothCorners.clip(
+    return McSmoothCorners.clip(
       borderRadius: radius,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), // 深度模糊
@@ -160,12 +157,9 @@ class _GlassContainer extends StatelessWidget {
           ),
           decoration: ShapeDecoration(
             color: backgroundColor,
-            shape: ClubSmoothCorners.shape(
+            shape: McSmoothCorners.shape(
               radius,
-              side: BorderSide(
-                color: borderColor,
-                width: 0.5,
-              ),
+              side: BorderSide(color: borderColor, width: 0.5),
             ),
           ),
           child: child,

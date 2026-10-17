@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -6,9 +7,6 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class HtmlImportPage extends ConsumerStatefulWidget {
   const HtmlImportPage({super.key});
@@ -67,7 +65,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     // 学校列表来自 SchoolApi，接口失败时 Provider 内部已退回 fallbackList。
     final schools =
@@ -81,7 +79,7 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
         _selectedUrl != null || _urlController.text.trim().isNotEmpty;
 
     return Scaffold(
-      appBar: ClubAppBar(title: l10n.htmlImport),
+      appBar: McAppBar(title: l10n.htmlImport),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -102,18 +100,21 @@ class _HtmlImportPageState extends ConsumerState<HtmlImportPage> {
               children: [
                 ...selectable.map(
                   (school) => Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     child: Material(
                       color: _selectedCode == school.code
                           ? colors.selectionFill
                           : colors.groupedBackground,
-                      shape: ClubSmoothCorners.shape(BorderRadius.circular(12)),
+                      shape: McSmoothCorners.shape(BorderRadius.circular(12)),
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                        customBorder:
-                            ClubSmoothCorners.shape(BorderRadius.circular(12)),
+                        customBorder: McSmoothCorners.shape(
+                          BorderRadius.circular(12),
+                        ),
                         onTap: () => _selectSchool(school),
                         child: Padding(
                           padding: const EdgeInsets.all(14),

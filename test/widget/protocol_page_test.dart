@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/ui/pages/protocol_page/protocol_page.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 const _urlLauncherChannel = MethodChannel('plugins.flutter.io/url_launcher');
 
@@ -16,7 +16,7 @@ Widget _wrapWithApp(Widget child) {
       ...GlobalMaterialLocalizations.delegates,
     ],
     supportedLocales: AppLocalizations.supportedLocales,
-    theme: ClubTheme.lightTheme(),
+    theme: McThemeData.materialTheme(McColors.light),
     home: child,
   );
 }
@@ -96,6 +96,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.text('无法打开协议页面'), findsOneWidget);
+
+      // Drain the McFeedback toast timer.
+      await tester.pump(const Duration(seconds: 3));
     });
   });
 }

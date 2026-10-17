@@ -129,6 +129,9 @@ void main() {
 
     expect(store.value, 'abc');
     expect(find.text('Token saved'), findsWidgets);
+
+    // Drain the McFeedback toast timer.
+    await tester.pump(const Duration(seconds: 3));
   });
 
   testWidgets('shows probe results and available tools', (tester) async {
@@ -191,5 +194,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(clipboard['text'], McpConfigGenerator.buildJson('abc'));
+
+    // Drain the McFeedback toast timer.
+    await tester.pump(const Duration(seconds: 3));
   });
 }

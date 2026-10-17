@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/services/time_service.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 时间轴列组件
 ///
@@ -21,7 +21,7 @@ class TimelineColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return SizedBox(
       width: 56,
@@ -35,10 +35,7 @@ class TimelineColumn extends StatelessWidget {
             decoration: showGrid
                 ? BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(
-                        color: colors.separator,
-                        width: 0.5,
-                      ),
+                      bottom: BorderSide(color: colors.separator, width: 0.5),
                     ),
                   )
                 : null,
@@ -59,18 +56,12 @@ class TimelineColumn extends StatelessWidget {
                   // 开始时间
                   Text(
                     timeInfo.start,
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: colors.tertiaryLabel,
-                    ),
+                    style: TextStyle(fontSize: 9, color: colors.tertiaryLabel),
                   ),
                   // 结束时间
                   Text(
                     timeInfo.end,
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: colors.tertiaryLabel,
-                    ),
+                    style: TextStyle(fontSize: 9, color: colors.tertiaryLabel),
                   ),
                 ],
               ),

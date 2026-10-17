@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -12,14 +13,9 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ScheduleWidget extends ConsumerStatefulWidget {
   const ScheduleWidget({super.key});
@@ -46,102 +42,117 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(
-              scheduleState.showTomorrow
-                  ? l10n.tomorrowSchedule
-                  : l10n.todayScheduleLabel,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                scheduleState.showTomorrow
+                    ? l10n.tomorrowSchedule
+                    : l10n.todayScheduleLabel,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            IconButton(
+              IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
                   PlatformDialog.showCustomDialog<void>(
                     context,
                     title: l10n.settings,
-                    content: Consumer(builder: (context, ref, child) {
-                      final settings = ref.watch(settingsStoreProvider);
-                      final scheduleStore =
-                          ref.read(scheduleStoreProvider.notifier);
-                      final settingsStore =
-                          ref.read(settingsStoreProvider.notifier);
+                    content: Consumer(
+                      builder: (context, ref, child) {
+                        final settings = ref.watch(settingsStoreProvider);
+                        final scheduleStore = ref.read(
+                          scheduleStoreProvider.notifier,
+                        );
+                        final settingsStore = ref.read(
+                          settingsStoreProvider.notifier,
+                        );
 
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ClubListTile(
-                            title: Text(l10n.showTomorrowSchedule),
-                            trailing: CupertinoSwitch(
-                              value: settings.isShowTomorrow,
-                              onChanged: (value) async {
-                                await scheduleStore.toggleShowTomorrow();
-                              },
-                            ),
-                          ),
-                          if ((PlatformUtils.isIOS || PlatformUtils.isAndroid))
-                            ClubListTile(
-                              title: Text(l10n.courseReminder),
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            McListTile(
+                              title: Text(l10n.showTomorrowSchedule),
                               trailing: CupertinoSwitch(
-                                value: settings.isRemind,
-                                onChanged: (bool value) async {
-                                  await settingsStore.setIsRemind(value);
-                                  if (value && context.mounted) {
-                                    await NotificationService.set(context);
-                                  }
+                                value: settings.isShowTomorrow,
+                                onChanged: (value) async {
+                                  await scheduleStore.toggleShowTomorrow();
                                 },
                               ),
                             ),
-                        ],
-                      );
-                    }),
+                            if ((PlatformUtils.isIOS ||
+                                PlatformUtils.isAndroid))
+                              McListTile(
+                                title: Text(l10n.courseReminder),
+                                trailing: CupertinoSwitch(
+                                  value: settings.isRemind,
+                                  onChanged: (bool value) async {
+                                    await settingsStore.setIsRemind(value);
+                                    if (value && context.mounted) {
+                                      await NotificationService.set(context);
+                                    }
+                                  },
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
                   );
-                })
-          ]),
+                },
+              ),
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
           child: AnimatedCard(
-            child: ClubCard(
-              child: Builder(builder: (context) {
-                final todayCourses = scheduleStore.getTodayCourses();
+            child: McCard.elevated(
+              padding: EdgeInsets.zero,
+              child: Builder(
+                builder: (context) {
+                  final todayCourses = scheduleStore.getTodayCourses();
 
-                return todayCourses.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: EmptyWidget(
+                  return todayCourses.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: EmptyWidget(
                             title: l10n.noCourseToday,
                             icon: Icons.school,
-                            subtitle: l10n.noCourseTodaySubtitle))
-                    : Column(
-                        children: todayCourses.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final course = entry.value;
-                          final weekdayNames = _getWeekdayNames(context);
-                          final time = TimeService.getStartAndEnd(course);
-                          final item = ScheduleItem(
-                            title: course.courseName,
-                            time:
-                                '${l10n.periodRange(course.startUnit, course.endUnit)} ${time.start}-${time.end}',
-                            location: course.room,
-                            teacher: course.teachers.join(','),
-                            description: l10n.scheduleCourseTime(
+                            subtitle: l10n.noCourseTodaySubtitle,
+                          ),
+                        )
+                      : Column(
+                          children: todayCourses.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final course = entry.value;
+                            final weekdayNames = _getWeekdayNames(context);
+                            final time = TimeService.getStartAndEnd(course);
+                            final item = ScheduleItem(
+                              title: course.courseName,
+                              time:
+                                  '${l10n.periodRange(course.startUnit, course.endUnit)} ${time.start}-${time.end}',
+                              location: course.room,
+                              teacher: course.teachers.join(','),
+                              description: l10n.scheduleCourseTime(
                                 CourseModel.formatWeekRanges(
-                                    course.weekIndexes),
+                                  course.weekIndexes,
+                                ),
                                 weekdayNames[course.weekday],
                                 course.startUnit,
-                                course.endUnit),
-                          );
-                          return AnimatedListItem(
-                            index: index,
-                            child: _buildScheduleItem(course, item, isTablet),
-                          );
-                        }).toList(),
-                      );
-              }),
+                                course.endUnit,
+                              ),
+                            );
+                            return AnimatedListItem(
+                              index: index,
+                              child: _buildScheduleItem(course, item, isTablet),
+                            );
+                          }).toList(),
+                        );
+                },
+              ),
             ),
           ),
         ),
@@ -150,15 +161,18 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
   }
 
   Widget _buildScheduleItem(
-      CourseModel course, ScheduleItem item, bool isTablet) {
-    final colors = context.clubColors;
+    CourseModel course,
+    ScheduleItem item,
+    bool isTablet,
+  ) {
+    final colors = context.mc.colors;
     return Material(
-      shape: ClubSmoothCorners.shape(ClubRadii.card),
+      shape: McSmoothCorners.shape(McRadii.cardBorder),
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: ClubRadii.card,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.card),
+        borderRadius: McRadii.cardBorder,
+        customBorder: McSmoothCorners.shape(McRadii.cardBorder),
         onTap: () {
           CourseDetailSheet.show(context, course);
         },
@@ -172,7 +186,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                 height: 52,
                 decoration: ShapeDecoration(
                   color: CourseColorManager.generateSoftColor(item.title),
-                  shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+                  shape: McSmoothCorners.shape(McRadii.xsBorder),
                 ),
               ),
               const SizedBox(width: 20),
@@ -218,12 +232,14 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
                           color: colors.secondaryLabel,
                         ),
                         const SizedBox(width: 6),
-                        Text(item.location,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: colors.secondaryLabel,
-                              fontWeight: FontWeight.w400,
-                            )),
+                        Text(
+                          item.location,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: colors.secondaryLabel,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -238,7 +254,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
   }
 
   Widget buildCourse(ScheduleItem course, bool isTablet) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -306,9 +322,7 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
             Expanded(
               child: Text(
                 course.description,
-                style: TextStyle(
-                  fontSize: isTablet ? 19 : 17,
-                ),
+                style: TextStyle(fontSize: isTablet ? 19 : 17),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
               ),

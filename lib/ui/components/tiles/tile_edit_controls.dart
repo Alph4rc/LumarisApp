@@ -1,16 +1,12 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Maps tile identifiers to their localized display names.
 String _tileDisplayName(String tileId, AppLocalizations l10n) {
@@ -68,7 +64,7 @@ class TileEditControls extends ConsumerWidget {
   /// Build edit button
   Widget _buildEditButton(BuildContext context, TileEditNotifier controller) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return TextButton.icon(
       key: const ValueKey('edit_button'),
@@ -85,7 +81,7 @@ class TileEditControls extends ConsumerWidget {
   /// Build done button
   Widget _buildDoneButton(BuildContext context, TileEditNotifier controller) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return ElevatedButton.icon(
       key: const ValueKey('done_button'),
@@ -106,23 +102,20 @@ class TileEditControls extends ConsumerWidget {
 class EditModeIndicator extends ConsumerWidget {
   final Widget child;
 
-  const EditModeIndicator({
-    super.key,
-    required this.child,
-  });
+  const EditModeIndicator({super.key, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isEditMode = ref.watch(
       tileEditControllerProvider.select((value) => value.isEditMode),
     );
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: ShapeDecoration(
-        shape: ClubSmoothCorners.shape(
-          ClubRadii.control,
+        shape: McSmoothCorners.shape(
+          McRadii.controlBorder,
           side: isEditMode
               ? BorderSide(
                   color: colors.primary.withValues(alpha: 0.3),
@@ -143,12 +136,14 @@ class EmptyTilesMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return ClubCard(
+    return McCard.elevated(
       margin: const EdgeInsets.all(16),
+      padding: EdgeInsets.zero,
       child: EmptyWidget(
-          title: l10n.noShortcuts,
-          icon: Icons.widgets_outlined,
-          subtitle: l10n.addInEditMode),
+        title: l10n.noShortcuts,
+        icon: Icons.widgets_outlined,
+        subtitle: l10n.addInEditMode,
+      ),
     );
   }
 }
@@ -166,7 +161,7 @@ class AvailableTilesList extends ConsumerWidget {
     final hiddenTiles = allTiles
         .where((t) => !t.isVisible && _isTileSupported(t.id, school))
         .toList();
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     if (hiddenTiles.isEmpty) {
       return const SizedBox.shrink();
@@ -188,24 +183,22 @@ class AvailableTilesList extends ConsumerWidget {
               ),
             ),
           ),
-          ClubCard(
+          McCard.elevated(
             padding: EdgeInsets.zero,
             child: Column(
               children: hiddenTiles.map((tile) {
                 final tileId = tile.id;
-                return ClubListTile(
+                return McListTile(
                   leading: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.success,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.add,
-                      color: colors.onAccent,
-                      size: 16,
-                    ),
+                    child: Icon(Icons.add, color: colors.onAccent, size: 16),
                   ),
                   title: Text(
                     _tileDisplayName(tileId, context.l10n),
@@ -216,7 +209,9 @@ class AvailableTilesList extends ConsumerWidget {
                   ),
                   onTap: () => controller.toggleVisibility(tileId),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 4.0),
+                    horizontal: 16.0,
+                    vertical: 4.0,
+                  ),
                 );
               }).toList(),
             ),

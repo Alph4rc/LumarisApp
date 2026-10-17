@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -17,18 +18,12 @@ import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
 import 'package:ios_club_app/ui/components/schedule/weekday_header.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/state/school_store.dart';
@@ -107,59 +102,64 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final scheduleState = ref.watch(scheduleStoreProvider);
 
     return Scaffold(
-      body: Builder(builder: (context) {
-        final hasCustomBackground = settings.scheduleBackground == 'custom' &&
-            settings.customBackgroundImage.isNotEmpty;
+      body: Builder(
+        builder: (context) {
+          final hasCustomBackground =
+              settings.scheduleBackground == 'custom' &&
+              settings.customBackgroundImage.isNotEmpty;
 
-        // 有自定义背景时，根据背景亮暗决定字体颜色（异步计算后自动更新）
-        // 未计算完成前回退到系统主题
-        final isDark = hasCustomBackground
-            ? (settings.customBackgroundIsDark ?? systemIsDark)
-            : systemIsDark;
+          // 有自定义背景时，根据背景亮暗决定字体颜色（异步计算后自动更新）
+          // 未计算完成前回退到系统主题
+          final isDark = hasCustomBackground
+              ? (settings.customBackgroundIsDark ?? systemIsDark)
+              : systemIsDark;
 
-        final content = Column(
-          children: [
-            // 顶部工具栏
-            _buildTopBar(context, isDesktop, isDark),
-            // 课表内容
-            Expanded(
-              child: Builder(builder: (context) {
-                if (scheduleState.isLoading) {
-                  return Center(
-                    child: LoadingStateView(
-                      title: context.l10n.loadingSchedule,
-                      subtitle: context.l10n.loadingScheduleSubtitle,
-                    ),
-                  );
-                }
+          final content = Column(
+            children: [
+              // 顶部工具栏
+              _buildTopBar(context, isDesktop, isDark),
+              // 课表内容
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    if (scheduleState.isLoading) {
+                      return Center(
+                        child: LoadingStateView(
+                          title: context.l10n.loadingSchedule,
+                          subtitle: context.l10n.loadingScheduleSubtitle,
+                        ),
+                      );
+                    }
 
-                return PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    ref
-                        .read(scheduleStoreProvider.notifier)
-                        .setCurrentPage(index);
+                    return PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        ref
+                            .read(scheduleStoreProvider.notifier)
+                            .setCurrentPage(index);
+                      },
+                      itemCount: scheduleState.allCourses.length,
+                      itemBuilder: (context, index) {
+                        return _buildSchedulePage(context, index);
+                      },
+                    );
                   },
-                  itemCount: scheduleState.allCourses.length,
-                  itemBuilder: (context, index) {
-                    return _buildSchedulePage(context, index);
-                  },
-                );
-              }),
-            ),
-          ],
-        );
+                ),
+              ),
+            ],
+          );
 
-        return hasCustomBackground
-            ? Stack(
-                fit: StackFit.expand,
-                children: [
-                  _buildBackgroundImage(settings.customBackgroundImage),
-                  content,
-                ],
-              )
-            : content;
-      }),
+          return hasCustomBackground
+              ? Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _buildBackgroundImage(settings.customBackgroundImage),
+                    content,
+                  ],
+                )
+              : content;
+        },
+      ),
     );
   }
 
@@ -190,53 +190,55 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Widget _buildWeekInfo(BuildContext context, bool isDark) {
     final scheduleState = ref.watch(scheduleStoreProvider);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
-    return Builder(builder: (context) {
-      final weekText = scheduleState.currentWeek <= 0
-          ? l10n.weeksUntilStart(-scheduleState.currentWeek + 1)
-          : l10n.currentWeek(scheduleState.currentWeek);
+    return Builder(
+      builder: (context) {
+        final weekText = scheduleState.currentWeek <= 0
+            ? l10n.weeksUntilStart(-scheduleState.currentWeek + 1)
+            : l10n.currentWeek(scheduleState.currentWeek);
 
-      return InkWell(
-        onLongPress: () => weekMenuPress(context),
-        onDoubleTap: () => _jumpToPage(0),
-        onTap: () => _jumpToPage(scheduleState.currentWeek),
-        borderRadius: ClubRadii.control,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.control),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                scheduleState.currentPage <= 0
-                    ? l10n.allSchedules
-                    : l10n.weekUnit(scheduleState.currentPage),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: colors.label,
+        return InkWell(
+          onLongPress: () => weekMenuPress(context),
+          onDoubleTap: () => _jumpToPage(0),
+          onTap: () => _jumpToPage(scheduleState.currentWeek),
+          borderRadius: McRadii.controlBorder,
+          customBorder: McSmoothCorners.shape(McRadii.controlBorder),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  scheduleState.currentPage <= 0
+                      ? l10n.allSchedules
+                      : l10n.weekUnit(scheduleState.currentPage),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: colors.label,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                weekText,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(height: 2),
+                Text(
+                  weekText,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Future<void> weekMenuPress(BuildContext context) async {
     final scheduleState = ref.read(scheduleStoreProvider);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final renderBox = context.findRenderObject() as RenderBox?;
     final overlay =
@@ -247,8 +249,10 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         renderBox.localToGlobal(Offset.zero, ancestor: overlay),
-        renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero),
-            ancestor: overlay),
+        renderBox.localToGlobal(
+          renderBox.size.bottomRight(Offset.zero),
+          ancestor: overlay,
+        ),
       ),
       Offset.zero & overlay.size,
     );
@@ -261,59 +265,59 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
       shadowColor: colors.shadowColor.withValues(alpha: 0.18),
       elevation: 10,
       constraints: const BoxConstraints(minWidth: 196, maxWidth: 240),
-      shape: ClubSmoothCorners.shape(
-        ClubRadii.card,
+      shape: McSmoothCorners.shape(
+        McRadii.cardBorder,
         side: BorderSide(
           color: colors.separator.withValues(alpha: 0.18),
           width: 0.75,
         ),
       ),
       menuPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      items: List<PopupMenuEntry<int>>.generate(
-        scheduleState.maxWeek + 1,
-        (index) {
-          final isSelected = index == scheduleState.currentPage;
-          final isCurrentWeek = index == scheduleState.currentWeek;
-          final label = index == 0
-              ? l10n.allSchedules
-              : '${l10n.weekUnit(index)}'
+      items: List<PopupMenuEntry<int>>.generate(scheduleState.maxWeek + 1, (
+        index,
+      ) {
+        final isSelected = index == scheduleState.currentPage;
+        final isCurrentWeek = index == scheduleState.currentWeek;
+        final label = index == 0
+            ? l10n.allSchedules
+            : '${l10n.weekUnit(index)}'
                   '${isCurrentWeek ? " (${l10n.currentWeekLabel})" : ""}';
 
-          return PopupMenuItem<int>(
-            value: index,
-            padding: EdgeInsets.zero,
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: ShapeDecoration(
-                shape: ClubSmoothCorners.shape(ClubRadii.navigation),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      label,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w600,
-                        color: colors.label,
-                      ),
+        return PopupMenuItem<int>(
+          value: index,
+          padding: EdgeInsets.zero,
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: ShapeDecoration(
+              shape: McSmoothCorners.shape(McRadii.navigationBorder),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
+                      color: colors.label,
                     ),
                   ),
-                  if (isSelected)
-                    Icon(
-                      CupertinoIcons.check_mark,
-                      size: 18,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                ],
-              ),
+                ),
+                if (isSelected)
+                  Icon(
+                    CupertinoIcons.check_mark,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      }),
     );
 
     if (!mounted || selectedPage == null) return;
@@ -335,11 +339,8 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
           scheduleState.currentPage <= 0
               ? l10n.allSchedules
               : '${l10n.weekUnit(scheduleState.currentPage)}'
-                  '${scheduleState.currentPage == scheduleState.currentWeek ? " (${l10n.currentWeekLabel})" : ""}',
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+                    '${scheduleState.currentPage == scheduleState.currentWeek ? " (${l10n.currentWeekLabel})" : ""}',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(width: 8),
         IconButton(
@@ -395,7 +396,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: ShapeDecoration(
-        shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+        shape: McSmoothCorners.shape(McRadii.navigationBorder),
       ),
       child: CupertinoSlidingSegmentedControl<CourseCardStyle>(
         groupValue: _cardStyle,
@@ -449,50 +450,53 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
     final weekStartDate = weekIndex == 0
         ? WeekStartUtils.getWeekStart(now, weekStartDay)
-        : WeekStartUtils.getWeekStart(now, weekStartDay).add(
-            Duration(days: (weekIndex - currentWeek) * 7),
-          );
+        : WeekStartUtils.getWeekStart(
+            now,
+            weekStartDay,
+          ).add(Duration(days: (weekIndex - currentWeek) * 7));
 
-    return Builder(builder: (context) {
-      final scheduleContent = Column(
-        children: [
-          // 星期标题栏
-          WeekdayHeader(
-            weekStartDate: weekStartDate,
-            currentWeek: weekIndex == 0 ? null : weekIndex,
-            showDate: weekIndex > 0,
-            showGrid: settings.showCourseGrid,
-            highlightToday: currentWeek != 0,
-          ),
-          // 课表网格
-          Expanded(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: scheduleState.height * 12,
-                child: ScheduleGrid(
-                  courses: courses,
-                  cellHeight: scheduleState.height,
-                  weekStartDay: weekStartDay,
-                  isYanTa: scheduleState.isYanTa,
-                  cardStyle: _cardStyle,
-                  showGrid: settings.showCourseGrid,
-                  onCourseTap: (course) => _showCourseDetail(course),
-                  onCourseLongPress: (course) {
-                    if (course.isCustom) {
-                      _showCourseActions(course);
-                    }
-                  },
-                  onConflictCourseTap: (courses) =>
-                      _showConflictCourseSelector(courses),
+    return Builder(
+      builder: (context) {
+        final scheduleContent = Column(
+          children: [
+            // 星期标题栏
+            WeekdayHeader(
+              weekStartDate: weekStartDate,
+              currentWeek: weekIndex == 0 ? null : weekIndex,
+              showDate: weekIndex > 0,
+              showGrid: settings.showCourseGrid,
+              highlightToday: currentWeek != 0,
+            ),
+            // 课表网格
+            Expanded(
+              child: SingleChildScrollView(
+                child: SizedBox(
+                  height: scheduleState.height * 12,
+                  child: ScheduleGrid(
+                    courses: courses,
+                    cellHeight: scheduleState.height,
+                    weekStartDay: weekStartDay,
+                    isYanTa: scheduleState.isYanTa,
+                    cardStyle: _cardStyle,
+                    showGrid: settings.showCourseGrid,
+                    onCourseTap: (course) => _showCourseDetail(course),
+                    onCourseLongPress: (course) {
+                      if (course.isCustom) {
+                        _showCourseActions(course);
+                      }
+                    },
+                    onConflictCourseTap: (courses) =>
+                        _showConflictCourseSelector(courses),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
+          ],
+        );
 
-      return scheduleContent;
-    });
+        return scheduleContent;
+      },
+    );
   }
 
   /// 构建背景图片
@@ -503,9 +507,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
         image: CachedNetworkImageProvider(imagePath),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
-          );
+          return Container(color: Theme.of(context).scaffoldBackgroundColor);
         },
       );
     }
@@ -515,9 +517,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
       imagePath,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        return Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-        );
+        return Container(color: Theme.of(context).scaffoldBackgroundColor);
       },
     );
   }
@@ -531,24 +531,21 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Future<void> _handleRefresh() async {
     final l10n = context.l10n;
-    showClubSnackBar(context, Text(l10n.updatingSchedule));
+    McFeedback.showMessage(context, message: l10n.updatingSchedule);
     try {
       await ref.read(scheduleStoreProvider.notifier).refreshCourses();
       if (mounted) {
-        showClubSnackBar(context, Text(l10n.updateComplete));
+        McFeedback.showMessage(context, message: l10n.updateComplete);
       }
     } on TimeoutException {
       if (mounted) {
-        showClubSnackBar(
-          context,
-          Text(l10n.updateTimeout),
-        );
+        McFeedback.showMessage(context, message: l10n.updateTimeout);
       }
     } catch (e) {
       if (mounted) {
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(l10n.updateFailed(e.toString())),
+          message: l10n.updateFailed(e.toString()),
         );
       }
     }
@@ -566,52 +563,54 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   /// 显示冲突课程选择列表
   void _showConflictCourseSelector(List<CourseModel> courses) {
     final l10n = context.l10n;
-    showClubModalBottomSheet(
-      context,
-      Column(
+    showMcBottomSheet(
+      context: context,
+      builder: (_) => Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.selectCourse,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
-          ...courses.map((course) => ClubListTile(
-                leading: Container(
-                  width: 8,
-                  height: 40,
-                  decoration: ShapeDecoration(
-                    color:
-                        CourseColorManager.generateSoftColor(course.courseName),
-                    shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+          ...courses.map(
+            (course) => McListTile(
+              leading: Container(
+                width: 8,
+                height: 40,
+                decoration: ShapeDecoration(
+                  color: CourseColorManager.generateSoftColor(
+                    course.courseName,
                   ),
+                  shape: McSmoothCorners.shape(McRadii.xsBorder),
                 ),
-                title: Text(
-                  course.courseName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                subtitle: Text(
-                  '${course.room} · ${l10n.periodRange(course.startUnit, course.endUnit)}',
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showCourseDetail(course);
-                },
-              )),
+              ),
+              title: Text(
+                course.courseName,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                '${course.room} · ${l10n.periodRange(course.startUnit, course.endUnit)}',
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showCourseDetail(course);
+              },
+            ),
+          ),
           const SizedBox(height: 8),
         ],
       ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.6,
     );
   }
 
   void _showCourseActions(CourseModel course) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
 
     showModalBottomSheet(
@@ -619,7 +618,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ClubListTile(
+          McListTile(
             leading: const Icon(Icons.edit),
             title: Text(l10n.editCourse),
             onTap: () {
@@ -627,10 +626,12 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
               _editCustomCourse(course);
             },
           ),
-          ClubListTile(
+          McListTile(
             leading: Icon(Icons.delete, color: colors.danger),
-            title:
-                Text(l10n.deleteCourse, style: TextStyle(color: colors.danger)),
+            title: Text(
+              l10n.deleteCourse,
+              style: TextStyle(color: colors.danger),
+            ),
             onTap: () {
               Navigator.pop(context);
               _deleteCustomCourse(course);
@@ -644,17 +645,23 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
   void _editCustomCourse(CourseModel course) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    showClubModalBottomSheet(
-      context,
-      AddEditCourseDialog(
+    showMcBottomSheet(
+      context: context,
+      builder: (_) => AddEditCourseDialog(
         course: course,
         onSave: (updatedCourse) async {
           await _saveUpdatedCustomCourse(updatedCourse);
           if (mounted && context.mounted) {
-            showClubSnackBar(context, Text(context.l10n.courseModified));
+            McFeedback.showMessage(
+              context,
+              message: context.l10n.courseModified,
+            );
           }
         },
       ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
       maxHeight: screenHeight * 0.7,
     );
   }
@@ -666,10 +673,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
       title: l10n.confirmDelete,
       content: Text(l10n.confirmDeleteCourseContent(course.courseName)),
       actions: [
-        PlatformDialogAction<bool>(
-          label: l10n.cancel,
-          value: false,
-        ),
+        PlatformDialogAction<bool>(label: l10n.cancel, value: false),
         PlatformDialogAction<bool>(
           label: l10n.delete,
           value: true,
@@ -690,18 +694,21 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
               .where((c) => c.isCustom && c.lessonId != course.lessonId)
               .toList();
 
-          final updatedJsonString =
-              jsonEncode(customCourses.map((c) => c.toJson()).toList());
+          final updatedJsonString = jsonEncode(
+            customCourses.map((c) => c.toJson()).toList(),
+          );
           await prefs.setString(
-              PrefsKeys.CUSTOM_COURSE_DATA, updatedJsonString);
+            PrefsKeys.CUSTOM_COURSE_DATA,
+            updatedJsonString,
+          );
           await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
 
           if (mounted) {
-            showClubSnackBar(context, Text(l10n.courseDeleted));
+            McFeedback.showMessage(context, message: l10n.courseDeleted);
           }
         } catch (e) {
           if (mounted) {
-            showClubSnackBar(context, Text(l10n.deleteFailed));
+            McFeedback.showMessage(context, message: l10n.deleteFailed);
           }
         }
       }
@@ -720,14 +727,16 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
             .where((c) => c.isCustom)
             .toList();
 
-        final index = customCourses
-            .indexWhere((c) => c.lessonId == updatedCourse.lessonId);
+        final index = customCourses.indexWhere(
+          (c) => c.lessonId == updatedCourse.lessonId,
+        );
         if (index != -1) {
           customCourses[index] = updatedCourse;
         }
 
-        final updatedJsonString =
-            jsonEncode(customCourses.map((c) => c.toJson()).toList());
+        final updatedJsonString = jsonEncode(
+          customCourses.map((c) => c.toJson()).toList(),
+        );
         await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, updatedJsonString);
         await ref.read(scheduleStoreProvider.notifier).refreshLocalCourses();
       } catch (e) {

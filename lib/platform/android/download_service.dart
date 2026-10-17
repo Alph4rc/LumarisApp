@@ -3,12 +3,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/app_service.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,7 +16,7 @@ import 'package:ios_club_app/core/utils/app_logger.dart';
 Future<void> updateApp(
   String name, {
   Function(int downloaded, int total, double progress, String speed)?
-      onProgress,
+  onProgress,
 }) async {
   final packageInfo = await PackageInfo.fromPlatform();
   if (AppService.isVersionNewer(
@@ -26,13 +25,14 @@ Future<void> updateApp(
     currentBuildNumber: packageInfo.buildNumber,
   )) {
     final Uri uri = Uri.parse(
-        'https://gitee.com/luckyfishisdashen/iOSClub.AppMobile/releases/download/$name/app-release.apk');
+      'https://gitee.com/luckyfishisdashen/iOSClub.AppMobile/releases/download/$name/app-release.apk',
+    );
 
-// 获取应用缓存目录
+    // 获取应用缓存目录
     final directory = await getTemporaryDirectory();
     final filePath = '${directory.path}/app-release.apk';
 
-// 删除已存在的文件
+    // 删除已存在的文件
     final file = File(filePath);
     if (file.existsSync()) {
       await file.delete();
@@ -62,7 +62,7 @@ Future<void> _downloadFileWithProgress(
   String url,
   String filePath, {
   Function(int downloaded, int total, double progress, String speed)?
-      onProgress,
+  onProgress,
 }) async {
   final httpClient = HttpClient();
 
@@ -80,10 +80,10 @@ Future<void> _downloadFileWithProgress(
       int lastTime = 0;
       int lastDownloaded = 0;
 
-// 创建一个完成器来等待下载完成
+      // 创建一个完成器来等待下载完成
       final Completer<void> completer = Completer<void>();
 
-// 监听数据流
+      // 监听数据流
       response.listen(
         (List<int> chunk) {
           sink.add(chunk);
@@ -91,7 +91,7 @@ Future<void> _downloadFileWithProgress(
 
           final progress = contentLength > 0 ? downloaded / contentLength : 0.0;
 
-// 计算下载速度
+          // 计算下载速度
           final currentTime = stopwatch.elapsedMilliseconds;
           String speedText = '';
 
@@ -107,7 +107,7 @@ Future<void> _downloadFileWithProgress(
             lastDownloaded = downloaded;
           }
 
-// 调用进度回调
+          // 调用进度回调
           onProgress?.call(downloaded, contentLength, progress, speedText);
         },
         onDone: () async {
@@ -122,7 +122,7 @@ Future<void> _downloadFileWithProgress(
         },
       );
 
-// 等待下载完成
+      // 等待下载完成
       await completer.future;
     } else {
       throw '下载失败，状态码: ${response.statusCode}';
@@ -156,7 +156,9 @@ class DownloadProgress {
 
 class UpdateManager {
   static Future<void> showUpdateWithProgress(
-      BuildContext context, String version) async {
+    BuildContext context,
+    String version,
+  ) async {
     final ValueNotifier<DownloadProgress> progressNotifier = ValueNotifier(
       DownloadProgress(
         progress: 0.0,
@@ -192,7 +194,7 @@ class UpdateManager {
                   downloadProgress.speedText,
                   style: TextStyle(
                     fontSize: 12,
-                    color: context.clubColors.secondaryLabel,
+                    color: context.mc.colors.secondaryLabel,
                   ),
                 ),
               ],
@@ -200,9 +202,7 @@ class UpdateManager {
           );
         },
       ),
-      actions: [
-        PlatformDialogAction<void>(label: context.l10n.cancel),
-      ],
+      actions: [PlatformDialogAction<void>(label: context.l10n.cancel)],
     );
 
     try {
@@ -222,17 +222,17 @@ class UpdateManager {
       // 下载完成
       if (context.mounted) {
         Navigator.of(context).pop();
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(context.l10n.downloadCompletedInstalling),
+          message: context.l10n.downloadCompletedInstalling,
         );
       }
     } catch (e) {
       if (context.mounted) {
         Navigator.of(context).pop();
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(context.l10n.downloadFailed(e.toString())),
+          message: context.l10n.downloadFailed(e.toString()),
         );
       }
     } finally {

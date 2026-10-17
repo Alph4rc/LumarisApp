@@ -1,7 +1,7 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 优化的图片加载组件
 class OptimizedImage extends StatelessWidget {
@@ -112,7 +112,7 @@ class OptimizedImage extends StatelessWidget {
 
   /// 默认占位符
   Widget _defaultPlaceholder(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Container(
       width: width,
       height: height,
@@ -129,7 +129,7 @@ class OptimizedImage extends StatelessWidget {
 
   /// 默认错误占位符
   Widget _defaultErrorWidget(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Container(
       width: width,
       height: height,
@@ -250,7 +250,8 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
       final pixels = scrollPosition.pixels;
 
       // 检查是否在视口中
-      final isVisible = position.dy < pixels + viewportDimension &&
+      final isVisible =
+          position.dy < pixels + viewportDimension &&
           position.dy + size.height > pixels - 200; // 提前200px加载
 
       if (isVisible != _isVisible) {
@@ -285,7 +286,7 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
           : Container(
               width: widget.width,
               height: widget.height,
-              color: context.clubColors.surfaceRaised,
+              color: context.mc.colors.surfaceRaised,
             ),
     );
   }

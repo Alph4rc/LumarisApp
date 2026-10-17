@@ -1,8 +1,7 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class EasterEggPage extends StatelessWidget {
   const EasterEggPage({super.key});
@@ -10,22 +9,16 @@ class EasterEggPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Scaffold(
-      appBar: ClubAppBar(
-        title: l10n.easterEggTitle,
-      ),
+      appBar: McAppBar(title: l10n.easterEggTitle),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.egg,
-                size: 100,
-                color: colors.warning,
-              ),
+              Icon(Icons.egg, size: 100, color: colors.warning),
               const SizedBox(height: 20),
               Text(
                 l10n.easterEggFound,
@@ -38,9 +31,7 @@ class EasterEggPage extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 l10n.easterEggContent,
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
+                style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),

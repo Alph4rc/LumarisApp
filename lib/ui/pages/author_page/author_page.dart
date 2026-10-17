@@ -1,11 +1,7 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthorPage extends StatelessWidget {
@@ -14,7 +10,7 @@ class AuthorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Scaffold(
       backgroundColor: colors.groupedBackground,
@@ -68,7 +64,7 @@ class AuthorPage extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Column(
       children: [
         const SizedBox(height: 16),
@@ -76,7 +72,7 @@ class AuthorPage extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: ShapeDecoration(
-            shape: ClubSmoothCorners.shape(ClubRadii.tile),
+            shape: McSmoothCorners.shape(McRadii.tileBorder),
             shadows: [
               BoxShadow(
                 color: colors.shadowColor,
@@ -86,12 +82,9 @@ class AuthorPage extends StatelessWidget {
               ),
             ],
           ),
-          child: ClubSmoothCorners.clip(
-            borderRadius: ClubRadii.tile,
-            child: Image.asset(
-              'assets/icon.webp',
-              fit: BoxFit.cover,
-            ),
+          child: McSmoothCorners.clip(
+            borderRadius: McRadii.tileBorder,
+            child: Image.asset('assets/icon.webp', fit: BoxFit.cover),
           ),
         ),
         const SizedBox(height: 20),
@@ -108,10 +101,7 @@ class AuthorPage extends StatelessWidget {
         Text(
           l10n.tagline,
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 15,
-            color: colors.secondaryLabel,
-          ),
+          style: TextStyle(fontSize: 15, color: colors.secondaryLabel),
         ),
       ],
     );
@@ -127,7 +117,7 @@ class AuthorPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: context.clubColors.secondaryLabel,
+            color: context.mc.colors.secondaryLabel,
             letterSpacing: 0.5,
           ),
         ),
@@ -136,7 +126,7 @@ class AuthorPage extends StatelessWidget {
   }
 
   Widget _buildTeamSection(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final members = [
       {'name': 'LuckyFish', 'role': 'Lead Developer'},
       {'name': 'zealous', 'role': 'Developer'},
@@ -144,10 +134,11 @@ class AuthorPage extends StatelessWidget {
       {'name': 'YoChine_Lanee', 'role': 'Developer'},
       {'name': 'To-fly-high', 'role': 'Developer'},
       {'name': 'Alpharc', 'role': 'Developer'},
-      {'name': '白熊', 'role': 'Developer'}
+      {'name': '白熊', 'role': 'Developer'},
     ];
 
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Column(
         children: List.generate(members.length, (index) {
           final member = members[index];
@@ -156,10 +147,10 @@ class AuthorPage extends StatelessWidget {
 
           return Column(
             children: [
-              ClubListTile(
+              McListTile(
                 borderRadius: BorderRadius.vertical(
-                  top: isFirst ? ClubRadii.cardRadius : Radius.zero,
-                  bottom: isLast ? ClubRadii.cardRadius : Radius.zero,
+                  top: isFirst ? McRadii.cardRadius : Radius.zero,
+                  bottom: isLast ? McRadii.cardRadius : Radius.zero,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -170,7 +161,7 @@ class AuthorPage extends StatelessWidget {
                   height: 36,
                   decoration: ShapeDecoration(
                     color: colors.primary.withValues(alpha: 0.1),
-                    shape: ClubSmoothCorners.shape(ClubRadii.control),
+                    shape: McSmoothCorners.shape(McRadii.controlBorder),
                   ),
                   child: Icon(
                     CupertinoIcons.person_fill,
@@ -187,10 +178,7 @@ class AuthorPage extends StatelessWidget {
                 ),
                 subtitle: Text(
                   member['role']!,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colors.secondaryLabel,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.secondaryLabel),
                 ),
                 showChevron: true,
                 onTap: () {
@@ -213,19 +201,15 @@ class AuthorPage extends StatelessWidget {
 
   Widget _buildThanksSection(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
-    return ClubCard(
+    final colors = context.mc.colors;
+    return McCard.elevated(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                CupertinoIcons.heart_fill,
-                color: colors.danger,
-                size: 18,
-              ),
+              Icon(CupertinoIcons.heart_fill, color: colors.danger, size: 18),
               const SizedBox(width: 8),
               Text(
                 l10n.thanksTitle,
@@ -253,23 +237,24 @@ class AuthorPage extends StatelessWidget {
 
   Widget _buildContactSection(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final items = [
       {
         'title': l10n.githubRepository,
         'icon': CupertinoIcons.doc_text_fill,
         'color': colors.secondaryLabel,
-        'url': 'https://github.com/iOS-Club-XAUAT/ios_club_app'
+        'url': 'https://github.com/iOS-Club-XAUAT/ios_club_app',
       },
       {
         'title': l10n.joinUs,
         'icon': CupertinoIcons.person_2_fill,
         'color': colors.primary,
-        'url': 'https://iosclub.org'
+        'url': 'https://iosclub.org',
       },
     ];
 
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Column(
         children: List.generate(items.length, (index) {
           final item = items[index];
@@ -278,10 +263,10 @@ class AuthorPage extends StatelessWidget {
 
           return Column(
             children: [
-              ClubListTile(
+              McListTile(
                 borderRadius: BorderRadius.vertical(
-                  top: isFirst ? ClubRadii.cardRadius : Radius.zero,
-                  bottom: isLast ? ClubRadii.cardRadius : Radius.zero,
+                  top: isFirst ? McRadii.cardRadius : Radius.zero,
+                  bottom: isLast ? McRadii.cardRadius : Radius.zero,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -320,23 +305,17 @@ class AuthorPage extends StatelessWidget {
 
   Widget _buildFooter(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Column(
       children: [
         Text(
           '© 2026 Lumaris Team',
-          style: TextStyle(
-            fontSize: 13,
-            color: colors.tertiaryLabel,
-          ),
+          style: TextStyle(fontSize: 13, color: colors.tertiaryLabel),
         ),
         const SizedBox(height: 4),
         Text(
           l10n.madeWithLove,
-          style: TextStyle(
-            fontSize: 12,
-            color: colors.quaternaryLabel,
-          ),
+          style: TextStyle(fontSize: 12, color: colors.quaternaryLabel),
         ),
       ],
     );

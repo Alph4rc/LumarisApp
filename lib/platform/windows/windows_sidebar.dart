@@ -1,9 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Apple 风格侧边栏 (参考 iCloud / App Store 设计)
 ///
@@ -37,18 +35,13 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Container(
       width: widget.width,
       decoration: BoxDecoration(
         color: colors.groupedBackground,
-        border: Border(
-          right: BorderSide(
-            color: colors.separator,
-            width: 1,
-          ),
-        ),
+        border: Border(right: BorderSide(color: colors.separator, width: 1)),
       ),
       child: Column(
         children: [
@@ -97,33 +90,35 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
         children: [
           // App 图标 - 更加圆润
           Container(
-              width: 28,
-              height: 28,
-              decoration: ShapeDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    colorScheme.primary,
-                    colorScheme.primary.withValues(alpha: 0.8),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: ClubSmoothCorners.shape(ClubRadii.control),
-                shadows: [
-                  BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
+            width: 28,
+            height: 28,
+            decoration: ShapeDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colorScheme.primary,
+                  colorScheme.primary.withValues(alpha: 0.8),
                 ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: const Image(
-                    image: AssetImage('assets/icon.webp'),
-                    fit: BoxFit.cover,
-                  ))),
+              shape: McSmoothCorners.shape(McRadii.controlBorder),
+              shadows: [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: const Image(
+                image: AssetImage('assets/icon.webp'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           const SizedBox(width: 12),
           // App 名称
           Text(
@@ -131,7 +126,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: context.clubColors.label,
+              color: context.mc.colors.label,
               letterSpacing: -0.5, // 紧凑的字间距
             ),
           ),
@@ -151,11 +146,11 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
   }) {
     // 选中态颜色 - 模仿 macOS 强调色
     final selectedBgColor = colorScheme.primary;
-    final selectedTextColor = context.clubColors.onAccent;
+    final selectedTextColor = context.mc.colors.onAccent;
 
     // 悬停态颜色
     final hoverBgColor = isDark
-        ? context.clubColors.selectionFill
+        ? context.mc.colors.selectionFill
         : colorScheme.primary.withValues(alpha: 0.08);
 
     return Container(
@@ -169,17 +164,14 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: ShapeDecoration(
               color: isSelected
                   ? selectedBgColor
                   : isHovered
-                      ? hoverBgColor
-                      : Colors.transparent,
-              shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+                  ? hoverBgColor
+                  : Colors.transparent,
+              shape: McSmoothCorners.shape(McRadii.navigationBorder),
             ),
             child: Row(
               children: [
@@ -189,7 +181,7 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                   size: 20,
                   color: isSelected
                       ? selectedTextColor
-                      : context.clubColors.secondaryLabel,
+                      : context.mc.colors.secondaryLabel,
                 ),
                 const SizedBox(width: 12),
                 // 标签
@@ -198,11 +190,12 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                     item.label,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight:
-                          isSelected ? FontWeight.w500 : FontWeight.w400,
+                      fontWeight: isSelected
+                          ? FontWeight.w500
+                          : FontWeight.w400,
                       color: isSelected
                           ? selectedTextColor
-                          : context.clubColors.label,
+                          : context.mc.colors.label,
                       letterSpacing: -0.2,
                     ),
                     maxLines: 1,
@@ -218,16 +211,16 @@ class _WindowsSidebarState extends State<WindowsSidebar> {
                     ),
                     decoration: ShapeDecoration(
                       color: isSelected
-                          ? context.clubColors.onAccent.withValues(alpha: 0.2)
-                          : context.clubColors.cardOverlay,
-                      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+                          ? context.mc.colors.onAccent.withValues(alpha: 0.2)
+                          : context.mc.colors.cardOverlay,
+                      shape: McSmoothCorners.shape(McRadii.navigationBorder),
                     ),
                     child: Text(
                       item.badge!,
                       style: TextStyle(
                         color: isSelected
-                            ? context.clubColors.onAccent
-                            : context.clubColors.label,
+                            ? context.mc.colors.onAccent
+                            : context.mc.colors.label,
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),

@@ -1,9 +1,6 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/club_menu.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Modal 内部布局组件库
 ///
@@ -63,7 +60,7 @@ class ModalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
@@ -129,7 +126,7 @@ class ModalInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,13 +137,9 @@ class ModalInfoRow extends StatelessWidget {
           height: 36,
           decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            shape: ClubSmoothCorners.shape(ClubRadii.control),
+            shape: McSmoothCorners.shape(McRadii.controlBorder),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: color,
-          ),
+          child: Icon(icon, size: 20, color: color),
         ),
         const SizedBox(width: 14),
         // 文本内容
@@ -197,19 +190,19 @@ class ModalActionMenu extends StatelessWidget {
 
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
-  final List<ClubMenuItem<String>>? customActions;
+  final List<McMenuItem<String>>? customActions;
 
   @override
   Widget build(BuildContext context) {
-    final List<ClubMenuItem<String>> items = <ClubMenuItem<String>>[
+    final List<McMenuItem<String>> items = <McMenuItem<String>>[
       if (onEdit != null)
-        ClubMenuItem<String>(
+        McMenuItem<String>(
           value: 'edit',
           label: context.l10n.edit,
           icon: CupertinoIcons.pencil,
         ),
       if (onDelete != null)
-        ClubMenuItem<String>(
+        McMenuItem<String>(
           value: 'delete',
           label: context.l10n.delete,
           icon: CupertinoIcons.delete,
@@ -218,7 +211,7 @@ class ModalActionMenu extends StatelessWidget {
       ...?customActions,
     ];
 
-    return ClubMenu<String>(
+    return McMenu<String>(
       items: items,
       onSelected: (String value) {
         Navigator.of(context).pop();
@@ -236,10 +229,7 @@ class ModalActionMenu extends StatelessWidget {
 ///
 /// 提供统一的响应式间距，根据屏幕尺寸自动调整
 class ModalSpacing extends StatelessWidget {
-  const ModalSpacing({
-    super.key,
-    this.small = false,
-  });
+  const ModalSpacing({super.key, this.small = false});
 
   final bool small;
 

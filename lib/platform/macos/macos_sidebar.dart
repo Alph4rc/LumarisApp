@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -9,7 +10,6 @@ import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:window_manager/window_manager.dart';
 
 // 以下规格取自 macos_ui 2.2.2 的 `SidebarItemSize.large` 与 `_SidebarItem`，
@@ -56,7 +56,7 @@ const Color _labelColorDark = Color.fromRGBO(255, 255, 255, 0.85);
 /// macos_ui `MacosColors.white`。
 const Color _selectedForeground = Color(0xFFFFFFFF);
 
-// macos_ui `_ColorProvider.getSelectedColor`，其 accentColor 被 ClubTheme 固定为
+// macos_ui `_ColorProvider.getSelectedColor`，其 accentColor 被 McThemeData 固定为
 // `AccentColor.blue`（`MacosThemeData.light()/dark()` 的默认值）。
 const Color _selectionLight = Color.fromRGBO(9, 129, 255, 0.749);
 const Color _selectionDark = Color.fromRGBO(22, 105, 229, 0.749);
@@ -156,7 +156,7 @@ class _MacosSidebarState extends State<MacosSidebar> with WindowListener {
         decoration: TextDecoration.none,
       ),
       child: ColoredBox(
-        color: context.clubColors.groupedBackground,
+        color: context.mc.colors.groupedBackground,
         child: Column(
           children: [
             const SizedBox(height: 8),
@@ -198,7 +198,7 @@ class _MacosSidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedColor = _selectionColor(
       isDark: isDark,
@@ -283,7 +283,7 @@ class _UserTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userState = ref.watch(userStoreProvider);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleStyle = TextStyle(
       fontFamily: _macosFontFamily,

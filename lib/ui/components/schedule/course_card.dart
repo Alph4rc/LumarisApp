@@ -1,9 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程卡片组件
 ///
@@ -27,7 +25,7 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final courseColor = CourseColorManager.generateSoftColor(course.courseName);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
@@ -39,12 +37,12 @@ class CourseCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(2),
       decoration: ShapeDecoration(
-        shape: ClubSmoothCorners.shape(ClubRadii.control),
+        shape: McSmoothCorners.shape(McRadii.controlBorder),
         color: courseColor,
       ),
       child: InkWell(
-        borderRadius: ClubRadii.control,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.control),
+        borderRadius: McRadii.controlBorder,
+        customBorder: McSmoothCorners.shape(McRadii.controlBorder),
         onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
@@ -104,8 +102,4 @@ class CourseCard extends StatelessWidget {
 }
 
 /// 课程卡片样式枚举
-enum CourseCardStyle {
-  small,
-  normal,
-  large,
-}
+enum CourseCardStyle { small, normal, large }

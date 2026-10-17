@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -7,15 +8,9 @@ import 'package:ios_club_app/l10n/app_localizations.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/app_states.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/payment_store.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class PaymentPage extends ConsumerStatefulWidget {
   const PaymentPage({super.key});
@@ -37,11 +32,11 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
     }
 
     if (!saveSuccess) {
-      showClubSnackBar(context, Text(l10n.saveFailedRetry));
+      McFeedback.showMessage(context, message: l10n.saveFailedRetry);
       return;
     }
 
-    showClubSnackBar(context, Text(l10n.save));
+    McFeedback.showMessage(context, message: l10n.save);
     await controller.loadData();
   }
 
@@ -71,20 +66,20 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
   Widget build(BuildContext context) {
     final payment = ref.watch(paymentStoreProvider);
     final controller = ref.read(paymentStoreProvider.notifier);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final school = ref.watch(schoolStoreProvider).school;
     final canPayment = school?.supports(Feature.payment) ?? true;
 
     if (school != null && !canPayment) {
       return Scaffold(
-        appBar: ClubAppBar(title: l10n.payment),
+        appBar: McAppBar(title: l10n.payment),
         body: Center(child: Text(l10n.schoolNotSupported)),
       );
     }
 
     return Scaffold(
-      appBar: ClubAppBar(
+      appBar: McAppBar(
         title: l10n.payment,
         actions: [
           IconButton(
@@ -105,7 +100,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
     BuildContext context,
     PaymentState payment,
     PaymentStore controller,
-    ClubColors colors,
+    McColors colors,
     AppLocalizations l10n,
   ) {
     return ListView(
@@ -135,7 +130,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
 
   Widget _buildBalanceCard(
     PaymentState payment,
-    ClubColors colors,
+    McColors colors,
     AppLocalizations l10n,
   ) {
     return Container(
@@ -145,12 +140,9 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            colors.primary,
-            colors.primary.withValues(alpha: 0.8),
-          ],
+          colors: [colors.primary, colors.primary.withValues(alpha: 0.8)],
         ),
-        shape: ClubSmoothCorners.shape(BorderRadius.circular(20)),
+        shape: McSmoothCorners.shape(BorderRadius.circular(20)),
         shadows: [
           BoxShadow(
             color: colors.primary.withValues(alpha: 0.3),
@@ -209,14 +201,16 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
 
   Widget _buildRecentTransactionsSection(
     PaymentState payment,
-    ClubColors colors,
+    McColors colors,
     AppLocalizations l10n,
   ) {
     final recentRecords = payment.records
-        .where((r) =>
-            r.turnoverType.contains('支付') ||
-            r.turnoverType.contains('消费') ||
-            r.turnoverType.contains('充值'))
+        .where(
+          (r) =>
+              r.turnoverType.contains('支付') ||
+              r.turnoverType.contains('消费') ||
+              r.turnoverType.contains('充值'),
+        )
         .toList();
 
     if (recentRecords.isEmpty) {
@@ -238,40 +232,38 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
             ),
           ),
         ),
-        ClubCard(
+        McCard.elevated(
+          padding: EdgeInsets.zero,
           child: Column(
-            children: List.generate(
-              recentRecords.length.clamp(0, 10),
-              (index) {
-                final record = recentRecords[index];
-                final isLast = index == recentRecords.length.clamp(0, 10) - 1;
-                return Column(
-                  children: [
-                    _buildTransactionItem(record, colors),
-                    if (!isLast)
-                      Divider(
-                        height: 1,
-                        indent: 16,
-                        endIndent: 16,
-                        color: colors.separator.withValues(alpha: 0.05),
-                      ),
-                  ],
-                );
-              },
-            ),
+            children: List.generate(recentRecords.length.clamp(0, 10), (index) {
+              final record = recentRecords[index];
+              final isLast = index == recentRecords.length.clamp(0, 10) - 1;
+              return Column(
+                children: [
+                  _buildTransactionItem(record, colors),
+                  if (!isLast)
+                    Divider(
+                      height: 1,
+                      indent: 16,
+                      endIndent: 16,
+                      color: colors.separator.withValues(alpha: 0.05),
+                    ),
+                ],
+              );
+            }),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTransactionItem(PaymentModel record, ClubColors colors) {
+  Widget _buildTransactionItem(PaymentModel record, McColors colors) {
     final isRecharge = record.turnoverType.contains('充值');
     final amount = record.amount;
     final date = record.datetimeStr;
     final description = record.resume;
 
-    return ClubListTile(
+    return McListTile(
       title: Text(description.trim()),
       subtitle: Text(date),
       trailing: Text(
@@ -286,8 +278,8 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
     );
   }
 
-  Widget _buildLoginPrompt(ClubColors colors, AppLocalizations l10n) {
-    return ClubCard(
+  Widget _buildLoginPrompt(McColors colors, AppLocalizations l10n) {
+    return McCard.elevated(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
       child: Column(
         children: [
@@ -306,19 +298,13 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
           const SizedBox(height: 24),
           Text(
             l10n.noCardData,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             l10n.noCardDataSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              color: colors.secondaryLabel,
-            ),
+            style: TextStyle(fontSize: 15, color: colors.secondaryLabel),
           ),
         ],
       ),
@@ -328,7 +314,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
   Widget _buildSettingsSection(
     PaymentState payment,
     PaymentStore controller,
-    ClubColors colors,
+    McColors colors,
     AppLocalizations l10n,
   ) {
     return Column(
@@ -346,12 +332,15 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
             ),
           ),
         ),
-        ClubCard(
+        McCard.elevated(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
-              ClubListTile(
-                leading:
-                    Icon(Icons.lock_outline_rounded, color: colors.primary),
+              McListTile(
+                leading: Icon(
+                  Icons.lock_outline_rounded,
+                  color: colors.primary,
+                ),
                 title: Text(l10n.paymentPasswordTitle),
                 subtitle: Text(
                   payment.password.isEmpty
@@ -367,7 +356,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
                     ? null
                     : () => _showPasswordDialog(controller, payment),
               ),
-              ClubListTile(
+              McListTile(
                 leading: Icon(Icons.apps_rounded, color: colors.primary),
                 title: Text(l10n.showPaymentTile),
                 subtitle: Text(l10n.showPaymentTileSubtitle),

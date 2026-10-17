@@ -1,11 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/models/info_model.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
-
-import 'club_card.dart';
 
 class StudyCreditCard extends StatelessWidget {
   final InfoModel data;
@@ -17,9 +13,10 @@ class StudyCreditCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(12),
       decoration: ShapeDecoration(
-        shape: ClubSmoothCorners.shape(ClubRadii.card),
+        shape: McSmoothCorners.shape(McRadii.cardBorder),
       ),
-      child: ClubCard(
+      child: McCard.elevated(
+        padding: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -64,7 +61,7 @@ class StudyCreditCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: ShapeDecoration(
             color: theme.colorScheme.primary.withValues(alpha: 0.1),
-            shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+            shape: McSmoothCorners.shape(McRadii.navigationBorder),
           ),
           child: Icon(
             Icons.school_rounded,
@@ -100,8 +97,9 @@ class StudyCreditCard extends StatelessWidget {
 
   Widget _buildMainCreditCard(BuildContext context) {
     final theme = Theme.of(context);
-    final progress =
-        data.total.full > 0 ? data.total.actual / data.total.full : 0.0;
+    final progress = data.total.full > 0
+        ? data.total.actual / data.total.full
+        : 0.0;
 
     return Container(
       padding: const EdgeInsets.only(left: 0, right: 20, top: 20, bottom: 20),
@@ -118,7 +116,7 @@ class StudyCreditCard extends StatelessWidget {
                     height: 20,
                     decoration: ShapeDecoration(
                       color: theme.colorScheme.error,
-                      shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
+                      shape: McSmoothCorners.shape(McRadii.indicatorBorder),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -159,7 +157,7 @@ class StudyCreditCard extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -175,7 +173,7 @@ class StudyCreditCard extends StatelessWidget {
           height: 20,
           decoration: ShapeDecoration(
             color: theme.colorScheme.primary,
-            shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
+            shape: McSmoothCorners.shape(McRadii.indicatorBorder),
           ),
         ),
         const SizedBox(width: 12),
@@ -255,7 +253,7 @@ class StudyCreditCard extends StatelessWidget {
       height: 6,
       decoration: ShapeDecoration(
         color: theme.colorScheme.outline.withValues(alpha: 0.2),
-        shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+        shape: McSmoothCorners.shape(McRadii.xsBorder),
       ),
       child: Stack(
         children: [
@@ -265,7 +263,7 @@ class StudyCreditCard extends StatelessWidget {
             width: double.infinity,
             decoration: ShapeDecoration(
               color: theme.colorScheme.outline.withValues(alpha: 0.1),
-              shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+              shape: McSmoothCorners.shape(McRadii.xsBorder),
             ),
           ),
           AnimatedContainer(
@@ -278,16 +276,20 @@ class StudyCreditCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       _getProgressColor(clampedProgress, theme),
-                      _getProgressColor(clampedProgress, theme)
-                          .withValues(alpha: 0.8),
+                      _getProgressColor(
+                        clampedProgress,
+                        theme,
+                      ).withValues(alpha: 0.8),
                     ],
                   ),
-                  shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+                  shape: McSmoothCorners.shape(McRadii.xsBorder),
                   shadows: clampedProgress > 0
                       ? [
                           BoxShadow(
-                            color: _getProgressColor(clampedProgress, theme)
-                                .withValues(alpha: 0.3),
+                            color: _getProgressColor(
+                              clampedProgress,
+                              theme,
+                            ).withValues(alpha: 0.3),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -303,10 +305,9 @@ class StudyCreditCard extends StatelessWidget {
   }
 
   Color _getProgressColor(double progress, ThemeData theme) {
-    final colors = theme.extension<ClubColors>() ??
-        (theme.brightness == Brightness.dark
-            ? ClubColors.dark
-            : ClubColors.light);
+    final colors =
+        theme.extension<McColors>() ??
+        (theme.brightness == Brightness.dark ? McColors.dark : McColors.light);
     if (progress >= 1.0) {
       return colors.success;
     } else if (progress >= 0.8) {

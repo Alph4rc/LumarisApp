@@ -1,9 +1,9 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 
 // 添加触觉反馈设置组件
 class HapticFeedbackSetting extends ConsumerWidget {
@@ -14,13 +14,9 @@ class HapticFeedbackSetting extends ConsumerWidget {
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
 
-    return ClubListTile(
+    return McListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: Icon(
-        Icons.vibration,
-        size: 20,
-        color: Colors.deepPurple,
-      ),
+      leading: Icon(Icons.vibration, size: 20, color: Colors.deepPurple),
       title: Text(context.l10n.hapticFeedback),
       subtitle: Text(context.l10n.hapticFeedbackSubtitle),
       trailing: CupertinoSwitch(

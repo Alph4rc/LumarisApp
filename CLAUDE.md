@@ -123,7 +123,7 @@ lib/
 ├── ui/                       # UI layer
 │   ├── components/           # Reusable widgets
 │   ├── pages/                # Page widgets (one per route)
-│   └── theme/                # ClubTheme (light/dark), color scheme
+│   └── theme/                # ThemeModeCodec; app theming comes from luamris_ui (McThemeData)
 ├── main.dart                 # Entry point, platform init, provider bootstrap
 └── main_app.dart             # Platform-adaptive app shell with navigation
 ```

@@ -1,12 +1,9 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
-import 'package:ios_club_app/ui/components/club_menu.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 课程详情弹窗组件
 ///
@@ -25,7 +22,7 @@ class CourseDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
     final isDesktop =
@@ -35,8 +32,8 @@ class CourseDetailSheet extends StatelessWidget {
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: ShapeDecoration(
         color: colors.cardBackground,
-        shape: ClubSmoothCorners.shape(
-          isDesktop ? ClubRadii.card : ClubRadii.sheetTop,
+        shape: McSmoothCorners.shape(
+          isDesktop ? McRadii.cardBorder : McRadii.sheetTopBorder,
         ),
       ),
       child: Column(
@@ -122,16 +119,16 @@ class CourseDetailSheet extends StatelessWidget {
   }
 
   Widget _buildActionMenu(BuildContext context) {
-    return ClubMenu<String>(
-      items: <ClubMenuItem<String>>[
+    return McMenu<String>(
+      items: <McMenuItem<String>>[
         if (onEdit != null)
-          ClubMenuItem<String>(
+          McMenuItem<String>(
             value: 'edit',
             label: context.l10n.editCourse,
             icon: CupertinoIcons.pencil,
           ),
         if (onDelete != null)
-          ClubMenuItem<String>(
+          McMenuItem<String>(
             value: 'delete',
             label: context.l10n.deleteCourse,
             icon: CupertinoIcons.delete,
@@ -156,7 +153,7 @@ class CourseDetailSheet extends StatelessWidget {
     required String content,
     required Color color,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -166,13 +163,9 @@ class CourseDetailSheet extends StatelessWidget {
           height: 36,
           decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            shape: ClubSmoothCorners.shape(ClubRadii.control),
+            shape: McSmoothCorners.shape(McRadii.controlBorder),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: color,
-          ),
+          child: Icon(icon, size: 20, color: color),
         ),
         const SizedBox(width: 14),
         // 文本内容
@@ -243,7 +236,7 @@ class CourseDetailSheet extends StatelessWidget {
       return showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: ClubSmoothCorners.shape(ClubRadii.card),
+          shape: McSmoothCorners.shape(McRadii.cardBorder),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: CourseDetailSheet(

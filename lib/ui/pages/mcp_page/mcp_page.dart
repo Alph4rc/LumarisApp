@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -8,14 +9,7 @@ import 'package:ios_club_app/features/mcp/models/mcp_tool.dart';
 import 'package:ios_club_app/features/mcp/services/mcp_config_generator.dart';
 import 'package:ios_club_app/features/mcp/services/mcp_probe_service.dart';
 import 'package:ios_club_app/features/mcp/services/mcp_token_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 光序 MCP 配置页：展示服务地址、保存令牌，并生成可复制的客户端配置。
 class McpPage extends StatefulWidget {
@@ -92,11 +86,11 @@ class _McpPageState extends State<McpPage> {
       }
     });
 
-    showClubSnackBar(
+    McFeedback.showMessage(
       context,
-      Text(
-        saved ? context.l10n.mcpTokenSaved : context.l10n.mcpTokenSaveFailed,
-      ),
+      message: saved
+          ? context.l10n.mcpTokenSaved
+          : context.l10n.mcpTokenSaveFailed,
     );
   }
 
@@ -128,7 +122,7 @@ class _McpPageState extends State<McpPage> {
     });
 
     if (!cleared) {
-      showClubSnackBar(context, Text(context.l10n.mcpTokenSaveFailed));
+      McFeedback.showMessage(context, message: context.l10n.mcpTokenSaveFailed);
     }
   }
 
@@ -138,7 +132,7 @@ class _McpPageState extends State<McpPage> {
       return;
     }
 
-    showClubSnackBar(context, Text(context.l10n.copiedToClipboard));
+    McFeedback.showMessage(context, message: context.l10n.copiedToClipboard);
   }
 
   Future<void> _testConnection() async {
@@ -160,7 +154,7 @@ class _McpPageState extends State<McpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final jsonConfig = McpConfigGenerator.buildJson(_tokenController.text);
     final cliCommand = McpConfigGenerator.buildClaudeCodeCommand(
@@ -168,7 +162,7 @@ class _McpPageState extends State<McpPage> {
     );
 
     return Scaffold(
-      appBar: ClubAppBar(title: l10n.mcpTitle),
+      appBar: McAppBar(title: l10n.mcpTitle),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final horizontalPadding = constraints.maxWidth > 600 ? 32.0 : 16.0;
@@ -228,7 +222,7 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -248,13 +242,14 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildServerCard(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
 
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
-          ClubListTile(
+          McListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
@@ -271,7 +266,7 @@ class _McpPageState extends State<McpPage> {
               onPressed: () => _copy(McpConstants.endpoint),
             ),
           ),
-          ClubListTile(
+          McListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
@@ -293,11 +288,11 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildTokenCard(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final disabled = !_tokenLoaded || _savingToken;
 
-    return ClubCard(
+    return McCard.elevated(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +322,7 @@ class _McpPageState extends State<McpPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: colors.surfaceRaised,
-              borderRadius: BorderRadius.circular(ClubRadii.md),
+              borderRadius: BorderRadius.circular(McRadii.md),
               border: Border.all(
                 color: colors.separator.withValues(alpha: 0.2),
               ),
@@ -384,7 +379,7 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildTokenStatusChip(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final normalized = McpConfigGenerator.normalizeToken(_tokenController.text);
 
     final String text;
@@ -422,11 +417,11 @@ class _McpPageState extends State<McpPage> {
     String jsonConfig,
     String cliCommand,
   ) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final enabled = _tokenLoaded;
 
-    return ClubCard(
+    return McCard.elevated(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,14 +452,14 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildCodeBlock(BuildContext context, String text) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: ShapeDecoration(
         color: colors.surfaceRaised,
-        shape: ClubSmoothCorners.shape(ClubRadii.control),
+        shape: McSmoothCorners.shape(McRadii.controlBorder),
       ),
       child: SelectableText(
         text,
@@ -501,12 +496,12 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildConnectionCard(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final normalized = McpConfigGenerator.normalizeToken(_tokenController.text);
     final result = _probeResult;
 
-    return ClubCard(
+    return McCard.elevated(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,7 +547,7 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildProbeResult(BuildContext context, McpProbeResult result) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     if (!result.isSuccess) {
       return Row(
@@ -643,7 +638,7 @@ class _McpPageState extends State<McpPage> {
   }
 
   Widget _buildToolRow(BuildContext context, McpTool tool) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),

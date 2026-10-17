@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,18 +10,12 @@ import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/electric_data.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ElectricityPage extends ConsumerStatefulWidget {
   const ElectricityPage({super.key});
@@ -65,22 +60,24 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       electricityStoreProvider.select((state) => state.hasConfiguredSource),
     );
     final l10n = context.l10n;
-    final isLogin =
-        ref.watch(userStoreProvider.select((state) => state.isLogin));
-    final school =
-        ref.watch(schoolStoreProvider.select((state) => state.school));
+    final isLogin = ref.watch(
+      userStoreProvider.select((state) => state.isLogin),
+    );
+    final school = ref.watch(
+      schoolStoreProvider.select((state) => state.school),
+    );
     final canElectricity = school?.supports(Feature.electricity) ?? true;
 
     if (school != null && !canElectricity) {
       return Scaffold(
-        appBar: ClubAppBar(title: l10n.electricityManagement),
+        appBar: McAppBar(title: l10n.electricityManagement),
         body: Center(child: Text(l10n.schoolNotSupported)),
       );
     }
 
     if (!isLogin) {
       return Scaffold(
-        appBar: ClubAppBar(title: l10n.electricityManagement),
+        appBar: McAppBar(title: l10n.electricityManagement),
         body: EmptyWidget(
           title: l10n.guestMode,
           subtitle: l10n.guestModeSubtitle,
@@ -96,9 +93,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     }
     if (kIsWeb) {
       return Scaffold(
-        appBar: ClubAppBar(
-          title: l10n.electricityManagement,
-        ),
+        appBar: McAppBar(title: l10n.electricityManagement),
         body: EmptyWidget(
           title: l10n.webNotSupported,
           subtitle: l10n.webNotSupportedSubtitle,
@@ -107,56 +102,58 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       );
     }
     return Scaffold(
-        appBar: ClubAppBar(
-          title: l10n.electricityManagement,
-          actions: [
-            CupertinoButton(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              onPressed: _handleElectricityAction,
-              child: Icon(
-                hasElectricityData
-                    ? CupertinoIcons.arrow_2_circlepath
-                    : hasConfiguredSource
-                        ? CupertinoIcons.arrow_2_circlepath
-                        : CupertinoIcons.add,
-                color: Theme.of(context).colorScheme.primary,
-                size: 24,
-              ),
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: _handlePullToRefresh,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 当前电费头部
-                _buildCurrentElectricityHeader(),
-
-                const SizedBox(height: 32),
-
-                // 电费图表卡片
-                if (hasElectricityData) _buildChartCard(),
-
-                if (hasElectricityData) const SizedBox(height: 24),
-
-                // 设置选项
-                if (hasElectricityData) _buildSettingsSection(),
-
-                const SizedBox(height: 24),
-
-                if (hasElectricityData)
-                  _buildSubscriptionSection(
-                      hasElectricityData: hasElectricityData),
-              ],
+      appBar: McAppBar(
+        title: l10n.electricityManagement,
+        actions: [
+          CupertinoButton(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            onPressed: _handleElectricityAction,
+            child: Icon(
+              hasElectricityData
+                  ? CupertinoIcons.arrow_2_circlepath
+                  : hasConfiguredSource
+                  ? CupertinoIcons.arrow_2_circlepath
+                  : CupertinoIcons.add,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
             ),
           ),
-        ));
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _handlePullToRefresh,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 当前电费头部
+              _buildCurrentElectricityHeader(),
+
+              const SizedBox(height: 32),
+
+              // 电费图表卡片
+              if (hasElectricityData) _buildChartCard(),
+
+              if (hasElectricityData) const SizedBox(height: 24),
+
+              // 设置选项
+              if (hasElectricityData) _buildSettingsSection(),
+
+              const SizedBox(height: 24),
+
+              if (hasElectricityData)
+                _buildSubscriptionSection(
+                  hasElectricityData: hasElectricityData,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _handlePullToRefresh() async {
@@ -249,22 +246,24 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 ),
               const SizedBox(height: 16),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: ShapeDecoration(
                   color: electricityState.hasData
                       ? statusColor.withValues(alpha: 0.1)
                       : colorScheme.surfaceContainerHighest,
-                  shape: ClubSmoothCorners.shape(BorderRadius.circular(20)),
+                  shape: McSmoothCorners.shape(BorderRadius.circular(20)),
                 ),
                 child: Text(
                   electricityState.hasData
                       ? (electricityState.electricity <= 10
-                          ? l10n.electricityLowBalance
-                          : l10n.electricitySufficient)
+                            ? l10n.electricityLowBalance
+                            : l10n.electricitySufficient)
                       : electricityState.hasConfiguredSource
-                          ? l10n.fetchFailed
-                          : l10n.electricityAddTip,
+                      ? l10n.fetchFailed
+                      : l10n.electricityAddTip,
                   style: TextStyle(
                     fontSize: 13,
                     color: electricityState.hasData
@@ -286,112 +285,118 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       builder: (context, ref, child) {
         final electricityState = ref.watch(
           electricityStoreProvider.select(
-            (state) => (
-              isLoading: state.isLoading,
-              weeklyData: state.weeklyData,
-            ),
+            (state) =>
+                (isLoading: state.isLoading, weeklyData: state.weeklyData),
           ),
         );
         final colorScheme = Theme.of(context).colorScheme;
         final l10n = context.l10n;
         return AnimatedCard(
           delay: const Duration(milliseconds: 150),
-          child: ClubCard(
+          child: McCard.elevated(
+            padding: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Builder(builder: (context) {
-                if (electricityState.isLoading) {
-                  return SizedBox(
-                    height: 240,
-                    child: Center(
-                      child: LoadingStateView(
-                        title: l10n.electricityLoading,
-                        subtitle: l10n.electricityLoadingSubtitle,
-                        compact: true,
-                        showCard: false,
-                        padding: EdgeInsets.zero,
-                      ),
-                    ),
-                  );
-                }
-
-                final data = electricityState.weeklyData;
-                if (data.isEmpty) {
-                  return SizedBox(
-                    height: 220,
-                    child: Center(
-                      child: EmptyWidget(
-                        title: l10n.noUsageDetails,
-                        subtitle: l10n.noUsageDetailsSubtitle,
-                        icon: CupertinoIcons.chart_bar_alt_fill,
-                      ),
-                    ),
-                  );
-                }
-
-                final dailySummaries = _buildDailySummaries(data);
-                final totalCost = data.fold<double>(
-                  0,
-                  (previousValue, item) => previousValue + item.value,
-                );
-                final todayCost = data
-                    .where((item) => _isSameDay(item.timestamp, DateTime.now()))
-                    .fold<double>(
-                      0,
-                      (previousValue, item) => previousValue + item.value,
-                    );
-                final averageDailyCost = dailySummaries.isEmpty
-                    ? 0.0
-                    : totalCost / dailySummaries.length;
-                final peakData = data.reduce(
-                  (currentPeak, item) =>
-                      item.value > currentPeak.value ? item : currentPeak,
-                );
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n.electricityCost,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+              child: Builder(
+                builder: (context) {
+                  if (electricityState.isLoading) {
+                    return SizedBox(
+                      height: 240,
+                      child: Center(
+                        child: LoadingStateView(
+                          title: l10n.electricityLoading,
+                          subtitle: l10n.electricityLoadingSubtitle,
+                          compact: true,
+                          showCard: false,
+                          padding: EdgeInsets.zero,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: ShapeDecoration(
-                            color: colorScheme.surfaceContainerHighest,
-                            shape: ClubSmoothCorners.shape(
-                                BorderRadius.circular(12)),
-                          ),
-                          child: Text(
-                            l10n.lastNDays(dailySummaries.length),
+                      ),
+                    );
+                  }
+
+                  final data = electricityState.weeklyData;
+                  if (data.isEmpty) {
+                    return SizedBox(
+                      height: 220,
+                      child: Center(
+                        child: EmptyWidget(
+                          title: l10n.noUsageDetails,
+                          subtitle: l10n.noUsageDetailsSubtitle,
+                          icon: CupertinoIcons.chart_bar_alt_fill,
+                        ),
+                      ),
+                    );
+                  }
+
+                  final dailySummaries = _buildDailySummaries(data);
+                  final totalCost = data.fold<double>(
+                    0,
+                    (previousValue, item) => previousValue + item.value,
+                  );
+                  final todayCost = data
+                      .where(
+                        (item) => _isSameDay(item.timestamp, DateTime.now()),
+                      )
+                      .fold<double>(
+                        0,
+                        (previousValue, item) => previousValue + item.value,
+                      );
+                  final averageDailyCost = dailySummaries.isEmpty
+                      ? 0.0
+                      : totalCost / dailySummaries.length;
+                  final peakData = data.reduce(
+                    (currentPeak, item) =>
+                        item.value > currentPeak.value ? item : currentPeak,
+                  );
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            l10n.electricityCost,
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildCostOverview(
-                      totalCost: totalCost,
-                      todayCost: todayCost,
-                      averageDailyCost: averageDailyCost,
-                      peakData: peakData,
-                    ),
-                    const SizedBox(height: 32),
-                    _buildHourlyCostScroller(data),
-                  ],
-                );
-              }),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: ShapeDecoration(
+                              color: colorScheme.surfaceContainerHighest,
+                              shape: McSmoothCorners.shape(
+                                BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              l10n.lastNDays(dailySummaries.length),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildCostOverview(
+                        totalCost: totalCost,
+                        todayCost: todayCost,
+                        averageDailyCost: averageDailyCost,
+                        peakData: peakData,
+                      ),
+                      const SizedBox(height: 32),
+                      _buildHourlyCostScroller(data),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         );
@@ -418,9 +423,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               ),
             ),
             Container(
-                width: 1,
-                height: 40,
-                color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              width: 1,
+              height: 40,
+              color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+            ),
             Expanded(
               child: _buildMinimalMetric(
                 label: l10n.todayCost,
@@ -439,9 +445,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               ),
             ),
             Container(
-                width: 1,
-                height: 40,
-                color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              width: 1,
+              height: 40,
+              color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+            ),
             Expanded(
               child: _buildMinimalMetric(
                 label: l10n.peakHours,
@@ -454,10 +461,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     );
   }
 
-  Widget _buildMinimalMetric({
-    required String label,
-    required String value,
-  }) {
+  Widget _buildMinimalMetric({required String label, required String value}) {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
@@ -493,10 +497,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       children: [
         Text(
           l10n.hourlyDetails,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 16),
         SingleChildScrollView(
@@ -507,10 +508,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
             children: recentData.map((item) {
               return Padding(
                 padding: const EdgeInsets.only(right: 16),
-                child: _buildHourlyCostTile(
-                  data: item,
-                  maxValue: maxValue,
-                ),
+                child: _buildHourlyCostTile(data: item, maxValue: maxValue),
               );
             }).toList(),
           ),
@@ -550,7 +548,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                   width: 12,
                   decoration: ShapeDecoration(
                     color: colorScheme.primary,
-                    shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
+                    shape: McSmoothCorners.shape(BorderRadius.circular(6)),
                   ),
                 ),
               ),
@@ -586,10 +584,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     }
 
     return dailyCosts.entries
-        .map((entry) => _ElectricityDailySummary(
-              date: entry.key,
-              cost: entry.value,
-            ))
+        .map(
+          (entry) =>
+              _ElectricityDailySummary(date: entry.key, cost: entry.value),
+        )
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
   }
@@ -605,7 +603,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   Color _successColor(BuildContext context) {
-    return context.clubColors.success;
+    return context.mc.colors.success;
   }
 
   Widget _buildSettingsSection() {
@@ -620,14 +618,19 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
         return AnimatedCard(
           delay: const Duration(milliseconds: 300),
-          child: ClubCard(
+          child: McCard.elevated(
+            padding: EdgeInsets.zero,
             child: Column(
               children: [
-                ClubListTile(
-                  leading: Icon(CupertinoIcons.square_grid_2x2,
-                      color: colorScheme.primary),
-                  title: Text(l10n.addToHome,
-                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                McListTile(
+                  leading: Icon(
+                    CupertinoIcons.square_grid_2x2,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(
+                    l10n.addToHome,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
                   subtitle: Text(l10n.showElectricityTile),
                   trailing: CupertinoSwitch(
                     value: tiles.contains('电费'),
@@ -636,14 +639,21 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                     },
                   ),
                 ),
-                ClubListTile(
-                  leading: Icon(CupertinoIcons.money_yen_circle,
-                      color: colorScheme.primary),
-                  title: Text(l10n.electricityRecharge,
-                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                McListTile(
+                  leading: Icon(
+                    CupertinoIcons.money_yen_circle,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(
+                    l10n.electricityRecharge,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
                   subtitle: Text(l10n.electricityRechargeSubtitle),
-                  trailing: Icon(CupertinoIcons.chevron_right,
-                      size: 16, color: colorScheme.onSurfaceVariant),
+                  trailing: Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 16,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   onTap: () async {
                     await ref
                         .read(electricityServiceProvider)
@@ -664,7 +674,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
     return AnimatedCard(
       delay: const Duration(milliseconds: 360),
-      child: ClubCard(
+      child: McCard.elevated(
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -721,7 +732,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                 subtitle: l10n.noElectricityDataSubtitle,
               )
             else ...[
-              ClubListTile(
+              McListTile(
                 leading: Icon(
                   _hasActiveSubscription
                       ? CupertinoIcons.check_mark_circled_solid
@@ -734,9 +745,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                       : l10n.addLowBalanceAlert,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
-                subtitle: Text(
-                  _buildSubscriptionSummary(),
-                ),
+                subtitle: Text(_buildSubscriptionSummary()),
                 trailing: Icon(
                   _hasActiveSubscription
                       ? CupertinoIcons.chevron_right
@@ -751,7 +760,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                     : _showCreateSubscriptionDialog,
               ),
               if (_hasActiveSubscription)
-                ClubListTile(
+                McListTile(
                   leading: Icon(
                     CupertinoIcons.delete,
                     color: colorScheme.error,
@@ -760,9 +769,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                     l10n.deleteSubscription,
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
-                  subtitle: Text(
-                    l10n.deleteSubDesc,
-                  ),
+                  subtitle: Text(l10n.deleteSubDesc),
                   trailing: Icon(
                     CupertinoIcons.chevron_right,
                     size: 18,
@@ -780,7 +787,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
                       child: CircularProgressIndicator(strokeWidth: 2.4),
                     ),
                   ),
-                )
+                ),
             ],
           ],
         ),
@@ -799,18 +806,11 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 28,
-            color: colorScheme.onSurfaceVariant,
-          ),
+          Icon(icon, size: 28, color: colorScheme.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
@@ -912,10 +912,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           isDefaultAction: true,
           onPressed: () async {
             final sourceUrl = _urlController.text;
-            final value =
-                await ref.read(electricityServiceProvider).fetchCurrentBalance(
-                      url: sourceUrl,
-                    );
+            final value = await ref
+                .read(electricityServiceProvider)
+                .fetchCurrentBalance(url: sourceUrl);
             if (!mounted) {
               return;
             }
@@ -936,8 +935,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   }
 
   Future<void> _restoreSubscriptionPreferences() async {
-    final email =
-        await ref.read(electricityServiceProvider).getSavedSubscriptionEmail();
+    final email = await ref
+        .read(electricityServiceProvider)
+        .getSavedSubscriptionEmail();
     if (!mounted) {
       return;
     }
@@ -991,7 +991,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         return;
       }
       final l10n = context.l10n;
-      showClubSnackBar(context, Text('${l10n.electricitySubLoadFailed}: $e'));
+      McFeedback.showMessage(
+        context,
+        message: '${l10n.electricitySubLoadFailed}: $e',
+      );
       setState(() {
         _hasLoadedSubscriptions = true;
       });
@@ -1043,8 +1046,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               child: CupertinoTextField(
                 controller: _subscriptionThresholdController,
                 placeholder: l10n.remindThresholdPlaceholder,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 padding: const EdgeInsets.all(12),
                 clearButtonMode: OverlayVisibilityMode.editing,
                 style: const TextStyle(fontSize: 14),
@@ -1074,15 +1078,15 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
     final l10nSB = context.l10n;
     if (email.isEmpty) {
-      showClubSnackBar(context, Text(l10nSB.pleaseEnterEmail));
+      McFeedback.showMessage(context, message: l10nSB.pleaseEnterEmail);
       return;
     }
     if (!_isValidEmail(email)) {
-      showClubSnackBar(context, Text(l10nSB.pleaseEnterValidEmail));
+      McFeedback.showMessage(context, message: l10nSB.pleaseEnterValidEmail);
       return;
     }
     if (threshold == null || threshold <= 0) {
-      showClubSnackBar(context, Text(l10nSB.pleaseEnterThreshold));
+      McFeedback.showMessage(context, message: l10nSB.pleaseEnterThreshold);
       return;
     }
 
@@ -1091,10 +1095,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     });
 
     try {
-      await ref.read(electricityServiceProvider).createSubscription(
-            email: email,
-            threshold: threshold,
-          );
+      await ref
+          .read(electricityServiceProvider)
+          .createSubscription(email: email, threshold: threshold);
 
       if (!mounted) {
         return;
@@ -1111,12 +1114,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text(l10nSB.lowBalanceAlertCreated));
+      McFeedback.showMessage(context, message: l10nSB.lowBalanceAlertCreated);
     } catch (e) {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text('${l10nSB.createSubFailed}: $e'));
+      McFeedback.showMessage(context, message: '${l10nSB.createSubFailed}: $e');
       setState(() {
         _isSubscriptionLoading = false;
       });
@@ -1127,7 +1130,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     final l10n = context.l10n;
     if (_hasActiveSubscription && _subscriptionEmail.isNotEmpty) {
       return l10n.currentSubInfo(
-          _subscriptionEmail, _formatThreshold(_subscriptionThreshold));
+        _subscriptionEmail,
+        _formatThreshold(_subscriptionThreshold),
+      );
     }
     return l10n.subSetupHint;
   }
@@ -1144,8 +1149,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           children: [
             _buildSubscriptionDetailLine(
               label: l10n.remindEmailLabel,
-              value:
-                  _subscriptionEmail.isEmpty ? l10n.notSet : _subscriptionEmail,
+              value: _subscriptionEmail.isEmpty
+                  ? l10n.notSet
+                  : _subscriptionEmail,
             ),
             const SizedBox(height: 10),
             _buildSubscriptionDetailLine(
@@ -1156,10 +1162,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
         ),
       ),
       actions: [
-        PlatformDialogAction<void>(
-          label: l10n.gotIt,
-          isDefaultAction: true,
-        ),
+        PlatformDialogAction<void>(label: l10n.gotIt, isDefaultAction: true),
       ],
     );
   }
@@ -1187,10 +1190,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -1200,7 +1200,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Future<void> _showDeleteSubscriptionDialog() async {
     final l10n = context.l10n;
     if (_subscriptionId.isEmpty) {
-      showClubSnackBar(context, Text(l10n.noSubToDelete));
+      McFeedback.showMessage(context, message: l10n.noSubToDelete);
       return;
     }
 
@@ -1220,7 +1220,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
   Future<void> _deleteSubscription() async {
     final l10n = context.l10n;
     if (_subscriptionId.isEmpty) {
-      showClubSnackBar(context, Text(l10n.noSubToDelete));
+      McFeedback.showMessage(context, message: l10n.noSubToDelete);
       return;
     }
 
@@ -1229,9 +1229,9 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
     });
 
     try {
-      await ref.read(electricityServiceProvider).deleteSubscription(
-            _subscriptionId,
-          );
+      await ref
+          .read(electricityServiceProvider)
+          .deleteSubscription(_subscriptionId);
 
       if (!mounted) {
         return;
@@ -1248,12 +1248,12 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text(l10n.lowBalanceAlertDeleted));
+      McFeedback.showMessage(context, message: l10n.lowBalanceAlertDeleted);
     } catch (e) {
       if (!mounted) {
         return;
       }
-      showClubSnackBar(context, Text('${l10n.deleteSubFailed}: $e'));
+      McFeedback.showMessage(context, message: '${l10n.deleteSubFailed}: $e');
       setState(() {
         _isSubscriptionLoading = false;
       });
@@ -1277,10 +1277,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 }
 
 class _ElectricityDailySummary {
-  const _ElectricityDailySummary({
-    required this.date,
-    required this.cost,
-  });
+  const _ElectricityDailySummary({required this.date, required this.cost});
 
   final DateTime date;
   final double cost;

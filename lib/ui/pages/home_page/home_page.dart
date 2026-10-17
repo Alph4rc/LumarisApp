@@ -1,11 +1,11 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/state/user_store.dart';
 
 import 'package:ios_club_app/ui/pages/home_page/exam_card.dart';
@@ -39,7 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       _lastPressedTime = now;
 
       // 显示提示
-      showClubSnackBar(context, Text(context.l10n.doubleTapExit));
+      McFeedback.showMessage(context, message: context.l10n.doubleTapExit);
       return false; // 不退出
     }
 

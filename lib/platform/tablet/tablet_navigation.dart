@@ -1,7 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 
 /// 平板设备导航组件
 ///
@@ -26,7 +24,7 @@ class TabletNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Scaffold(
       body: SafeArea(
@@ -45,10 +43,7 @@ class TabletNavigation extends StatelessWidget {
                   selectedIcon: destination.selectedIcon,
                   label: Text(
                     destination.label,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      letterSpacing: 0.2,
-                    ),
+                    style: const TextStyle(fontSize: 11, letterSpacing: 0.2),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 6),
                 );
@@ -74,12 +69,10 @@ class TabletNavigation extends StatelessWidget {
                 letterSpacing: 0.2,
               ),
               indicatorColor: colorScheme.primary.withValues(alpha: 0.12),
-              indicatorShape: ClubSmoothCorners.shape(ClubRadii.navigation),
+              indicatorShape: McSmoothCorners.shape(McRadii.navigationBorder),
               minWidth: 88,
             ),
-            Expanded(
-              child: child,
-            ),
+            Expanded(child: child),
           ],
         ),
       ),

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
+import 'package:ios_club_app/ui/theme/theme_mode_codec.dart';
 
 import '../features/basic/models/school.dart';
 import '../features/basic/services/school_api.dart';
@@ -13,14 +13,15 @@ import '../features/education/services/edu_http_client_manager.dart';
 import '../features/education/services/education_cache_service.dart';
 import 'prefs_keys.dart';
 
-final settingsStoreProvider =
-    NotifierProvider<SettingsStore, SettingsState>(SettingsStore.new);
+final settingsStoreProvider = NotifierProvider<SettingsStore, SettingsState>(
+  SettingsStore.new,
+);
 
 /// 学校列表 Provider：从 API 获取，失败时回退到本地 fallback
 final schoolListProvider =
     AsyncNotifierProvider<SchoolListNotifier, List<School>>(
-  SchoolListNotifier.new,
-);
+      SchoolListNotifier.new,
+    );
 
 class SchoolListNotifier extends AsyncNotifier<List<School>> {
   @override
@@ -121,7 +122,7 @@ class SettingsStore extends Notifier<SettingsState> {
       updateIgnored: prefs.getBool(PrefsKeys.UPDATE_IGNORED) ?? false,
       fontFamily: prefs.getString(PrefsKeys.FONT_FAMILY) ?? '',
       showCourseGrid: prefs.getBool(PrefsKeys.SHOW_COURSE_GRID) ?? false,
-      themeMode: ClubThemeModeCodec.fromPreference(
+      themeMode: ThemeModeCodec.fromPreference(
         prefs.getString(PrefsKeys.THEME_MODE),
       ),
       localeCode: AppLocaleService.fromPreference(
@@ -130,8 +131,9 @@ class SettingsStore extends Notifier<SettingsState> {
       scheduleBackground: prefs.getString(PrefsKeys.SCHEDULE_BACKGROUND) ?? '',
       customBackgroundImage:
           prefs.getString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE) ?? '',
-      customBackgroundIsDark:
-          prefs.getBool(PrefsKeys.CUSTOM_BACKGROUND_IS_DARK),
+      customBackgroundIsDark: prefs.getBool(
+        PrefsKeys.CUSTOM_BACKGROUND_IS_DARK,
+      ),
       schoolId: prefs.getString(PrefsKeys.SCHOOL_ID) ?? School.defaultCode,
       hasAcceptedAgreement:
           prefs.getBool(PrefsKeys.AGREEMENT_ACCEPTED) ?? false,
@@ -173,8 +175,10 @@ class SettingsStore extends Notifier<SettingsState> {
 
   Future<void> setEnableHapticFeedback(bool value) async {
     state = state.copyWith(enableHapticFeedback: value);
-    await PrefsService.instance
-        .setBool(PrefsKeys.ENABLE_HAPTIC_FEEDBACK, value);
+    await PrefsService.instance.setBool(
+      PrefsKeys.ENABLE_HAPTIC_FEEDBACK,
+      value,
+    );
   }
 
   Future<void> setUpdateIgnored(bool value) async {
@@ -196,7 +200,7 @@ class SettingsStore extends Notifier<SettingsState> {
     state = state.copyWith(themeMode: value);
     await PrefsService.instance.setString(
       PrefsKeys.THEME_MODE,
-      ClubThemeModeCodec.toPreference(value),
+      ThemeModeCodec.toPreference(value),
     );
   }
 
@@ -215,8 +219,10 @@ class SettingsStore extends Notifier<SettingsState> {
 
   Future<void> setCustomBackgroundImage(String value) async {
     state = state.copyWith(customBackgroundImage: value);
-    await PrefsService.instance
-        .setString(PrefsKeys.CUSTOM_BACKGROUND_IMAGE, value);
+    await PrefsService.instance.setString(
+      PrefsKeys.CUSTOM_BACKGROUND_IMAGE,
+      value,
+    );
   }
 
   Future<void> setCustomBackgroundIsDark(bool? value) async {
@@ -255,10 +261,7 @@ class SettingsStore extends Notifier<SettingsState> {
     }
 
     state = state.copyWith(schoolId: normalizedCode);
-    await PrefsService.instance.setString(
-      PrefsKeys.SCHOOL_ID,
-      normalizedCode,
-    );
+    await PrefsService.instance.setString(PrefsKeys.SCHOOL_ID, normalizedCode);
     await SchoolConfigCache.save(school);
 
     EduHttpClientManager.current.updateSchoolConfig(school);

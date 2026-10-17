@@ -60,7 +60,7 @@ ListView.builder(
 ```dart
 AnimatedCard(
   delay: Duration(milliseconds: 100),  // 可选延迟
-  child: ClubCard(
+  child: McCard.elevated(
     child: YourContent(),
   ),
 )
@@ -73,7 +73,7 @@ AnimatedCard(
 ```dart
 InteractiveCard(
   onTap: () => print('Tapped'),
-  child: ClubCard(
+  child: McCard.elevated(
     child: YourContent(),
   ),
 )
@@ -157,7 +157,7 @@ class DataCard extends StatelessWidget {
       child: ShimmerLoading(
         isLoading: isLoading,
         skeleton: CardSkeleton(height: 150),
-        child: ClubCard(
+        child: McCard.elevated(
           child: Text(data),
         ),
       ),
@@ -233,7 +233,7 @@ ListView.builder(
 )
 
 // 卡片添加进入动画
-AnimatedCard(child: ClubCard(...))
+AnimatedCard(child: McCard.elevated(...))
 
 // 按钮添加交互反馈
 AnimatedButton(onTap: ..., child: ...)

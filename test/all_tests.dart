@@ -5,8 +5,6 @@ import 'unit/course_store_test.dart' as course_store_test;
 import 'unit/course_repository_test.dart' as course_repository_test;
 import 'unit/score_repository_test.dart' as score_repository_test;
 import 'widget/empty_widget_test.dart' as empty_widget_test;
-import 'widget/club_card_test.dart' as club_card_test;
-import 'widget/show_club_snack_bar_test.dart' as show_club_snack_bar_test;
 
 void main() {
   // 运行所有单元测试
@@ -19,6 +17,4 @@ void main() {
 
   // 运行所有小部件测试
   empty_widget_test.main();
-  club_card_test.main();
-  show_club_snack_bar_test.main();
 }

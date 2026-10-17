@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:material_ui/material_ui.dart';
@@ -10,15 +11,8 @@ import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -72,8 +66,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     required String username,
     required String password,
   }) {
-    final website = SchoolConfigCache.read()?.website ??
-        School.fallbackList.first.website;
+    final website =
+        SchoolConfigCache.read()?.website ?? School.fallbackList.first.website;
 
     return Uri.parse(website)
         .replace(
@@ -125,10 +119,10 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
       final ignoredNames = courseStore.ignoreCourses;
 
       final ignores = courseNames
-          .map((i) => CourseIgnore(
-                title: i,
-                isCompleted: ignoredNames.contains(i),
-              ))
+          .map(
+            (i) =>
+                CourseIgnore(title: i, isCompleted: ignoredNames.contains(i)),
+          )
           .toList();
 
       if (!mounted) return;
@@ -149,48 +143,47 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     final l10n = context.l10n;
     final isDesktop = PlatformUtils.isDesktop;
 
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     final schoolState = ref.watch(schoolStoreProvider);
     final school = schoolState.school;
     // The current subscription service is XAUAT-specific. Other schools must
     // provide their own endpoint before this entry can be enabled.
-    final canSyncCalendar = school?.code.toUpperCase() == School.defaultCode &&
+    final canSyncCalendar =
+        school?.code.toUpperCase() == School.defaultCode &&
         (school?.supports(Feature.timetable) ?? false);
     final canEdit = school?.supports(Feature.timetable) ?? false;
 
     return Scaffold(
-        appBar: ClubAppBar(
-          title: l10n.scheduleSettingsTitle,
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isDesktop && canSyncCalendar) ...[
-                _buildSectionTitle(l10n.calendarSubscription),
-                const SizedBox(height: 12),
-                _buildCalendarSection(context, colors),
-                const SizedBox(height: 24),
-              ],
-              if (canEdit) ...[
-                _buildSectionTitle(l10n.scheduleManagement),
-                const SizedBox(height: 12),
-                _buildManagementSection(context, colors),
-                const SizedBox(height: 24),
-              ],
-              _buildSectionTitle(l10n.scheduleBackground),
+      appBar: McAppBar(title: l10n.scheduleSettingsTitle),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!isDesktop && canSyncCalendar) ...[
+              _buildSectionTitle(l10n.calendarSubscription),
               const SizedBox(height: 12),
-              _buildBackgroundSection(context, colors),
-              if (_ignores.isNotEmpty) const SizedBox(height: 24),
-              if (_ignores.isNotEmpty) _buildSectionTitle(l10n.ignoreCourses),
-              if (_ignores.isNotEmpty) const SizedBox(height: 12),
-              if (_ignores.isNotEmpty)
-                _buildIgnoreCourseSection(context, colors),
+              _buildCalendarSection(context, colors),
+              const SizedBox(height: 24),
             ],
-          ),
-        ));
+            if (canEdit) ...[
+              _buildSectionTitle(l10n.scheduleManagement),
+              const SizedBox(height: 12),
+              _buildManagementSection(context, colors),
+              const SizedBox(height: 24),
+            ],
+            _buildSectionTitle(l10n.scheduleBackground),
+            const SizedBox(height: 12),
+            _buildBackgroundSection(context, colors),
+            if (_ignores.isNotEmpty) const SizedBox(height: 24),
+            if (_ignores.isNotEmpty) _buildSectionTitle(l10n.ignoreCourses),
+            if (_ignores.isNotEmpty) const SizedBox(height: 12),
+            if (_ignores.isNotEmpty) _buildIgnoreCourseSection(context, colors),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSectionTitle(String title) {
@@ -204,22 +197,17 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildCalendarSection(BuildContext context, ClubColors colors) {
+  Widget _buildCalendarSection(BuildContext context, McColors colors) {
     final l10n = context.l10n;
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
-          ClubListTile(
-            leading: Icon(
-              Icons.calendar_today_outlined,
-              color: colors.primary,
-            ),
+          McListTile(
+            leading: Icon(Icons.calendar_today_outlined, color: colors.primary),
             title: Text(
               l10n.scheduleWidgetTitle,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             trailing: IconButton(
               icon: const Icon(Icons.open_in_new, size: 20),
@@ -244,7 +232,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                   padding: const EdgeInsets.all(12),
                   decoration: ShapeDecoration(
                     color: colors.surfaceRaised,
-                    shape: ClubSmoothCorners.shape(ClubRadii.control),
+                    shape: McSmoothCorners.shape(McRadii.controlBorder),
                   ),
                   child: Row(
                     children: [
@@ -269,7 +257,10 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                           }
                           Clipboard.setData(ClipboardData(text: webcalUrl));
                           if (context.mounted) {
-                            showClubSnackBar(context, Text(l10n.copiedSuccess));
+                            McFeedback.showMessage(
+                              context,
+                              message: l10n.copiedSuccess,
+                            );
                           }
                         },
                         padding: EdgeInsets.zero,
@@ -283,9 +274,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                   onPressed: () => showCalendarGuidanceDialog(context),
                   icon: const Icon(Icons.help_outline, size: 18),
                   label: Text(l10n.howToImport),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                  ),
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 ),
               ],
             ),
@@ -295,90 +284,95 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildManagementSection(BuildContext context, ClubColors colors) {
+  Widget _buildManagementSection(BuildContext context, McColors colors) {
     final l10n = context.l10n;
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           Material(
-              color: Colors.transparent,
-              shape: ClubSmoothCorners.shape(ClubRadii.card),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                  borderRadius: ClubRadii.card,
-                  customBorder: ClubSmoothCorners.shape(ClubRadii.card),
-                  onTap: () => AppRouter.push(AppRoutes.customCourseManage),
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.edit_calendar_outlined,
-                                color: colors.secondaryLabel,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                l10n.customCourseManage,
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Icon(Icons.arrow_forward_ios, size: 16),
-                              const SizedBox(width: 8),
-                            ],
-                          )
-                        ],
-                      )))),
-          Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: ShapeDecoration(
-                shape: ClubSmoothCorners.shape(ClubRadii.card),
+            color: Colors.transparent,
+            shape: McSmoothCorners.shape(McRadii.cardBorder),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              borderRadius: McRadii.cardBorder,
+              customBorder: McSmoothCorners.shape(McRadii.cardBorder),
+              onTap: () => AppRouter.push(AppRoutes.customCourseManage),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.edit_calendar_outlined,
+                          color: colors.secondaryLabel,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          l10n.customCourseManage,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.arrow_forward_ios, size: 16),
+                        const SizedBox(width: 8),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.grid_on_outlined,
-                        color: colors.secondaryLabel,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.showCourseGrid,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      CupertinoSwitch(
-                        value: settingsStore.showCourseGrid,
-                        onChanged: (value) {
-                          setState(() {
-                            settingsStore.setShowCourseGrid(value);
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                  )
-                ],
-              ))
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: ShapeDecoration(
+              shape: McSmoothCorners.shape(McRadii.cardBorder),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.grid_on_outlined, color: colors.secondaryLabel),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.showCourseGrid,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    CupertinoSwitch(
+                      value: settingsStore.showCourseGrid,
+                      onChanged: (value) {
+                        setState(() {
+                          settingsStore.setShowCourseGrid(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildBackgroundSection(BuildContext context, ClubColors colors) {
+  Widget _buildBackgroundSection(BuildContext context, McColors colors) {
     final l10n = context.l10n;
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           _buildBackgroundOption(context, l10n.noBackground, ''),
@@ -418,15 +412,15 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     String title,
     String value,
   ) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final isSelected = settingsStore.scheduleBackground == value;
     return Material(
-      shape: ClubSmoothCorners.shape(ClubRadii.card),
+      shape: McSmoothCorners.shape(McRadii.cardBorder),
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: ClubRadii.card,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.card),
+        borderRadius: McRadii.cardBorder,
+        customBorder: McSmoothCorners.shape(McRadii.cardBorder),
         onTap: () {
           setState(() {
             settingsStore.setScheduleBackground(value);
@@ -435,7 +429,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: ShapeDecoration(
-            shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+            shape: McSmoothCorners.shape(McRadii.navigationBorder),
           ),
           child: Row(
             children: [
@@ -460,8 +454,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     );
   }
 
-  Widget _buildIgnoreCourseSection(BuildContext context, ClubColors colors) {
-    return ClubCard(
+  Widget _buildIgnoreCourseSection(BuildContext context, McColors colors) {
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -495,10 +490,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         await intent.launch();
       } else {
         if (context.mounted) {
-          showClubSnackBar(
-            context,
-            Text(context.l10n.noCalendarApp),
-          );
+          McFeedback.showMessage(context, message: context.l10n.noCalendarApp);
         }
       }
       return;
@@ -510,9 +502,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
       await launchUrl(uri);
     } else {
       if (context.mounted) {
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(context.l10n.cannotOpenCalendar),
+          message: context.l10n.cannotOpenCalendar,
         );
       }
     }
@@ -535,17 +527,17 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         });
 
         if (mounted) {
-          showClubSnackBar(
+          McFeedback.showMessage(
             context,
-            Text(context.l10n.bgImageSetSuccess),
+            message: context.l10n.bgImageSetSuccess,
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        showClubSnackBar(
+        McFeedback.showMessage(
           context,
-          Text(context.l10n.selectImageFailed),
+          message: context.l10n.selectImageFailed,
         );
       }
       AppLogger.debug('选择背景图片失败: $e');
@@ -569,7 +561,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
       if (!mounted) return;
       setState(() => ignore.isCompleted = !value);
       if (!mounted) return;
-      showClubSnackBar(context, Text(context.l10n.saveFailedRetry));
+      McFeedback.showMessage(context, message: context.l10n.saveFailedRetry);
     }
   }
 
@@ -595,8 +587,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: ShapeDecoration(
-                color: context.clubColors.surfaceRaised,
-                shape: ClubSmoothCorners.shape(ClubRadii.xsBorder),
+                color: context.mc.colors.surfaceRaised,
+                shape: McSmoothCorners.shape(McRadii.xsBorder),
               ),
               child: Row(
                 children: [
@@ -611,9 +603,9 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
                     onPressed: () async {
                       await Clipboard.setData(ClipboardData(text: httpsUrl));
                       if (context.mounted) {
-                        showClubSnackBar(
+                        McFeedback.showMessage(
                           context,
-                          Text(l10n.linkCopiedToClipboard),
+                          message: l10n.linkCopiedToClipboard,
                         );
                       }
                     },
@@ -648,38 +640,40 @@ class CourseIgnoreItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Material(
-        color: Colors.transparent,
-        shape: ClubSmoothCorners.shape(ClubRadii.card),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-            borderRadius: ClubRadii.card,
-            customBorder: ClubSmoothCorners.shape(ClubRadii.card),
-            onTap: () => onChanged(ignore, !ignore.isCompleted),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Row(
-                children: [
-                  Icon(
-                    ignore.isCompleted
-                        ? Icons.check_box
-                        : Icons.check_box_outline_blank,
-                    color: ignore.isCompleted
-                        ? Theme.of(context).colorScheme.primary
-                        : colors.tertiaryLabel,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      ignore.title,
-                      style: const TextStyle(fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+      color: Colors.transparent,
+      shape: McSmoothCorners.shape(McRadii.cardBorder),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        borderRadius: McRadii.cardBorder,
+        customBorder: McSmoothCorners.shape(McRadii.cardBorder),
+        onTap: () => onChanged(ignore, !ignore.isCompleted),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              Icon(
+                ignore.isCompleted
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank,
+                color: ignore.isCompleted
+                    ? Theme.of(context).colorScheme.primary
+                    : colors.tertiaryLabel,
               ),
-            )));
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  ignore.title,
+                  style: const TextStyle(fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -1,13 +1,11 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/week_start_utils.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/models/course_model.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/timeline_column.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 import '../../../core/services/course_color_manager.dart';
 
@@ -57,16 +55,17 @@ class ScheduleGrid extends StatelessWidget {
           child: CustomPaint(
             painter: showGrid
                 ? _ScheduleGridPainter(
-                    color: context.clubColors.separator,
+                    color: context.mc.colors.separator,
                     cellHeight: cellHeight,
                     periodCount: periodCount,
                   )
                 : null,
             child: Row(
               children: WeekStartUtils.orderedWeekdays(weekStartDay)
-                  .map((weekday) => Expanded(
-                        child: _buildDayColumn(context, weekday),
-                      ))
+                  .map(
+                    (weekday) =>
+                        Expanded(child: _buildDayColumn(context, weekday)),
+                  )
                   .toList(),
             ),
           ),
@@ -112,8 +111,9 @@ class ScheduleGrid extends StatelessWidget {
         height: height,
         style: cardStyle,
         onTap: onCourseTap != null ? () => onCourseTap!(course) : null,
-        onLongPress:
-            onCourseLongPress != null ? () => onCourseLongPress!(course) : null,
+        onLongPress: onCourseLongPress != null
+            ? () => onCourseLongPress!(course)
+            : null,
       ),
     );
   }
@@ -128,7 +128,9 @@ class ScheduleGrid extends StatelessWidget {
 
   /// 构建冲突提示卡片
   Widget _buildConflictIndicator(
-      BuildContext context, List<CourseModel> courses) {
+    BuildContext context,
+    List<CourseModel> courses,
+  ) {
     final isTablet = MediaQuery.of(context).size.width > 600;
     var minStart = courses.first.startUnit;
     var maxEnd = courses.first.endUnit;
@@ -141,8 +143,9 @@ class ScheduleGrid extends StatelessWidget {
     final top = (minStart - 1) * cellHeight;
     final height = (maxEnd - minStart + 1) * cellHeight;
     // 使用第一个课程的颜色作为背景
-    final courseColor =
-        CourseColorManager.generateSoftColor(courses.first.courseName);
+    final courseColor = CourseColorManager.generateSoftColor(
+      courses.first.courseName,
+    );
 
     return Positioned(
       top: top,
@@ -152,17 +155,17 @@ class ScheduleGrid extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.all(2),
         decoration: ShapeDecoration(
-          shape: ClubSmoothCorners.shape(ClubRadii.control),
+          shape: McSmoothCorners.shape(McRadii.controlBorder),
           color: courseColor,
         ),
         child: InkWell(
-          borderRadius: ClubRadii.control,
-          customBorder: ClubSmoothCorners.shape(ClubRadii.control),
+          borderRadius: McRadii.controlBorder,
+          customBorder: McSmoothCorners.shape(McRadii.controlBorder),
           onTap: onConflictCourseTap != null
               ? () => onConflictCourseTap!(courses)
               : (onCourseTap != null
-                  ? () => onCourseTap!(courses.first)
-                  : null),
+                    ? () => onCourseTap!(courses.first)
+                    : null),
           onLongPress: null,
           child: Padding(
             padding: EdgeInsets.all(isTablet ? 8 : 4),
@@ -171,7 +174,7 @@ class ScheduleGrid extends StatelessWidget {
                 context.l10n.courseConflict,
                 style: TextStyle(
                   fontSize: 10,
-                  color: context.clubColors.onAccent.withValues(alpha: 0.9),
+                  color: context.mc.colors.onAccent.withValues(alpha: 0.9),
                   fontWeight: FontWeight.bold,
                 ),
               ),

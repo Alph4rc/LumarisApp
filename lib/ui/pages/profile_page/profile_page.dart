@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,13 +11,9 @@ import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/services/info_service.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/state/school_store.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
@@ -168,7 +165,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Widget _buildProfileContent() {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     final school = ref.watch(schoolStoreProvider).school;
@@ -190,17 +187,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       width: 48,
                       height: 48,
                       decoration: ShapeDecoration(
-                        shape: ClubSmoothCorners.shape(ClubRadii.control),
+                        shape: McSmoothCorners.shape(McRadii.controlBorder),
                         shadows: [
                           BoxShadow(
                             color: colors.shadowColor,
-                            blurRadius: ClubRadii.sm,
+                            blurRadius: McRadii.sm,
                             offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: ClubSmoothCorners.clip(
-                        borderRadius: ClubRadii.control,
+                      child: McSmoothCorners.clip(
+                        borderRadius: McRadii.controlBorder,
                         child: const Image(
                           image: AssetImage('assets/icon.webp'),
                           fit: BoxFit.cover,
@@ -239,8 +236,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
           AnimatedCard(
             delay: const Duration(milliseconds: 100),
-            child: ClubCard(
+            child: McCard.elevated(
               margin: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+              padding: EdgeInsets.zero,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: GridView.builder(
@@ -336,14 +334,14 @@ class ProfileButtonItem {
   });
 
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
-    final shape = ClubSmoothCorners.shape(ClubRadii.panel);
+    final colors = context.mc.colors;
+    final shape = McSmoothCorners.shape(McRadii.panelBorder);
     return Material(
       shape: shape,
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: ClubRadii.panel,
+        borderRadius: McRadii.panelBorder,
         customBorder: shape,
         child: Center(
           child: Column(

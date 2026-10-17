@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/utils/animations/app_animations.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Shimmer闪光加载效果
 ///
@@ -46,10 +46,8 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    )..repeat();
+    _controller = AnimationController(vsync: this, duration: widget.duration)
+      ..repeat();
     _animation = Tween<double>(begin: -2.0, end: 2.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
@@ -75,7 +73,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          final colors = context.clubColors;
+          final colors = context.mc.colors;
           return ShaderMask(
             shaderCallback: (bounds) {
               return LinearGradient(
@@ -102,9 +100,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
   }
 
   Widget _buildDefaultSkeleton(BuildContext context) {
-    return Container(
-      color: context.clubColors.cardBackground,
-    );
+    return Container(color: context.mc.colors.cardBackground);
   }
 }
 
@@ -125,7 +121,7 @@ class SkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Container(
       width: width,
@@ -144,15 +140,11 @@ class SkeletonCircle extends StatelessWidget {
   final double size;
   final EdgeInsetsGeometry? margin;
 
-  const SkeletonCircle({
-    super.key,
-    required this.size,
-    this.margin,
-  });
+  const SkeletonCircle({super.key, required this.size, this.margin});
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Container(
       width: size,
@@ -172,16 +164,11 @@ class SkeletonLine extends StatelessWidget {
   final double height;
   final EdgeInsetsGeometry? margin;
 
-  const SkeletonLine({
-    super.key,
-    this.width,
-    this.height = 12,
-    this.margin,
-  });
+  const SkeletonLine({super.key, this.width, this.height = 12, this.margin});
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Container(
       width: width,
@@ -215,10 +202,7 @@ class ListItemSkeleton extends StatelessWidget {
       child: Row(
         children: [
           if (hasLeading)
-            const SkeletonCircle(
-              size: 48,
-              margin: EdgeInsets.only(right: 12),
-            ),
+            const SkeletonCircle(size: 48, margin: EdgeInsets.only(right: 12)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,14 +236,11 @@ class ListItemSkeleton extends StatelessWidget {
 class CardSkeleton extends StatelessWidget {
   final double? height;
 
-  const CardSkeleton({
-    super.key,
-    this.height,
-  });
+  const CardSkeleton({super.key, this.height});
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Container(
       height: height ?? 200,
@@ -275,7 +256,9 @@ class CardSkeleton extends StatelessWidget {
           Row(
             children: [
               const SkeletonCircle(
-                  size: 40, margin: EdgeInsets.only(right: 12)),
+                size: 40,
+                margin: EdgeInsets.only(right: 12),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,11 +279,14 @@ class CardSkeleton extends StatelessWidget {
           ),
           const Spacer(),
           const SkeletonLine(
-              width: double.infinity,
-              height: 14,
-              margin: EdgeInsets.only(bottom: 8)),
+            width: double.infinity,
+            height: 14,
+            margin: EdgeInsets.only(bottom: 8),
+          ),
           SkeletonLine(
-              width: MediaQuery.of(context).size.width * 0.7, height: 14),
+            width: MediaQuery.of(context).size.width * 0.7,
+            height: 14,
+          ),
         ],
       ),
     );

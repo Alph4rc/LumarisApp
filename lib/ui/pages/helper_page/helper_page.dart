@@ -1,10 +1,7 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class HelperPage extends StatefulWidget {
@@ -19,11 +16,11 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   late PageController _pageController;
 
   List<String> _getTabs(BuildContext context) => [
-        context.l10n.helpFeaturesTab,
-        context.l10n.helpInstructionsTab,
-        context.l10n.helpNotesTab,
-        context.l10n.helpAboutTab,
-      ];
+    context.l10n.helpFeaturesTab,
+    context.l10n.helpInstructionsTab,
+    context.l10n.helpNotesTab,
+    context.l10n.helpAboutTab,
+  ];
 
   @override
   void initState() {
@@ -66,10 +63,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
       appBar: AppBar(
         title: Text(
           context.l10n.help,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         elevation: 0,
@@ -101,7 +95,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   Widget _buildFeaturesPage() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -109,7 +103,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
@@ -148,7 +142,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(height: 16),
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
@@ -171,7 +165,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(height: 16),
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
@@ -209,7 +203,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   Widget _buildInstructionsPage() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -217,7 +211,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
@@ -269,7 +263,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   }
 
   Widget _buildNotesPage() {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -277,7 +271,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
@@ -313,7 +307,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   }
 
   Widget _buildAboutPage() {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -324,7 +318,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
           // 应用信息卡片
           const SizedBox(height: 16),
           // 平台支持卡片
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +330,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                       height: 36,
                       decoration: ShapeDecoration(
                         color: colors.successSoft,
-                        shape: ClubSmoothCorners.shape(ClubRadii.control),
+                        shape: McSmoothCorners.shape(McRadii.controlBorder),
                       ),
                       child: Icon(
                         CupertinoIcons.device_phone_portrait,
@@ -358,10 +352,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 const SizedBox(height: 16),
                 Text(
                   context.l10n.helpAboutPlatformDesc,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors.secondaryLabel,
-                  ),
+                  style: TextStyle(fontSize: 14, color: colors.secondaryLabel),
                 ),
                 const SizedBox(height: 12),
                 ...[
@@ -372,32 +363,31 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                   'Linux',
                   'Web',
                   '微信小程序',
-                ].map((platform) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.checkmark_circle_fill,
-                            size: 18,
-                            color: colors.success,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            platform,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: colors.label,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
+                ].map(
+                  (platform) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.checkmark_circle_fill,
+                          size: 18,
+                          color: colors.success,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          platform,
+                          style: TextStyle(fontSize: 15, color: colors.label),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 16),
           // 开源信息卡片
-          ClubCard(
+          McCard.elevated(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +399,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                       height: 36,
                       decoration: ShapeDecoration(
                         color: colors.warningSoft,
-                        shape: ClubSmoothCorners.shape(ClubRadii.control),
+                        shape: McSmoothCorners.shape(McRadii.controlBorder),
                       ),
                       child: Icon(
                         CupertinoIcons.heart,
@@ -431,18 +421,12 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
                 const SizedBox(height: 16),
                 Text(
                   context.l10n.helpAboutOpenSourceDesc,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors.secondaryLabel,
-                  ),
+                  style: TextStyle(fontSize: 14, color: colors.secondaryLabel),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   context.l10n.helpAboutRepoLabel,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors.secondaryLabel,
-                  ),
+                  style: TextStyle(fontSize: 14, color: colors.secondaryLabel),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -468,7 +452,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
     required Color color,
     required bool isTablet,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -480,13 +464,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             height: 36,
             decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.12),
-              shape: ClubSmoothCorners.shape(ClubRadii.control),
+              shape: McSmoothCorners.shape(McRadii.controlBorder),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: color,
-            ),
+            child: Icon(icon, size: 20, color: color),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -525,7 +505,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
     required Color color,
     required bool isTablet,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -537,13 +517,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             height: 36,
             decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.12),
-              shape: ClubSmoothCorners.shape(ClubRadii.control),
+              shape: McSmoothCorners.shape(McRadii.controlBorder),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: color,
-            ),
+            child: Icon(icon, size: 20, color: color),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -580,7 +556,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
     required String text,
     required Color color,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -590,13 +566,9 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
           height: 32,
           decoration: ShapeDecoration(
             color: color.withValues(alpha: 0.12),
-            shape: ClubSmoothCorners.shape(ClubRadii.control),
+            shape: McSmoothCorners.shape(McRadii.controlBorder),
           ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: color,
-          ),
+          child: Icon(icon, size: 18, color: color),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -604,11 +576,7 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
             padding: const EdgeInsets.only(top: 6),
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 14,
-                color: colors.label,
-                height: 1.5,
-              ),
+              style: TextStyle(fontSize: 14, color: colors.label, height: 1.5),
             ),
           ),
         ),
@@ -617,14 +585,10 @@ class _HelperPageState extends State<HelperPage> with TickerProviderStateMixin {
   }
 
   Widget _buildDivider() {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Divider(
-        height: 1,
-        thickness: 0.5,
-        color: colors.separator,
-      ),
+      child: Divider(height: 1, thickness: 0.5, color: colors.separator),
     );
   }
 }

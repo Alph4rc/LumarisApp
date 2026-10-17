@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/state/tile_edit_notifier.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// Wrapper for tiles that adds edit mode functionality
 class EditableTileWrapper extends ConsumerStatefulWidget {
@@ -93,14 +91,14 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               decoration: ShapeDecoration(
-                shape: ClubSmoothCorners.shape(ClubRadii.tile),
+                shape: McSmoothCorners.shape(McRadii.tileBorder),
               ),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   // Original tile content
-                  ClubSmoothCorners.clip(
-                    borderRadius: ClubRadii.tile,
+                  McSmoothCorners.clip(
+                    borderRadius: McRadii.tileBorder,
                     child: widget.child,
                   ),
 
@@ -109,9 +107,7 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
                     Positioned.fill(
                       child: ReorderableDragStartListener(
                         index: widget.index,
-                        child: Container(
-                          color: Colors.transparent,
-                        ),
+                        child: Container(color: Colors.transparent),
                       ),
                     ),
 
@@ -134,7 +130,7 @@ class _EditableTileWrapperState extends ConsumerState<EditableTileWrapper>
   }
 
   Widget _buildHideButton(TileEditNotifier controller) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return GestureDetector(
       onTap: () async {

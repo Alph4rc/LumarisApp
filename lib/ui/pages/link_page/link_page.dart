@@ -1,18 +1,14 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/education/apis/link_api.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ios_club_app/features/education/models/link_model.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
 import 'package:ios_club_app/ui/components/icon_font.dart';
 
 class LinkPage extends ConsumerStatefulWidget {
@@ -40,7 +36,7 @@ class _LinkPageState extends ConsumerState<LinkPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final isLogin = ref.watch(userStoreProvider).isLogin;
 
     if (!isLogin) {
@@ -55,7 +51,7 @@ class _LinkPageState extends ConsumerState<LinkPage> {
     }
 
     return Scaffold(
-      appBar: ClubAppBar(
+      appBar: McAppBar(
         title: l10n.campusNavigation,
         actions: [
           IconButton(
@@ -74,10 +70,7 @@ class _LinkPageState extends ConsumerState<LinkPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                    ),
+                    Icon(Icons.error_outline, size: 48),
                     const SizedBox(height: 16),
                     Text(
                       l10n.loadFailed,
@@ -87,20 +80,16 @@ class _LinkPageState extends ConsumerState<LinkPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      "${snapshot.error}",
-                      style: TextStyle(
-                        fontSize: 14,
-                      ),
-                    ),
+                    Text("${snapshot.error}", style: TextStyle(fontSize: 14)),
                   ],
                 ),
               );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return EmptyWidget(
-                  title: l10n.linkNoData,
-                  subtitle: l10n.linkNoDataSubtitle,
-                  icon: Icons.link);
+                title: l10n.linkNoData,
+                subtitle: l10n.linkNoDataSubtitle,
+                icon: Icons.link,
+              );
             } else {
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -112,9 +101,7 @@ class _LinkPageState extends ConsumerState<LinkPage> {
                       horizontal: 16.0,
                       vertical: 8.0,
                     ),
-                    child: ScoreBuilder(
-                      categoryList: categoryList,
-                    ),
+                    child: ScoreBuilder(categoryList: categoryList),
                   );
                 },
               );
@@ -148,11 +135,12 @@ class ScoreBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return ClubCard(
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -168,7 +156,7 @@ class ScoreBuilder extends StatelessWidget {
                     height: 20,
                     decoration: ShapeDecoration(
                       color: colors.indigo,
-                      shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
+                      shape: McSmoothCorners.shape(McRadii.indicatorBorder),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -187,11 +175,11 @@ class ScoreBuilder extends StatelessWidget {
               builder: (context, constraints) {
                 const spacing = 12.0;
                 final crossAxisCount = isTablet ? 6 : 3;
-                final rows =
-                    (categoryList.links.length / crossAxisCount).ceil();
+                final rows = (categoryList.links.length / crossAxisCount)
+                    .ceil();
                 final itemWidth =
                     (constraints.maxWidth - spacing * (crossAxisCount - 1)) /
-                        crossAxisCount;
+                    crossAxisCount;
                 final gridHeight = rows * itemWidth + spacing * (rows - 1);
 
                 return SizedBox(
@@ -228,39 +216,32 @@ class _LinkItem extends StatelessWidget {
   final LinkModel link;
   final VoidCallback onTap;
 
-  const _LinkItem({
-    required this.link,
-    required this.onTap,
-  });
+  const _LinkItem({required this.link, required this.onTap});
 
   Widget _buildIconPlaceholder(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Container(
       width: 44,
       height: 44,
       decoration: ShapeDecoration(
         color: colors.surfaceRaised,
-        shape: ClubSmoothCorners.shape(ClubRadii.control),
+        shape: McSmoothCorners.shape(McRadii.controlBorder),
       ),
       alignment: Alignment.center,
-      child: Icon(
-        Icons.link_rounded,
-        size: 20,
-        color: colors.secondaryLabel,
-      ),
+      child: Icon(Icons.link_rounded, size: 20, color: colors.secondaryLabel),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Material(
       color: Colors.transparent,
-      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+      shape: McSmoothCorners.shape(McRadii.navigationBorder),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: ClubRadii.navigation,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.navigation),
+        borderRadius: McRadii.navigationBorder,
+        customBorder: McSmoothCorners.shape(McRadii.navigationBorder),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(8.0),

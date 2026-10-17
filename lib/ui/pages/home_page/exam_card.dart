@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/error_message_resolver.dart';
@@ -9,15 +10,10 @@ import 'package:ios_club_app/features/education/models/exam_result.dart';
 import 'package:ios_club_app/core/utils/animations/animations.dart';
 import 'package:ios_club_app/features/education/services/exam_service.dart';
 
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class ExamCard extends StatefulWidget {
   const ExamCard({super.key});
@@ -51,13 +47,15 @@ class _ExamCardState extends State<ExamCard> {
     setState(() {
       if (result.isSuccess) {
         examItems = result.exams
-            .map((course) => ExamData(
-                  title: course.name,
-                  time: course.examTime,
-                  location: course.room,
-                  color: CourseColorManager.generateSoftColor(course),
-                  seat: course.seatNo,
-                ))
+            .map(
+              (course) => ExamData(
+                title: course.name,
+                time: course.examTime,
+                location: course.room,
+                color: CourseColorManager.generateSoftColor(course),
+                seat: course.seatNo,
+              ),
+            )
             .toList();
         errorMessage = null;
         isNetworkError = false;
@@ -89,39 +87,37 @@ class _ExamCardState extends State<ExamCard> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.upcomingExams,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.upcomingExams,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-                IconButton(
-                  onPressed: () async {
-                    await getExam();
-                  },
-                  icon: const Icon(
-                    CupertinoIcons.refresh,
-                    size: 22,
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 16),
-            examCard()
-          ],
-        ));
+              ),
+              IconButton(
+                onPressed: () async {
+                  await getExam();
+                },
+                icon: const Icon(CupertinoIcons.refresh, size: 22),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          examCard(),
+        ],
+      ),
+    );
   }
 
   Widget examWrap(ExamData exam) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Wrap(
       spacing: 16,
@@ -130,11 +126,7 @@ class _ExamCardState extends State<ExamCard> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              CupertinoIcons.clock,
-              size: 16,
-              color: colors.secondaryLabel,
-            ),
+            Icon(CupertinoIcons.clock, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 6),
             Text(
               exam.time,
@@ -194,7 +186,8 @@ class _ExamCardState extends State<ExamCard> {
     final l10n = context.l10n;
     if (isLoading) {
       return AnimatedCard(
-        child: ClubCard(
+        child: McCard.elevated(
+          padding: EdgeInsets.zero,
           child: LoadingStateView(
             title: l10n.fetchingScores,
             subtitle: l10n.loadingExamsSubtitle,
@@ -208,7 +201,7 @@ class _ExamCardState extends State<ExamCard> {
     // 显示错误信息
     if (errorMessage != null) {
       return AnimatedCard(
-        child: ClubCard(
+        child: McCard.elevated(
           padding: const EdgeInsets.all(20),
           child: EmptyWidget(
             title: isNetworkError ? l10n.networkError : l10n.loadFailed,
@@ -227,7 +220,7 @@ class _ExamCardState extends State<ExamCard> {
 
     return examItems.isEmpty
         ? AnimatedCard(
-            child: ClubCard(
+            child: McCard.elevated(
               padding: const EdgeInsets.all(20),
               child: EmptyWidget(
                 title: l10n.empty,
@@ -237,10 +230,13 @@ class _ExamCardState extends State<ExamCard> {
             ),
           )
         : AnimatedCard(
-            child: ClubCard(
+            child: McCard.elevated(
+              padding: EdgeInsets.zero,
               child: SizedBox(
-                height: math.min(examItems.length * (isTablet ? 72.0 : 84.0),
-                    isTablet ? 420.0 : 360.0),
+                height: math.min(
+                  examItems.length * (isTablet ? 72.0 : 84.0),
+                  isTablet ? 420.0 : 360.0,
+                ),
                 child: ListView.builder(
                   padding: EdgeInsets.zero,
                   itemCount: examItems.length,
@@ -251,7 +247,7 @@ class _ExamCardState extends State<ExamCard> {
                       index: index,
                       child: Material(
                         color: Colors.transparent,
-                        shape: ClubSmoothCorners.shape(ClubRadii.card),
+                        shape: McSmoothCorners.shape(McRadii.cardBorder),
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
                           onTap: () {
@@ -261,14 +257,21 @@ class _ExamCardState extends State<ExamCard> {
                                 content: _buildExamTip(exam),
                               );
                             } else {
-                              showClubModalBottomSheet(
-                                context,
-                                _buildExamTip(exam),
+                              showMcBottomSheet(
+                                context: context,
+                                builder: (_) => _buildExamTip(exam),
+                                showHandle: true,
+                                contentPadding: const EdgeInsets.all(24),
+                                scrollable: true,
+                                maxHeight:
+                                    MediaQuery.sizeOf(context).height * 0.6,
                               );
                             }
                           },
-                          borderRadius: ClubRadii.card,
-                          customBorder: ClubSmoothCorners.shape(ClubRadii.card),
+                          borderRadius: McRadii.cardBorder,
+                          customBorder: McSmoothCorners.shape(
+                            McRadii.cardBorder,
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
                             child: Row(
@@ -279,8 +282,9 @@ class _ExamCardState extends State<ExamCard> {
                                   height: isTablet ? 42 : 52,
                                   decoration: ShapeDecoration(
                                     color: exam.color,
-                                    shape: ClubSmoothCorners.shape(
-                                        ClubRadii.xsBorder),
+                                    shape: McSmoothCorners.shape(
+                                      McRadii.xsBorder,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -319,7 +323,7 @@ class _ExamCardState extends State<ExamCard> {
 
   Widget _buildExamTip(ExamData exam) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

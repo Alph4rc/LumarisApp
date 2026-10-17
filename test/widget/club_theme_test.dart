@@ -1,31 +1,32 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 void main() {
-  group('ClubTheme', () {
+  group('McThemeData', () {
     test('should expose expected semantic colors in light theme', () {
-      final theme = ClubTheme.lightTheme();
-      final colors = theme.extension<ClubColors>();
+      final theme = McThemeData.materialTheme(McColors.light);
+      final colors = theme.extension<McColors>();
 
-      expect(theme.colorScheme.primary, ClubColors.light.primary);
-      expect(theme.scaffoldBackgroundColor, ClubColors.light.groupedBackground);
-      expect(colors?.label, ClubColors.light.label);
+      expect(theme.colorScheme.primary, McColors.light.primary);
+      expect(theme.scaffoldBackgroundColor, McColors.light.groupedBackground);
+      expect(colors?.label, McColors.light.label);
     });
 
     test('should expose expected semantic colors in dark theme', () {
-      final theme = ClubTheme.darkTheme();
-      final colors = theme.extension<ClubColors>();
+      final theme = McThemeData.materialTheme(McColors.dark);
+      final colors = theme.extension<McColors>();
 
-      expect(theme.colorScheme.primary, ClubColors.dark.primary);
-      expect(theme.scaffoldBackgroundColor, ClubColors.dark.groupedBackground);
-      expect(colors?.label, ClubColors.dark.label);
+      expect(theme.colorScheme.primary, McColors.dark.primary);
+      expect(theme.scaffoldBackgroundColor, McColors.dark.groupedBackground);
+      expect(colors?.label, McColors.dark.label);
     });
 
-    testWidgets('should resolve fallback ClubColors from brightness',
-        (WidgetTester tester) async {
-      late ClubColors resolved;
+    testWidgets('should resolve fallback McColors from brightness', (
+      WidgetTester tester,
+    ) async {
+      late McColors resolved;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -33,32 +34,33 @@ void main() {
           darkTheme: ThemeData(brightness: Brightness.dark),
           home: Builder(
             builder: (context) {
-              resolved = context.clubColors;
+              resolved = context.mc.colors;
               return const SizedBox.shrink();
             },
           ),
         ),
       );
 
-      expect(resolved, ClubColors.dark);
+      expect(resolved, McColors.dark);
     });
 
-    testWidgets('should bridge dark theme to Cupertino widgets',
-        (WidgetTester tester) async {
+    testWidgets('should bridge dark theme to Cupertino widgets', (
+      WidgetTester tester,
+    ) async {
       late ThemeData resolvedTheme;
-      late ClubColors resolvedColors;
+      late McColors resolvedColors;
       late Brightness cupertinoBrightness;
       late Color cupertinoPrimaryColor;
 
       await tester.pumpWidget(
         MaterialApp(
           themeMode: ThemeMode.dark,
-          darkTheme: ClubTheme.darkTheme(),
+          darkTheme: McThemeData.materialTheme(McColors.dark),
           home: Scaffold(
             body: Builder(
               builder: (context) {
                 resolvedTheme = Theme.of(context);
-                resolvedColors = context.clubColors;
+                resolvedColors = context.mc.colors;
                 final cupertinoTheme = CupertinoTheme.of(context);
                 cupertinoBrightness = cupertinoTheme.brightness!;
                 cupertinoPrimaryColor = cupertinoTheme.primaryColor;
@@ -72,11 +74,11 @@ void main() {
       expect(resolvedTheme.brightness, Brightness.dark);
       expect(
         resolvedTheme.scaffoldBackgroundColor,
-        ClubColors.dark.groupedBackground,
+        McColors.dark.groupedBackground,
       );
-      expect(resolvedColors, ClubColors.dark);
+      expect(resolvedColors, McColors.dark);
       expect(cupertinoBrightness, Brightness.dark);
-      expect(cupertinoPrimaryColor, ClubColors.dark.primary);
+      expect(cupertinoPrimaryColor, McColors.dark.primary);
     });
   });
 }

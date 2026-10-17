@@ -1,13 +1,8 @@
 import 'dart:convert';
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_menu.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 
 import 'package:ios_club_app/features/education/models/course_model.dart';
@@ -16,8 +11,6 @@ import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 /// 自定义课程管理页面
 ///
@@ -81,17 +74,18 @@ class _CustomCourseManagePageState
 
   Future<void> _saveCustomCourses() async {
     final prefs = PrefsService.instance;
-    final jsonString =
-        jsonEncode(customCourses.map((course) => course.toJson()).toList());
+    final jsonString = jsonEncode(
+      customCourses.map((course) => course.toJson()).toList(),
+    );
     await prefs.setString(PrefsKeys.CUSTOM_COURSE_DATA, jsonString);
   }
 
   void _showAddCourseDialog() {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    showClubModalBottomSheet(
-      context,
-      AddEditCourseDialog(
+    showMcBottomSheet(
+      context: context,
+      builder: (_) => AddEditCourseDialog(
         onSave: (course) async {
           setState(() {
             customCourses.add(course);
@@ -100,25 +94,32 @@ class _CustomCourseManagePageState
           await _refreshCourseStore();
           if (mounted) {
             if (context.mounted) {
-              showClubSnackBar(context, Text(context.l10n.courseAdded));
+              McFeedback.showMessage(
+                context,
+                message: context.l10n.courseAdded,
+              );
             }
           }
         },
       ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
       maxHeight: screenHeight * 0.7,
     );
   }
 
   void _showEditCourseDialog(CourseModel course) {
     final screenHeight = MediaQuery.of(context).size.height;
-    showClubModalBottomSheet(
-      context,
-      AddEditCourseDialog(
+    showMcBottomSheet(
+      context: context,
+      builder: (_) => AddEditCourseDialog(
         course: course,
         onSave: (updatedCourse) async {
           setState(() {
-            final index =
-                customCourses.indexWhere((c) => c.lessonId == course.lessonId);
+            final index = customCourses.indexWhere(
+              (c) => c.lessonId == course.lessonId,
+            );
             if (index != -1) {
               customCourses[index] = updatedCourse;
             }
@@ -128,12 +129,18 @@ class _CustomCourseManagePageState
           if (mounted) {
             if (context.mounted) {
               if (context.mounted) {
-                showClubSnackBar(context, Text(context.l10n.courseAdded));
+                McFeedback.showMessage(
+                  context,
+                  message: context.l10n.courseAdded,
+                );
               }
             }
           }
         },
       ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
       maxHeight: screenHeight * 0.7,
     );
   }
@@ -144,10 +151,7 @@ class _CustomCourseManagePageState
       title: context.l10n.confirmDelete,
       content: Text(context.l10n.confirmDeleteCourseContent(course.courseName)),
       actions: [
-        PlatformDialogAction<bool>(
-          label: context.l10n.cancel,
-          value: false,
-        ),
+        PlatformDialogAction<bool>(label: context.l10n.cancel, value: false),
         PlatformDialogAction<bool>(
           label: context.l10n.delete,
           value: true,
@@ -163,7 +167,7 @@ class _CustomCourseManagePageState
       await _saveCustomCourses();
       await _refreshCourseStore();
       if (mounted) {
-        showClubSnackBar(context, Text(context.l10n.courseDeleted));
+        McFeedback.showMessage(context, message: context.l10n.courseDeleted);
       }
     }
   }
@@ -176,10 +180,10 @@ class _CustomCourseManagePageState
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
-      appBar: ClubAppBar(
+      appBar: McAppBar(
         titleWidget: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -206,11 +210,11 @@ class _CustomCourseManagePageState
           ],
         ),
         actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _showAddCourseDialog,
-              tooltip: l10n.addCourse,
-            ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showAddCourseDialog,
+            tooltip: l10n.addCourse,
+          ),
         ],
       ),
       body: Column(
@@ -224,129 +228,131 @@ class _CustomCourseManagePageState
                     ),
                   )
                 : customCourses.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: primaryColor.withValues(alpha: 0.1),
-                                borderRadius: ClubRadii.card,
-                              ),
-                              child: Icon(
-                                Icons.event_available,
-                                size: 48,
-                                color: primaryColor,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Text(
-                              l10n.noCustomCourses,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              l10n.noCustomCoursesSubtitle,
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: colors.secondaryLabel,
-                              ),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.1),
+                            borderRadius: McRadii.cardBorder,
+                          ),
+                          child: Icon(
+                            Icons.event_available,
+                            size: 48,
+                            color: primaryColor,
+                          ),
                         ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: customCourses.length,
-                        itemBuilder: (context, index) {
-                          final course = customCourses[index];
-                          return ClubCard(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: Material(
-                              color: Colors.transparent,
-                              shape: ClubSmoothCorners.shape(ClubRadii.card),
-                              clipBehavior: Clip.antiAlias,
-                              child: InkWell(
-                                borderRadius: ClubRadii.card,
-                                customBorder:
-                                    ClubSmoothCorners.shape(ClubRadii.card),
-                                onTap: () {
-                                  _showEditCourseDialog(course);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                        const SizedBox(height: 24),
+                        Text(
+                          l10n.noCustomCourses,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.noCustomCoursesSubtitle,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: colors.secondaryLabel,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: customCourses.length,
+                    itemBuilder: (context, index) {
+                      final course = customCourses[index];
+                      return McCard.elevated(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: EdgeInsets.zero,
+                        child: Material(
+                          color: Colors.transparent,
+                          shape: McSmoothCorners.shape(McRadii.cardBorder),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            borderRadius: McRadii.cardBorder,
+                            customBorder: McSmoothCorners.shape(
+                              McRadii.cardBorder,
+                            ),
+                            onTap: () {
+                              _showEditCourseDialog(course);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          course.courseName,
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
                                           children: [
-                                            Text(
-                                              course.courseName,
-                                              style: const TextStyle(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                            _buildInfoChip(
+                                              Icons.location_on_outlined,
+                                              course.room.isEmpty
+                                                  ? l10n.noLocation
+                                                  : course.room,
+                                              colors.primary,
                                             ),
-                                            const SizedBox(height: 12),
-                                            Wrap(
-                                              spacing: 8,
-                                              runSpacing: 8,
-                                              children: [
-                                                _buildInfoChip(
-                                                  Icons.location_on_outlined,
-                                                  course.room.isEmpty
-                                                      ? l10n.noLocation
-                                                      : course.room,
-                                                  colors.primary,
-                                                ),
-                                                _buildInfoChip(
-                                                  Icons.schedule_outlined,
-                                                  _formatCourseTime(course),
-                                                  colors.success,
-                                                ),
-                                              ],
+                                            _buildInfoChip(
+                                              Icons.schedule_outlined,
+                                              _formatCourseTime(course),
+                                              colors.success,
                                             ),
                                           ],
                                         ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  McMenu<String>(
+                                    tooltip: l10n.moreFunctions,
+                                    items: <McMenuItem<String>>[
+                                      McMenuItem<String>(
+                                        value: 'edit',
+                                        label: l10n.editCourse,
+                                        icon: Icons.edit_outlined,
                                       ),
-                                      const SizedBox(width: 12),
-                                      ClubMenu<String>(
-                                        tooltip: l10n.moreFunctions,
-                                        items: <ClubMenuItem<String>>[
-                                          ClubMenuItem<String>(
-                                            value: 'edit',
-                                            label: l10n.editCourse,
-                                            icon: Icons.edit_outlined,
-                                          ),
-                                          ClubMenuItem<String>(
-                                            value: 'delete',
-                                            label: l10n.deleteCourse,
-                                            icon: Icons.delete_outline,
-                                            isDestructive: true,
-                                          ),
-                                        ],
-                                        onSelected: (String value) {
-                                          if (value == 'edit') {
-                                            _showEditCourseDialog(course);
-                                          } else if (value == 'delete') {
-                                            _deleteCourse(course);
-                                          }
-                                        },
+                                      McMenuItem<String>(
+                                        value: 'delete',
+                                        label: l10n.deleteCourse,
+                                        icon: Icons.delete_outline,
+                                        isDestructive: true,
                                       ),
                                     ],
+                                    onSelected: (String value) {
+                                      if (value == 'edit') {
+                                        _showEditCourseDialog(course);
+                                      } else if (value == 'delete') {
+                                        _deleteCourse(course);
+                                      }
+                                    },
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -358,16 +364,12 @@ class _CustomCourseManagePageState
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: ShapeDecoration(
         color: color.withValues(alpha: 0.1),
-        shape: ClubSmoothCorners.shape(ClubRadii.control),
+        shape: McSmoothCorners.shape(McRadii.controlBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 14,
-            color: color,
-          ),
+          Icon(icon, size: 14, color: color),
           const SizedBox(width: 4),
           Text(
             label,
@@ -448,11 +450,7 @@ class AddEditCourseDialog extends StatefulWidget {
   final CourseModel? course;
   final Function(CourseModel) onSave;
 
-  const AddEditCourseDialog({
-    super.key,
-    this.course,
-    required this.onSave,
-  });
+  const AddEditCourseDialog({super.key, this.course, required this.onSave});
 
   @override
   State<AddEditCourseDialog> createState() => _AddEditCourseDialogState();
@@ -473,42 +471,46 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
   @override
   void initState() {
     super.initState();
-    _courseNameController =
-        TextEditingController(text: widget.course?.courseName ?? '');
+    _courseNameController = TextEditingController(
+      text: widget.course?.courseName ?? '',
+    );
     _roomController = TextEditingController(text: widget.course?.room ?? '');
-    _teacherController =
-        TextEditingController(text: widget.course?.teachers.join(', ') ?? '');
-    _creditsController =
-        TextEditingController(text: widget.course?.credits ?? '');
-    _selectedWeekday =
-        _normalizeCourseWeekday(widget.course?.weekday ?? DateTime.monday);
+    _teacherController = TextEditingController(
+      text: widget.course?.teachers.join(', ') ?? '',
+    );
+    _creditsController = TextEditingController(
+      text: widget.course?.credits ?? '',
+    );
+    _selectedWeekday = _normalizeCourseWeekday(
+      widget.course?.weekday ?? DateTime.monday,
+    );
     _startUnit = widget.course?.startUnit ?? 1;
     _endUnit = widget.course?.endUnit ?? 2;
     _selectedWeeks =
         widget.course != null && widget.course!.weekIndexes.isNotEmpty
-            ? List.from(widget.course!.weekIndexes)
-            : [
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13,
-                14,
-                15,
-                16,
-                17,
-                18,
-                19,
-                20
-              ];
+        ? List.from(widget.course!.weekIndexes)
+        : [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+          ];
   }
 
   @override
@@ -522,7 +524,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
 
   void _save() {
     if (_courseNameController.text.trim().isEmpty) {
-      showClubSnackBar(context, Text(context.l10n.courseName));
+      McFeedback.showMessage(context, message: context.l10n.courseName);
       return;
     }
 
@@ -541,7 +543,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
       startUnit: _startUnit,
       endUnit: _endUnit,
       credits: _creditsController.text.trim(),
-      lessonId: widget.course?.lessonId ??
+      lessonId:
+          widget.course?.lessonId ??
           'CUSTOM_${DateTime.now().millisecondsSinceEpoch}',
       campus: '',
       isCustom: true,
@@ -555,7 +558,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final weekdays = _getWeekdayNames(l10n);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Column(
@@ -567,17 +570,12 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
           children: [
             Text(
               widget.course == null ? l10n.addCourse : l10n.editCourse,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
           ],
         ),
 
-        const SizedBox(
-          height: 12,
-        ),
+        const SizedBox(height: 12),
 
         // Content
         Column(
@@ -628,8 +626,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: ShapeDecoration(
                 color: colors.surfaceRaised,
-                shape: ClubSmoothCorners.shape(
-                  ClubRadii.navigation,
+                shape: McSmoothCorners.shape(
+                  McRadii.navigationBorder,
                   side: BorderSide(color: colors.borderStrong),
                 ),
               ),
@@ -675,8 +673,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: ShapeDecoration(
                           color: colors.surfaceRaised,
-                          shape: ClubSmoothCorners.shape(
-                            ClubRadii.navigation,
+                          shape: McSmoothCorners.shape(
+                            McRadii.navigationBorder,
                             side: BorderSide(color: colors.borderStrong),
                           ),
                         ),
@@ -724,8 +722,8 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: ShapeDecoration(
                           color: colors.surfaceRaised,
-                          shape: ClubSmoothCorners.shape(
-                            ClubRadii.navigation,
+                          shape: McSmoothCorners.shape(
+                            McRadii.navigationBorder,
                             side: BorderSide(color: colors.borderStrong),
                           ),
                         ),
@@ -788,11 +786,12 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                     ),
                     decoration: ShapeDecoration(
                       color: isSelected ? primaryColor : colors.surfaceMuted,
-                      shape: ClubSmoothCorners.shape(
-                        ClubRadii.card,
+                      shape: McSmoothCorners.shape(
+                        McRadii.cardBorder,
                         side: BorderSide(
-                          color:
-                              isSelected ? primaryColor : colors.borderStrong,
+                          color: isSelected
+                              ? primaryColor
+                              : colors.borderStrong,
                         ),
                       ),
                     ),
@@ -802,8 +801,9 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                         color: isSelected
                             ? colors.onAccent
                             : colors.secondaryLabel,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         fontSize: 13,
                       ),
                     ),
@@ -823,9 +823,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 l10n.cancel,
-                style: TextStyle(
-                  color: colors.secondaryLabel,
-                ),
+                style: TextStyle(color: colors.secondaryLabel),
               ),
             ),
             const SizedBox(width: 12),
@@ -838,7 +836,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
                   horizontal: 24,
                   vertical: 12,
                 ),
-                shape: ClubSmoothCorners.shape(ClubRadii.control),
+                shape: McSmoothCorners.shape(McRadii.controlBorder),
                 elevation: 0,
               ),
               child: Text(
@@ -847,7 +845,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -859,7 +857,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
     IconData icon, {
     bool required = false,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -868,10 +866,7 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
             if (required)
               Text(
@@ -889,26 +884,20 @@ class _AddEditCourseDialogState extends State<AddEditCourseDialog> {
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(
-              color: colors.tertiaryLabel,
-            ),
-            prefixIcon: Icon(
-              icon,
-              size: 20,
-              color: colors.tertiaryLabel,
-            ),
+            hintStyle: TextStyle(color: colors.tertiaryLabel),
+            prefixIcon: Icon(icon, size: 20, color: colors.tertiaryLabel),
             filled: true,
             fillColor: colors.surfaceRaised,
             border: OutlineInputBorder(
-              borderRadius: ClubRadii.control,
+              borderRadius: McRadii.controlBorder,
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: ClubRadii.control,
+              borderRadius: McRadii.controlBorder,
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: ClubRadii.control,
+              borderRadius: McRadii.controlBorder,
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.primary,
                 width: 2,

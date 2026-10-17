@@ -1,6 +1,7 @@
 import 'dart:async' show TimeoutException, unawaited;
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
@@ -11,17 +12,10 @@ import 'package:ios_club_app/features/education/services/score_service.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/features/education/models/score_model.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_menu.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -66,15 +60,18 @@ class _ScorePageState extends ConsumerState<ScorePage>
       return;
     }
 
-    final localSnapshot =
-        await ScoreService.getScores(policy: FetchPolicy.localFirst);
+    final localSnapshot = await ScoreService.getScores(
+      policy: FetchPolicy.localFirst,
+    );
     if (localSnapshot.data.isNotEmpty) {
       _applyScoreData(localSnapshot.data, isLoading: false);
-      unawaited(_loadScores(
-        policy: FetchPolicy.refresh,
-        keepCurrentDataWhileLoading: true,
-        showStaleMessage: false,
-      ));
+      unawaited(
+        _loadScores(
+          policy: FetchPolicy.refresh,
+          keepCurrentDataWhileLoading: true,
+          showStaleMessage: false,
+        ),
+      );
       return;
     }
 
@@ -105,16 +102,19 @@ class _ScorePageState extends ConsumerState<ScorePage>
       _applyScoreData(snapshot.data, isLoading: false);
       if (!mounted) return;
       if (snapshot.isStale && snapshot.data.isNotEmpty && showStaleMessage) {
-        showClubSnackBar(context, Text(l10n.refreshFailedFallback));
+        McFeedback.showMessage(context, message: l10n.refreshFailedFallback);
       }
     } on TimeoutException catch (e) {
       if (mounted) {
-        showClubSnackBar(context, Text(l10n.fetchTimeout));
+        McFeedback.showMessage(context, message: l10n.fetchTimeout);
       }
       AppLogger.warning('[ScorePage] 获取数据超时: $e');
     } catch (e, stackTrace) {
       if (mounted) {
-        showClubSnackBar(context, Text('${l10n.fetchFailed}: ${e.toString()}'));
+        McFeedback.showMessage(
+          context,
+          message: '${l10n.fetchFailed}: ${e.toString()}',
+        );
       }
       AppLogger.error('[ScorePage] 获取数据失败', error: e, stackTrace: stackTrace);
     } finally {
@@ -171,13 +171,13 @@ class _ScorePageState extends ConsumerState<ScorePage>
     for (var i = 0; i < count; i++) {
       final y = count - i + 1;
       selectorList.add(
-          '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
+        '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}',
+      );
     }
     return selectorList;
   }
 
   void _handleFoolishMode() {
-    final colors = context.clubColors;
     setState(() {
       _isFool = true;
       for (final item in _scoreList) {
@@ -191,21 +191,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
       _isYear = false;
     });
 
-    showClubSnackBar(
-      context,
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(context.l10n.foolishModeMessage),
-          Icon(Icons.mood, color: colors.quaternaryLabel),
-        ],
-      ),
-    );
+    McFeedback.showMessage(context, message: context.l10n.foolishModeMessage);
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final school = ref.watch(schoolStoreProvider).school;
     final canGradeQuery = school?.supports(Feature.gradeQuery) ?? true;
 
@@ -223,26 +214,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.warning,
-                size: 48,
-                color: colors.secondaryLabel,
-              ),
+              Icon(Icons.warning, size: 48, color: colors.secondaryLabel),
               SizedBox(height: 16),
               Text(
                 context.l10n.notLoggedIn,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
               Text(
                 context.l10n.pleaseLoginFirst,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.secondaryLabel,
-                ),
+                style: TextStyle(fontSize: 16, color: colors.secondaryLabel),
               ),
               SizedBox(height: 24),
               CupertinoButton.filled(
@@ -279,23 +260,26 @@ class _ScorePageState extends ConsumerState<ScorePage>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                    padding: const EdgeInsets.all(0),
-                    decoration: BoxDecoration(
-                      color: colors.cardBackground,
-                      borderRadius: BorderRadius.circular(25.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.shadowColor.withValues(alpha: 0.1),
-                          blurRadius: 12,
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      onPressed: _changeScoreList,
-                      icon: Icon(_isYear
+                  padding: const EdgeInsets.all(0),
+                  decoration: BoxDecoration(
+                    color: colors.cardBackground,
+                    borderRadius: BorderRadius.circular(25.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.shadowColor.withValues(alpha: 0.1),
+                        blurRadius: 12,
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    onPressed: _changeScoreList,
+                    icon: Icon(
+                      _isYear
                           ? Icons.calendar_today_rounded
-                          : Icons.calendar_view_day_rounded),
-                    )),
+                          : Icons.calendar_view_day_rounded,
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Align(
@@ -306,9 +290,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
               ],
             ),
           ),
-          Expanded(
-            child: _buildScoreList(),
-          )
+          Expanded(child: _buildScoreList()),
         ],
       ),
     );
@@ -316,32 +298,30 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildAppBar() {
     return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.l10n.scoresAndGpa,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Row(
-              children: [
-                if (!_isFool)
-                  IconButton(
-                    onPressed: _handleFoolishMode,
-                    icon: const Icon(Icons.mood),
-                  ),
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            context.l10n.scoresAndGpa,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          Row(
+            children: [
+              if (!_isFool)
                 IconButton(
-                  onPressed: () => refresh(isRefresh: true),
-                  icon: const Icon(Icons.refresh),
+                  onPressed: _handleFoolishMode,
+                  icon: const Icon(Icons.mood),
                 ),
-              ],
-            ),
-          ],
-        ));
+              IconButton(
+                onPressed: () => refresh(isRefresh: true),
+                icon: const Icon(Icons.refresh),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   void _changeScoreList() {
@@ -351,10 +331,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
         for (var i = _scoreList.length - 1; i >= 0; i--) {
           var j = _scoreList.length - 1 - i;
           if (j % 2 == 0) {
-            _yearList.add(ScoreList(
-              semester: _scoreList[i].semester,
-              list: _scoreList[i].list.toList(),
-            ));
+            _yearList.add(
+              ScoreList(
+                semester: _scoreList[i].semester,
+                list: _scoreList[i].list.toList(),
+              ),
+            );
           } else {
             var a = _yearList.lastOrNull;
             if (a != null) {
@@ -374,13 +356,15 @@ class _ScorePageState extends ConsumerState<ScorePage>
           for (var i = 0; i < _scoreList.length; i++) {
             var y = _scoreList.length - i + 1;
             _selectorList.add(
-                '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}');
+              '${_yearLabel(y ~/ 2 - 1)}${y % 2 == 1 ? context.l10n.semesterSpringShort : context.l10n.semesterAutumnShort}',
+            );
           }
         }
 
         if (_currentIndex >= _selectorList.length) {
-          _currentIndex =
-              _selectorList.isNotEmpty ? _selectorList.length - 1 : 0;
+          _currentIndex = _selectorList.isNotEmpty
+              ? _selectorList.length - 1
+              : 0;
         }
         if (_selectorList.isNotEmpty && pageController.hasClients) {
           pageController.jumpToPage(_currentIndex);
@@ -396,14 +380,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: ClubCard(
+      child: McCard.elevated(
+        padding: EdgeInsets.zero,
         child: _buildStatsPadding(),
       ),
     );
   }
 
   Widget _buildStatsPadding({ScoreList? scoreList}) {
-    final canGpa = ref
+    final canGpa =
+        ref
             .read(schoolStoreProvider)
             .school
             ?.supports(Feature.gpaCalculation) ??
@@ -438,7 +424,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
               label: context.l10n.totalCredits,
               withInfo: true,
             ),
-          )
+          ),
         ],
       ),
     );
@@ -450,29 +436,19 @@ class _ScorePageState extends ConsumerState<ScorePage>
     required String label,
     bool withInfo = false,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Column(
       children: [
-        Icon(
-          icon,
-          size: 32,
-        ),
+        Icon(icon, size: 32),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (withInfo)
-              Icon(
-                Icons.info_outline,
-                size: 9,
-                color: colors.secondaryLabel,
-              ),
+              Icon(Icons.info_outline, size: 9, color: colors.secondaryLabel),
             Text(
               label,
               style: TextStyle(
@@ -516,24 +492,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
         proportionalWidth: true,
         groupValue: _currentIndex,
         onValueChanged: _handleSelectorChanged,
-        children: _selectorList
-            .map(
-              (x) => Text(x),
-            )
-            .toList()
-            .asMap(),
+        children: _selectorList.map((x) => Text(x)).toList().asMap(),
       ),
     );
   }
 
   Widget _buildDropdownSelector() {
-    final colors = context.clubColors;
-    return ClubMenu<int>(
+    final colors = context.mc.colors;
+    return McMenu<int>(
       items: List.generate(_selectorList.length, (index) {
-        return ClubMenuItem<int>(
-          value: index,
-          label: _selectorList[index],
-        );
+        return McMenuItem<int>(value: index, label: _selectorList[index]);
       }),
       onSelected: _handleSelectorChanged,
       child: Container(
@@ -541,9 +509,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: ShapeDecoration(
           color: colors.cardBackground,
-          shape: ClubSmoothCorners.shape(
-            ClubRadii.navigation,
-          ),
+          shape: McSmoothCorners.shape(McRadii.navigationBorder),
         ),
         child: Row(
           children: [
@@ -586,8 +552,8 @@ class _ScorePageState extends ConsumerState<ScorePage>
     return _scoreList.isEmpty
         ? _buildEmptyState()
         : _isYear
-            ? _buildYearList()
-            : _buildSemesterList();
+        ? _buildYearList()
+        : _buildSemesterList();
   }
 
   Widget _buildSemesterList() {
@@ -605,14 +571,15 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildYearList() {
     return PageView.builder(
-        controller: pageController,
-        itemCount: _yearList.length,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        itemBuilder: (context, index) => _buildYearCard(_yearList[index]));
+      controller: pageController,
+      itemCount: _yearList.length,
+      onPageChanged: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      itemBuilder: (context, index) => _buildYearCard(_yearList[index]),
+    );
   }
 
   Widget _buildYearCard(ScoreList score) {
@@ -621,8 +588,9 @@ class _ScorePageState extends ConsumerState<ScorePage>
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverToBoxAdapter(
-            child: ClubCard(
-              borderRadius: ClubRadii.navigation,
+            child: McCard.elevated(
+              radius: McRadii.navigation,
+              padding: EdgeInsets.zero,
               child: _buildStatsPadding(scoreList: score),
             ),
           ),
@@ -671,9 +639,10 @@ class _ScorePageState extends ConsumerState<ScorePage>
         itemCount: scores.length,
         itemBuilder: (context, index) => AnimatedCard(
           delay: Duration(milliseconds: 50 * index),
-          child: ClubCard(
+          child: McCard.elevated(
             margin: const EdgeInsets.only(bottom: 8),
-            borderRadius: ClubRadii.navigation,
+            radius: McRadii.navigation,
+            padding: EdgeInsets.zero,
             child: AnimatedListItem(
               index: index,
               child: _buildScoreItem(scores[index]),
@@ -686,12 +655,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
 
   Widget _buildScoreItem(ScoreModel item) {
     return Material(
-      shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+      shape: McSmoothCorners.shape(McRadii.navigationBorder),
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: ClubRadii.navigation,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.navigation),
+        borderRadius: McRadii.navigationBorder,
+        customBorder: McSmoothCorners.shape(McRadii.navigationBorder),
         onTap: () => _showScoreDetails(item),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -702,32 +671,34 @@ class _ScorePageState extends ConsumerState<ScorePage>
                 height: 40,
                 decoration: ShapeDecoration(
                   color: CourseColorManager.generateSoftColor(item.name),
-                  shape: ClubSmoothCorners.shape(ClubRadii.indicatorBorder),
+                  shape: McSmoothCorners.shape(McRadii.indicatorBorder),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${item.name}${item.isMinor ? ' (${context.l10n.minorCourse})' : ''}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                              const SizedBox(height: 4),
-                              _buildScoreMeta(item),
-                            ]),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${item.name}${item.isMinor ? ' (${context.l10n.minorCourse})' : ''}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 4),
+                          _buildScoreMeta(item),
+                        ],
                       ),
-                    ]),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -737,8 +708,9 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   Widget _buildScoreMeta(ScoreModel item) {
-    final colors = context.clubColors;
-    final canGpa = ref
+    final colors = context.mc.colors;
+    final canGpa =
+        ref
             .read(schoolStoreProvider)
             .school
             ?.supports(Feature.gpaCalculation) ??
@@ -751,18 +723,25 @@ class _ScorePageState extends ConsumerState<ScorePage>
           children: [
             Icon(CupertinoIcons.time, size: 16, color: colors.secondaryLabel),
             const SizedBox(width: 4),
-            Text(context.l10n.creditUnit(item.credit),
-                style: TextStyle(color: colors.secondaryLabel))
+            Text(
+              context.l10n.creditUnit(item.credit),
+              style: TextStyle(color: colors.secondaryLabel),
+            ),
           ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.location,
-                size: 16, color: colors.secondaryLabel),
+            Icon(
+              CupertinoIcons.location,
+              size: 16,
+              color: colors.secondaryLabel,
+            ),
             const SizedBox(width: 4),
-            Text(context.l10n.gradeLabel(item.grade),
-                style: TextStyle(color: colors.secondaryLabel))
+            Text(
+              context.l10n.gradeLabel(item.grade),
+              style: TextStyle(color: colors.secondaryLabel),
+            ),
           ],
         ),
         if (canGpa)
@@ -771,8 +750,10 @@ class _ScorePageState extends ConsumerState<ScorePage>
             children: [
               Icon(CupertinoIcons.star, size: 16, color: colors.secondaryLabel),
               const SizedBox(width: 4),
-              Text(context.l10n.gpaLabel(item.gpa),
-                  style: TextStyle(color: colors.secondaryLabel))
+              Text(
+                context.l10n.gpaLabel(item.gpa),
+                style: TextStyle(color: colors.secondaryLabel),
+              ),
             ],
           ),
       ],
@@ -789,13 +770,16 @@ class _ScorePageState extends ConsumerState<ScorePage>
         barrierDismissible: true,
         builder: (BuildContext dialogContext) {
           final screenSize = MediaQuery.sizeOf(dialogContext);
-          final dialogWidth =
-              (screenSize.width * 0.36).clamp(420.0, 560.0).toDouble();
+          final dialogWidth = (screenSize.width * 0.36)
+              .clamp(420.0, 560.0)
+              .toDouble();
           final maxDialogHeight = screenSize.height * 0.78;
 
           return Dialog(
-            insetPadding:
-                const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 32,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
             ),
@@ -816,13 +800,21 @@ class _ScorePageState extends ConsumerState<ScorePage>
         },
       );
     } else {
-      await showClubModalBottomSheet(context, content);
+      await showMcBottomSheet(
+        context: context,
+        builder: (_) => content,
+        showHandle: true,
+        contentPadding: const EdgeInsets.all(24),
+        scrollable: true,
+        maxHeight: MediaQuery.sizeOf(context).height * 0.6,
+      );
     }
   }
 
   Widget _buildScoreDetailsContent(ScoreModel score, bool isTablet) {
-    final colors = context.clubColors;
-    final canGpa = ref
+    final colors = context.mc.colors;
+    final canGpa =
+        ref
             .read(schoolStoreProvider)
             .school
             ?.supports(Feature.gpaCalculation) ??

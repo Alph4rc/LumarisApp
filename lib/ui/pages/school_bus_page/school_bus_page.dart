@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -9,17 +10,10 @@ import 'package:ios_club_app/features/education/models/bus_model.dart'
     show BusItem;
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/components/club_menu.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
 import 'package:ios_club_app/state/bus_page_notifier.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 
 class SchoolBusPage extends ConsumerWidget {
   const SchoolBusPage({super.key});
@@ -28,7 +22,7 @@ class SchoolBusPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final busState = ref.watch(busControllerProvider);
     final busController = ref.read(busControllerProvider.notifier);
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     final school = ref.watch(schoolStoreProvider).school;
     final canBusSchedule = school?.supports(Feature.busSchedule) ?? true;
@@ -72,9 +66,7 @@ class SchoolBusPage extends ConsumerWidget {
       body: Column(
         children: [
           _buildDateSelector(busState, busController, colors),
-          Expanded(
-            child: _buildContent(context, ref, busState, colors),
-          ),
+          Expanded(child: _buildContent(context, ref, busState, colors)),
         ],
       ),
     );
@@ -84,7 +76,7 @@ class SchoolBusPage extends ConsumerWidget {
     BuildContext context,
     BusPageState busState,
     BusPageNotifier busController,
-    ClubColors colors,
+    McColors colors,
   ) {
     final campusOptions = busState.campusOptions;
     if (campusOptions.isEmpty) {
@@ -99,7 +91,12 @@ class SchoolBusPage extends ConsumerWidget {
     }
 
     if (campusOptions.length >= 3) {
-      return _buildDropdownSelector(context, busState, busController, campusOptions);
+      return _buildDropdownSelector(
+        context,
+        busState,
+        busController,
+        campusOptions,
+      );
     }
 
     return CupertinoSlidingSegmentedControl<String>(
@@ -112,8 +109,9 @@ class SchoolBusPage extends ConsumerWidget {
               _displayCampusName(campus),
               style: TextStyle(
                 fontSize: 14,
-                fontWeight:
-                    busState.selectedCampus == campus ? FontWeight.w600 : null,
+                fontWeight: busState.selectedCampus == campus
+                    ? FontWeight.w600
+                    : null,
               ),
             ),
           ),
@@ -130,29 +128,28 @@ class SchoolBusPage extends ConsumerWidget {
     BuildContext context,
     BusPageState busState,
     BusPageNotifier busController,
-    List<String> campusOptions) {
-    final colors = context.clubColors;
+    List<String> campusOptions,
+  ) {
+    final colors = context.mc.colors;
     final selectedCampus = busState.selectedCampus;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: ClubMenu<String>(
+      child: McMenu<String>(
         items: List.generate(campusOptions.length, (index) {
-          return ClubMenuItem<String>(
+          return McMenuItem<String>(
             value: campusOptions[index],
             label: _displayCampusName(campusOptions[index]),
           );
         }),
         onSelected: (val) {
-        busController.selectCampus(val);
-      },
+          busController.selectCampus(val);
+        },
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: ShapeDecoration(
             color: colors.cardBackground,
-            shape: ClubSmoothCorners.shape(
-              ClubRadii.navigation,
-            ),
+            shape: McSmoothCorners.shape(McRadii.navigationBorder),
           ),
           child: Row(
             children: [
@@ -187,11 +184,12 @@ class SchoolBusPage extends ConsumerWidget {
   Widget _buildDateSelector(
     BusPageState busState,
     BusPageNotifier busController,
-    ClubColors colors,
+    McColors colors,
   ) {
     final dates = busController.availableDates.entries.toList();
-    final selectedIndex =
-        dates.indexWhere((e) => e.key == busState.selectedDate);
+    final selectedIndex = dates.indexWhere(
+      (e) => e.key == busState.selectedDate,
+    );
 
     return Container(
       height: 48,
@@ -208,13 +206,15 @@ class SchoolBusPage extends ConsumerWidget {
             child: GestureDetector(
               onTap: () => busController.selectDateByIndex(index),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: ShapeDecoration(
                   color: isSelected
                       ? colors.primary
                       : colors.primary.withValues(alpha: 0.05),
-                  shape: ClubSmoothCorners.shape(BorderRadius.circular(24)),
+                  shape: McSmoothCorners.shape(BorderRadius.circular(24)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -237,7 +237,7 @@ class SchoolBusPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     BusPageState busState,
-    ClubColors colors,
+    McColors colors,
   ) {
     final busController = ref.read(busControllerProvider.notifier);
 
@@ -256,7 +256,7 @@ class SchoolBusPage extends ConsumerWidget {
     if (busState.errorMessage.isNotEmpty && !hasBusData) {
       return _buildRefreshPlaceholder(
         onRefresh: busController.refreshData,
-        child: ClubCard(
+        child: McCard.elevated(
           margin: const EdgeInsets.all(24),
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -297,19 +297,17 @@ class SchoolBusPage extends ConsumerWidget {
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 12),
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: busState.busData.length +
+        itemCount:
+            busState.busData.length +
             (busState.errorMessage.isNotEmpty ? 1 : 0),
         itemBuilder: (context, index) {
           if (busState.errorMessage.isNotEmpty && index == 0) {
-            return ClubCard(
+            return McCard.elevated(
               margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    color: colors.warning,
-                  ),
+                  Icon(Icons.info_outline_rounded, color: colors.warning),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -353,9 +351,9 @@ class SchoolBusPage extends ConsumerWidget {
   }
 
   Future<void> _showSettingsModalBottomSheet(BuildContext context) async {
-    await showClubModalBottomSheet(
-      context,
-      Consumer(
+    await showMcBottomSheet(
+      context: context,
+      builder: (_) => Consumer(
         builder: (context, ref, child) {
           final busState = ref.watch(busControllerProvider);
           final busController = ref.read(busControllerProvider.notifier);
@@ -366,12 +364,12 @@ class SchoolBusPage extends ConsumerWidget {
             children: [
               Text(
                 context.l10n.pageSettings,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              ClubListTile(
+              McListTile(
                 title: Text(context.l10n.showBusTile),
                 subtitle: Text(context.l10n.showBusTileSubtitle),
                 trailing: CupertinoSwitch(
@@ -384,11 +382,15 @@ class SchoolBusPage extends ConsumerWidget {
           );
         },
       ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.6,
     );
   }
 
   Future<void> _showModalBottomSheet(BuildContext context, BusItem bus) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -428,7 +430,14 @@ class SchoolBusPage extends ConsumerWidget {
       ],
     );
 
-    return showClubModalBottomSheet(context, content);
+    return showMcBottomSheet(
+      context: context,
+      builder: (_) => content,
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.6,
+    );
   }
 
   Widget _buildInfoRow({
@@ -439,7 +448,7 @@ class SchoolBusPage extends ConsumerWidget {
     required Color color,
     int maxLines = 1,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -449,7 +458,7 @@ class SchoolBusPage extends ConsumerWidget {
             padding: const EdgeInsets.all(8),
             decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.1),
-              shape: ClubSmoothCorners.shape(BorderRadius.circular(8)),
+              shape: McSmoothCorners.shape(BorderRadius.circular(8)),
             ),
             child: Icon(icon, size: 20, color: color),
           ),
@@ -486,24 +495,20 @@ class SchoolBusPage extends ConsumerWidget {
 }
 
 class BusTimelineTile extends StatelessWidget {
-  const BusTimelineTile({
-    super.key,
-    required this.bus,
-    required this.onTap,
-  });
+  const BusTimelineTile({super.key, required this.bus, required this.onTap});
 
   final BusItem bus;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: GestureDetector(
         onTap: onTap,
-        child: ClubCard(
+        child: McCard.elevated(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,7 +516,10 @@ class BusTimelineTile extends StatelessWidget {
               Row(
                 children: [
                   _buildTimeDisplay(
-                      bus.runTime, context.l10n.departure, colors),
+                    bus.runTime,
+                    context.l10n.departure,
+                    colors,
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Icon(
@@ -521,18 +529,25 @@ class BusTimelineTile extends StatelessWidget {
                     ),
                   ),
                   _buildTimeDisplay(
-                      bus.arrivalTime, context.l10n.arrival, colors),
+                    bus.arrivalTime,
+                    context.l10n.arrival,
+                    colors,
+                  ),
                   const Spacer(),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: ShapeDecoration(
                       color: colors.primary.withValues(alpha: 0.1),
-                      shape: ClubSmoothCorners.shape(BorderRadius.circular(6)),
+                      shape: McSmoothCorners.shape(BorderRadius.circular(6)),
                     ),
                     child: Text(
                       _arrivalStationTimeInL10n(
-                          bus.arrivalStationTime, context),
+                        bus.arrivalStationTime,
+                        context,
+                      ),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -584,7 +599,7 @@ class BusTimelineTile extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeDisplay(String time, String label, ClubColors colors) {
+  Widget _buildTimeDisplay(String time, String label, McColors colors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -610,7 +625,9 @@ class BusTimelineTile extends StatelessWidget {
   }
 
   String _arrivalStationTimeInL10n(
-      String arrivalStationTime, BuildContext context) {
+    String arrivalStationTime,
+    BuildContext context,
+  ) {
     var s = arrivalStationTime.split(':');
     if (s.length >= 2) {
       return context.l10n.arrivalStationTime(s[0], s[1]);

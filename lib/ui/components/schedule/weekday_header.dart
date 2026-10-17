@@ -1,32 +1,32 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 List<String> _getWeekdayShortNames(AppLocalizations l10n) => [
-      l10n.sundayShort,
-      l10n.mondayShort,
-      l10n.tuesdayShort,
-      l10n.wednesdayShort,
-      l10n.thursdayShort,
-      l10n.fridayShort,
-      l10n.saturdayShort,
-    ];
+  l10n.sundayShort,
+  l10n.mondayShort,
+  l10n.tuesdayShort,
+  l10n.wednesdayShort,
+  l10n.thursdayShort,
+  l10n.fridayShort,
+  l10n.saturdayShort,
+];
 
 List<String> _getMonthShortNames(AppLocalizations l10n) => [
-      l10n.janShort,
-      l10n.febShort,
-      l10n.marShort,
-      l10n.aprShort,
-      l10n.mayShort,
-      l10n.junShort,
-      l10n.julShort,
-      l10n.augShort,
-      l10n.sepShort,
-      l10n.octShort,
-      l10n.novShort,
-      l10n.decShort,
-    ];
+  l10n.janShort,
+  l10n.febShort,
+  l10n.marShort,
+  l10n.aprShort,
+  l10n.mayShort,
+  l10n.junShort,
+  l10n.julShort,
+  l10n.augShort,
+  l10n.sepShort,
+  l10n.octShort,
+  l10n.novShort,
+  l10n.decShort,
+];
 
 /// 星期标题栏组件
 ///
@@ -49,7 +49,7 @@ class WeekdayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final now = DateTime.now();
 
     final monthStr = _getMonthShortNames(context.l10n)[weekStartDate.month - 1];
@@ -58,10 +58,7 @@ class WeekdayHeader extends StatelessWidget {
       decoration: showGrid
           ? BoxDecoration(
               border: Border(
-                top: BorderSide(
-                  color: colors.separator,
-                  width: 0.5,
-                ),
+                top: BorderSide(color: colors.separator, width: 0.5),
               ),
             )
           : null,
@@ -74,10 +71,7 @@ class WeekdayHeader extends StatelessWidget {
             decoration: showGrid
                 ? BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(
-                        color: colors.separator,
-                        width: 0.5,
-                      ),
+                      bottom: BorderSide(color: colors.separator, width: 0.5),
                     ),
                   )
                 : null,
@@ -97,7 +91,8 @@ class WeekdayHeader extends StatelessWidget {
           // 星期几
           ...List.generate(7, (index) {
             final date = weekStartDate.add(Duration(days: index));
-            final isToday = highlightToday &&
+            final isToday =
+                highlightToday &&
                 date.year == now.year &&
                 date.month == now.month &&
                 date.day == now.day;
@@ -107,10 +102,7 @@ class WeekdayHeader extends StatelessWidget {
                 decoration: showGrid
                     ? BoxDecoration(
                         border: Border(
-                          left: BorderSide(
-                            color: colors.separator,
-                            width: 0.5,
-                          ),
+                          left: BorderSide(color: colors.separator, width: 0.5),
                           bottom: BorderSide(
                             color: colors.separator,
                             width: 0.5,
@@ -149,8 +141,9 @@ class WeekdayHeader extends StatelessWidget {
                             date.day.toString(),
                             style: TextStyle(
                               fontSize: 13,
-                              fontWeight:
-                                  isToday ? FontWeight.w600 : FontWeight.w400,
+                              fontWeight: isToday
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
                               color: isToday
                                   ? colors.onAccent
                                   : colors.secondaryLabel,

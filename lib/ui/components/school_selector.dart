@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class SchoolSelector extends StatelessWidget {
   const SchoolSelector({
@@ -18,7 +18,7 @@ class SchoolSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final allSchools = schools ?? School.fallbackList;
 
     return Autocomplete<School>(
@@ -26,8 +26,7 @@ class SchoolSelector extends StatelessWidget {
       displayStringForOption: (school) => school.name,
       optionsBuilder: (textEditingValue) {
         if (textEditingValue.text.isEmpty) return allSchools;
-        return School.searchLocally(
-            allSchools, textEditingValue.text);
+        return School.searchLocally(allSchools, textEditingValue.text);
       },
       fieldViewBuilder: (context, controller, focusNode, onSubmit) {
         return TextField(
@@ -37,31 +36,28 @@ class SchoolSelector extends StatelessWidget {
           decoration: InputDecoration(
             hintText: l10n.selectSchool,
             hintStyle: TextStyle(
-              color: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.color
-                  ?.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
             ),
             prefixIcon: Icon(
               Icons.school_outlined,
-              color: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.color
-                  ?.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
               size: 22,
             ),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 16,
+            ),
             isDense: true,
           ),
           onSubmitted: (value) {
-            final match =
-                School.searchLocally(allSchools, value);
+            final match = School.searchLocally(allSchools, value);
             if (match.isNotEmpty) {
               onChanged(match.first);
               controller.text = match.first.name;
@@ -86,8 +82,7 @@ class SchoolSelector extends StatelessWidget {
                   final isSelected = school.code == selectedSchool?.code;
                   return ListTile(
                     selected: isSelected,
-                    selectedTileColor:
-                        colors.primary.withValues(alpha: 0.1),
+                    selectedTileColor: colors.primary.withValues(alpha: 0.1),
                     leading: Icon(
                       Icons.school_outlined,
                       color: isSelected ? colors.primary : null,
@@ -96,8 +91,9 @@ class SchoolSelector extends StatelessWidget {
                     title: Text(
                       school.name,
                       style: TextStyle(
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                         color: isSelected ? colors.primary : null,
                       ),
                     ),

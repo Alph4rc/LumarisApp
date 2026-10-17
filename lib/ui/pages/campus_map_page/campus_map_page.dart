@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,9 +9,6 @@ import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ios_club_app/state/map_notifier.dart';
 import 'package:ios_club_app/state/map_state.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/school_store.dart';
@@ -59,8 +57,10 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   void _zoomBy(double delta) {
-    final nextZoom =
-        (_mapController.camera.zoom + delta).clamp(_minMapZoom, _maxMapZoom);
+    final nextZoom = (_mapController.camera.zoom + delta).clamp(
+      _minMapZoom,
+      _maxMapZoom,
+    );
     _mapController.move(_mapController.camera.center, nextZoom);
     HapticFeedback.lightImpact();
   }
@@ -89,7 +89,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   @override
   Widget build(BuildContext context) {
     final mapState = ref.watch(mapNotifierProvider);
-    final clubColors = context.clubColors;
+    final colors = context.mc.colors;
     final padding = MediaQuery.of(context).padding;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final isLogin = ref.watch(userStoreProvider).isLogin;
@@ -115,8 +115,10 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     }
 
     // Listen for location changes to auto-center once
-    ref.listen(mapNotifierProvider.select((s) => s.currentLocation),
-        (previous, next) {
+    ref.listen(mapNotifierProvider.select((s) => s.currentLocation), (
+      previous,
+      next,
+    ) {
       if (previous == null && next != null) {
         _moveToLocation(next);
       }
@@ -125,14 +127,16 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     final filteredPOIs = mapState.searchQuery.isEmpty
         ? mapState.campusPOIs
         : mapState.campusPOIs
-            .where((poi) =>
-                poi.name
-                    .toLowerCase()
-                    .contains(mapState.searchQuery.toLowerCase()) ||
-                poi.description
-                    .toLowerCase()
-                    .contains(mapState.searchQuery.toLowerCase()))
-            .toList();
+              .where(
+                (poi) =>
+                    poi.name.toLowerCase().contains(
+                      mapState.searchQuery.toLowerCase(),
+                    ) ||
+                    poi.description.toLowerCase().contains(
+                      mapState.searchQuery.toLowerCase(),
+                    ),
+              )
+              .toList();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -181,7 +185,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                               ]),
                               child: ColorFiltered(
                                 colorFilter: ColorFilter.mode(
-                                  clubColors.primary.withValues(alpha: 0.05),
+                                  colors.primary.withValues(alpha: 0.05),
                                   BlendMode.colorBurn,
                                 ),
                                 child: tileWidget,
@@ -192,23 +196,28 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   ),
                   MarkerLayer(
                     markers: [
-                      ...filteredPOIs.map((poi) => Marker(
-                            point: poi.position,
-                            width: 120,
-                            height: 60,
-                            child: GestureDetector(
-                              onTap: () => _onPOITap(poi),
-                              child: _buildPOIMarker(
-                                  poi, clubColors, _selectedPOI == poi),
+                      ...filteredPOIs.map(
+                        (poi) => Marker(
+                          point: poi.position,
+                          width: 120,
+                          height: 60,
+                          child: GestureDetector(
+                            onTap: () => _onPOITap(poi),
+                            child: _buildPOIMarker(
+                              poi,
+                              colors,
+                              _selectedPOI == poi,
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                       if (mapState.currentLocation != null)
                         Marker(
                           point: mapState.currentLocation!,
                           width: 60,
                           height: 60,
-                          child: _buildMyLocationMarker(clubColors),
-                        )
+                          child: _buildMyLocationMarker(colors),
+                        ),
                     ],
                   ),
                 ],
@@ -220,8 +229,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   top: padding.top + 12,
                   left: 16,
                   right: 16,
-                  child: _buildFloatingTopPanel(
-                      mapState, clubColors, filteredPOIs),
+                  child: _buildFloatingTopPanel(mapState, colors, filteredPOIs),
                 ),
 
               // 3. Wide Screen Sidebar (Animated Floating)
@@ -233,7 +241,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   left: effectiveSidebarOpen ? 20 : -320,
                   bottom: 20,
                   width: 320,
-                  child: _buildSidebar(mapState, clubColors, filteredPOIs),
+                  child: _buildSidebar(mapState, colors, filteredPOIs),
                 ),
 
               // 4. Sidebar Toggle Button (Wide Screen Only - Adjust position based on sidebar)
@@ -243,18 +251,18 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   curve: Curves.easeInOutCubic,
                   top: padding.top + 20,
                   left: effectiveSidebarOpen ? 350 : 20,
-                  child: _buildSidebarToggle(clubColors),
+                  child: _buildSidebarToggle(colors),
                 ),
 
               // 5. Map Controls (Right)
               Positioned(
                 bottom: isWide ? 40 : 120,
                 right: 16,
-                child: _buildMapControls(mapState, clubColors),
+                child: _buildMapControls(mapState, colors),
               ),
 
               // 6. Bottom Sheet (Mobile)
-              if (!isWide) _buildPOIBottomSheet(clubColors),
+              if (!isWide) _buildPOIBottomSheet(colors),
             ],
           );
         },
@@ -262,12 +270,12 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildSidebarToggle(ClubColors colors) {
+  Widget _buildSidebarToggle(McColors colors) {
     final radius = BorderRadius.circular(20);
     return Container(
       decoration: ShapeDecoration(
         color: colors.cardOverlay,
-        shape: ClubSmoothCorners.shape(
+        shape: McSmoothCorners.shape(
           radius,
           side: BorderSide(
             color: colors.separator.withValues(alpha: 0.2),
@@ -275,7 +283,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
           ),
         ),
       ),
-      child: ClubSmoothCorners.clip(
+      child: McSmoothCorners.clip(
         borderRadius: radius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -293,7 +301,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildPOIMarker(CampusPOI poi, ClubColors colors, bool isSelected) {
+  Widget _buildPOIMarker(CampusPOI poi, McColors colors, bool isSelected) {
     final radius = BorderRadius.circular(20);
     return AnimatedScale(
       scale: isSelected ? 1.2 : 1.0,
@@ -305,7 +313,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: ShapeDecoration(
               color: isSelected ? colors.primary : colors.cardBackground,
-              shape: ClubSmoothCorners.shape(
+              shape: McSmoothCorners.shape(
                 radius,
                 side: BorderSide(
                   color: isSelected
@@ -319,7 +327,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   color: colors.shadowColor.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
-                )
+                ),
               ],
             ),
             child: Text(
@@ -344,7 +352,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildMyLocationMarker(ClubColors colors) {
+  Widget _buildMyLocationMarker(McColors colors) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -379,12 +387,15 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   Widget _buildFloatingTopPanel(
-      MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
+    MapState mapState,
+    McColors colors,
+    List<CampusPOI> filteredPOIs,
+  ) {
     final l10n = context.l10n;
     return Column(
       children: [
-        ClubSmoothCorners.clip(
-          borderRadius: ClubRadii.card,
+        McSmoothCorners.clip(
+          borderRadius: McRadii.cardBorder,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Container(
@@ -392,8 +403,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: ShapeDecoration(
                 color: colors.cardOverlay,
-                shape: ClubSmoothCorners.shape(
-                  ClubRadii.card,
+                shape: McSmoothCorners.shape(
+                  McRadii.cardBorder,
                   side: BorderSide(
                     color: colors.separator.withValues(alpha: 0.2),
                     width: 0.5,
@@ -412,10 +423,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                             .read(mapNotifierProvider.notifier)
                             .updateSearchQuery(value);
                       },
-                      style: TextStyle(
-                        color: colors.label,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: colors.label, fontSize: 16),
                       decoration: InputDecoration(
                         hintText: l10n.searchLocation,
                         hintStyle: TextStyle(
@@ -432,8 +440,11 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                                       .read(mapNotifierProvider.notifier)
                                       .updateSearchQuery('');
                                 },
-                                child: Icon(Icons.clear_rounded,
-                                    color: colors.secondaryLabel, size: 18),
+                                child: Icon(
+                                  Icons.clear_rounded,
+                                  color: colors.secondaryLabel,
+                                  size: 18,
+                                ),
                               )
                             : null,
                         suffixIconConstraints: const BoxConstraints(
@@ -449,8 +460,11 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       color: colors.primarySoft,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.map_rounded,
-                        color: colors.primary, size: 20),
+                    child: Icon(
+                      Icons.map_rounded,
+                      color: colors.primary,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
@@ -477,7 +491,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     fontSize: 13,
                   ),
-                  shape: ClubSmoothCorners.shape(
+                  shape: McSmoothCorners.shape(
                     BorderRadius.circular(100),
                     side: BorderSide(
                       color: isSelected
@@ -498,13 +512,13 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildMapControls(MapState mapState, ClubColors colors) {
+  Widget _buildMapControls(MapState mapState, McColors colors) {
     final controlRadius = BorderRadius.circular(12);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Zoom Controls
-        ClubSmoothCorners.clip(
+        McSmoothCorners.clip(
           borderRadius: controlRadius,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -512,7 +526,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               width: 44,
               decoration: ShapeDecoration(
                 color: colors.cardOverlay,
-                shape: ClubSmoothCorners.shape(
+                shape: McSmoothCorners.shape(
                   controlRadius,
                   side: BorderSide(
                     color: colors.separator.withValues(alpha: 0.2),
@@ -529,8 +543,9 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                     colors: colors,
                   ),
                   Divider(
-                      height: 1,
-                      color: colors.separator.withValues(alpha: 0.1)),
+                    height: 1,
+                    color: colors.separator.withValues(alpha: 0.1),
+                  ),
                   _buildControlItem(
                     icon: Icons.remove_rounded,
                     onTap: () => _zoomBy(-1),
@@ -543,7 +558,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
         ),
         const SizedBox(height: 12),
         // Location Control
-        ClubSmoothCorners.clip(
+        McSmoothCorners.clip(
           borderRadius: controlRadius,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -552,7 +567,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               height: 44,
               decoration: ShapeDecoration(
                 color: colors.cardOverlay,
-                shape: ClubSmoothCorners.shape(
+                shape: McSmoothCorners.shape(
                   controlRadius,
                   side: BorderSide(
                     color: colors.separator.withValues(alpha: 0.2),
@@ -588,7 +603,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   Widget _buildControlItem({
     required IconData icon,
     required VoidCallback onTap,
-    required ClubColors colors,
+    required McColors colors,
     Color? iconColor,
   }) {
     return Material(
@@ -609,11 +624,14 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
   }
 
   Widget _buildSidebar(
-      MapState mapState, ClubColors colors, List<CampusPOI> filteredPOIs) {
+    MapState mapState,
+    McColors colors,
+    List<CampusPOI> filteredPOIs,
+  ) {
     final l10n = context.l10n;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return ClubSmoothCorners.clip(
-      borderRadius: ClubRadii.card,
+    return McSmoothCorners.clip(
+      borderRadius: McRadii.cardBorder,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
@@ -621,8 +639,8 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
             color: isDarkMode
                 ? colors.cardBackground.withValues(alpha: 0.8)
                 : colors.cardOverlay.withValues(alpha: 0.7),
-            shape: ClubSmoothCorners.shape(
-              ClubRadii.card,
+            shape: McSmoothCorners.shape(
+              McRadii.cardBorder,
               side: BorderSide(
                 color: colors.separator.withValues(alpha: 0.15),
                 width: 0.8,
@@ -642,14 +660,15 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: ShapeDecoration(
                         color: colors.surfaceRaised,
-                        shape: ClubSmoothCorners.shape(
-                          BorderRadius.circular(12),
-                        ),
+                        shape: McSmoothCorners.shape(BorderRadius.circular(12)),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.search_rounded,
-                              color: colors.secondaryLabel, size: 20),
+                          Icon(
+                            Icons.search_rounded,
+                            color: colors.secondaryLabel,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
@@ -677,12 +696,15 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                                           _searchController.clear();
                                           ref
                                               .read(
-                                                  mapNotifierProvider.notifier)
+                                                mapNotifierProvider.notifier,
+                                              )
                                               .updateSearchQuery('');
                                         },
-                                        child: Icon(Icons.clear_rounded,
-                                            color: colors.secondaryLabel,
-                                            size: 18),
+                                        child: Icon(
+                                          Icons.clear_rounded,
+                                          color: colors.secondaryLabel,
+                                          size: 18,
+                                        ),
                                       )
                                     : null,
                                 suffixIconConstraints: const BoxConstraints(
@@ -701,7 +723,9 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Divider(
-                    height: 1, color: colors.separator.withValues(alpha: 0.2)),
+                  height: 1,
+                  color: colors.separator.withValues(alpha: 0.2),
+                ),
               ),
               Expanded(
                 child: ListView.separated(
@@ -710,15 +734,18 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   separatorBuilder: (_, _) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Divider(
-                        height: 1,
-                        color: colors.separator.withValues(alpha: 0.1)),
+                      height: 1,
+                      color: colors.separator.withValues(alpha: 0.1),
+                    ),
                   ),
                   itemBuilder: (context, index) {
                     final poi = filteredPOIs[index];
                     final isSelected = _selectedPOI == poi;
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 4),
+                        horizontal: 24,
+                        vertical: 4,
+                      ),
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -737,8 +764,9 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                         poi.name,
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           color: isSelected ? colors.primary : colors.label,
                         ),
                       ),
@@ -749,7 +777,9 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              fontSize: 13, color: colors.secondaryLabel),
+                            fontSize: 13,
+                            color: colors.secondaryLabel,
+                          ),
                         ),
                       ),
                       onTap: () => _onPOITap(poi),
@@ -764,7 +794,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     );
   }
 
-  Widget _buildPOIBottomSheet(ClubColors colors) {
+  Widget _buildPOIBottomSheet(McColors colors) {
     final l10n = context.l10n;
     return DraggableScrollableSheet(
       controller: _sheetController,
@@ -786,7 +816,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
         return Container(
           decoration: ShapeDecoration(
             color: colors.cardBackground,
-            shape: ClubSmoothCorners.shape(
+            shape: McSmoothCorners.shape(
               const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             shadows: [
@@ -794,7 +824,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                 color: colors.shadowColor.withValues(alpha: 0.1),
                 blurRadius: 10,
                 spreadRadius: 2,
-              )
+              ),
             ],
           ),
           child: ListView(
@@ -807,7 +837,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                   height: 5,
                   decoration: ShapeDecoration(
                     color: colors.separator.withValues(alpha: 0.3),
-                    shape: ClubSmoothCorners.shape(BorderRadius.circular(10)),
+                    shape: McSmoothCorners.shape(BorderRadius.circular(10)),
                   ),
                 ),
               ),
@@ -831,8 +861,10 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                       color: colors.primary,
                       shape: BoxShape.circle,
                     ),
-                    child:
-                        Icon(Icons.directions_rounded, color: colors.onAccent),
+                    child: Icon(
+                      Icons.directions_rounded,
+                      color: colors.onAccent,
+                    ),
                   ),
                 ],
               ),
@@ -862,13 +894,13 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
     required String title,
     required String content,
     required IconData icon,
-    required ClubColors colors,
+    required McColors colors,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
         color: colors.surfaceRaised,
-        shape: ClubSmoothCorners.shape(BorderRadius.circular(16)),
+        shape: McSmoothCorners.shape(BorderRadius.circular(16)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -890,11 +922,7 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
           const SizedBox(height: 8),
           Text(
             content,
-            style: TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              color: colors.label,
-            ),
+            style: TextStyle(fontSize: 15, height: 1.5, color: colors.label),
           ),
         ],
       ),

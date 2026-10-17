@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:display_mode/display_mode.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:feedback_sdk/feedback_sdk.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +30,6 @@ import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -42,10 +42,7 @@ void main() async {
   AppLogger.info('光序 启动中...');
 
   // Hive 和 SharedPreferences 互相独立，并行初始化
-  await Future.wait([
-    HiveManager.init(),
-    PrefsService.init(),
-  ]);
+  await Future.wait([HiveManager.init(), PrefsService.init()]);
 
   // 课表首帧就要用到节次时间，先用本地缓存的作息表装载
   await ScheduleTimeService.loadFromCache();
@@ -58,23 +55,27 @@ void main() async {
   // Keep cross-feature reactions in one app-level mediator, not in stores.
   providerContainer.read(appStateCoordinatorProvider);
   final settingsStore = providerContainer.read(settingsStoreProvider.notifier);
-  final authStateNotifier =
-      providerContainer.read(authStateNotifierProvider.notifier);
+  final authStateNotifier = providerContainer.read(
+    authStateNotifierProvider.notifier,
+  );
   final courseStore = providerContainer.read(courseStoreProvider.notifier);
 
   BasicHttpClientManager.initialize();
 
   // 先用本地学校配置初始化客户端，避免网络请求阻塞首帧。
   final schoolStore = providerContainer.read(schoolStoreProvider.notifier);
-  final initialSchool = providerContainer.read(schoolStoreProvider).school ??
+  final initialSchool =
+      providerContainer.read(schoolStoreProvider).school ??
       settingsStore.currentSchool;
 
   // 反馈 SDK 初始化（匿名反馈中心）。school 用当前学校 code 作 slug（如 xauat）。
-  await FeedbackSdk.init(FeedbackConfig(
-    baseUrl: 'https://feedbackapi.luckyfishes.site',
-    appName: 'lumaris',
-    school: initialSchool?.code.toLowerCase() ?? '',
-  ));
+  await FeedbackSdk.init(
+    FeedbackConfig(
+      baseUrl: 'https://feedbackapi.luckyfishes.site',
+      appName: 'lumaris',
+      school: initialSchool?.code.toLowerCase() ?? '',
+    ),
+  );
 
   EduHttpClientManager.initialize(
     school: initialSchool,
@@ -151,10 +152,12 @@ Future<void> _deferredInit() async {
 }
 
 void initApp(ProviderContainer container) {
-  runApp(UncontrolledProviderScope(
-    container: container,
-    child: const _AppLauncher(),
-  ));
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const _AppLauncher(),
+    ),
+  );
 }
 
 class _AppLauncher extends ConsumerWidget {
@@ -188,8 +191,16 @@ class _AppLauncher extends ConsumerWidget {
         AppLocalizations.delegate,
         ...GlobalMaterialLocalizations.delegates,
       ],
-      theme: ClubTheme.lightTheme(fontFamily: fontFamily, locale: locale),
-      darkTheme: ClubTheme.darkTheme(fontFamily: fontFamily, locale: locale),
+      theme: McThemeData.materialTheme(
+        McColors.light,
+        fontFamily: fontFamily,
+        locale: locale,
+      ),
+      darkTheme: McThemeData.materialTheme(
+        McColors.dark,
+        fontFamily: fontFamily,
+        locale: locale,
+      ),
       themeMode: settingsStore.themeMode,
       routerConfig: router,
       // 部分第三方依赖仍引用旧 SDK 的 material/cupertino，兼容桥为其注入
@@ -215,10 +226,7 @@ void requestPermissions() async {
 }
 
 class WindowPage extends StatefulWidget {
-  const WindowPage({
-    super.key,
-    required this.child,
-  });
+  const WindowPage({super.key, required this.child});
 
   final Widget child;
 

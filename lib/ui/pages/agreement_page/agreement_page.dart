@@ -1,13 +1,11 @@
 import 'dart:io';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/ui/pages/protocol_page/protocol_page.dart';
 
@@ -33,9 +31,7 @@ class _AgreementPageState extends ConsumerState<AgreementPage> {
 
   void _viewProtocol(ProtocolDocument document) {
     _navigatorKey.currentState?.push(
-      MaterialPageRoute(
-        builder: (_) => ProtocolPage(document: document),
-      ),
+      MaterialPageRoute(builder: (_) => ProtocolPage(document: document)),
     );
   }
 
@@ -74,7 +70,7 @@ class _AgreementHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Scaffold(
       body: SafeArea(
@@ -85,11 +81,13 @@ class _AgreementHomeView extends StatelessWidget {
             final isWide = isDesktop || isTablet;
 
             // 桌面端内容区最大宽度
-            final contentMaxWidth =
-                isDesktop ? 520.0 : (isTablet ? 480.0 : double.infinity);
+            final contentMaxWidth = isDesktop
+                ? 520.0
+                : (isTablet ? 480.0 : double.infinity);
             // 水平内边距
-            final horizontalPadding =
-                isDesktop ? 48.0 : (isTablet ? 40.0 : 28.0);
+            final horizontalPadding = isDesktop
+                ? 48.0
+                : (isTablet ? 40.0 : 28.0);
             // 顶部间距
             final topSpacing = isDesktop ? 48.0 : (isTablet ? 64.0 : 60.0);
 
@@ -124,8 +122,9 @@ class _AgreementHomeView extends StatelessWidget {
                       const SizedBox(height: 32),
                       // 说明文字
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
                         child: Text(
                           context.l10n.agreementDescription,
                           style: TextStyle(
@@ -138,8 +137,9 @@ class _AgreementHomeView extends StatelessWidget {
                       const SizedBox(height: 28),
                       // 协议卡片区域
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
                         child: _buildAgreementCard(
                           context: context,
                           isWide: isWide,
@@ -152,8 +152,9 @@ class _AgreementHomeView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
                         child: _buildAgreementCard(
                           context: context,
                           isWide: isWide,
@@ -167,8 +168,9 @@ class _AgreementHomeView extends StatelessWidget {
                       const SizedBox(height: 32),
                       // 提示文字
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
                         child: Text(
                           context.l10n.agreementReadTip,
                           style: TextStyle(
@@ -182,8 +184,9 @@ class _AgreementHomeView extends StatelessWidget {
                       const SizedBox(height: 28),
                       // 按钮区域
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
                         child: _buildButtons(context, isWide),
                       ),
                       SizedBox(height: isDesktop ? 40 : 24),
@@ -199,14 +202,14 @@ class _AgreementHomeView extends StatelessWidget {
   }
 
   Widget _buildAppIcon(BuildContext context, bool isWide) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final size = isWide ? 100.0 : 90.0;
     return Container(
       width: size,
       height: size,
       decoration: ShapeDecoration(
-        shape: ClubSmoothCorners.shape(
-          isWide ? ClubRadii.tile : ClubRadii.card,
+        shape: McSmoothCorners.shape(
+          isWide ? McRadii.tileBorder : McRadii.cardBorder,
         ),
         shadows: [
           BoxShadow(
@@ -216,8 +219,8 @@ class _AgreementHomeView extends StatelessWidget {
           ),
         ],
       ),
-      child: ClubSmoothCorners.clip(
-        borderRadius: isWide ? ClubRadii.tile : ClubRadii.card,
+      child: McSmoothCorners.clip(
+        borderRadius: isWide ? McRadii.tileBorder : McRadii.cardBorder,
         child: const Image(
           image: AssetImage('assets/icon.webp'),
           fit: BoxFit.cover,
@@ -226,11 +229,8 @@ class _AgreementHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildButtons(
-    BuildContext context,
-    bool isWide,
-  ) {
-    final colors = context.clubColors;
+  Widget _buildButtons(BuildContext context, bool isWide) {
+    final colors = context.mc.colors;
     final buttonHeight = isWide ? 52.0 : 50.0;
     final fontSize = isWide ? 18.0 : 17.0;
 
@@ -243,10 +243,7 @@ class _AgreementHomeView extends StatelessWidget {
             onPressed: onAgree,
             child: Text(
               context.l10n.agreeAndContinue,
-              style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -280,14 +277,14 @@ class _AgreementHomeView extends StatelessWidget {
     required String description,
     required VoidCallback onTap,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Material(
       color: colors.surfaceRaised,
-      shape: ClubSmoothCorners.shape(ClubRadii.panel),
+      shape: McSmoothCorners.shape(McRadii.panelBorder),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: ClubRadii.panel,
-        customBorder: ClubSmoothCorners.shape(ClubRadii.panel),
+        borderRadius: McRadii.panelBorder,
+        customBorder: McSmoothCorners.shape(McRadii.panelBorder),
         onTap: onTap,
         child: Padding(
           padding: EdgeInsets.all(isWide ? 20 : 18),
@@ -298,7 +295,7 @@ class _AgreementHomeView extends StatelessWidget {
                 height: isWide ? 46 : 42,
                 decoration: ShapeDecoration(
                   color: iconColor.withValues(alpha: 0.12),
-                  shape: ClubSmoothCorners.shape(ClubRadii.navigation),
+                  shape: McSmoothCorners.shape(McRadii.navigationBorder),
                 ),
                 child: Icon(icon, size: isWide ? 24 : 22, color: iconColor),
               ),

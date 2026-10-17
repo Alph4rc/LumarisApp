@@ -1,15 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:feedback_sdk/feedback_sdk.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/school_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// 匿名反馈表单页：描述 + 联系方式 + 图片（≤6）+ 字数统计 + 提交。
 class FeedbackPage extends ConsumerStatefulWidget {
@@ -43,7 +41,10 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
   Future<void> _pickImages() async {
     final remaining = _config.maxImageCount - _images.length;
     if (remaining <= 0) {
-      showClubSnackBar(context, Text(context.l10n.feedbackImageTooMany));
+      McFeedback.showMessage(
+        context,
+        message: context.l10n.feedbackImageTooMany,
+      );
       return;
     }
 
@@ -56,7 +57,10 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
       );
     } catch (_) {
       if (!mounted) return;
-      showClubSnackBar(context, Text(context.l10n.feedbackPickImageFailed));
+      McFeedback.showMessage(
+        context,
+        message: context.l10n.feedbackPickImageFailed,
+      );
       return;
     }
     if (result == null || !mounted) return;
@@ -64,16 +68,21 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
     final picked = result.files
         .where((f) => f.bytes != null)
         .take(remaining)
-        .map((f) => _PickedImage(
-              f.name.isNotEmpty
-                  ? f.name
-                  : 'feedback_${DateTime.now().millisecondsSinceEpoch}.jpg',
-              f.bytes!,
-            ))
+        .map(
+          (f) => _PickedImage(
+            f.name.isNotEmpty
+                ? f.name
+                : 'feedback_${DateTime.now().millisecondsSinceEpoch}.jpg',
+            f.bytes!,
+          ),
+        )
         .toList();
 
     if (picked.isEmpty) {
-      showClubSnackBar(context, Text(context.l10n.feedbackPickImageFailed));
+      McFeedback.showMessage(
+        context,
+        message: context.l10n.feedbackPickImageFailed,
+      );
       return;
     }
 
@@ -95,11 +104,17 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
     final contact = _contactController.text.trim();
 
     if (content.isEmpty) {
-      showClubSnackBar(context, Text(context.l10n.feedbackContentRequired));
+      McFeedback.showMessage(
+        context,
+        message: context.l10n.feedbackContentRequired,
+      );
       return;
     }
     if (contact.isEmpty) {
-      showClubSnackBar(context, Text(context.l10n.feedbackContactRequired));
+      McFeedback.showMessage(
+        context,
+        message: context.l10n.feedbackContactRequired,
+      );
       return;
     }
 
@@ -108,18 +123,18 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
       // 三段式上传每张图片，收集 attachment_id。
       final attachmentIds = <int>[];
       for (final img in _images) {
-        attachmentIds.add(await FeedbackSdk.instance.uploadImage(
-          filename: img.filename,
-          raw: img.bytes,
-        ));
+        attachmentIds.add(
+          await FeedbackSdk.instance.uploadImage(
+            filename: img.filename,
+            raw: img.bytes,
+          ),
+        );
       }
 
       // school 运行时可能切换，提交时用当前学校覆盖 init 时的值。
       final school =
           ref.read(schoolStoreProvider).school?.code.toLowerCase() ?? '';
-      final extra = <String, dynamic>{
-        if (school.isNotEmpty) 'school': school,
-      };
+      final extra = <String, dynamic>{if (school.isNotEmpty) 'school': school};
 
       // 复用同一 request_id 保证失败重试幂等。
       _requestId ??= FeedbackSdk.instance.newRequestId();
@@ -133,7 +148,10 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
       );
 
       if (!mounted) return;
-      showClubSnackBar(context, Text(context.l10n.feedbackSubmitSuccess));
+      McFeedback.showMessage(
+        context,
+        message: context.l10n.feedbackSubmitSuccess,
+      );
       setState(() {
         _submitting = false;
         _images.clear();
@@ -145,11 +163,14 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
     } on FeedbackException catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      showClubSnackBar(context, Text(e.userMessage));
+      McFeedback.showMessage(context, message: e.userMessage);
     } catch (e) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      showClubSnackBar(context, Text(FeedbackApi.toFeedback(e).userMessage));
+      McFeedback.showMessage(
+        context,
+        message: FeedbackApi.toFeedback(e).userMessage,
+      );
     }
   }
 
@@ -158,7 +179,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: ClubAppBar(title: l10n.feedback),
+      appBar: McAppBar(title: l10n.feedback),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -168,12 +189,15 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
               l10n.feedbackSubtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: context.clubColors.secondaryLabel,
+                color: context.mc.colors.secondaryLabel,
               ),
             ),
             const SizedBox(height: 24),
-            _buildFieldLabel(context, l10n.feedbackContentLabel,
-                required: true),
+            _buildFieldLabel(
+              context,
+              l10n.feedbackContentLabel,
+              required: true,
+            ),
             const SizedBox(height: 8),
             CupertinoTextField(
               controller: _contentController,
@@ -198,8 +222,11 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
               onChanged: (_) => _markDirty(),
             ),
             const SizedBox(height: 16),
-            _buildFieldLabel(context, l10n.feedbackContactLabel,
-                required: true),
+            _buildFieldLabel(
+              context,
+              l10n.feedbackContactLabel,
+              required: true,
+            ),
             const SizedBox(height: 8),
             CupertinoTextField(
               controller: _contactController,
@@ -227,10 +254,12 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
             _buildImageGrid(context),
             const SizedBox(height: 32),
             SizedBox(
-                width: double.infinity,
-                child: CupertinoButton.filled(
-                    onPressed: _submitting ? null : _submit,
-                    child: Text(l10n.feedbackSubmit)))
+              width: double.infinity,
+              child: CupertinoButton.filled(
+                onPressed: _submitting ? null : _submit,
+                child: Text(l10n.feedbackSubmit),
+              ),
+            ),
           ],
         ),
       ),
@@ -242,7 +271,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
     String text, {
     bool required = false,
   }) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Row(
       children: [
         Text(
@@ -270,7 +299,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
   }
 
   Widget _buildAddTile(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return InkWell(
       onTap: _pickImages,
       borderRadius: BorderRadius.circular(12),
@@ -285,8 +314,10 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_photo_alternate_outlined,
-                color: colors.secondaryLabel),
+            Icon(
+              Icons.add_photo_alternate_outlined,
+              color: colors.secondaryLabel,
+            ),
             const SizedBox(height: 4),
             Text(
               context.l10n.feedbackAddImage,

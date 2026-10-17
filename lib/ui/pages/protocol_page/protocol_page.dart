@@ -1,11 +1,9 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -106,7 +104,7 @@ class _ProtocolPageState extends State<ProtocolPage> {
       AppLogger.error('打开协议链接失败: $uri', error: e);
     }
     if (mounted) {
-      showClubSnackBar(context, Text(context.l10n.protocolOpenFailed));
+      McFeedback.showMessage(context, message: context.l10n.protocolOpenFailed);
     }
   }
 
@@ -121,7 +119,7 @@ class _ProtocolPageState extends State<ProtocolPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClubAppBar(title: widget.document.title(context.l10n)),
+      appBar: McAppBar(title: widget.document.title(context.l10n)),
       body: _buildBody(context),
     );
   }
@@ -173,7 +171,7 @@ class _ProtocolFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Center(
       child: Padding(

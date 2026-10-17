@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -11,7 +12,6 @@ import 'package:permission_handler/permission_handler.dart'
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/routes/router.dart';
-import 'package:ios_club_app/ui/components/club_modal_bottom_sheet.dart';
 import 'package:ios_club_app/ui/pages/setting_page/version_setting.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
@@ -21,14 +21,7 @@ import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/components/club_app_bar.dart';
-import 'package:ios_club_app/ui/components/club_card.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
 import 'package:ios_club_app/ui/components/platform_dialog.dart';
-import 'package:ios_club_app/ui/theme/club_radii.dart';
-import 'package:ios_club_app/ui/theme/club_smooth_corners.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
-import 'package:ios_club_app/ui/components/show_club_snack_bar.dart';
 
 import 'package:ios_club_app/ui/pages/setting_page/show_tomorrow_setting.dart';
 import 'package:ios_club_app/ui/pages/setting_page/remind_setting.dart';
@@ -43,16 +36,14 @@ class SettingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final userState = ref.watch(userStoreProvider);
     final userStore = ref.read(userStoreProvider.notifier);
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
 
     return Scaffold(
-      appBar: ClubAppBar(
-        title: context.l10n.settings,
-      ),
+      appBar: McAppBar(title: context.l10n.settings),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isTablet = constraints.maxWidth > 600;
@@ -80,17 +71,13 @@ class SettingPage extends ConsumerWidget {
                 const SizedBox(height: 24),
                 _buildSectionTitle(context, context.l10n.version),
                 const SizedBox(height: 12),
-                _buildSettingsGroup([
-                  const VersionSetting(),
-                ]),
+                _buildSettingsGroup([const VersionSetting()]),
                 const SizedBox(height: 24),
                 if (PlatformUtils.isMobile)
                   _buildSectionTitle(context, context.l10n.widgets),
                 if (PlatformUtils.isMobile) const SizedBox(height: 12),
                 if (PlatformUtils.isMobile)
-                  _buildSettingsGroup([
-                    _buildWidgetTile(context),
-                  ]),
+                  _buildSettingsGroup([_buildWidgetTile(context)]),
                 if (PlatformUtils.isMobile) const SizedBox(height: 24),
                 _buildSectionTitle(context, context.l10n.about),
                 const SizedBox(height: 12),
@@ -100,14 +87,14 @@ class SettingPage extends ConsumerWidget {
                   _buildLicenseTile(context),
                   _buildPrivacyPolicyTile(context),
                   _buildUserAgreementTile(context),
-                  _buildICPTile(context)
+                  _buildICPTile(context),
                 ]),
                 const SizedBox(height: 24),
                 _buildSectionTitle(context, context.l10n.other),
                 const SizedBox(height: 12),
                 _buildSettingsGroup([
                   _buildClearCacheTile(context),
-                  ClubListTile(
+                  McListTile(
                     leading: Icon(
                       CupertinoIcons.link,
                       size: 20,
@@ -119,7 +106,7 @@ class SettingPage extends ConsumerWidget {
                     onTap: () => AppRouter.push(AppRoutes.mcp),
                   ),
                   if (userState.isLogin) _buildLogoutTile(context, userStore),
-                  ClubListTile(
+                  McListTile(
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 12,
@@ -138,7 +125,7 @@ class SettingPage extends ConsumerWidget {
                     ),
                   ),
                   if (kDebugMode)
-                    ClubListTile(
+                    McListTile(
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
@@ -169,7 +156,7 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildAppHeader(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Column(
       children: [
@@ -177,7 +164,7 @@ class SettingPage extends ConsumerWidget {
           width: 120,
           height: 120,
           decoration: ShapeDecoration(
-            shape: ClubSmoothCorners.shape(ClubRadii.tile),
+            shape: McSmoothCorners.shape(McRadii.tileBorder),
             shadows: [
               BoxShadow(
                 color: colors.shadowColor,
@@ -186,8 +173,8 @@ class SettingPage extends ConsumerWidget {
               ),
             ],
           ),
-          child: ClubSmoothCorners.clip(
-            borderRadius: ClubRadii.tile,
+          child: McSmoothCorners.clip(
+            borderRadius: McRadii.tileBorder,
             child: const Image(
               image: AssetImage('assets/icon.webp'),
               fit: BoxFit.cover,
@@ -206,17 +193,14 @@ class SettingPage extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           context.l10n.appSlogan,
-          style: TextStyle(
-            fontSize: 14,
-            color: colors.secondaryLabel,
-          ),
+          style: TextStyle(fontSize: 14, color: colors.secondaryLabel),
         ),
       ],
     );
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -236,36 +220,33 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildSettingsGroup(List<Widget> children) {
-    return ClubCard(
-      child: Column(
-        children: children,
-      ),
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
+      child: Column(children: children),
     );
   }
 
   Widget _buildRefreshTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.refresh,
         size: 20,
-        color: context.clubColors.primary,
+        color: context.mc.colors.primary,
       ),
       title: Text(context.l10n.refreshData),
       showChevron: true,
       onTap: () async {
-        showClubSnackBar(context, Text(context.l10n.refreshingData));
+        McFeedback.showMessage(context, message: context.l10n.refreshingData);
         final re = await EducationRefreshService.refresh();
         if (re) {
           await _syncHomeWidget();
         }
         if (context.mounted) {
-          showClubSnackBar(
+          McFeedback.showMessage(
             context,
-            Text(
-              re
-                  ? context.l10n.refreshDataSuccess
-                  : context.l10n.refreshDataFailed,
-            ),
+            message: re
+                ? context.l10n.refreshDataSuccess
+                : context.l10n.refreshDataFailed,
           );
         }
       },
@@ -277,14 +258,10 @@ class SettingPage extends ConsumerWidget {
     SettingsState settings,
     SettingsStore settingsStore,
   ) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
-    return ClubListTile(
-      leading: Icon(
-        CupertinoIcons.moon_stars,
-        size: 20,
-        color: colors.primary,
-      ),
+    return McListTile(
+      leading: Icon(CupertinoIcons.moon_stars, size: 20, color: colors.primary),
       title: Text(context.l10n.appearance),
       subtitle: Text(_themeModeLabel(context, settings.themeMode)),
       showChevron: true,
@@ -304,11 +281,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildFeedbackTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         Icons.feedback_rounded,
         size: 20,
-        color: context.clubColors.primary,
+        color: context.mc.colors.primary,
       ),
       title: Text(context.l10n.feedback),
       subtitle: Text(context.l10n.feedbackSubtitle),
@@ -319,11 +296,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildTeamTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.person_2_fill,
         size: 20,
-        color: context.clubColors.warning,
+        color: context.mc.colors.warning,
       ),
       title: Text(context.l10n.team),
       subtitle: Text(context.l10n.teamName),
@@ -334,11 +311,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildLicenseTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.doc_text_fill,
         size: 20,
-        color: context.clubColors.success,
+        color: context.mc.colors.success,
       ),
       title: Text(context.l10n.openSourceLicense),
       subtitle: Text(context.l10n.mitLicense),
@@ -349,11 +326,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildICPTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.checkmark_shield_fill,
         size: 20,
-        color: context.clubColors.success,
+        color: context.mc.colors.success,
       ),
       title: Text(context.l10n.icp),
       subtitle: Text("陕ICP备2024031872号-2A"),
@@ -367,11 +344,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildPrivacyPolicyTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.shield_fill,
         size: 20,
-        color: context.clubColors.primary,
+        color: context.mc.colors.primary,
       ),
       title: Text(context.l10n.privacyPolicy),
       subtitle: Text(context.l10n.privacyPolicySubtitle),
@@ -382,11 +359,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildUserAgreementTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.doc_text_fill,
         size: 20,
-        color: context.clubColors.purple,
+        color: context.mc.colors.purple,
       ),
       title: Text(context.l10n.userAgreement),
       subtitle: Text(context.l10n.userAgreementSubtitle),
@@ -396,15 +373,12 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLogoutTile(
-    BuildContext context,
-    UserStore userStore,
-  ) {
-    return ClubListTile(
+  Widget _buildLogoutTile(BuildContext context, UserStore userStore) {
+    return McListTile(
       leading: Icon(
         Icons.logout_outlined,
         size: 20,
-        color: context.clubColors.tertiaryLabel,
+        color: context.mc.colors.tertiaryLabel,
       ),
       title: Text(context.l10n.logoutEduSystem),
       onTap: () async {
@@ -425,12 +399,8 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildWidgetTile(BuildContext context) {
-    return ClubListTile(
-      leading: Icon(
-        Icons.widgets,
-        size: 20,
-        color: context.clubColors.primary,
-      ),
+    return McListTile(
+      leading: Icon(Icons.widgets, size: 20, color: context.mc.colors.primary),
       title: Text(context.l10n.addToDesktop),
       showChevron: true,
       onTap: () {
@@ -456,15 +426,17 @@ class SettingPage extends ConsumerWidget {
   Future<bool> _ensureAndroidWidgetPrerequisites(BuildContext context) async {
     final exactAlarmPlugin = NotificationService.instance.notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     final canScheduleExact =
         await exactAlarmPlugin?.canScheduleExactNotifications() ?? false;
     final batteryOptimizationStatus =
         await permission_handler.Permission.ignoreBatteryOptimizations.status;
 
     final hasExactAlarm = canScheduleExact;
-    final hasBackgroundPermission =
-        _isPermissionGranted(batteryOptimizationStatus);
+    final hasBackgroundPermission = _isPermissionGranted(
+      batteryOptimizationStatus,
+    );
 
     if (hasExactAlarm && hasBackgroundPermission) {
       return true;
@@ -540,11 +512,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   Widget _buildClearCacheTile(BuildContext context) {
-    return ClubListTile(
+    return McListTile(
       leading: Icon(
         CupertinoIcons.trash_fill,
         size: 20,
-        color: context.clubColors.danger,
+        color: context.mc.colors.danger,
       ),
       title: Text(context.l10n.clearCache),
       showChevron: true,
@@ -559,14 +531,17 @@ class SettingPage extends ConsumerWidget {
 
         if (result == true) {
           if (context.mounted) {
-            showClubSnackBar(context, Text(context.l10n.clearingCache));
+            McFeedback.showMessage(
+              context,
+              message: context.l10n.clearingCache,
+            );
           }
 
           await EducationCacheService.clearEduCache();
           await RequestCache.instance.clear();
 
           if (context.mounted) {
-            showClubSnackBar(context, Text(context.l10n.cacheCleared));
+            McFeedback.showMessage(context, message: context.l10n.cacheCleared);
           }
         }
       },
@@ -574,11 +549,11 @@ class SettingPage extends ConsumerWidget {
   }
 
   void _showWidgetInstructions(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
-    showClubModalBottomSheet(
-      context,
-      Column(
+    showMcBottomSheet(
+      context: context,
+      builder: (_) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -593,46 +568,28 @@ class SettingPage extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             context.l10n.widgetSetupIntro,
-            style: TextStyle(
-              fontSize: 16,
-              color: colors.secondaryLabel,
-            ),
+            style: TextStyle(fontSize: 16, color: colors.secondaryLabel),
           ),
           const SizedBox(height: 16),
-          _buildInstructionStep(
-            context,
-            '1',
-            context.l10n.widgetSetupStep1,
-          ),
+          _buildInstructionStep(context, '1', context.l10n.widgetSetupStep1),
           const SizedBox(height: 8),
-          _buildInstructionStep(
-            context,
-            '2',
-            context.l10n.widgetSetupStep2,
-          ),
+          _buildInstructionStep(context, '2', context.l10n.widgetSetupStep2),
           const SizedBox(height: 8),
-          _buildInstructionStep(
-            context,
-            '3',
-            context.l10n.widgetSetupStep3,
-          ),
+          _buildInstructionStep(context, '3', context.l10n.widgetSetupStep3),
           const SizedBox(height: 8),
-          _buildInstructionStep(
-            context,
-            '4',
-            context.l10n.widgetSetupStep4,
-          ),
+          _buildInstructionStep(context, '4', context.l10n.widgetSetupStep4),
           const SizedBox(height: 24),
           Text(
             context.l10n.widgetSetupTip,
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.secondaryLabel,
-            ),
+            style: TextStyle(fontSize: 14, color: colors.secondaryLabel),
           ),
           const SizedBox(height: 24),
         ],
       ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.6,
     );
   }
 
@@ -641,7 +598,7 @@ class SettingPage extends ConsumerWidget {
     String step,
     String description,
   ) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -668,10 +625,7 @@ class SettingPage extends ConsumerWidget {
         Expanded(
           child: Text(
             description,
-            style: TextStyle(
-              fontSize: 16,
-              color: colors.label,
-            ),
+            style: TextStyle(fontSize: 16, color: colors.label),
           ),
         ),
       ],
@@ -682,7 +636,7 @@ class SettingPage extends ConsumerWidget {
     BuildContext context,
     SettingsStore settingsStore,
   ) async {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     await showCupertinoModalPopup<void>(
       context: context,

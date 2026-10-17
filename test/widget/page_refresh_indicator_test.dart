@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
@@ -17,7 +18,6 @@ import 'package:ios_club_app/ui/pages/electricity_page/electricity_page.dart';
 import 'package:ios_club_app/ui/pages/payment_page/payment_page.dart';
 import 'package:ios_club_app/ui/pages/program_page/program_page.dart';
 import 'package:ios_club_app/ui/pages/school_bus_page/school_bus_page.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 创建已登录的容器：电费页和校车页对游客会直接显示登录引导，
@@ -27,9 +27,9 @@ Future<ProviderContainer> _createLoggedInContainer(
 ) async {
   final container = ProviderContainer(overrides: overrides);
   addTearDown(container.dispose);
-  await container.read(userStoreProvider.notifier).setUserData(
-        UserData(studentId: '2026001', cookie: 'session'),
-      );
+  await container
+      .read(userStoreProvider.notifier)
+      .setUserData(UserData(studentId: '2026001', cookie: 'session'));
   return container;
 }
 
@@ -41,8 +41,8 @@ Widget _wrapWithApp(Widget child) {
       ...GlobalMaterialLocalizations.delegates,
     ],
     supportedLocales: AppLocalizations.supportedLocales,
-    theme: ClubTheme.lightTheme(),
-    darkTheme: ClubTheme.darkTheme(),
+    theme: McThemeData.materialTheme(McColors.light),
+    darkTheme: McThemeData.materialTheme(McColors.dark),
     home: child,
   );
 }
@@ -93,9 +93,7 @@ void main() {
   testWidgets('PaymentPage should expose pull to refresh', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          tileStoreAutoLoadProvider.overrideWithValue(false),
-        ],
+        overrides: [tileStoreAutoLoadProvider.overrideWithValue(false)],
         child: _wrapWithApp(const PaymentPage()),
       ),
     );
@@ -118,25 +116,26 @@ void main() {
     expect(find.byType(RefreshIndicator), findsOneWidget);
   });
 
-  testWidgets('ElectricityPage should render subscription section',
-      (tester) async {
+  testWidgets('ElectricityPage should render subscription section', (
+    tester,
+  ) async {
     final container = ProviderContainer(
       overrides: [
         tileStoreAutoLoadProvider.overrideWithValue(false),
         electricityReaderProvider.overrideWithValue(() async => 23.5),
-        electricityWeeklyReaderProvider
-            .overrideWithValue(() async => <ElectricData>[]),
-        electricityTileVisibilityReaderProvider
-            .overrideWithValue((_) async => false),
-        electricityServiceProvider.overrideWithValue(
-          ElectricityService(),
+        electricityWeeklyReaderProvider.overrideWithValue(
+          () async => <ElectricData>[],
         ),
+        electricityTileVisibilityReaderProvider.overrideWithValue(
+          (_) async => false,
+        ),
+        electricityServiceProvider.overrideWithValue(ElectricityService()),
       ],
     );
     addTearDown(container.dispose);
-    await container.read(userStoreProvider.notifier).setUserData(
-          UserData(studentId: '2026001', cookie: 'session'),
-        );
+    await container
+        .read(userStoreProvider.notifier)
+        .setUserData(UserData(studentId: '2026001', cookie: 'session'));
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -154,60 +153,64 @@ void main() {
   });
 
   testWidgets(
-      'ElectricityPage should show delete entry for active subscription',
-      (tester) async {
+    'ElectricityPage should show delete entry for active subscription',
+    (tester) async {
+      final service = ElectricityService(
+        subscriptionQueryReader: (email) async =>
+            const ElectricitySubscriptionQueryResponse(
+              email: 'codex@example.com',
+              hasSubscription: true,
+              subscriptionId: 'sub-1',
+              threshold: 10,
+            ),
+      );
+      await service.saveSubscriptionEmail('codex@example.com');
+
+      final container = ProviderContainer(
+        overrides: [
+          tileStoreAutoLoadProvider.overrideWithValue(false),
+          electricityReaderProvider.overrideWithValue(() async => 23.5),
+          electricityWeeklyReaderProvider.overrideWithValue(
+            () async => <ElectricData>[],
+          ),
+          electricityTileVisibilityReaderProvider.overrideWithValue(
+            (_) async => false,
+          ),
+          electricityServiceProvider.overrideWithValue(service),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container
+          .read(userStoreProvider.notifier)
+          .setUserData(UserData(studentId: '2026001', cookie: 'session'));
+      await container
+          .read(electricityStoreProvider.notifier)
+          .loadElectricityData();
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: _wrapWithApp(const ElectricityPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('已开启低余额提醒'), findsOneWidget);
+      expect(find.text('删除订阅'), findsOneWidget);
+    },
+  );
+
+  testWidgets('ElectricityPage should show subscription details dialog', (
+    tester,
+  ) async {
     final service = ElectricityService(
       subscriptionQueryReader: (email) async =>
           const ElectricitySubscriptionQueryResponse(
-        email: 'codex@example.com',
-        hasSubscription: true,
-        subscriptionId: 'sub-1',
-        threshold: 10,
-      ),
-    );
-    await service.saveSubscriptionEmail('codex@example.com');
-
-    final container = ProviderContainer(
-      overrides: [
-        tileStoreAutoLoadProvider.overrideWithValue(false),
-        electricityReaderProvider.overrideWithValue(() async => 23.5),
-        electricityWeeklyReaderProvider
-            .overrideWithValue(() async => <ElectricData>[]),
-        electricityTileVisibilityReaderProvider
-            .overrideWithValue((_) async => false),
-        electricityServiceProvider.overrideWithValue(service),
-      ],
-    );
-    addTearDown(container.dispose);
-    await container.read(userStoreProvider.notifier).setUserData(
-          UserData(studentId: '2026001', cookie: 'session'),
-        );
-    await container
-        .read(electricityStoreProvider.notifier)
-        .loadElectricityData();
-
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: _wrapWithApp(const ElectricityPage()),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('已开启低余额提醒'), findsOneWidget);
-    expect(find.text('删除订阅'), findsOneWidget);
-  });
-
-  testWidgets('ElectricityPage should show subscription details dialog',
-      (tester) async {
-    final service = ElectricityService(
-      subscriptionQueryReader: (email) async =>
-          const ElectricitySubscriptionQueryResponse(
-        email: 'codex@example.com',
-        hasSubscription: true,
-        subscriptionId: 'sub-1',
-        threshold: 12.5,
-      ),
+            email: 'codex@example.com',
+            hasSubscription: true,
+            subscriptionId: 'sub-1',
+            threshold: 12.5,
+          ),
     );
     await service.saveSubscriptionEmail('cached@example.com');
 
@@ -215,17 +218,19 @@ void main() {
       overrides: [
         tileStoreAutoLoadProvider.overrideWithValue(false),
         electricityReaderProvider.overrideWithValue(() async => 23.5),
-        electricityWeeklyReaderProvider
-            .overrideWithValue(() async => <ElectricData>[]),
-        electricityTileVisibilityReaderProvider
-            .overrideWithValue((_) async => false),
+        electricityWeeklyReaderProvider.overrideWithValue(
+          () async => <ElectricData>[],
+        ),
+        electricityTileVisibilityReaderProvider.overrideWithValue(
+          (_) async => false,
+        ),
         electricityServiceProvider.overrideWithValue(service),
       ],
     );
     addTearDown(container.dispose);
-    await container.read(userStoreProvider.notifier).setUserData(
-          UserData(studentId: '2026001', cookie: 'session'),
-        );
+    await container
+        .read(userStoreProvider.notifier)
+        .setUserData(UserData(studentId: '2026001', cookie: 'session'));
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -250,18 +255,19 @@ void main() {
     expect(find.text('12.50 元'), findsOneWidget);
   });
 
-  testWidgets('ElectricityPage should delete active subscription',
-      (tester) async {
+  testWidgets('ElectricityPage should delete active subscription', (
+    tester,
+  ) async {
     var deletedId = '';
     var hasSubscription = true;
     final service = ElectricityService(
       subscriptionQueryReader: (email) async =>
           ElectricitySubscriptionQueryResponse(
-        email: 'codex@example.com',
-        hasSubscription: hasSubscription,
-        subscriptionId: hasSubscription ? 'sub-1' : '',
-        threshold: hasSubscription ? 10 : 0,
-      ),
+            email: 'codex@example.com',
+            hasSubscription: hasSubscription,
+            subscriptionId: hasSubscription ? 'sub-1' : '',
+            threshold: hasSubscription ? 10 : 0,
+          ),
       subscriptionDeleter: (id) async {
         deletedId = id;
         hasSubscription = false;
@@ -273,17 +279,19 @@ void main() {
       overrides: [
         tileStoreAutoLoadProvider.overrideWithValue(false),
         electricityReaderProvider.overrideWithValue(() async => 23.5),
-        electricityWeeklyReaderProvider
-            .overrideWithValue(() async => <ElectricData>[]),
-        electricityTileVisibilityReaderProvider
-            .overrideWithValue((_) async => false),
+        electricityWeeklyReaderProvider.overrideWithValue(
+          () async => <ElectricData>[],
+        ),
+        electricityTileVisibilityReaderProvider.overrideWithValue(
+          (_) async => false,
+        ),
         electricityServiceProvider.overrideWithValue(service),
       ],
     );
     addTearDown(container.dispose);
-    await container.read(userStoreProvider.notifier).setUserData(
-          UserData(studentId: '2026001', cookie: 'session'),
-        );
+    await container
+        .read(userStoreProvider.notifier)
+        .setUserData(UserData(studentId: '2026001', cookie: 'session'));
     await container
         .read(electricityStoreProvider.notifier)
         .loadElectricityData();
@@ -304,6 +312,9 @@ void main() {
 
     expect(deletedId, 'sub-1');
     expect(find.text('添加低余额提醒'), findsOneWidget);
+
+    // Drain the McFeedback toast timer.
+    await tester.pump(const Duration(seconds: 3));
   });
 
   testWidgets('SchoolBusPage should expose pull to refresh', (tester) async {

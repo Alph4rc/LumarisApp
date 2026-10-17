@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:ios_club_app/core/utils/sidebar_destination.dart';
 import 'package:ios_club_app/platform/macos/macos_sidebar.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 /// macOS 窗口外壳：左侧侧边栏 + 右侧内容区。
 ///
@@ -77,7 +77,7 @@ class _MacosShellState extends State<MacosShell> {
     // macos_ui 的 MacosWindow 会把 canvasColor（即 groupedBackground）铺满窗口，
     // 这里补上同样的底色，避免内容区之外出现透明区域。
     return ColoredBox(
-      color: context.clubColors.groupedBackground,
+      color: context.mc.colors.groupedBackground,
       child: Stack(
         fit: StackFit.expand,
         children: [

@@ -1,14 +1,14 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class UnderMaintenanceScreen extends StatelessWidget {
   const UnderMaintenanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Scaffold(
       backgroundColor: colors.groupedBackground,
       body: SafeArea(
@@ -61,7 +61,7 @@ class ErrorInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 400),
@@ -72,26 +72,24 @@ class ErrorInfo extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall!
-                  .copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            Text(
-              description,
-              textAlign: TextAlign.center,
-            ),
+            Text(description, textAlign: TextAlign.center),
             const SizedBox(height: 16 * 2.5),
             button ??
                 ElevatedButton(
                   onPressed: press,
                   style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 48),
-                      backgroundColor: colors.label,
-                      foregroundColor: colors.inverseLabel,
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)))),
+                    minimumSize: const Size(double.infinity, 48),
+                    backgroundColor: colors.label,
+                    foregroundColor: colors.inverseLabel,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
                   child: Text(btnText ?? context.l10n.back),
                 ),
             const SizedBox(height: 16),

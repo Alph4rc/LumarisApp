@@ -1,31 +1,24 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/app_locale_service.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/club_list_tile.dart';
-import 'package:ios_club_app/ui/theme/club_theme.dart';
 
 class LanguageSetting extends ConsumerWidget {
   const LanguageSetting({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
     final l10n = context.l10n;
     final settings = ref.watch(settingsStoreProvider);
     final settingsStore = ref.read(settingsStoreProvider.notifier);
 
-    return ClubListTile(
-      leading: Icon(
-        CupertinoIcons.globe,
-        size: 20,
-        color: colors.primary,
-      ),
+    return McListTile(
+      leading: Icon(CupertinoIcons.globe, size: 20, color: colors.primary),
       title: Text(l10n.language),
-      subtitle: Text(
-        AppLocaleService.labelOf(l10n, settings.localeCode),
-      ),
+      subtitle: Text(AppLocaleService.labelOf(l10n, settings.localeCode)),
       showChevron: true,
       onTap: () => _showLanguagePicker(
         context: context,
@@ -41,7 +34,7 @@ class LanguageSetting extends ConsumerWidget {
     required Future<void> Function(AppLocaleCode code) onChanged,
   }) async {
     final l10n = context.l10n;
-    final colors = context.clubColors;
+    final colors = context.mc.colors;
 
     await showCupertinoModalPopup<void>(
       context: context,
