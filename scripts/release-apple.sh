@@ -31,6 +31,23 @@ SKIP_CLEAN="false"
 DRY_RUN="false"
 
 log() { printf '[apple] %s\n' "$*"; }
+
+# --upload 的凭证在构建前就检查：否则一次十几分钟的构建跑完才因为缺环境变量退出，
+# 用户看到的只是“构建产物有了、ASC 里没有”。
+require_upload_credentials() {
+  [[ -n "${ASC_API_KEY_ID:-}" ]] || die "--upload requires ASC_API_KEY_ID"
+  [[ -n "${ASC_ISSUER_ID:-}" ]] || die "--upload requires ASC_ISSUER_ID"
+  if [[ -z "${ASC_API_KEY_PATH:-}" ]]; then
+    for candidate in \
+      "${HOME}/.appstoreconnect/private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
+      "${HOME}/keys/AuthKey_${ASC_API_KEY_ID}.p8"; do
+      if [[ -f "${candidate}" ]]; then ASC_API_KEY_PATH="${candidate}"; break; fi
+    done
+  fi
+  [[ -n "${ASC_API_KEY_PATH:-}" && -f "${ASC_API_KEY_PATH}" ]] ||
+    die "--upload requires ASC_API_KEY_PATH (or put the .p8 in ~/.appstoreconnect/private_keys)"
+}
+
 die() { printf '[apple] ERROR: %s\n' "$*" >&2; exit 1; }
 
 usage() {
@@ -60,6 +77,7 @@ done
 TARGETS=("${expanded[@]}")
 
 [[ "$(uname -s)" == "Darwin" ]] || die "Apple builds require macOS"
+[[ "${UPLOAD}" != "true" ]] || require_upload_credentials
 command -v flutter >/dev/null 2>&1 || die "flutter not found in PATH"
 command -v xcodebuild >/dev/null 2>&1 || die "xcodebuild not found; install Xcode"
 
@@ -107,17 +125,6 @@ if [[ "${UPLOAD}" != "true" ]]; then
   exit 0
 fi
 
-[[ -n "${ASC_API_KEY_ID:-}" ]] || die "--upload requires ASC_API_KEY_ID"
-[[ -n "${ASC_ISSUER_ID:-}" ]] || die "--upload requires ASC_ISSUER_ID"
-if [[ -z "${ASC_API_KEY_PATH:-}" ]]; then
-  for candidate in \
-    "${HOME}/.appstoreconnect/private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
-    "${HOME}/keys/AuthKey_${ASC_API_KEY_ID}.p8"; do
-    if [[ -f "${candidate}" ]]; then ASC_API_KEY_PATH="${candidate}"; break; fi
-  done
-fi
-[[ -n "${ASC_API_KEY_PATH:-}" && -f "${ASC_API_KEY_PATH}" ]] ||
-  die "--upload requires ASC_API_KEY_PATH (or put the .p8 in ~/.appstoreconnect/private_keys)"
 
 [[ "${DRY_RUN}" == "true" ]] || command -v xcrun >/dev/null 2>&1 || die "xcrun not found"
 
