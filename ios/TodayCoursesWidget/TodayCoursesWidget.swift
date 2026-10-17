@@ -568,6 +568,9 @@ struct TodayCoursesCompactView: View {
             }
         }
         .padding(8)
+        // Widget 根视图若尺寸小于可用空间，WidgetKit 默认会把整块内容居中；
+        // 这里撑满并顶对齐，课程变少时才不会被推到中间。
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
