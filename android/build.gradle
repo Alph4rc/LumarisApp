@@ -11,14 +11,38 @@ allprojects {
     }
 }
 
-rootProject.buildDir = '../build'
+def newBuildDir = rootProject.layout.buildDirectory.dir("../../build").get()
+rootProject.layout.buildDirectory.value(newBuildDir)
+
 subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.layout.buildDirectory.value(newBuildDir.dir(project.name))
+}
+subprojects { subproject ->
+    // With android.builtInKotlin=false, Flutter applies KGP to plugin projects
+    // that do not mention it in their build script. Some plugins (for example
+    // file_picker 11.x) only mention it inside an `if (!isAgp9OrAbove)` guard,
+    // so Flutter skips them even though KGP never gets applied. Apply KGP to
+    // any Android library module that still lacks it.
+    subproject.plugins.withId('com.android.library') {
+        if (subproject.plugins.findPlugin('org.jetbrains.kotlin.android') == null) {
+            subproject.pluginManager.apply('org.jetbrains.kotlin.android')
+            // KGP defaults jvmTarget to the JDK running Gradle, which no longer
+            // matches the Java 17 target these modules compile against.
+            def kotlinExtension = subproject.extensions.findByName('kotlin')
+            if (kotlinExtension != null) {
+                def jvmTargetClass = kotlinExtension.class.classLoader
+                    .loadClass('org.jetbrains.kotlin.gradle.dsl.JvmTarget')
+                kotlinExtension.compilerOptions.jvmTarget.set(
+                    jvmTargetClass.getField('JVM_17').get(null)
+                )
+            }
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
-    delete rootProject.buildDir
+    delete rootProject.layout.buildDirectory
 }
