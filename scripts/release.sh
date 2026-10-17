@@ -12,6 +12,7 @@ UPDATE_CHANNEL="${UPDATE_CHANNEL:-gitee}"
 DRY_RUN="false"
 SKIP_CLEAN="false"
 ASC_CLOUD_SIGNING="false"
+LOCAL_SIGNING="false"
 ASC_SIGNING_ARGS=()
 
 log() { printf '[release] %s\n' "$*"; }
@@ -59,7 +60,8 @@ Options:
   --output-dir DIR       Artifact directory (default: ./dist)
   --channel NAME         UPDATE_CHANNEL dart define (default: gitee)
   --skip-clean           Do not run flutter clean before building
-  --asc-cloud-signing    Build ios/macos via xcodebuild cloud signing (for CI)
+  --asc-cloud-signing    Build ios/macos via xcodebuild cloud signing (CI, needs an ASC API key)
+  --local-signing        Build ios/macos with the Mac's keychain + Xcode account (local release)
   --dry-run              Print commands without executing them
   --help                 Show this help
 
@@ -101,6 +103,9 @@ Examples:
 
   ASC_API_KEY_ID=ABC ASC_ISSUER_ID=... ASC_API_KEY_PATH=./private/AuthKey_ABC.p8 \
     scripts/release.sh build ios --asc-cloud-signing --channel appstore
+
+  # 本地发版（证书在钥匙串里，Xcode 已登录开发者账号）：
+  scripts/release-apple.sh ios --upload
 EOF
 }
 
@@ -132,6 +137,18 @@ apple_team_id() {
   printf '%s' "${team}"
 }
 
+# 本地签名不向 App Store Connect 要证书：证书和私钥必须已经在钥匙串里，
+# 描述文件由 Xcode 用登录的开发者账号自动创建/刷新（-allowProvisioningUpdates）。
+require_local_signing_identity() {
+  local identities
+  command -v security >/dev/null 2>&1 || die "security is required to check local signing identities"
+  identities="$(security find-identity -v -p codesigning 2>/dev/null || true)"
+  if ! grep -q 'Apple Distribution' <<<"${identities}"; then
+    die "钥匙串里没有 Apple Distribution 证书：先在 Xcode → Settings → Accounts 登录开发者账号并下载证书，或改用 --asc-cloud-signing"
+  fi
+  log "本地签名证书：$(grep 'Apple Distribution' <<<"${identities}" | head -1 | sed 's/^ *[0-9]*) //')"
+}
+
 write_export_options() {
   local plist="$1" team="$2"
   cat > "${plist}" <<PLIST
@@ -154,11 +171,11 @@ write_export_options() {
 PLIST
 }
 
-# Cloud signing: xcodebuild asks App Store Connect to create or refresh the
-# certificates and provisioning profiles from the API key, so CI only needs the
-# .p8. flutter build ipa cannot pass the -authenticationKey* flags through, which
-# is why the archive is driven by xcodebuild directly.
-build_apple_cloud_signed() {
+# Archive + export driven by xcodebuild directly: flutter build ipa cannot pass
+# the -authenticationKey* flags through. Cloud signing asks App Store Connect to
+# create/refresh certificates from the API key (CI); local signing uses the
+# keychain and the Xcode account instead (release from a Mac).
+build_apple_signed() {
   local target="$1"
   local platform_dir="${target}"
   local workspace="${platform_dir}/Runner.xcworkspace"
@@ -170,7 +187,13 @@ build_apple_cloud_signed() {
   [[ "$(uname -s)" == "Darwin" ]] || die "${target} builds require macOS and Xcode"
   require_command flutter
   require_command xcodebuild
-  require_asc_key
+
+  if [[ "${LOCAL_SIGNING}" == "true" ]]; then
+    require_local_signing_identity
+    ASC_SIGNING_ARGS=(-allowProvisioningUpdates)
+  else
+    require_asc_key
+  fi
 
   if [[ "${target}" == "ios" ]]; then
     destination="generic/platform=iOS"
@@ -219,8 +242,9 @@ build_target() {
   local target="$1"
   mkdir -p "${OUTPUT_DIR}"
 
-  if [[ "${ASC_CLOUD_SIGNING}" == "true" && ( "${target}" == "ios" || "${target}" == "macos" ) ]]; then
-    build_apple_cloud_signed "${target}"
+  if [[ ( "${ASC_CLOUD_SIGNING}" == "true" || "${LOCAL_SIGNING}" == "true" ) &&
+        ( "${target}" == "ios" || "${target}" == "macos" ) ]]; then
+    build_apple_signed "${target}"
     log "Built ${target} artifacts in ${OUTPUT_DIR}"
     return 0
   fi
@@ -316,6 +340,7 @@ api_post() {
     2*) printf '%s' "${body}" ;;
     401) die "Publish server rejected the API key (401): the key is wrong, disabled or expired. Check RELEASE_SERVER_API_KEY" ;;
     403) die "API key is not allowed to publish (403): it is not a publish-scoped key, check the admin console" ;;
+    405) die "POST ${url} returned 405: RELEASE_SERVER_API does not point at the Downloader backend. Use the API root such as https://appapi.xauat.site (no /api suffix, not the frontend site)" ;;
     *) die "POST ${url} failed (HTTP ${http_code}): ${body}" ;;
   esac
 }
@@ -344,6 +369,20 @@ upload_server() {
   fi
   require_command curl
   require_command jq
+
+  # 先确认 base URL 指向的确实是 Downloader 后端。填成前端站点时 POST 会得到
+  # 405（静态托管只允许 GET/HEAD），报错信息里却看不出是地址问题，所以在这里拦。
+  if [[ "${DRY_RUN}" != "true" ]]; then
+    local probe_file probe_code
+    probe_file="$(mktemp "${TMPDIR:-/tmp}/release-probe.XXXXXX")"
+    probe_code="$(curl -sS -o "${probe_file}" -w '%{http_code}' --max-time 20 \
+      -H 'Accept: application/json' "${api%/}/api/Release" 2>/dev/null || true)"
+    if [[ "${probe_code}" != "200" ]] || ! jq -e 'type == "array"' "${probe_file}" >/dev/null 2>&1; then
+      rm -f "${probe_file}"
+      die "RELEASE_SERVER_API=${api%/} is not the Downloader backend: GET /api/Release returned HTTP ${probe_code:-000} and was not a JSON array. Use the API root such as https://appapi.xauat.site"
+    fi
+    rm -f "${probe_file}"
+  fi
 
   local release_id="${RELEASE_ID:-}"
   if [[ -z "${release_id}" ]]; then
@@ -444,6 +483,7 @@ parse_options() {
       --channel) (($# >= 2)) || die "--channel requires a value"; UPDATE_CHANNEL="$2"; flutter_args=(--no-tree-shake-icons "--dart-define=UPDATE_CHANNEL=${UPDATE_CHANNEL}"); shift 2 ;;
       --skip-clean) SKIP_CLEAN="true"; shift ;;
       --asc-cloud-signing) ASC_CLOUD_SIGNING="true"; shift ;;
+      --local-signing) LOCAL_SIGNING="true"; shift ;;
       --dry-run) DRY_RUN="true"; shift ;;
       --help|-h) usage; exit 0 ;;
       *) die "Unknown option: $1" ;;
