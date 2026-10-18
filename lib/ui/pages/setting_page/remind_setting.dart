@@ -66,16 +66,11 @@ class RemindSetting extends ConsumerWidget {
   }
 
   Future<void> _show(BuildContext context, WidgetRef ref) async {
-    final a = MediaQuery.of(context).size.width;
-
-    await showModalBottomSheet<void>(
+    await showMcBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxWidth: a,
-        minWidth: a,
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-      ),
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      maxHeight: MediaQuery.sizeOf(context).height * 0.9,
       builder: (BuildContext context) {
         return Consumer(
           builder: (context, ref, child) {

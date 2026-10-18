@@ -9,7 +9,6 @@ import 'package:ios_club_app/features/mcp/models/mcp_tool.dart';
 import 'package:ios_club_app/features/mcp/services/mcp_config_generator.dart';
 import 'package:ios_club_app/features/mcp/services/mcp_probe_service.dart';
 import 'package:ios_club_app/features/mcp/services/mcp_token_store.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 /// 光序 MCP 配置页：展示服务地址、保存令牌，并生成可复制的客户端配置。
 class McpPage extends StatefulWidget {
@@ -95,10 +94,10 @@ class _McpPageState extends State<McpPage> {
   }
 
   Future<void> _clearToken() async {
-    final confirmed = await PlatformDialog.showConfirmDialog(
-      context,
+    final confirmed = await showMcConfirmDialog(
+      context: context,
       title: context.l10n.mcpTokenSection,
-      content: context.l10n.mcpTokenClearConfirm,
+      message: context.l10n.mcpTokenClearConfirm,
       confirmText: context.l10n.delete,
       cancelText: context.l10n.cancel,
     );

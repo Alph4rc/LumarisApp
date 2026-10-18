@@ -13,7 +13,6 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/services/course_color_manager.dart';
 
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 
@@ -57,8 +56,8 @@ class _ScheduleWidgetState extends ConsumerState<ScheduleWidget> {
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  PlatformDialog.showCustomDialog<void>(
-                    context,
+                  showMcDialog(
+                    context: context,
                     title: l10n.settings,
                     content: Consumer(
                       builder: (context, ref, child) {

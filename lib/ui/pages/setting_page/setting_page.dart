@@ -21,7 +21,6 @@ import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/user_store.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 import 'package:ios_club_app/ui/pages/setting_page/show_tomorrow_setting.dart';
 import 'package:ios_club_app/ui/pages/setting_page/remind_setting.dart';
@@ -382,10 +381,10 @@ class SettingPage extends ConsumerWidget {
       ),
       title: Text(context.l10n.logoutEduSystem),
       onTap: () async {
-        final result = await PlatformDialog.showConfirmDialog(
-          context,
+        final result = await showMcConfirmDialog(
+          context: context,
           title: context.l10n.confirmLogoutTitle,
-          content: context.l10n.confirmLogoutContent,
+          message: context.l10n.confirmLogoutContent,
           confirmText: context.l10n.logout,
           cancelText: context.l10n.cancel,
         );
@@ -444,10 +443,10 @@ class SettingPage extends ConsumerWidget {
 
     if (!context.mounted) return false;
 
-    final shouldRequest = await PlatformDialog.showConfirmDialog(
-      context,
+    final shouldRequest = await showMcConfirmDialog(
+      context: context,
       title: context.l10n.addToDesktop,
-      content:
+      message:
           '${context.l10n.allowScheduleAlarm}\n${context.l10n.allowScheduleAlarmContent}\n\n'
           '${context.l10n.allowBackgroundRun}\n${context.l10n.allowBackgroundRunContent}',
       confirmText: context.l10n.goAuthorize,
@@ -521,10 +520,10 @@ class SettingPage extends ConsumerWidget {
       title: Text(context.l10n.clearCache),
       showChevron: true,
       onTap: () async {
-        final result = await PlatformDialog.showConfirmDialog(
-          context,
+        final result = await showMcConfirmDialog(
+          context: context,
           title: context.l10n.confirmClearCacheTitle,
-          content: context.l10n.confirmClearCacheContent,
+          message: context.l10n.confirmClearCacheContent,
           confirmText: context.l10n.clearCache,
           cancelText: context.l10n.cancel,
         );

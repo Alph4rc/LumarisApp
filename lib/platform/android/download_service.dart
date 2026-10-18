@@ -7,7 +7,6 @@ import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/services/app_service.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -169,8 +168,8 @@ class UpdateManager {
     );
 
     // 显示进度对话框
-    PlatformDialog.showCustomDialog<void>(
-      context,
+    showMcDialog(
+      context: context,
       title: context.l10n.downloadingUpdateTitle(version),
       barrierDismissible: false,
       content: ValueListenableBuilder<DownloadProgress>(
@@ -202,7 +201,7 @@ class UpdateManager {
           );
         },
       ),
-      actions: [PlatformDialogAction<void>(label: context.l10n.cancel)],
+      actions: [McDialogAction<void>(label: context.l10n.cancel)],
     );
 
     try {

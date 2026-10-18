@@ -13,7 +13,6 @@ import 'package:ios_club_app/features/education/models/electric_data.dart';
 
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/state/electricity_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 
@@ -874,8 +873,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
   void _showInputDialog() {
     final l10n = context.l10n;
-    PlatformDialog.showCustomDialog<void>(
-      context,
+    showMcDialog(
+      context: context,
       title: l10n.getElectricity,
       content: Padding(
         padding: const EdgeInsets.only(top: 8.0),
@@ -887,27 +886,20 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 16),
-            Card(
-              color: Theme.of(context).cardColor,
-              elevation: 0,
-              child: CupertinoTextField(
-                controller: _urlController,
-                placeholder: l10n.urlPlaceholder,
-                padding: const EdgeInsets.all(12),
-                clearButtonMode: OverlayVisibilityMode.editing,
-                style: const TextStyle(fontSize: 14),
-              ),
+            McField.text(
+              controller: _urlController,
+              placeholder: l10n.urlPlaceholder,
             ),
           ],
         ),
       ),
       actions: [
-        PlatformDialogAction<void>(
+        McDialogAction<void>(
           label: l10n.cancel,
           isDestructiveAction: true,
           onPressed: _urlController.clear,
         ),
-        PlatformDialogAction<void>(
+        McDialogAction<void>(
           label: l10n.confirm,
           isDefaultAction: true,
           onPressed: () async {
@@ -1014,8 +1006,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       _subscriptionThresholdController.text = '10';
     }
 
-    PlatformDialog.showCustomDialog<void>(
-      context,
+    showMcDialog(
+      context: context,
       title: l10n.createLowBalanceAlert,
       content: Padding(
         padding: const EdgeInsets.only(top: 8),
@@ -1027,42 +1019,25 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
               style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 16),
-            Card(
-              color: Theme.of(context).cardColor,
-              elevation: 0,
-              child: CupertinoTextField(
-                controller: _subscriptionEmailController,
-                placeholder: l10n.remindEmailPlaceholder,
-                keyboardType: TextInputType.emailAddress,
-                padding: const EdgeInsets.all(12),
-                clearButtonMode: OverlayVisibilityMode.editing,
-                style: const TextStyle(fontSize: 14),
-              ),
+            McField.text(
+              controller: _subscriptionEmailController,
+              placeholder: l10n.remindEmailPlaceholder,
+              keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 12),
-            Card(
-              color: Theme.of(context).cardColor,
-              elevation: 0,
-              child: CupertinoTextField(
-                controller: _subscriptionThresholdController,
-                placeholder: l10n.remindThresholdPlaceholder,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                padding: const EdgeInsets.all(12),
-                clearButtonMode: OverlayVisibilityMode.editing,
-                style: const TextStyle(fontSize: 14),
+            McField.text(
+              controller: _subscriptionThresholdController,
+              placeholder: l10n.remindThresholdPlaceholder,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
             ),
           ],
         ),
       ),
       actions: [
-        PlatformDialogAction<void>(
-          label: l10n.cancel,
-          isDestructiveAction: true,
-        ),
-        PlatformDialogAction<void>(
+        McDialogAction<void>(label: l10n.cancel, isDestructiveAction: true),
+        McDialogAction<void>(
           label: l10n.create,
           isDefaultAction: true,
           onPressed: _createSubscription,
@@ -1139,8 +1114,8 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
 
   void _showSubscriptionDetailDialog() {
     final l10n = context.l10n;
-    PlatformDialog.showCustomDialog<void>(
-      context,
+    showMcDialog(
+      context: context,
       title: l10n.lowBalanceSub,
       content: Padding(
         padding: const EdgeInsets.only(top: 8),
@@ -1161,9 +1136,7 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
           ],
         ),
       ),
-      actions: [
-        PlatformDialogAction<void>(label: l10n.gotIt, isDefaultAction: true),
-      ],
+      actions: [McDialogAction<void>(label: l10n.gotIt, isDefaultAction: true)],
     );
   }
 
@@ -1204,10 +1177,10 @@ class _ElectricityPageState extends ConsumerState<ElectricityPage> {
       return;
     }
 
-    final confirmed = await PlatformDialog.showConfirmDialog(
-      context,
+    final confirmed = await showMcConfirmDialog(
+      context: context,
       title: l10n.deleteSubTitle,
-      content: l10n.deleteSubConfirmContent,
+      message: l10n.deleteSubConfirmContent,
       confirmText: l10n.delete,
       cancelText: l10n.cancel,
     );

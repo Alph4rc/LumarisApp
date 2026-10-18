@@ -19,7 +19,6 @@ import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/user_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/ui/components/schedule/course_card.dart';
 import 'package:ios_club_app/ui/components/schedule/course_detail_sheet.dart';
 import 'package:ios_club_app/ui/components/schedule/schedule_grid.dart';
@@ -613,16 +612,20 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
     final colors = context.mc.colors;
     final l10n = context.l10n;
 
-    showModalBottomSheet(
+    showMcBottomSheet(
       context: context,
-      builder: (context) => Column(
+      showHandle: true,
+      contentPadding: const EdgeInsets.all(24),
+      scrollable: true,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.6,
+      builder: (sheetContext) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           McListTile(
             leading: const Icon(Icons.edit),
             title: Text(l10n.editCourse),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pop(sheetContext);
               _editCustomCourse(course);
             },
           ),
@@ -633,7 +636,7 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
               style: TextStyle(color: colors.danger),
             ),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pop(sheetContext);
               _deleteCustomCourse(course);
             },
           ),
@@ -668,13 +671,13 @@ class _ScheduleListPageState extends ConsumerState<ScheduleListPage> {
 
   Future<void> _deleteCustomCourse(CourseModel course) async {
     final l10n = context.l10n;
-    final confirm = await PlatformDialog.showCustomDialog<bool>(
-      context,
+    final confirm = await showMcDialog(
+      context: context,
       title: l10n.confirmDelete,
       content: Text(l10n.confirmDeleteCourseContent(course.courseName)),
       actions: [
-        PlatformDialogAction<bool>(label: l10n.cancel, value: false),
-        PlatformDialogAction<bool>(
+        McDialogAction<bool>(label: l10n.cancel, value: false),
+        McDialogAction<bool>(
           label: l10n.delete,
           value: true,
           isDestructiveAction: true,

@@ -13,7 +13,6 @@ import 'package:ios_club_app/features/system/update/check_update_manager.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 import 'platform/mobile/bottom_navigation.dart';
 import 'platform/tablet/tablet_navigation.dart';
@@ -142,8 +141,8 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
       return;
     }
 
-    PlatformDialog.showCustomDialog<void>(
-      navigatorContext,
+    showMcDialog(
+      context: navigatorContext,
       title: navigatorContext.l10n.updateAvailable,
       content: SingleChildScrollView(
         child: Column(
@@ -158,17 +157,15 @@ class _MainAppState extends ConsumerState<MainApp> with WidgetsBindingObserver {
         ),
       ),
       actions: [
-        PlatformDialogAction<void>(
-          label: navigatorContext.l10n.ignoreThisUpdate,
-        ),
-        PlatformDialogAction<void>(
+        McDialogAction<void>(label: navigatorContext.l10n.ignoreThisUpdate),
+        McDialogAction<void>(
           label: navigatorContext.l10n.ignoreAllUpdates,
           onPressed: () async {
             final prefs = PrefsService.instance;
             prefs.setBool(PrefsKeys.UPDATE_IGNORED, true);
           },
         ),
-        PlatformDialogAction<void>(
+        McDialogAction<void>(
           label: navigatorContext.l10n.goToBrowserUpdate,
           isDefaultAction: true,
           onPressed: () async {

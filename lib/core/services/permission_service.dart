@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:luamris_ui/luamris_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 export 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionStatus;
@@ -130,10 +130,10 @@ class PermissionService {
     String? confirmText,
     String? cancelText,
   }) async {
-    final result = await PlatformDialog.showConfirmDialog(
-      context,
+    final result = await showMcConfirmDialog(
+      context: context,
       title: title ?? context.l10n.permissionRequired,
-      content: content ?? context.l10n.permissionRequiredContent,
+      message: content ?? context.l10n.permissionRequiredContent,
       confirmText: confirmText ?? context.l10n.goAuthorize,
       cancelText: cancelText ?? context.l10n.cancel,
     );
@@ -147,10 +147,10 @@ class PermissionService {
     String? settingsText,
     String? cancelText,
   }) async {
-    final result = await PlatformDialog.showConfirmDialog(
-      context,
+    final result = await showMcConfirmDialog(
+      context: context,
       title: title ?? context.l10n.permissionDenied,
-      content: content ?? context.l10n.permissionDeniedContent,
+      message: content ?? context.l10n.permissionDeniedContent,
       confirmText: settingsText ?? context.l10n.goToSettings,
       cancelText: cancelText ?? context.l10n.cancel,
     );

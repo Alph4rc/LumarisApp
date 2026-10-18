@@ -6,7 +6,6 @@ import 'package:ios_club_app/core/services/app_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/settings_store.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ios_club_app/features/system/update/check_update_manager.dart';
@@ -100,10 +99,10 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
             _handleTap(); // 处理点击事件
 
             if (isNeedUpdate) {
-              final result = await PlatformDialog.showConfirmDialog(
-                context,
+              final result = await showMcConfirmDialog(
+                context: context,
                 title: l10n.confirmUpdateTitle(latestRelease?.name ?? ''),
-                content: l10n.confirmUpdateContent,
+                message: l10n.confirmUpdateContent,
                 confirmText: l10n.goToBrowser,
                 cancelText: l10n.dontUpdate,
               );

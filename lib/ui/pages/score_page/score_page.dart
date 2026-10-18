@@ -15,7 +15,6 @@ import 'package:ios_club_app/features/education/models/score_model.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
@@ -464,15 +463,12 @@ class _ScorePageState extends ConsumerState<ScorePage>
   }
 
   void _showCreditInfoDialog() {
-    PlatformDialog.showCustomDialog<void>(
-      context,
+    showMcDialog(
+      context: context,
       title: context.l10n.creditInfoTitle,
       content: Text(context.l10n.creditInfoContent),
       actions: [
-        PlatformDialogAction<void>(
-          label: context.l10n.ok,
-          isDefaultAction: true,
-        ),
+        McDialogAction<void>(label: context.l10n.ok, isDefaultAction: true),
       ],
     );
   }
@@ -765,39 +761,22 @@ class _ScorePageState extends ConsumerState<ScorePage>
     final content = _buildScoreDetailsContent(score, isTablet);
 
     if (isTablet) {
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext dialogContext) {
-          final screenSize = MediaQuery.sizeOf(dialogContext);
-          final dialogWidth = (screenSize.width * 0.36)
-              .clamp(420.0, 560.0)
-              .toDouble();
-          final maxDialogHeight = screenSize.height * 0.78;
+      final screenSize = MediaQuery.sizeOf(context);
+      final dialogWidth = (screenSize.width * 0.36)
+          .clamp(420.0, 560.0)
+          .toDouble();
+      final maxDialogHeight = screenSize.height * 0.78;
 
-          return Dialog(
-            insetPadding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 32,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: dialogWidth,
-                maxHeight: maxDialogHeight,
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-                child: content,
-              ),
-            ),
-          );
-        },
+      await showMcDialog<void>(
+        context: context,
+        width: dialogWidth,
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxDialogHeight),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            child: content,
+          ),
+        ),
       );
     } else {
       await showMcBottomSheet(

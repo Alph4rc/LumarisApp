@@ -10,7 +10,6 @@ import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:ios_club_app/state/schedule_store.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 /// 自定义课程管理页面
 ///
@@ -146,13 +145,13 @@ class _CustomCourseManagePageState
   }
 
   Future<void> _deleteCourse(CourseModel course) async {
-    final confirm = await PlatformDialog.showCustomDialog<bool>(
-      context,
+    final confirm = await showMcDialog(
+      context: context,
       title: context.l10n.confirmDelete,
       content: Text(context.l10n.confirmDeleteCourseContent(course.courseName)),
       actions: [
-        PlatformDialogAction<bool>(label: context.l10n.cancel, value: false),
-        PlatformDialogAction<bool>(
+        McDialogAction<bool>(label: context.l10n.cancel, value: false),
+        McDialogAction<bool>(
           label: context.l10n.delete,
           value: true,
           isDestructiveAction: true,

@@ -13,7 +13,6 @@ import 'package:ios_club_app/features/education/services/exam_service.dart';
 import 'package:ios_club_app/ui/components/empty_widget.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
 import 'package:ios_club_app/ui/components/modal_components.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 
 class ExamCard extends StatefulWidget {
   const ExamCard({super.key});
@@ -252,8 +251,8 @@ class _ExamCardState extends State<ExamCard> {
                         child: InkWell(
                           onTap: () {
                             if (isTablet) {
-                              PlatformDialog.showCustomDialog<void>(
-                                context,
+                              showMcDialog(
+                                context: context,
                                 content: _buildExamTip(exam),
                               );
                             } else {

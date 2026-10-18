@@ -9,7 +9,6 @@ import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/ui/components/loading_state_view.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/state/payment_store.dart';
 
 class PaymentPage extends ConsumerStatefulWidget {
@@ -45,14 +44,15 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
     PaymentState payment,
   ) async {
     final l10n = context.l10n;
-    final result = await PlatformDialog.showInputDialog(
-      context,
+    final result = await showMcInputDialog(
+      context: context,
       title: l10n.paymentPasswordTitle,
-      content: l10n.paymentPasswordSubtitle,
+      message: l10n.paymentPasswordSubtitle,
       hintText: l10n.password,
       confirmText: l10n.paymentSaveAndRefresh,
       initialValue: payment.password,
       obscureText: true,
+      cancelText: context.l10n.cancel,
     );
 
     if (result == null) {

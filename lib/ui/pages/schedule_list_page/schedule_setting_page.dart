@@ -11,7 +11,6 @@ import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
@@ -569,8 +568,8 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
     final httpsUrl = _webcalCalendarSubscriptionUrl ?? '';
     final l10n = context.l10n;
 
-    PlatformDialog.showCustomDialog<void>(
-      context,
+    showMcDialog(
+      context: context,
       title: l10n.addCalendarSub,
       content: SingleChildScrollView(
         child: Column(
@@ -619,10 +618,7 @@ class _ScheduleSettingPageState extends ConsumerState<ScheduleSettingPage>
         ),
       ),
       actions: [
-        PlatformDialogAction<void>(
-          label: l10n.understand,
-          isDefaultAction: true,
-        ),
+        McDialogAction<void>(label: l10n.understand, isDefaultAction: true),
       ],
     );
   }

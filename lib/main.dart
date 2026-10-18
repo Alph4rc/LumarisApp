@@ -29,7 +29,6 @@ import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/course_store.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/state/school_store.dart';
-import 'package:ios_club_app/ui/components/platform_dialog.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
@@ -334,19 +333,19 @@ class _WindowPageState extends State<WindowPage>
       final l10n = dialogContext.l10n;
       try {
         // 显示退出选项
-        await PlatformDialog.showCustomDialog<void>(
-          dialogContext,
+        await showMcDialog(
+          context: dialogContext,
           title: l10n.closeWindow,
           content: Text(l10n.closeWindowChoice),
           actions: [
-            PlatformDialogAction<void>(label: l10n.cancel),
-            PlatformDialogAction<void>(
+            McDialogAction<void>(label: l10n.cancel),
+            McDialogAction<void>(
               label: l10n.minimizeToTray,
               onPressed: () async {
                 await windowManager.hide();
               },
             ),
-            PlatformDialogAction<void>(
+            McDialogAction<void>(
               label: l10n.quitApp,
               isDestructiveAction: true,
               onPressed: _exitApp,
