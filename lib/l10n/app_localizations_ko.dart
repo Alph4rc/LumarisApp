@@ -321,8 +321,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get permissionDenied => '권한 거부됨';
 
   @override
-  String get permissionDeniedContent =>
-      '해당 권한이 영구적으로 거부되었습니다. 시스템 설정에서 수동으로 허용해 주세요';
+  String get permissionDeniedContent => '이 권한이 거부되었습니다. 시스템 설정에서 직접 활성화하세요.';
 
   @override
   String get updateAvailable => '새 버전이 있습니다!';
@@ -1923,4 +1922,98 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mcpErrorProtocol => '응답 형식이 올바르지 않아 MCP 서비스를 해석할 수 없습니다';
+
+  @override
+  String get permissionManagement => '권한 관리';
+
+  @override
+  String get permissionManagementSubtitle => '알림, 위치 등 시스템 권한을 관리합니다';
+
+  @override
+  String get permissionSectionTitle => '시스템 권한';
+
+  @override
+  String get permissionIntro =>
+      '광서는 해당 기능이 필요할 때만 권한을 요청합니다. 언제든지 여기에서 권한 상태를 확인하거나 시스템 설정에서 조정할 수 있습니다.';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return '$granted/$total 승인됨';
+  }
+
+  @override
+  String get permissionAllGranted => '모든 권한이 승인되었습니다';
+
+  @override
+  String get permissionStatusGranted => '승인됨';
+
+  @override
+  String get permissionStatusLimited => '일부 승인됨';
+
+  @override
+  String get permissionStatusDenied => '승인되지 않음';
+
+  @override
+  String get permissionStatusPermanentlyDenied => '영구 거부됨';
+
+  @override
+  String get permissionStatusRestricted => '제한됨';
+
+  @override
+  String get permissionActionRequest => '허용';
+
+  @override
+  String get permissionActionSettings => '시스템 설정 열기';
+
+  @override
+  String get permissionGrantedContent =>
+      '이 권한이 활성화되어 있습니다. 끄려면 시스템 설정에서 변경하세요.';
+
+  @override
+  String get permissionRequestFailed => '권한 상태를 가져올 수 없습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get permissionRefresh => '상태 새로고침';
+
+  @override
+  String get permissionNotSupported => '이 플랫폼에서는 권한 관리가 필요하지 않습니다';
+
+  @override
+  String get permissionNotSupportedContent =>
+      '시스템 권한은 운영체제에서 관리합니다. 부여된 권한은 시스템 설정에서 확인할 수 있습니다.';
+
+  @override
+  String get permissionFootnote => '권한은 시스템에서 관리하며, 광서는 기능과 무관한 정보를 읽지 않습니다.';
+
+  @override
+  String get permissionNotificationTitle => '알림';
+
+  @override
+  String get permissionNotificationDesc => '수업 알림, 시간표 변경 및 성적 업데이트 알림 받기';
+
+  @override
+  String get permissionLocationTitle => '위치';
+
+  @override
+  String get permissionLocationDesc => '캠퍼스 지도에서 현재 위치를 표시하고 길 안내 제공';
+
+  @override
+  String get permissionExactAlarmTitle => '정확한 알람';
+
+  @override
+  String get permissionExactAlarmDesc => '수업 알림이 설정한 시간에 정확히 울리도록 함';
+
+  @override
+  String get permissionBatteryTitle => '백그라운드 실행';
+
+  @override
+  String get permissionBatteryDesc =>
+      '홈 화면 위젯과 수업 알림이 백그라운드에서 안정적으로 업데이트되도록 유지';
+
+  @override
+  String get permissionBackgroundRefreshTitle => '백그라운드 앱 새로고침';
+
+  @override
+  String get permissionBackgroundRefreshDesc =>
+      '앱이 백그라운드에서 시간표와 알림을 업데이트하도록 허용';
 }

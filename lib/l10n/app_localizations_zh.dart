@@ -319,7 +319,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get permissionDenied => '权限已拒绝';
 
   @override
-  String get permissionDeniedContent => '该权限已被永久拒绝，请前往系统设置手动开启';
+  String get permissionDeniedContent => '该权限已被拒绝。请前往系统设置手动开启。';
 
   @override
   String get updateAvailable => '有新版本了！';
@@ -1903,6 +1903,96 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mcpErrorProtocol => '响应格式异常，无法解析 MCP 服务';
+
+  @override
+  String get permissionManagement => '权限管理';
+
+  @override
+  String get permissionManagementSubtitle => '管理通知、定位等系统权限';
+
+  @override
+  String get permissionSectionTitle => '系统权限';
+
+  @override
+  String get permissionIntro => '光序只会在对应功能需要时申请权限。你可以随时在这里检查授权状态，或前往系统设置调整。';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return '已授权 $granted/$total';
+  }
+
+  @override
+  String get permissionAllGranted => '全部权限已授权';
+
+  @override
+  String get permissionStatusGranted => '已授权';
+
+  @override
+  String get permissionStatusLimited => '部分授权';
+
+  @override
+  String get permissionStatusDenied => '未授权';
+
+  @override
+  String get permissionStatusPermanentlyDenied => '已永久拒绝';
+
+  @override
+  String get permissionStatusRestricted => '受限制';
+
+  @override
+  String get permissionActionRequest => '立即授权';
+
+  @override
+  String get permissionActionSettings => '前往系统设置';
+
+  @override
+  String get permissionGrantedContent => '该权限已开启。如需关闭，请前往系统设置手动调整。';
+
+  @override
+  String get permissionRequestFailed => '无法获取权限状态，请稍后重试';
+
+  @override
+  String get permissionRefresh => '刷新状态';
+
+  @override
+  String get permissionNotSupported => '当前平台无需权限管理';
+
+  @override
+  String get permissionNotSupportedContent =>
+      '系统权限由操作系统统一管理，你可以在系统设置中查看应用已获得的权限。';
+
+  @override
+  String get permissionFootnote => '权限由系统统一管理，光序不会读取与功能无关的信息。';
+
+  @override
+  String get permissionNotificationTitle => '通知';
+
+  @override
+  String get permissionNotificationDesc => '接收课程提醒、调课与成绩更新通知';
+
+  @override
+  String get permissionLocationTitle => '位置信息';
+
+  @override
+  String get permissionLocationDesc => '在校园地图中显示当前位置并提供路线指引';
+
+  @override
+  String get permissionExactAlarmTitle => '精确闹钟';
+
+  @override
+  String get permissionExactAlarmDesc => '让课程提醒在设定时间准时触发';
+
+  @override
+  String get permissionBatteryTitle => '后台运行';
+
+  @override
+  String get permissionBatteryDesc => '保持桌面小组件和课程提醒在后台稳定更新';
+
+  @override
+  String get permissionBackgroundRefreshTitle => '后台 App 刷新';
+
+  @override
+  String get permissionBackgroundRefreshDesc => '允许应用在后台更新课表与提醒';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2220,7 +2310,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get permissionDenied => '權限已拒絕';
 
   @override
-  String get permissionDeniedContent => '該權限已被永久拒絕，請前往系統設定手動開啟';
+  String get permissionDeniedContent => '該權限已被拒絕。請前往系統設定手動開啟。';
 
   @override
   String get updateAvailable => '有新版本了！';
@@ -3805,4 +3895,94 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get mcpErrorProtocol => '回應格式異常，無法解析 MCP 服務';
+
+  @override
+  String get permissionManagement => '權限管理';
+
+  @override
+  String get permissionManagementSubtitle => '管理通知、定位等系統權限';
+
+  @override
+  String get permissionSectionTitle => '系統權限';
+
+  @override
+  String get permissionIntro => '光序只會在對應功能需要時申請權限。你可以隨時在這裡檢查授權狀態，或前往系統設定調整。';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return '已授權 $granted/$total';
+  }
+
+  @override
+  String get permissionAllGranted => '全部權限已授權';
+
+  @override
+  String get permissionStatusGranted => '已授權';
+
+  @override
+  String get permissionStatusLimited => '部分授權';
+
+  @override
+  String get permissionStatusDenied => '未授權';
+
+  @override
+  String get permissionStatusPermanentlyDenied => '已永久拒絕';
+
+  @override
+  String get permissionStatusRestricted => '受限制';
+
+  @override
+  String get permissionActionRequest => '立即授權';
+
+  @override
+  String get permissionActionSettings => '前往系統設定';
+
+  @override
+  String get permissionGrantedContent => '該權限已開啟。如需關閉，請前往系統設定手動調整。';
+
+  @override
+  String get permissionRequestFailed => '無法取得權限狀態，請稍後再試';
+
+  @override
+  String get permissionRefresh => '重新整理狀態';
+
+  @override
+  String get permissionNotSupported => '目前平台無需權限管理';
+
+  @override
+  String get permissionNotSupportedContent =>
+      '系統權限由作業系統統一管理，你可以在系統設定中查看應用已獲得的權限。';
+
+  @override
+  String get permissionFootnote => '權限由系統統一管理，光序不會讀取與功能無關的資訊。';
+
+  @override
+  String get permissionNotificationTitle => '通知';
+
+  @override
+  String get permissionNotificationDesc => '接收課程提醒、調課與成績更新通知';
+
+  @override
+  String get permissionLocationTitle => '位置資訊';
+
+  @override
+  String get permissionLocationDesc => '在校園地圖中顯示目前位置並提供路線指引';
+
+  @override
+  String get permissionExactAlarmTitle => '精確鬧鐘';
+
+  @override
+  String get permissionExactAlarmDesc => '讓課程提醒在設定時間準時觸發';
+
+  @override
+  String get permissionBatteryTitle => '背景執行';
+
+  @override
+  String get permissionBatteryDesc => '保持桌面小工具和課程提醒在背景穩定更新';
+
+  @override
+  String get permissionBackgroundRefreshTitle => '背景 App 重新整理';
+
+  @override
+  String get permissionBackgroundRefreshDesc => '允許應用程式在背景更新課表與提醒';
 }

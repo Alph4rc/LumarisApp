@@ -331,7 +331,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get permissionDeniedContent =>
-      'Разрешение было отклонено навсегда. Включите его в системных настройках';
+      'Это разрешение отклонено. Включите его в системных настройках.';
 
   @override
   String get updateAvailable => 'Доступна новая версия!';
@@ -1985,4 +1985,105 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get mcpErrorProtocol =>
       'Неверный формат ответа; не удалось разобрать службу MCP';
+
+  @override
+  String get permissionManagement => 'Управление разрешениями';
+
+  @override
+  String get permissionManagementSubtitle =>
+      'Управление системными разрешениями: уведомления, геолокация и другие';
+
+  @override
+  String get permissionSectionTitle => 'Системные разрешения';
+
+  @override
+  String get permissionIntro =>
+      'Guangxu запрашивает разрешение только тогда, когда оно нужно соответствующей функции. Здесь можно проверить статус или изменить его в системных настройках.';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return 'Предоставлено $granted/$total';
+  }
+
+  @override
+  String get permissionAllGranted => 'Все разрешения предоставлены';
+
+  @override
+  String get permissionStatusGranted => 'Предоставлено';
+
+  @override
+  String get permissionStatusLimited => 'Предоставлено частично';
+
+  @override
+  String get permissionStatusDenied => 'Не предоставлено';
+
+  @override
+  String get permissionStatusPermanentlyDenied => 'Отклонено навсегда';
+
+  @override
+  String get permissionStatusRestricted => 'Ограничено';
+
+  @override
+  String get permissionActionRequest => 'Разрешить';
+
+  @override
+  String get permissionActionSettings => 'Открыть системные настройки';
+
+  @override
+  String get permissionGrantedContent =>
+      'Это разрешение включено. Чтобы отключить его, измените настройку в системе.';
+
+  @override
+  String get permissionRequestFailed =>
+      'Не удалось получить статус разрешения. Повторите попытку позже.';
+
+  @override
+  String get permissionRefresh => 'Обновить статус';
+
+  @override
+  String get permissionNotSupported =>
+      'На этой платформе управление разрешениями не требуется';
+
+  @override
+  String get permissionNotSupportedContent =>
+      'Системными разрешениями управляет операционная система. Предоставленные приложению разрешения можно посмотреть в системных настройках.';
+
+  @override
+  String get permissionFootnote =>
+      'Разрешениями управляет система. Guangxu не читает информацию, не связанную с его функциями.';
+
+  @override
+  String get permissionNotificationTitle => 'Уведомления';
+
+  @override
+  String get permissionNotificationDesc =>
+      'Получать напоминания о занятиях, изменениях расписания и обновлениях оценок';
+
+  @override
+  String get permissionLocationTitle => 'Геолокация';
+
+  @override
+  String get permissionLocationDesc =>
+      'Показывать текущее местоположение и строить маршрут на карте кампуса';
+
+  @override
+  String get permissionExactAlarmTitle => 'Точные будильники';
+
+  @override
+  String get permissionExactAlarmDesc =>
+      'Позволять напоминаниям о занятиях срабатывать точно в заданное время';
+
+  @override
+  String get permissionBatteryTitle => 'Фоновая работа';
+
+  @override
+  String get permissionBatteryDesc =>
+      'Поддерживать обновление виджетов и напоминаний о занятиях в фоне';
+
+  @override
+  String get permissionBackgroundRefreshTitle => 'Фоновая загрузка приложения';
+
+  @override
+  String get permissionBackgroundRefreshDesc =>
+      'Разрешить приложению обновлять расписание и напоминания в фоне';
 }

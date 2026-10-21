@@ -17,6 +17,7 @@ import '../ui/pages/link_page/link_page.dart';
 import '../ui/pages/login_page/login_page.dart';
 import '../ui/pages/mcp_page/mcp_page.dart';
 import '../ui/pages/payment_page/payment_page.dart';
+import '../ui/pages/permission_page/permission_page.dart';
 import '../ui/pages/protocol_page/protocol_page.dart';
 import '../ui/pages/profile_page/profile_page.dart';
 import '../ui/pages/program_page/program_page.dart';
@@ -55,6 +56,7 @@ class AppRoutes {
   static const author = '/Profile/About/Author';
   static const feedback = '/Profile/About/Feedback';
   static const mcp = '/Profile/About/Mcp';
+  static const permissions = '/Profile/About/Permissions';
   static const htmlImport = '/Schedule/HtmlImport';
   static const htmlImportWebview = '/Schedule/HtmlImport/Webview';
   static const campusMap = '/CampusMap';
@@ -156,6 +158,8 @@ class AppRouter {
                         'Feedback', (context, state) => const FeedbackPage()),
                     _detailRoute(
                         'Mcp', (context, state) => const McpPage()),
+                    _detailRoute('Permissions',
+                        (context, state) => const PermissionPage()),
                   ],
                 ),
               ],

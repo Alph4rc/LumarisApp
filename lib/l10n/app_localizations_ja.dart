@@ -320,7 +320,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get permissionDenied => '権限が拒否されました';
 
   @override
-  String get permissionDeniedContent => 'この権限は永続的に拒否されました。システム設定で有効にしてください';
+  String get permissionDeniedContent => 'この権限は拒否されています。システム設定で有効にしてください。';
 
   @override
   String get updateAvailable => '新しいバージョンがあります！';
@@ -1908,4 +1908,96 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mcpErrorProtocol => '応答形式が不正です。MCP サービスを解析できませんでした';
+
+  @override
+  String get permissionManagement => '権限管理';
+
+  @override
+  String get permissionManagementSubtitle => '通知・位置情報などのシステム権限を管理';
+
+  @override
+  String get permissionSectionTitle => 'システム権限';
+
+  @override
+  String get permissionIntro =>
+      '光序は該当機能が必要とするときにのみ権限を要求します。ここで認可状態を確認したり、システム設定で変更したりできます。';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return '$granted/$total 許可済み';
+  }
+
+  @override
+  String get permissionAllGranted => 'すべての権限が許可されています';
+
+  @override
+  String get permissionStatusGranted => '許可済み';
+
+  @override
+  String get permissionStatusLimited => '一部許可';
+
+  @override
+  String get permissionStatusDenied => '未許可';
+
+  @override
+  String get permissionStatusPermanentlyDenied => '完全に拒否';
+
+  @override
+  String get permissionStatusRestricted => '制限あり';
+
+  @override
+  String get permissionActionRequest => '許可する';
+
+  @override
+  String get permissionActionSettings => 'システム設定を開く';
+
+  @override
+  String get permissionGrantedContent => 'この権限は有効です。オフにする場合はシステム設定で変更してください。';
+
+  @override
+  String get permissionRequestFailed => '権限の状態を取得できません。しばらくしてから再試行してください。';
+
+  @override
+  String get permissionRefresh => '状態を更新';
+
+  @override
+  String get permissionNotSupported => 'このプラットフォームでは権限管理は不要です';
+
+  @override
+  String get permissionNotSupportedContent =>
+      'システム権限は OS によって管理されています。許可済みの権限はシステム設定で確認できます。';
+
+  @override
+  String get permissionFootnote => '権限はシステムが管理します。光序は機能に関係のない情報を読み取りません。';
+
+  @override
+  String get permissionNotificationTitle => '通知';
+
+  @override
+  String get permissionNotificationDesc => '授業リマインダー、時間割変更、成績更新の通知を受け取る';
+
+  @override
+  String get permissionLocationTitle => '位置情報';
+
+  @override
+  String get permissionLocationDesc => 'キャンパスマップで現在地を表示し、ルート案内を行う';
+
+  @override
+  String get permissionExactAlarmTitle => '正確なアラーム';
+
+  @override
+  String get permissionExactAlarmDesc => '授業リマインダーを設定時刻に正確に通知';
+
+  @override
+  String get permissionBatteryTitle => 'バックグラウンド実行';
+
+  @override
+  String get permissionBatteryDesc => 'ホーム画面ウィジェットと授業リマインダーをバックグラウンドで安定して更新';
+
+  @override
+  String get permissionBackgroundRefreshTitle => 'バックグラウンド App 更新';
+
+  @override
+  String get permissionBackgroundRefreshDesc =>
+      'アプリがバックグラウンドで時間割とリマインダーを更新できるようにする';
 }

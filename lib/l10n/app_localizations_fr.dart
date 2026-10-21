@@ -335,7 +335,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get permissionDeniedContent =>
-      'Cette autorisation a été définitivement refusée. Veuillez l\'activer dans les paramètres système';
+      'Cette autorisation est refusée. Activez-la dans les réglages système.';
 
   @override
   String get updateAvailable => 'Nouvelle version disponible !';
@@ -2008,4 +2008,106 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get mcpErrorProtocol =>
       'Format de réponse inattendu ; impossible d\'analyser le service MCP';
+
+  @override
+  String get permissionManagement => 'Gestion des autorisations';
+
+  @override
+  String get permissionManagementSubtitle =>
+      'Gérez les autorisations système : notifications, localisation, etc.';
+
+  @override
+  String get permissionSectionTitle => 'Autorisations système';
+
+  @override
+  String get permissionIntro =>
+      'Guangxu ne demande une autorisation que lorsque la fonction concernée en a besoin. Vous pouvez vérifier son état ici ou le modifier dans les réglages système à tout moment.';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return '$granted/$total accordées';
+  }
+
+  @override
+  String get permissionAllGranted => 'Toutes les autorisations sont accordées';
+
+  @override
+  String get permissionStatusGranted => 'Accordée';
+
+  @override
+  String get permissionStatusLimited => 'Partiellement accordée';
+
+  @override
+  String get permissionStatusDenied => 'Non accordée';
+
+  @override
+  String get permissionStatusPermanentlyDenied => 'Refusée définitivement';
+
+  @override
+  String get permissionStatusRestricted => 'Limitée';
+
+  @override
+  String get permissionActionRequest => 'Autoriser';
+
+  @override
+  String get permissionActionSettings => 'Ouvrir les réglages système';
+
+  @override
+  String get permissionGrantedContent =>
+      'Cette autorisation est activée. Pour la désactiver, modifiez-la dans les réglages système.';
+
+  @override
+  String get permissionRequestFailed =>
+      'Impossible de lire l\'état de l\'autorisation. Réessayez plus tard.';
+
+  @override
+  String get permissionRefresh => 'Actualiser l\'état';
+
+  @override
+  String get permissionNotSupported =>
+      'Aucune gestion des autorisations nécessaire sur cette plateforme';
+
+  @override
+  String get permissionNotSupportedContent =>
+      'Les autorisations système sont gérées par le système d\'exploitation. Vous pouvez consulter celles accordées à l\'application dans les réglages système.';
+
+  @override
+  String get permissionFootnote =>
+      'Les autorisations sont gérées par le système. Guangxu ne lit jamais d’informations sans rapport avec ses fonctionnalités.';
+
+  @override
+  String get permissionNotificationTitle => 'Notifications';
+
+  @override
+  String get permissionNotificationDesc =>
+      'Recevoir les rappels de cours, les changements d\'emploi du temps et les mises à jour de notes';
+
+  @override
+  String get permissionLocationTitle => 'Localisation';
+
+  @override
+  String get permissionLocationDesc =>
+      'Afficher votre position actuelle et fournir un itinéraire sur la carte du campus';
+
+  @override
+  String get permissionExactAlarmTitle => 'Alarmes exactes';
+
+  @override
+  String get permissionExactAlarmDesc =>
+      'Permettre aux rappels de cours de se déclencher à l\'heure exacte';
+
+  @override
+  String get permissionBatteryTitle => 'Exécution en arrière-plan';
+
+  @override
+  String get permissionBatteryDesc =>
+      'Maintenir la mise à jour des widgets et des rappels de cours en arrière-plan';
+
+  @override
+  String get permissionBackgroundRefreshTitle =>
+      'Actualisation en arrière-plan';
+
+  @override
+  String get permissionBackgroundRefreshDesc =>
+      'Autoriser l\'application à mettre à jour les emplois du temps et les rappels en arrière-plan';
 }

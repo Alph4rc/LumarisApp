@@ -9,6 +9,7 @@ import 'package:ios_club_app/ui/pages/home_page/home_page.dart';
 import 'package:ios_club_app/ui/pages/link_page/link_page.dart';
 import 'package:ios_club_app/ui/pages/login_page/login_page.dart';
 import 'package:ios_club_app/ui/pages/mcp_page/mcp_page.dart';
+import 'package:ios_club_app/ui/pages/permission_page/permission_page.dart';
 import 'package:ios_club_app/ui/pages/profile_page/profile_page.dart';
 import 'package:ios_club_app/ui/pages/schedule_list_page/schedule_list_page.dart';
 import 'package:ios_club_app/ui/pages/score_page/score_page.dart';
@@ -30,6 +31,7 @@ void main() {
     final state = match.last.buildState(
       AppRouter.router.configuration,
       match,
+      metadata: const {},
     );
     return match.last.route.builder!(context, state);
   }
@@ -64,6 +66,10 @@ void main() {
     expect(buildMatchedRoute(context, AppRoutes.login), isA<LoginPage>());
     expect(buildMatchedRoute(context, AppRoutes.link), isA<LinkPage>());
     expect(buildMatchedRoute(context, AppRoutes.mcp), isA<McpPage>());
+    expect(
+      buildMatchedRoute(context, AppRoutes.permissions),
+      isA<PermissionPage>(),
+    );
   });
 
   testWidgets('login route can return true when popped', (tester) async {

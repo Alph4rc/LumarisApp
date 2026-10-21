@@ -334,7 +334,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get permissionDeniedContent =>
-      'Diese Berechtigung wurde dauerhaft verweigert. Bitte in den Systemeinstellungen aktivieren';
+      'Diese Berechtigung wurde abgelehnt. Bitte aktiviere sie in den Systemeinstellungen.';
 
   @override
   String get updateAvailable => 'Neue Version verfügbar!';
@@ -2021,4 +2021,105 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get mcpErrorProtocol =>
       'Unerwartetes Antwortformat; MCP-Dienst konnte nicht verarbeitet werden';
+
+  @override
+  String get permissionManagement => 'Berechtigungen';
+
+  @override
+  String get permissionManagementSubtitle =>
+      'Benachrichtigungen, Standort und weitere Systemberechtigungen verwalten';
+
+  @override
+  String get permissionSectionTitle => 'Systemberechtigungen';
+
+  @override
+  String get permissionIntro =>
+      'Guangxu fragt eine Berechtigung nur ab, wenn die zugehörige Funktion sie benötigt. Du kannst den Status hier prüfen oder ihn jederzeit in den Systemeinstellungen ändern.';
+
+  @override
+  String permissionSummary(int granted, int total) {
+    return '$granted/$total erteilt';
+  }
+
+  @override
+  String get permissionAllGranted => 'Alle Berechtigungen erteilt';
+
+  @override
+  String get permissionStatusGranted => 'Erteilt';
+
+  @override
+  String get permissionStatusLimited => 'Teilweise erteilt';
+
+  @override
+  String get permissionStatusDenied => 'Nicht erteilt';
+
+  @override
+  String get permissionStatusPermanentlyDenied => 'Dauerhaft abgelehnt';
+
+  @override
+  String get permissionStatusRestricted => 'Eingeschränkt';
+
+  @override
+  String get permissionActionRequest => 'Erlauben';
+
+  @override
+  String get permissionActionSettings => 'Systemeinstellungen öffnen';
+
+  @override
+  String get permissionGrantedContent =>
+      'Diese Berechtigung ist aktiviert. Um sie zu deaktivieren, ändere sie in den Systemeinstellungen.';
+
+  @override
+  String get permissionRequestFailed =>
+      'Berechtigungsstatus konnte nicht gelesen werden. Bitte später erneut versuchen.';
+
+  @override
+  String get permissionRefresh => 'Status aktualisieren';
+
+  @override
+  String get permissionNotSupported =>
+      'Auf dieser Plattform ist keine Berechtigungsverwaltung erforderlich';
+
+  @override
+  String get permissionNotSupportedContent =>
+      'Systemberechtigungen werden vom Betriebssystem verwaltet. Die erteilten Berechtigungen kannst du in den Systemeinstellungen einsehen.';
+
+  @override
+  String get permissionFootnote =>
+      'Berechtigungen werden vom System verwaltet. Guangxu liest keine Informationen, die für die Funktionen nicht erforderlich sind.';
+
+  @override
+  String get permissionNotificationTitle => 'Mitteilungen';
+
+  @override
+  String get permissionNotificationDesc =>
+      'Kurserinnerungen, Stundenplanänderungen und Notenaktualisierungen erhalten';
+
+  @override
+  String get permissionLocationTitle => 'Standort';
+
+  @override
+  String get permissionLocationDesc =>
+      'Aktuellen Standort auf der Campus-Karte anzeigen und eine Route bereitstellen';
+
+  @override
+  String get permissionExactAlarmTitle => 'Genaue Alarme';
+
+  @override
+  String get permissionExactAlarmDesc =>
+      'Kurserinnerungen exakt zur eingestellten Zeit auslösen';
+
+  @override
+  String get permissionBatteryTitle => 'Hintergrundausführung';
+
+  @override
+  String get permissionBatteryDesc =>
+      'Startbildschirm-Widgets und Kurserinnerungen zuverlässig im Hintergrund aktualisieren';
+
+  @override
+  String get permissionBackgroundRefreshTitle => 'Hintergrundaktualisierung';
+
+  @override
+  String get permissionBackgroundRefreshDesc =>
+      'Der App erlauben, Stundenpläne und Erinnerungen im Hintergrund zu aktualisieren';
 }

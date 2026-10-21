@@ -724,7 +724,7 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
-  /// **'该权限已被永久拒绝，请前往系统设置手动开启'**
+  /// **'该权限已被拒绝。请前往系统设置手动开启。'**
   String get permissionDeniedContent;
 
   ///
@@ -3773,6 +3773,180 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'响应格式异常，无法解析 MCP 服务'**
   String get mcpErrorProtocol;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'权限管理'**
+  String get permissionManagement;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'管理通知、定位等系统权限'**
+  String get permissionManagementSubtitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'系统权限'**
+  String get permissionSectionTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'光序只会在对应功能需要时申请权限。你可以随时在这里检查授权状态，或前往系统设置调整。'**
+  String get permissionIntro;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'已授权 {granted}/{total}'**
+  String permissionSummary(int granted, int total);
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'全部权限已授权'**
+  String get permissionAllGranted;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'已授权'**
+  String get permissionStatusGranted;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'部分授权'**
+  String get permissionStatusLimited;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'未授权'**
+  String get permissionStatusDenied;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'已永久拒绝'**
+  String get permissionStatusPermanentlyDenied;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'受限制'**
+  String get permissionStatusRestricted;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'立即授权'**
+  String get permissionActionRequest;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'前往系统设置'**
+  String get permissionActionSettings;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'该权限已开启。如需关闭，请前往系统设置手动调整。'**
+  String get permissionGrantedContent;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'无法获取权限状态，请稍后重试'**
+  String get permissionRequestFailed;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新状态'**
+  String get permissionRefresh;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'当前平台无需权限管理'**
+  String get permissionNotSupported;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'系统权限由操作系统统一管理，你可以在系统设置中查看应用已获得的权限。'**
+  String get permissionNotSupportedContent;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'权限由系统统一管理，光序不会读取与功能无关的信息。'**
+  String get permissionFootnote;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'通知'**
+  String get permissionNotificationTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'接收课程提醒、调课与成绩更新通知'**
+  String get permissionNotificationDesc;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'位置信息'**
+  String get permissionLocationTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'在校园地图中显示当前位置并提供路线指引'**
+  String get permissionLocationDesc;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'精确闹钟'**
+  String get permissionExactAlarmTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'让课程提醒在设定时间准时触发'**
+  String get permissionExactAlarmDesc;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'后台运行'**
+  String get permissionBatteryTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'保持桌面小组件和课程提醒在后台稳定更新'**
+  String get permissionBatteryDesc;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'后台 App 刷新'**
+  String get permissionBackgroundRefreshTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'允许应用在后台更新课表与提醒'**
+  String get permissionBackgroundRefreshDesc;
 }
 
 class _AppLocalizationsDelegate

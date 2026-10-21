@@ -64,6 +64,7 @@ class SettingPage extends ConsumerWidget {
                   const ShowTomorrowSetting(),
                   if (PlatformUtils.isMobile) const RemindSetting(),
                   const HomePageSetting(),
+                  if (PlatformUtils.isMobile) _buildPermissionTile(context),
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
                     const FontFamilySetting(),
                 ]),
@@ -277,6 +278,20 @@ class SettingPage extends ConsumerWidget {
     if (PlatformUtils.isIOS) {
       await IOSBackgroundService.updateWidget();
     }
+  }
+
+  Widget _buildPermissionTile(BuildContext context) {
+    return McListTile(
+      leading: Icon(
+        CupertinoIcons.checkmark_shield_fill,
+        size: 20,
+        color: context.mc.colors.indigo,
+      ),
+      title: Text(context.l10n.permissionManagement),
+      subtitle: Text(context.l10n.permissionManagementSubtitle),
+      showChevron: true,
+      onTap: () => AppRouter.push(AppRoutes.permissions),
+    );
   }
 
   Widget _buildFeedbackTile(BuildContext context) {
