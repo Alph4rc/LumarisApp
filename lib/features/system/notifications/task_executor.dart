@@ -119,11 +119,8 @@ class TaskExecutor {
     }
 
     filteredCourses = filteredCourses.where((course) {
-      final courseTime = TimeService.getStartAndEnd(course);
-      final l = courseTime.end.split(':');
-      var end = DateTime(
-          now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
-      return now.isBefore(end);
+      final end = TimeService.getStartAndEnd(course, date: now).endDateTime(now);
+      return end == null || now.isBefore(end);
     }).toList();
 
     filteredCourses = _mergeAndSortCourses(filteredCourses);
@@ -158,11 +155,8 @@ class TaskExecutor {
 
     // 过滤掉已经结束的课程
     todayCourses = todayCourses.where((course) {
-      final courseTime = TimeService.getStartAndEnd(course);
-      final l = courseTime.end.split(':');
-      var end = DateTime(
-          now.year, now.month, now.day, int.parse(l[0]), int.parse(l[1]), 0);
-      return now.isBefore(end);
+      final end = TimeService.getStartAndEnd(course, date: now).endDateTime(now);
+      return end == null || now.isBefore(end);
     }).toList();
 
     todayCourses = _mergeAndSortCourses(todayCourses);
@@ -221,6 +215,10 @@ class TaskExecutor {
         return;
       }
 
+      // 先撤销过期却仍挂在系统里的旧闹钟：设备重启/应用更新后 Android
+      // 会把这些过期闹钟重新注册并立刻触发，用户就会在半夜收到通知。
+      await NotificationService.purgeStaleReminders();
+
       final now = DateTime.now();
 
       // 一天只提醒一次（force 模式除外，如用户主动启用提醒时）
@@ -229,9 +227,10 @@ class TaskExecutor {
         if (lastRemindStr != null) {
           try {
             final lastRemindDate = DateTime.parse(lastRemindStr);
-            if (lastRemindDate.year >= now.year &&
-                lastRemindDate.month >= now.month &&
-                lastRemindDate.day >= now.day) {
+            final alreadyScheduledToday = lastRemindDate.year == now.year &&
+                lastRemindDate.month == now.month &&
+                lastRemindDate.day == now.day;
+            if (alreadyScheduledToday) {
               AppLogger.debug('今日已执行课程提醒，跳过');
               return;
             }
@@ -254,20 +253,11 @@ class TaskExecutor {
 
       final startTime = DateTime.parse(_cachedTime!.startTime!);
 
-      // 获取所有已排期的通知，优化去重逻辑
-      final pendingRequests = await NotificationService.instance.notifications
-          .pendingNotificationRequests();
-
-      // 如果已经接近上限，先清空所有通知（这是一个应急保险）
-      if (pendingRequests.length > 400) {
-        AppLogger.debug('检测到闹钟接近上限 (${pendingRequests.length}), 正在清空并重排...');
-        await NotificationService.instance.cancelAllNotifications();
-      }
-
-      final existingIds = pendingRequests.map((r) => r.id).toSet();
-
-      // 只排期一天的课程，优先今天，今天没课则排明天
+      // 只排期一天的课程，优先今天，今天没课则排明天。
+      // 即使两天都没课也要调用 remindList：它会顺便撤销已经过期、
+      // 却还挂在系统里的旧闹钟（Android 会在开机/更新后立刻把它们弹出来）。
       DateTime? scheduledDate;
+      List<CourseModel>? dailyCourses;
       for (int i = 0; i < 2; i++) {
         final targetDate = now.add(Duration(days: i));
         final targetWeek = EduTimeService.getWeekIndexByStartTime(
@@ -277,34 +267,33 @@ class TaskExecutor {
         );
         final targetWeekday = targetDate.weekday;
 
-        var dailyCourses = _cachedCourses!.where((course) {
+        var courses = _cachedCourses!.where((course) {
           return course.weekIndexes.contains(targetWeek) &&
               course.weekday == targetWeekday;
         }).toList();
 
         // 如果是今天，过滤掉已经结束的课程
         if (i == 0) {
-          dailyCourses = dailyCourses.where((course) {
-            final courseTime = TimeService.getStartAndEnd(course);
-            final l = courseTime.end.split(':');
-            var end = DateTime(now.year, now.month, now.day, int.parse(l[0]),
-                int.parse(l[1]), 0);
-            return now.isBefore(end);
+          courses = courses.where((course) {
+            final end =
+                TimeService.getStartAndEnd(course, date: now).endDateTime(now);
+            return end == null || now.isBefore(end);
           }).toList();
         }
 
-        dailyCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
+        courses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
 
-        if (dailyCourses.isNotEmpty) {
-          await NotificationService.remindList(
-            dailyCourses,
-            targetDate: targetDate,
-            existingIds: existingIds,
-          );
+        if (courses.isNotEmpty) {
+          dailyCourses = courses;
           scheduledDate = targetDate;
           break; // 一天有课即停止，不再排后续天数
         }
       }
+
+      await NotificationService.remindList(
+        dailyCourses ?? const <CourseModel>[],
+        targetDate: scheduledDate ?? now,
+      );
 
       // LAST_REMIND_DATE 设为实际排期的目标日期，而非今天
       // 这样如果排的是明天的课，明天就不会重复排期

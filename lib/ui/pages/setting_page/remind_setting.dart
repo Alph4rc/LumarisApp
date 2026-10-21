@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/features/system/notifications/notification_service.dart';
+import 'package:ios_club_app/features/system/notifications/task_executor.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class RemindSetting extends ConsumerWidget {
@@ -99,5 +100,15 @@ class RemindSetting extends ConsumerWidget {
         );
       },
     );
+
+    // 提前量修改后立即按新设置重排：否则系统里已经排好的闹钟
+    // 还会按旧时间响，看起来就像“通知时间错乱”。
+    if (!context.mounted) {
+      return;
+    }
+    if (!ref.read(settingsStoreProvider).isRemind) {
+      return;
+    }
+    await TaskExecutor.checkAndSendCourseReminder(force: true);
   }
 }

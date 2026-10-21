@@ -47,6 +47,12 @@ class PrefsKeys {
   static const String LAST_REMIND_DATE = 'last_remind_date';
   static const String IS_SHOW_TOMORROW = 'is_show_tomorrow';
 
+  /// 课程通知排期记录（通知 id -> 计划触发时刻），用于识别并撤销排歪的旧闹钟
+  static const String COURSE_REMINDER_PLAN = 'course_reminder_plan';
+
+  /// 课程通知排期规则版本，用于升级后清空旧版本排出来的闹钟
+  static const String COURSE_REMINDER_SCHEMA = 'course_reminder_schema';
+
   /// 电费相关
   static const String ELECTRICITY_URL = 'electricity_url';
   static const String ELECTRICITY_SUBSCRIPTION_EMAIL =

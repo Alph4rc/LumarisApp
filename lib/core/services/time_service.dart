@@ -314,4 +314,37 @@ class StartAndEnd {
     required this.start,
     required this.end,
   });
+
+  /// [start] 在 [date] 这一天对应的墙上时间；格式不对或该节次没有时间时为 null。
+  ///
+  /// 返回值只带年月日时分、不带时区语义，调用方需要自己决定按哪个时区换算成
+  /// 绝对时刻（课程提醒按校区时区）。
+  DateTime? startDateTime(DateTime date) => _parseClock(start, date);
+
+  /// [end] 在 [date] 这一天对应的墙上时间；格式不对或该节次没有时间时为 null。
+  DateTime? endDateTime(DateTime date) => _parseClock(end, date);
+
+  static DateTime? _parseClock(String raw, DateTime date) {
+    final text = raw.trim();
+    if (text.isEmpty) {
+      return null;
+    }
+
+    // 兼容 "8:00" / "08:00:00" / "8：00"（全角冒号）这几种写法
+    final parts = text.split(RegExp(r'[:：]'));
+    if (parts.length < 2) {
+      return null;
+    }
+
+    final hour = int.tryParse(parts[0].trim());
+    final minute = int.tryParse(parts[1].trim());
+    if (hour == null || minute == null) {
+      return null;
+    }
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      return null;
+    }
+
+    return DateTime(date.year, date.month, date.day, hour, minute);
+  }
 }

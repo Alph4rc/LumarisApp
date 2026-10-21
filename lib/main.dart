@@ -140,7 +140,7 @@ Future<void> _deferredInit() async {
   }
 
   if (PlatformUtils.isMobile || PlatformUtils.isMacOS) {
-    await NotificationService.instance.initialize();
+    await NotificationService.instance.ensureInitialized();
     Future.delayed(const Duration(seconds: 2), () async {
       await TaskExecutor.checkAndSendCourseReminder();
       if (PlatformUtils.isMobile) {

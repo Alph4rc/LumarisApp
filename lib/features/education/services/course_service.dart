@@ -192,16 +192,8 @@ class CourseService {
     }
 
     filteredCourses = filteredCourses.where((course) {
-      final time = TimeService.getStartAndEnd(course);
-      final l = time.end.split(':');
-      final end = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        int.parse(l[0]),
-        int.parse(l[1]),
-      );
-      return now.isBefore(end);
+      final end = TimeService.getStartAndEnd(course, date: now).endDateTime(now);
+      return end == null || now.isBefore(end);
     }).toList();
 
     filteredCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
@@ -234,16 +226,8 @@ class CourseService {
     }).toList();
 
     todayCourses = todayCourses.where((course) {
-      final time = TimeService.getStartAndEnd(course);
-      final l = time.end.split(':');
-      final end = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        int.parse(l[0]),
-        int.parse(l[1]),
-      );
-      return now.isBefore(end);
+      final end = TimeService.getStartAndEnd(course, date: now).endDateTime(now);
+      return end == null || now.isBefore(end);
     }).toList();
 
     todayCourses.sort((a, b) => a.startUnit.compareTo(b.startUnit));
