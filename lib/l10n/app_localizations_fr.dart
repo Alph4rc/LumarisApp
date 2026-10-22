@@ -2110,4 +2110,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get permissionBackgroundRefreshDesc =>
       'Autoriser l\'application à mettre à jour les emplois du temps et les rappels en arrière-plan';
+
+  @override
+  String get permissionReminderFeatureTitle =>
+      'Autorisations des rappels de cours';
+
+  @override
+  String get permissionReminderFeatureDesc =>
+      'Autorisez les notifications, les alarmes exactes et l\'exécution en arrière-plan pour que les rappels arrivent à l\'heure.';
+
+  @override
+  String get permissionWidgetFeatureTitle => 'Autorisations du widget de cours';
+
+  @override
+  String get permissionWidgetFeatureDesc =>
+      'Autorisez l\'exécution en arrière-plan pour que le widget de l\'écran d\'accueil se mette à jour à l\'heure.';
 }

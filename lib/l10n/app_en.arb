@@ -714,5 +714,9 @@
   "permissionBatteryTitle": "Background Running",
   "permissionBatteryDesc": "Keep home screen widgets and course reminders updating in the background",
   "permissionBackgroundRefreshTitle": "Background App Refresh",
-  "permissionBackgroundRefreshDesc": "Allow the app to update schedules and reminders in the background"
+  "permissionBackgroundRefreshDesc": "Allow the app to update schedules and reminders in the background",
+  "permissionReminderFeatureTitle": "Course Reminder Permissions",
+  "permissionReminderFeatureDesc": "Allow notifications, exact alarms, and background running so reminders arrive on time.",
+  "permissionWidgetFeatureTitle": "Course Widget Permissions",
+  "permissionWidgetFeatureDesc": "Allow background running so the home screen widget updates on time."
 }

@@ -2122,4 +2122,19 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get permissionBackgroundRefreshDesc =>
       'Der App erlauben, Stundenpläne und Erinnerungen im Hintergrund zu aktualisieren';
+
+  @override
+  String get permissionReminderFeatureTitle =>
+      'Berechtigungen für Kurserinnerungen';
+
+  @override
+  String get permissionReminderFeatureDesc =>
+      'Erlaube Mitteilungen, genaue Alarme und Hintergrundausführung, damit Kurserinnerungen pünktlich ankommen.';
+
+  @override
+  String get permissionWidgetFeatureTitle => 'Berechtigungen für Kurs-Widget';
+
+  @override
+  String get permissionWidgetFeatureDesc =>
+      'Erlaube die Hintergrundausführung, damit das Startbildschirm-Widget rechtzeitig aktualisiert wird.';
 }

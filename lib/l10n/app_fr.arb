@@ -711,5 +711,9 @@
   "permissionBatteryTitle": "Exécution en arrière-plan",
   "permissionBatteryDesc": "Maintenir la mise à jour des widgets et des rappels de cours en arrière-plan",
   "permissionBackgroundRefreshTitle": "Actualisation en arrière-plan",
-  "permissionBackgroundRefreshDesc": "Autoriser l'application à mettre à jour les emplois du temps et les rappels en arrière-plan"
+  "permissionBackgroundRefreshDesc": "Autoriser l'application à mettre à jour les emplois du temps et les rappels en arrière-plan",
+  "permissionReminderFeatureTitle": "Autorisations des rappels de cours",
+  "permissionReminderFeatureDesc": "Autorisez les notifications, les alarmes exactes et l'exécution en arrière-plan pour que les rappels arrivent à l'heure.",
+  "permissionWidgetFeatureTitle": "Autorisations du widget de cours",
+  "permissionWidgetFeatureDesc": "Autorisez l'exécution en arrière-plan pour que le widget de l'écran d'accueil se mette à jour à l'heure."
 }

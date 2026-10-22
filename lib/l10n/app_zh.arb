@@ -1368,5 +1368,13 @@
   "permissionBackgroundRefreshTitle": "后台 App 刷新",
   "@permissionBackgroundRefreshTitle": {"description": ""},
   "permissionBackgroundRefreshDesc": "允许应用在后台更新课表与提醒",
-  "@permissionBackgroundRefreshDesc": {"description": ""}
+  "@permissionBackgroundRefreshDesc": {"description": ""},
+  "permissionReminderFeatureTitle": "课表提醒权限",
+  "@permissionReminderFeatureTitle": {"description": ""},
+  "permissionReminderFeatureDesc": "开启通知、精确闹钟与后台运行，确保课程提醒准时送达",
+  "@permissionReminderFeatureDesc": {"description": ""},
+  "permissionWidgetFeatureTitle": "课程小组件权限",
+  "@permissionWidgetFeatureTitle": {"description": ""},
+  "permissionWidgetFeatureDesc": "开启后台运行，确保桌面小组件按时刷新",
+  "@permissionWidgetFeatureDesc": {"description": ""}
 }

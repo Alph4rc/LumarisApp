@@ -2016,4 +2016,18 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get permissionBackgroundRefreshDesc =>
       '앱이 백그라운드에서 시간표와 알림을 업데이트하도록 허용';
+
+  @override
+  String get permissionReminderFeatureTitle => '수업 알림 권한';
+
+  @override
+  String get permissionReminderFeatureDesc =>
+      '알림, 정확한 알람, 백그라운드 실행을 허용하여 수업 알림이 제시간에 도착하도록 합니다';
+
+  @override
+  String get permissionWidgetFeatureTitle => '수업 위젯 권한';
+
+  @override
+  String get permissionWidgetFeatureDesc =>
+      '백그라운드 실행을 허용하여 홈 화면 위젯이 제때 업데이트되도록 합니다';
 }

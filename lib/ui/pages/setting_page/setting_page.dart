@@ -1,22 +1,19 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:luamris_ui/luamris_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/core/utils/platform_utils.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ios_club_app/core/services/permission_service.dart';
-import 'package:permission_handler/permission_handler.dart'
-    as permission_handler;
 import 'package:ios_club_app/state/settings_store.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/ui/pages/setting_page/version_setting.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/features/education/services/education_refresh_service.dart';
-import 'package:ios_club_app/features/system/notifications/notification_service.dart';
+import 'package:ios_club_app/features/system/permissions/course_feature_permissions.dart';
 import 'package:ios_club_app/features/system/widget_settings_service.dart';
+import 'package:ios_club_app/ui/components/permissions/course_feature_permission_tile.dart';
 import 'package:ios_club_app/platform/android/background_service.dart';
 import 'package:ios_club_app/platform/ios/background_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
@@ -63,6 +60,10 @@ class SettingPage extends ConsumerWidget {
                   const LanguageSetting(),
                   const ShowTomorrowSetting(),
                   if (PlatformUtils.isMobile) const RemindSetting(),
+                  if (PlatformUtils.isAndroid)
+                    const CourseFeaturePermissionTile(
+                      feature: CourseFeaturePermission.reminder,
+                    ),
                   const HomePageSetting(),
                   if (PlatformUtils.isMobile) _buildPermissionTile(context),
                   if (PlatformUtils.isDesktop && !PlatformUtils.isMacOS)
@@ -77,7 +78,13 @@ class SettingPage extends ConsumerWidget {
                   _buildSectionTitle(context, context.l10n.widgets),
                 if (PlatformUtils.isMobile) const SizedBox(height: 12),
                 if (PlatformUtils.isMobile)
-                  _buildSettingsGroup([_buildWidgetTile(context)]),
+                  _buildSettingsGroup([
+                    _buildWidgetTile(context),
+                    if (PlatformUtils.isAndroid)
+                      const CourseFeaturePermissionTile(
+                        feature: CourseFeaturePermission.widget,
+                      ),
+                  ]),
                 if (PlatformUtils.isMobile) const SizedBox(height: 24),
                 _buildSectionTitle(context, context.l10n.about),
                 const SizedBox(height: 12),
@@ -438,21 +445,14 @@ class SettingPage extends ConsumerWidget {
   }
 
   Future<bool> _ensureAndroidWidgetPrerequisites(BuildContext context) async {
-    final exactAlarmPlugin = NotificationService.instance.notifications
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
-    final canScheduleExact =
-        await exactAlarmPlugin?.canScheduleExactNotifications() ?? false;
-    final batteryOptimizationStatus =
-        await permission_handler.Permission.ignoreBatteryOptimizations.status;
-
-    final hasExactAlarm = canScheduleExact;
-    final hasBackgroundPermission = _isPermissionGranted(
-      batteryOptimizationStatus,
+    final statuses = await CourseFeaturePermissions.load(
+      CourseFeaturePermission.widget,
+    );
+    final hasBackgroundPermission = CourseFeaturePermissions.allGranted(
+      statuses.values,
     );
 
-    if (hasExactAlarm && hasBackgroundPermission) {
+    if (hasBackgroundPermission) {
       return true;
     }
 
@@ -462,8 +462,7 @@ class SettingPage extends ConsumerWidget {
       context: context,
       title: context.l10n.addToDesktop,
       message:
-          '${context.l10n.allowScheduleAlarm}\n${context.l10n.allowScheduleAlarmContent}\n\n'
-          '${context.l10n.allowBackgroundRun}\n${context.l10n.allowBackgroundRunContent}',
+          '${context.l10n.allowBackgroundRun}\n${context.l10n.permissionBatteryDesc}',
       confirmText: context.l10n.goAuthorize,
       cancelText: context.l10n.cancel,
     );
@@ -472,13 +471,10 @@ class SettingPage extends ConsumerWidget {
       return false;
     }
 
-    return NotificationService.ensureReminderPermission(context);
-  }
-
-  bool _isPermissionGranted(PermissionStatus status) {
-    return status == PermissionStatus.granted ||
-        status == PermissionStatus.limited ||
-        status == PermissionStatus.provisional;
+    return CourseFeaturePermissions.requestMissing(
+      context,
+      CourseFeaturePermission.widget,
+    );
   }
 
   Future<void> _openWidgetSettings(

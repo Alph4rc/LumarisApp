@@ -711,5 +711,9 @@
   "permissionBatteryTitle": "Hintergrundausführung",
   "permissionBatteryDesc": "Startbildschirm-Widgets und Kurserinnerungen zuverlässig im Hintergrund aktualisieren",
   "permissionBackgroundRefreshTitle": "Hintergrundaktualisierung",
-  "permissionBackgroundRefreshDesc": "Der App erlauben, Stundenpläne und Erinnerungen im Hintergrund zu aktualisieren"
+  "permissionBackgroundRefreshDesc": "Der App erlauben, Stundenpläne und Erinnerungen im Hintergrund zu aktualisieren",
+  "permissionReminderFeatureTitle": "Berechtigungen für Kurserinnerungen",
+  "permissionReminderFeatureDesc": "Erlaube Mitteilungen, genaue Alarme und Hintergrundausführung, damit Kurserinnerungen pünktlich ankommen.",
+  "permissionWidgetFeatureTitle": "Berechtigungen für Kurs-Widget",
+  "permissionWidgetFeatureDesc": "Erlaube die Hintergrundausführung, damit das Startbildschirm-Widget rechtzeitig aktualisiert wird."
 }

@@ -2086,4 +2086,19 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get permissionBackgroundRefreshDesc =>
       'Разрешить приложению обновлять расписание и напоминания в фоне';
+
+  @override
+  String get permissionReminderFeatureTitle =>
+      'Разрешения для напоминаний о занятиях';
+
+  @override
+  String get permissionReminderFeatureDesc =>
+      'Разрешите уведомления, точные будильники и фоновую работу, чтобы напоминания приходили вовремя.';
+
+  @override
+  String get permissionWidgetFeatureTitle => 'Разрешения для виджета занятий';
+
+  @override
+  String get permissionWidgetFeatureDesc =>
+      'Разрешите фоновую работу, чтобы виджет на главном экране обновлялся вовремя.';
 }

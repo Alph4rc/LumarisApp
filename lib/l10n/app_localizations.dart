@@ -3947,6 +3947,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'允许应用在后台更新课表与提醒'**
   String get permissionBackgroundRefreshDesc;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'课表提醒权限'**
+  String get permissionReminderFeatureTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'开启通知、精确闹钟与后台运行，确保课程提醒准时送达'**
+  String get permissionReminderFeatureDesc;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'课程小组件权限'**
+  String get permissionWidgetFeatureTitle;
+
+  ///
+  ///
+  /// In zh, this message translates to:
+  /// **'开启后台运行，确保桌面小组件按时刷新'**
+  String get permissionWidgetFeatureDesc;
 }
 
 class _AppLocalizationsDelegate

@@ -2000,4 +2000,18 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get permissionBackgroundRefreshDesc =>
       'アプリがバックグラウンドで時間割とリマインダーを更新できるようにする';
+
+  @override
+  String get permissionReminderFeatureTitle => '授業リマインダー権限';
+
+  @override
+  String get permissionReminderFeatureDesc =>
+      '通知・正確なアラーム・バックグラウンド実行を許可し、授業リマインダーを時間どおりに届けます';
+
+  @override
+  String get permissionWidgetFeatureTitle => '授業ウィジェット権限';
+
+  @override
+  String get permissionWidgetFeatureDesc =>
+      'バックグラウンド実行を許可し、ホーム画面ウィジェットを時間どおりに更新します';
 }

@@ -298,23 +298,42 @@ class NotificationService {
 
   static Future<bool> ensureReminderPermission(BuildContext context) async {
     final l10n = context.l10n;
-    final status = await PermissionService.request(
-      Permission.scheduleExactAlarm,
+
+    // Android 13+ 通知需要运行时授权；否则即使闹钟排好了也不会显示。
+    final notificationStatus = await PermissionService.request(
+      Permission.notification,
       context: context,
-      dialogTitle: l10n.allowScheduleAlarm,
-      dialogContent: l10n.allowScheduleAlarmContent,
+      dialogTitle: l10n.permissionNotificationTitle,
+      dialogContent: l10n.permissionNotificationDesc,
       settingsText: l10n.goToSettings,
     );
 
-    if (!_isGranted(status)) {
+    if (!_isGranted(notificationStatus)) {
       return false;
     }
 
-    // 在 Android 上进一步请求忽略电池优化权限，以确保后台任务存活
+    // 精确闹钟与忽略电池优化只存在于 Android；iOS 由系统统一调度本地通知。
     if (PlatformUtils.isAndroid) {
       if (!context.mounted) {
         return false;
       }
+
+      final status = await PermissionService.request(
+        Permission.scheduleExactAlarm,
+        context: context,
+        dialogTitle: l10n.allowScheduleAlarm,
+        dialogContent: l10n.allowScheduleAlarmContent,
+        settingsText: l10n.goToSettings,
+      );
+
+      if (!_isGranted(status)) {
+        return false;
+      }
+
+      if (!context.mounted) {
+        return false;
+      }
+
       await PermissionService.request(
         Permission.ignoreBatteryOptimizations,
         context: context,
@@ -413,7 +432,8 @@ class NotificationService {
       prefs.getInt(PrefsKeys.NOTIFICATION_TIME),
     );
     final now = tz.TZDateTime.now(CourseReminderHelper.campusLocation);
-    final staleBeforeMs = now.millisecondsSinceEpoch - _staleGrace.inMilliseconds;
+    final staleBeforeMs =
+        now.millisecondsSinceEpoch - _staleGrace.inMilliseconds;
 
     // 补排：时间对不上的旧闹钟先撤销再重排，避免它按旧时间响。
     final effectiveDate = targetDate ?? DateTime.now();

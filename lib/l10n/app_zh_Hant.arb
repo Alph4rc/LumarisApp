@@ -713,5 +713,9 @@
   "permissionBatteryTitle": "背景執行",
   "permissionBatteryDesc": "保持桌面小工具和課程提醒在背景穩定更新",
   "permissionBackgroundRefreshTitle": "背景 App 重新整理",
-  "permissionBackgroundRefreshDesc": "允許應用程式在背景更新課表與提醒"
+  "permissionBackgroundRefreshDesc": "允許應用程式在背景更新課表與提醒",
+  "permissionReminderFeatureTitle": "課程提醒權限",
+  "permissionReminderFeatureDesc": "開啟通知、精確鬧鐘與背景執行，確保課程提醒準時送達",
+  "permissionWidgetFeatureTitle": "課程小工具權限",
+  "permissionWidgetFeatureDesc": "開啟背景執行，確保桌面小工具準時更新"
 }

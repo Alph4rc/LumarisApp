@@ -1993,6 +1993,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get permissionBackgroundRefreshDesc => '允许应用在后台更新课表与提醒';
+
+  @override
+  String get permissionReminderFeatureTitle => '课表提醒权限';
+
+  @override
+  String get permissionReminderFeatureDesc => '开启通知、精确闹钟与后台运行，确保课程提醒准时送达';
+
+  @override
+  String get permissionWidgetFeatureTitle => '课程小组件权限';
+
+  @override
+  String get permissionWidgetFeatureDesc => '开启后台运行，确保桌面小组件按时刷新';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3985,4 +3997,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get permissionBackgroundRefreshDesc => '允許應用程式在背景更新課表與提醒';
+
+  @override
+  String get permissionReminderFeatureTitle => '課程提醒權限';
+
+  @override
+  String get permissionReminderFeatureDesc => '開啟通知、精確鬧鐘與背景執行，確保課程提醒準時送達';
+
+  @override
+  String get permissionWidgetFeatureTitle => '課程小工具權限';
+
+  @override
+  String get permissionWidgetFeatureDesc => '開啟背景執行，確保桌面小工具準時更新';
 }

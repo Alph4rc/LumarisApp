@@ -710,5 +710,9 @@
   "permissionBatteryTitle": "Фоновая работа",
   "permissionBatteryDesc": "Поддерживать обновление виджетов и напоминаний о занятиях в фоне",
   "permissionBackgroundRefreshTitle": "Фоновая загрузка приложения",
-  "permissionBackgroundRefreshDesc": "Разрешить приложению обновлять расписание и напоминания в фоне"
+  "permissionBackgroundRefreshDesc": "Разрешить приложению обновлять расписание и напоминания в фоне",
+  "permissionReminderFeatureTitle": "Разрешения для напоминаний о занятиях",
+  "permissionReminderFeatureDesc": "Разрешите уведомления, точные будильники и фоновую работу, чтобы напоминания приходили вовремя.",
+  "permissionWidgetFeatureTitle": "Разрешения для виджета занятий",
+  "permissionWidgetFeatureDesc": "Разрешите фоновую работу, чтобы виджет на главном экране обновлялся вовремя."
 }

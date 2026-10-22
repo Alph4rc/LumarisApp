@@ -711,5 +711,9 @@
   "permissionBatteryTitle": "백그라운드 실행",
   "permissionBatteryDesc": "홈 화면 위젯과 수업 알림이 백그라운드에서 안정적으로 업데이트되도록 유지",
   "permissionBackgroundRefreshTitle": "백그라운드 앱 새로고침",
-  "permissionBackgroundRefreshDesc": "앱이 백그라운드에서 시간표와 알림을 업데이트하도록 허용"
+  "permissionBackgroundRefreshDesc": "앱이 백그라운드에서 시간표와 알림을 업데이트하도록 허용",
+  "permissionReminderFeatureTitle": "수업 알림 권한",
+  "permissionReminderFeatureDesc": "알림, 정확한 알람, 백그라운드 실행을 허용하여 수업 알림이 제시간에 도착하도록 합니다",
+  "permissionWidgetFeatureTitle": "수업 위젯 권한",
+  "permissionWidgetFeatureDesc": "백그라운드 실행을 허용하여 홈 화면 위젯이 제때 업데이트되도록 합니다"
 }

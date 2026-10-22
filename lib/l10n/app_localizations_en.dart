@@ -2081,4 +2081,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permissionBackgroundRefreshDesc =>
       'Allow the app to update schedules and reminders in the background';
+
+  @override
+  String get permissionReminderFeatureTitle => 'Course Reminder Permissions';
+
+  @override
+  String get permissionReminderFeatureDesc =>
+      'Allow notifications, exact alarms, and background running so reminders arrive on time.';
+
+  @override
+  String get permissionWidgetFeatureTitle => 'Course Widget Permissions';
+
+  @override
+  String get permissionWidgetFeatureDesc =>
+      'Allow background running so the home screen widget updates on time.';
 }
