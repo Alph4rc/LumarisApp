@@ -7,51 +7,84 @@ import 'package:ios_club_app/features/education/services/auth_session_guard.dart
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 class EducationCacheService {
-  static Future<void> clearEduCache() async {
-    // 该操作会删除 USER_DATA，等同于清空教务会话：让在途登录结果作废。
-    AuthSessionGuard.invalidate();
+  /// 登录态相关 key：仅在 [clearSession] 为 true 时删除。
+  static const List<String> _sessionPrefsKeys = [
+    PrefsKeys.USER_DATA,
+    PrefsKeys.LAST_FETCH_TIME,
+  ];
 
-    try {
+  static const List<String> _eduDataPrefsKeys = [
+    PrefsKeys.COURSE_DATA,
+    PrefsKeys.IGNORE_DATA,
+    PrefsKeys.COURSE_LAST_FETCH_TIME,
+    PrefsKeys.SEMESTER_DATA,
+    PrefsKeys.SEMESTER_TIME,
+    PrefsKeys.ALL_SCORE_DATA,
+    PrefsKeys.LAST_SCORE_TIME,
+    PrefsKeys.THIS_SEMESTER_DATA,
+    PrefsKeys.EXAM_DATA,
+    PrefsKeys.EXAM_TIME,
+    PrefsKeys.TIME_DATA,
+    PrefsKeys.TIME_LAST_UPDATED,
+    PrefsKeys.INFO_DATA,
+    PrefsKeys.INFO_DATA_TIME,
+    '${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS',
+  ];
+
+  static const List<String> _requestCachePatterns = [
+    r'.*/course.*',
+    r'.*/score.*',
+    r'.*/exam.*',
+    r'.*/semester.*',
+    r'.*/program.*',
+    r'.*/info.*',
+    r'.*/time.*',
+  ];
+
+  /// 清理教务系统缓存。
+  ///
+  /// [clearSession] 为 true 时同时删除登录态（登出、换学校、登录前清场）；
+  /// 设置页的"清除缓存"传 false，只清数据、保留登录。
+  static Future<void> clearEduCache({bool clearSession = true}) async {
+    // 只有连同会话一起清空时才作废在途登录。
+    if (clearSession) {
+      AuthSessionGuard.invalidate();
+    }
+
+    AppLogger.debug('[EducationCacheService] 开始清理教务系统缓存');
+
+    final prefsKeys = clearSession
+        ? [..._sessionPrefsKeys, ..._eduDataPrefsKeys]
+        : _eduDataPrefsKeys;
+
+    // 每一步独立容错：某一步失败不能阻止后续缓存被清理。
+    await _runStep('清理 SharedPreferences', () async {
       final prefs = PrefsService.instance;
-
-      AppLogger.debug('[EducationCacheService] 开始清理教务系统缓存');
-
-      final eduKeys = [
-        PrefsKeys.USER_DATA,
-        PrefsKeys.LAST_FETCH_TIME,
-        PrefsKeys.COURSE_DATA,
-        PrefsKeys.IGNORE_DATA,
-        PrefsKeys.COURSE_LAST_FETCH_TIME,
-        PrefsKeys.SEMESTER_DATA,
-        PrefsKeys.SEMESTER_TIME,
-        PrefsKeys.ALL_SCORE_DATA,
-        PrefsKeys.LAST_SCORE_TIME,
-        PrefsKeys.THIS_SEMESTER_DATA,
-        PrefsKeys.EXAM_DATA,
-        PrefsKeys.EXAM_TIME,
-        PrefsKeys.TIME_DATA,
-        PrefsKeys.TIME_LAST_UPDATED,
-        PrefsKeys.INFO_DATA,
-        PrefsKeys.INFO_DATA_TIME,
-        '${PrefsKeys.ALL_SCORE_DATA}_TIMESTAMPS',
-      ];
-
-      for (final key in eduKeys) {
+      for (final key in prefsKeys) {
         await prefs.remove(key);
       }
+    });
 
-      await CourseRepository().clear();
-      await ScoreRepository().clear();
+    await _runStep('清理课程仓库', () => CourseRepository().clear());
+    await _runStep('清理成绩仓库', () => ScoreRepository().clear());
 
-      await RequestCache().deleteByPattern(RegExp(r'.*/course.*'));
-      await RequestCache().deleteByPattern(RegExp(r'.*/score.*'));
-      await RequestCache().deleteByPattern(RegExp(r'.*/exam.*'));
-      await RequestCache().deleteByPattern(RegExp(r'.*/semester.*'));
-      await RequestCache().deleteByPattern(RegExp(r'.*/program.*'));
-      await RequestCache().deleteByPattern(RegExp(r'.*/info.*'));
-      await RequestCache().deleteByPattern(RegExp(r'.*/time.*'));
+    for (final pattern in _requestCachePatterns) {
+      await _runStep(
+        '清理请求缓存 $pattern',
+        () => RequestCache().deleteByPattern(RegExp(pattern)),
+      );
+    }
+  }
+
+  static Future<void> _runStep(
+    String label,
+    Future<void> Function() action,
+  ) async {
+    try {
+      await action();
     } catch (e, stackTrace) {
-      AppLogger.error('清理教务系统缓存失败', error: e, stackTrace: stackTrace);
+      AppLogger.error('清理教务系统缓存失败: $label',
+          error: e, stackTrace: stackTrace);
     }
   }
 }

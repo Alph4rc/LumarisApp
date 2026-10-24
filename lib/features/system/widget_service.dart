@@ -37,6 +37,49 @@ class WidgetService {
     }
   }
 
+  /// 清空小组件展示的数据（登出时调用）。
+  ///
+  /// 只删除 App 写入的 key，再主动刷新一次，避免桌面继续显示上一个账号的课表。
+  static Future<void> clear() async {
+    if (!PlatformUtils.isIOS && !PlatformUtils.isAndroid) {
+      return;
+    }
+
+    await initialize();
+
+    const keys = <String>[
+      iOSScheduleSnapshotKey,
+      'flutter.date',
+      'flutter.courses',
+      'flutter.tomorrow.courses',
+      'flutter.tomorrow.tomorrowCourses',
+      'flutter.tomorrow.date',
+      'flutter.tomorrow.tomorrowDate',
+    ];
+
+    for (final key in keys) {
+      await HomeWidget.saveWidgetData<String>(key, null);
+    }
+
+    if (PlatformUtils.isIOS) {
+      await HomeWidget.updateWidget(iOSName: 'ScheduleWidget');
+      return;
+    }
+
+    await HomeWidget.updateWidget(
+      name: 'TodayCoursesWidgetProvider',
+      androidName: 'TodayCoursesWidgetProvider',
+      qualifiedAndroidName:
+          'com.example.ios_club_app.TodayCoursesWidgetProvider',
+    );
+    await HomeWidget.updateWidget(
+      name: 'TomorrowCoursesWidgetProvider',
+      androidName: 'TomorrowCoursesWidgetProvider',
+      qualifiedAndroidName:
+          'com.example.ios_club_app.TomorrowCoursesWidgetProvider',
+    );
+  }
+
   /// 推送整学期课表快照（仅 iOS）。
   ///
   /// 小组件拿到快照后自行推算今日/明日课表并生成多条 timeline entry，

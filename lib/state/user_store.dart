@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
+import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/services/auth_session_guard.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
+import 'package:ios_club_app/features/education/services/education_logout_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
@@ -52,7 +54,6 @@ class UserStore extends Notifier<UserState> {
     state = state.copyWith(userData: null, isLogin: false);
 
     final prefs = PrefsService.instance;
-    final secureStorage = SecureStorageService.instance;
 
     await prefs.remove(PrefsKeys.USER_DATA);
     await prefs.remove(PrefsKeys.USERNAME);
@@ -62,10 +63,27 @@ class UserStore extends Notifier<UserState> {
     await prefs.remove(PrefsKeys.INFO_DATA);
     await prefs.remove(PrefsKeys.COURSE_DATA);
 
-    await secureStorage.delete(key: PrefsKeys.USERNAME);
-    await secureStorage.delete(key: PrefsKeys.PASSWORD);
+    await _deleteCredential(PrefsKeys.USERNAME);
+    await _deleteCredential(PrefsKeys.PASSWORD);
 
     await EducationCacheService.clearEduCache();
+    await EducationLogoutService.clearAccountArtifacts();
+  }
+
+  /// 删除安全存储凭证。
+  ///
+  /// 失败时重试一次并明确记录，避免登出后残留凭证让后台任务静默重登。
+  Future<void> _deleteCredential(String key) async {
+    final storage = SecureStorageService.instance;
+
+    if (await storage.delete(key: key)) {
+      return;
+    }
+    if (await storage.delete(key: key)) {
+      return;
+    }
+
+    AppLogger.warning('登出时删除安全存储凭证失败: $key');
   }
 
   Future<void> logout() async {

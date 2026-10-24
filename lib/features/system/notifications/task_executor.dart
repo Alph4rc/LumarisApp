@@ -43,6 +43,16 @@ class TaskExecutor {
     return DateTime.now().difference(_cacheTimestamp!) < _cacheValidDuration;
   }
 
+  /// 清空内存缓存（登出后调用）。
+  ///
+  /// 否则缓存有效期内的下一次任务会拿旧课程重新排通知、刷新小组件，
+  /// 把登出时清掉的数据又写回来。
+  static void clearCache() {
+    _cachedCourses = null;
+    _cachedTime = null;
+    _cacheTimestamp = null;
+  }
+
   /// 预加载数据到缓存
   static Future<void> _preloadData() async {
     if (_isCacheValid()) {

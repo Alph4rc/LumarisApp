@@ -547,7 +547,8 @@ class SettingPage extends ConsumerWidget {
             );
           }
 
-          await EducationCacheService.clearEduCache();
+          // "清除缓存"只清数据，保留登录态。
+          await EducationCacheService.clearEduCache(clearSession: false);
           await RequestCache.instance.clear();
 
           if (context.mounted) {
