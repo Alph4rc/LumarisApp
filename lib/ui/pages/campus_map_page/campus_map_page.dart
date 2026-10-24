@@ -430,7 +430,10 @@ class _CampusMapPageState extends ConsumerState<CampusMapPage> {
                           color: colors.tertiaryLabel,
                           fontSize: 16,
                         ),
+                        filled: false,
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
                         isDense: true,
                         suffixIcon: mapState.searchQuery.isNotEmpty
                             ? GestureDetector(
