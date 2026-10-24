@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 import 'package:ios_club_app/features/education/models/user_data.dart';
+import 'package:ios_club_app/features/education/services/auth_session_guard.dart';
 import 'package:ios_club_app/features/education/services/education_cache_service.dart';
 import 'package:ios_club_app/state/app_states.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
@@ -46,6 +47,8 @@ class UserStore extends Notifier<UserState> {
   }
 
   Future<void> _clearUserData() async {
+    // 先让所有在途登录结果失效，再删除本地数据，避免竞态下被重新写回。
+    AuthSessionGuard.invalidate();
     state = state.copyWith(userData: null, isLogin: false);
 
     final prefs = PrefsService.instance;

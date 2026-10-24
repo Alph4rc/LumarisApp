@@ -16,6 +16,7 @@ import 'package:ios_club_app/features/education/models/user_data.dart';
 import 'package:ios_club_app/features/education/apis/login_api.dart';
 import 'package:ios_club_app/features/education/models/login_response.dart';
 import 'package:ios_club_app/features/education/services/auth_service.dart';
+import 'package:ios_club_app/features/education/services/auth_session_guard.dart';
 import 'package:ios_club_app/features/education/services/course_service.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client_manager.dart';
@@ -198,6 +199,29 @@ void main() {
       expect(storedUserData.containsKey('message'), isFalse);
       expect(
           PrefsService.instance.getInt(PrefsKeys.LAST_FETCH_TIME), isNotNull);
+    });
+
+    test(
+        'AuthService.loginFromData should discard result when session is invalidated',
+        () async {
+      await PrefsService.instance.remove(PrefsKeys.USER_DATA);
+      await PrefsService.instance.remove(PrefsKeys.LAST_FETCH_TIME);
+
+      LoginApi.setLoginOverrideForTest((_, _) async {
+        // 模拟登录请求还在途时用户点了退出登录。
+        AuthSessionGuard.invalidate();
+        return LoginResponse(
+          success: true,
+          studentId: '2026888',
+          cookie: 'stale-cookie',
+        );
+      });
+
+      final ok = await AuthService.loginFromData('u', 'p');
+
+      expect(ok, isFalse);
+      expect(PrefsService.instance.getString(PrefsKeys.USER_DATA), isNull);
+      expect(PrefsService.instance.getInt(PrefsKeys.LAST_FETCH_TIME), isNull);
     });
 
     test('CourseService.fetchCoursesFromRemote should persist repository data',

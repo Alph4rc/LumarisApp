@@ -3,10 +3,14 @@ import 'package:ios_club_app/core/repositories/score_repository.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
+import 'package:ios_club_app/features/education/services/auth_session_guard.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 
 class EducationCacheService {
   static Future<void> clearEduCache() async {
+    // 该操作会删除 USER_DATA，等同于清空教务会话：让在途登录结果作废。
+    AuthSessionGuard.invalidate();
+
     try {
       final prefs = PrefsService.instance;
 

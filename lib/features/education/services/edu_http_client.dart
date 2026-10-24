@@ -11,6 +11,7 @@ import '../../../core/utils/request_cache.dart';
 import '../../../core/services/retry_policy.dart';
 import '../../basic/models/school.dart';
 import '../apis/login_api.dart';
+import 'auth_session_guard.dart';
 import 'package:ios_club_app/core/utils/app_logger.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
 
@@ -110,6 +111,7 @@ class EduHttpClient extends BaseHttpClient {
 
         // 只在认证相关错误（401/403）时尝试重登录
         if (statusCode == 401 || statusCode == 403) {
+          final requestEpoch = AuthSessionGuard.epoch;
           try {
             AppLogger.info('检测到认证失败($statusCode)，正在尝试重新登录...');
 
@@ -118,6 +120,13 @@ class EduHttpClient extends BaseHttpClient {
 
             // 使用全局登录锁，确保同一时间只有一个登录请求
             if (await _reLoginWithLock()) {
+              if (!AuthSessionGuard.isCurrent(requestEpoch)) {
+                // 重登录期间用户已登出，不再继续重试原请求。
+                AppLogger.info('重登录期间会话已被清空，放弃本次重试');
+                handler.next(e);
+                return;
+              }
+
               AppLogger.info('重新登录成功，正在重试原请求...');
 
               // 通知UI层重登录成功
@@ -143,15 +152,19 @@ class EduHttpClient extends BaseHttpClient {
             } else {
               AppLogger.warning('重新登录失败，请检查账号密码');
 
-              // 通知UI层重登录失败
-              _notifyRelogFailed('账号或密码错误');
+              // 通知UI层重登录失败；已登出时不再提示，避免误导。
+              if (AuthSessionGuard.isCurrent(requestEpoch)) {
+                _notifyRelogFailed('账号或密码错误');
+              }
             }
           } catch (retryError) {
             // 重新请求失败，继续处理原错误
             AppLogger.debug('重登录后请求失败: $retryError');
 
-            // 通知UI层重登录失败
-            _notifyRelogFailed(retryError.toString());
+            // 通知UI层重登录失败；已登出时不再提示，避免误导。
+            if (AuthSessionGuard.isCurrent(requestEpoch)) {
+              _notifyRelogFailed(retryError.toString());
+            }
           }
         }
 
@@ -357,13 +370,16 @@ class EduHttpClient extends BaseHttpClient {
   }
 
   Future<bool> _reLogin() async {
+    final epoch = AuthSessionGuard.epoch;
     try {
-      final prefs = PrefsService.instance;
       final secureStorage = SecureStorageService.instance;
       final username = await secureStorage.read(key: PrefsKeys.USERNAME);
       final password = await secureStorage.read(key: PrefsKeys.PASSWORD);
 
       if (username == null || password == null) {
+        return false;
+      }
+      if (!AuthSessionGuard.isCurrent(epoch)) {
         return false;
       }
 
@@ -372,8 +388,7 @@ class EduHttpClient extends BaseHttpClient {
         if (loginResult['success'] != true) {
           return false;
         }
-        await prefs.setString(PrefsKeys.USER_DATA, jsonEncode(loginResult));
-        return true;
+        return await _persistReLoginResult(jsonEncode(loginResult), epoch);
       }
 
       final loginResponse = await LoginApi.login(username, password);
@@ -381,16 +396,47 @@ class EduHttpClient extends BaseHttpClient {
         return false;
       }
 
+      // 后台任务在独立 isolate 中运行，静态代际号不共享；登出会删除
+      // SecureStorage 凭证，重新读取可识别跨 isolate 的登出。
+      final currentUsername =
+          await secureStorage.read(key: PrefsKeys.USERNAME);
+      final currentPassword =
+          await secureStorage.read(key: PrefsKeys.PASSWORD);
+      if (currentUsername != username || currentPassword != password) {
+        AppLogger.info('重登录期间凭证已被清除，丢弃本次结果');
+        return false;
+      }
+
       // USER_DATA intentionally stores the flat login payload, not ApiResponse.
-      await prefs.setString(
-        PrefsKeys.USER_DATA,
+      return await _persistReLoginResult(
         jsonEncode(loginResponse.toJson()),
+        epoch,
       );
-      return true;
     } catch (e) {
       AppLogger.debug('重登录失败: $e');
       return false;
     }
+  }
+
+  /// 写入重登录结果。
+  ///
+  /// 写入前后校验代际，避免用户已登出后又被在途的重登录写回登录态。
+  Future<bool> _persistReLoginResult(String json, int epoch) async {
+    if (!AuthSessionGuard.isCurrent(epoch)) {
+      AppLogger.info('重登录会话已失效，丢弃过期的登录结果');
+      return false;
+    }
+
+    final prefs = PrefsService.instance;
+    await prefs.setString(PrefsKeys.USER_DATA, json);
+
+    if (!AuthSessionGuard.isCurrent(epoch)) {
+      await prefs.remove(PrefsKeys.USER_DATA);
+      AppLogger.info('重登录会话在写入期间失效，已回滚登录态');
+      return false;
+    }
+
+    return true;
   }
 
   /// 通知UI层开始重登录

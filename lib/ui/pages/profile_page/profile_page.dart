@@ -88,6 +88,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
+    // 登录态变化时重新读取账号名：登出后清空，重新登录后刷新，
+    // 避免页面被 IndexedStack 保活时继续显示旧账号。
+    ref.listen<bool>(userStoreProvider.select((state) => state.isLogin), (
+      previous,
+      next,
+    ) {
+      if (previous != next) {
+        unawaited(_checkLoginStatus());
+      }
+    });
+
     if (_isLoading) {
       return Scaffold(
         body: Center(
@@ -169,6 +181,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isLogin = ref.watch(userStoreProvider).isLogin;
     final school = ref.watch(schoolStoreProvider).school;
+    // 未登录时不再展示缓存的账号名，避免登出后仍显示旧账号。
+    final displayName = isLogin ? _username : '';
     // 判断是否为平板布局（宽度大于600）
     final isTablet = screenWidth > 600;
 
@@ -209,7 +223,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _username.isNotEmpty ? _username : l10n.notLoggedIn,
+                          displayName.isNotEmpty
+                              ? displayName
+                              : l10n.notLoggedIn,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

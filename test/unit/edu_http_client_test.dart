@@ -10,6 +10,7 @@ import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/utils/request_cache.dart';
 import 'package:ios_club_app/features/education/apis/login_api.dart';
 import 'package:ios_club_app/features/education/models/login_response.dart';
+import 'package:ios_club_app/features/education/services/auth_session_guard.dart';
 import 'package:ios_club_app/features/education/services/edu_http_client.dart';
 import 'package:ios_club_app/state/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -640,6 +641,30 @@ void main() {
         PrefsService.instance.getString(PrefsKeys.USER_DATA),
         contains('fresh-cookie'),
       );
+      client.dispose();
+    });
+
+    test('reLoginWithLockForTest should discard result after logout',
+        () async {
+      secureStore[PrefsKeys.USERNAME] = 'u1';
+      secureStore[PrefsKeys.PASSWORD] = 'p1';
+      await PrefsService.instance.remove(PrefsKeys.USER_DATA);
+
+      EduHttpClient.setLoginHandlerForTest((_, _) async {
+        // 模拟重登录请求还在途时用户点了退出登录。
+        AuthSessionGuard.invalidate();
+        return <String, dynamic>{
+          'success': true,
+          'studentId': '2026001',
+          'cookie': 'stale-cookie',
+        };
+      });
+
+      final client = EduHttpClient(baseUrl: 'http://api.test');
+      final ok = await client.reLoginWithLockForTest();
+
+      expect(ok, isFalse);
+      expect(PrefsService.instance.getString(PrefsKeys.USER_DATA), isNull);
       client.dispose();
     });
 
