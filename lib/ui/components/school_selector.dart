@@ -34,6 +34,8 @@ class SchoolSelector extends StatelessWidget {
           focusNode: focusNode,
           style: const TextStyle(fontSize: 17),
           decoration: InputDecoration(
+            // 关闭主题默认的填充，背景与圆角由外层分组容器负责绘制。
+            filled: false,
             hintText: l10n.selectSchool,
             hintStyle: TextStyle(
               color: Theme.of(

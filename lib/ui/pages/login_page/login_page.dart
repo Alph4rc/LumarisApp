@@ -194,7 +194,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.mc.colors;
-    final groupBackgroundColor = colors.cardBackground;
+    // 输入框本身设为透明（见 _buildCupertinoLikeTextField），分组背景由容器绘制，
+    // 这样圆角才能显现出来；颜色沿用主题里输入框的填充色。
+    final groupBackgroundColor = colors.input;
     final schools =
         ref.watch(schoolListProvider).valueOrNull ?? School.fallbackList;
 
@@ -421,6 +423,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       obscureText: obscureText,
       style: const TextStyle(fontSize: 17),
       decoration: InputDecoration(
+        // 关闭主题默认的填充，背景与圆角由外层分组容器负责绘制。
+        filled: false,
         hintText: hintText,
         hintStyle: TextStyle(
           color: Theme.of(
