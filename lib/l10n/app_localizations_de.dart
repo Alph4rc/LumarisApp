@@ -1373,6 +1373,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get paymentSaveAndRefresh => 'Speichern und aktualisieren';
 
   @override
+  String get paymentQrCode => 'Zahlungscode';
+
+  @override
+  String get paymentQrCodeSubtitle =>
+      'Zeigen Sie diesen Code am Scanner zum Bezahlen';
+
+  @override
+  String get paymentQrCodeLoading => 'Zahlungscode wird erstellt';
+
+  @override
+  String paymentQrCodeAutoRefresh(int seconds) {
+    return 'Automatische Aktualisierung in $seconds s';
+  }
+
+  @override
+  String get paymentQrCodeError =>
+      'Zahlungscode konnte nicht abgerufen werden. Bitte versuchen Sie es später erneut.';
+
+  @override
   String get campusCard => 'Campus-Karte';
 
   @override

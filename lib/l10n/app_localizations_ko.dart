@@ -1317,6 +1317,23 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paymentSaveAndRefresh => '저장 후 새로고침';
 
   @override
+  String get paymentQrCode => '결제 코드';
+
+  @override
+  String get paymentQrCodeSubtitle => '스캐너에 이 코드를 표시하면 결제됩니다';
+
+  @override
+  String get paymentQrCodeLoading => '결제 코드 생성 중';
+
+  @override
+  String paymentQrCodeAutoRefresh(int seconds) {
+    return '$seconds초 후 자동 새로 고침';
+  }
+
+  @override
+  String get paymentQrCodeError => '결제 코드를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
   String get campusCard => '캠퍼스 카드';
 
   @override

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_club_app/features/basic/models/school.dart';
 import 'package:ios_club_app/core/extensions/localization_extensions.dart';
 import 'package:ios_club_app/l10n/app_localizations.dart';
+import 'package:ios_club_app/routes/router.dart';
 import 'package:ios_club_app/state/school_store.dart';
 import 'package:ios_club_app/features/education/models/payment_model.dart';
 import 'package:ios_club_app/state/app_states.dart';
@@ -110,6 +111,10 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
       ),
       children: [
         _buildBalanceCard(payment, colors, l10n),
+        if (payment.hasData) ...[
+          const SizedBox(height: 16),
+          _buildQrCodeEntry(colors, l10n),
+        ],
         const SizedBox(height: 24),
         if (payment.isLoading)
           LoadingStateView(
@@ -195,6 +200,23 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
           ),
           const SizedBox(height: 12),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQrCodeEntry(McColors colors, AppLocalizations l10n) {
+    return McCard.elevated(
+      padding: EdgeInsets.zero,
+      child: McListTile(
+        leading: Icon(Icons.qr_code_2_rounded, color: colors.primary),
+        title: Text(l10n.paymentQrCode),
+        subtitle: Text(l10n.paymentQrCodeSubtitle),
+        trailing: Icon(
+          CupertinoIcons.chevron_right,
+          size: 18,
+          color: colors.tertiaryLabel,
+        ),
+        onTap: () => AppRouter.push(AppRoutes.paymentQrCode),
       ),
     );
   }

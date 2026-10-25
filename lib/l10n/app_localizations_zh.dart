@@ -1305,6 +1305,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get paymentSaveAndRefresh => '保存并刷新';
 
   @override
+  String get paymentQrCode => '支付码';
+
+  @override
+  String get paymentQrCodeSubtitle => '向扫码设备出示此码即可完成消费';
+
+  @override
+  String get paymentQrCodeLoading => '正在生成支付码';
+
+  @override
+  String paymentQrCodeAutoRefresh(int seconds) {
+    return '$seconds 秒后自动刷新';
+  }
+
+  @override
+  String get paymentQrCodeError => '支付码获取失败，请稍后重试';
+
+  @override
   String get campusCard => '校园一卡通';
 
   @override
@@ -3294,6 +3311,23 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get paymentSaveAndRefresh => '儲存並重新整理';
+
+  @override
+  String get paymentQrCode => '支付碼';
+
+  @override
+  String get paymentQrCodeSubtitle => '向掃碼裝置出示此碼即可完成消費';
+
+  @override
+  String get paymentQrCodeLoading => '正在產生支付碼';
+
+  @override
+  String paymentQrCodeAutoRefresh(int seconds) {
+    return '$seconds 秒後自動重新整理';
+  }
+
+  @override
+  String get paymentQrCodeError => '支付碼取得失敗，請稍後再試';
 
   @override
   String get campusCard => '校園一卡通';

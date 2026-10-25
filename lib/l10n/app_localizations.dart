@@ -2592,6 +2592,36 @@ abstract class AppLocalizations {
   /// **'保存并刷新'**
   String get paymentSaveAndRefresh;
 
+  /// 校园卡离线支付二维码标题
+  ///
+  /// In zh, this message translates to:
+  /// **'支付码'**
+  String get paymentQrCode;
+
+  /// 支付码入口与页面的说明
+  ///
+  /// In zh, this message translates to:
+  /// **'向扫码设备出示此码即可完成消费'**
+  String get paymentQrCodeSubtitle;
+
+  /// 支付码加载中的提示
+  ///
+  /// In zh, this message translates to:
+  /// **'正在生成支付码'**
+  String get paymentQrCodeLoading;
+
+  /// 支付码自动刷新倒计时
+  ///
+  /// In zh, this message translates to:
+  /// **'{seconds} 秒后自动刷新'**
+  String paymentQrCodeAutoRefresh(int seconds);
+
+  /// 支付码获取失败提示
+  ///
+  /// In zh, this message translates to:
+  /// **'支付码获取失败，请稍后重试'**
+  String get paymentQrCodeError;
+
   ///
   ///
   /// In zh, this message translates to:

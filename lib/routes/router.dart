@@ -18,6 +18,7 @@ import '../ui/pages/link_page/link_page.dart';
 import '../ui/pages/login_page/login_page.dart';
 import '../ui/pages/mcp_page/mcp_page.dart';
 import '../ui/pages/payment_page/payment_page.dart';
+import '../ui/pages/payment_page/payment_qr_page.dart';
 import '../ui/pages/permission_page/permission_page.dart';
 import '../ui/pages/protocol_page/protocol_page.dart';
 import '../ui/pages/profile_page/profile_page.dart';
@@ -48,6 +49,7 @@ class AppRoutes {
   static const program = '/Profile/Program';
   static const electricity = '/Electricity';
   static const payment = '/Payment';
+  static const paymentQrCode = '/Payment/QrCode';
   static const helper = '/Profile/Helper';
   static const license = '/Profile/About/License';
   static const agreement = '/Profile/About/Agreement';
@@ -180,8 +182,15 @@ class AppRouter {
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-                path: AppRoutes.payment,
-                builder: (context, state) => PaymentPage()),
+              path: AppRoutes.payment,
+              builder: (context, state) => PaymentPage(),
+              routes: [
+                _detailRoute(
+                  'QrCode',
+                  (context, state) => const PaymentQrPage(),
+                ),
+              ],
+            ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(

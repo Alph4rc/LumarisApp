@@ -1308,6 +1308,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get paymentSaveAndRefresh => '保存して更新';
 
   @override
+  String get paymentQrCode => '支払いコード';
+
+  @override
+  String get paymentQrCodeSubtitle => 'スキャン端末にこのコードを表示して支払います';
+
+  @override
+  String get paymentQrCodeLoading => '支払いコードを生成中';
+
+  @override
+  String paymentQrCodeAutoRefresh(int seconds) {
+    return '$seconds 秒後に自動更新';
+  }
+
+  @override
+  String get paymentQrCodeError => '支払いコードの取得に失敗しました。しばらくしてから再試行してください。';
+
+  @override
   String get campusCard => '学内カード';
 
   @override

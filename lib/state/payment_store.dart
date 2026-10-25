@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ios_club_app/features/education/apis/payment_api.dart';
 import 'package:ios_club_app/features/education/services/payment_service.dart';
 import 'package:ios_club_app/core/services/prefs_service.dart';
 import 'package:ios_club_app/core/services/secure_storage_service.dart';
@@ -22,8 +23,17 @@ typedef TileVisibilityReader = Future<bool> Function(String tileId);
 typedef TileMutator = Future<void> Function(String tileId);
 typedef PaymentPasswordWriter = Future<bool> Function(String? password);
 
+typedef PaymentQrFetcher = Future<String> Function(
+  String cardNumber,
+  String? password,
+);
+
 final paymentDataFetcherProvider = Provider<PaymentDataFetcher>((ref) {
   return PaymentService.fetchData;
+});
+
+final paymentQrFetcherProvider = Provider<PaymentQrFetcher>((ref) {
+  return PaymentApi.getPaymentQrCodePayload;
 });
 
 final studentIsLoginReaderProvider = Provider<StudentIsLoginReader>((ref) {

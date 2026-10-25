@@ -1348,6 +1348,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentSaveAndRefresh => 'Save and Refresh';
 
   @override
+  String get paymentQrCode => 'Payment Code';
+
+  @override
+  String get paymentQrCodeSubtitle => 'Show this code to the scanner to pay';
+
+  @override
+  String get paymentQrCodeLoading => 'Generating payment code';
+
+  @override
+  String paymentQrCodeAutoRefresh(int seconds) {
+    return 'Auto-refresh in ${seconds}s';
+  }
+
+  @override
+  String get paymentQrCodeError =>
+      'Failed to get the payment code. Please try again later.';
+
+  @override
   String get campusCard => 'Campus Card';
 
   @override

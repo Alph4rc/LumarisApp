@@ -337,6 +337,40 @@ void main() {
       );
     });
 
+    test('PaymentApi.getPaymentQrCodePayload should fetch payload and bypass cache',
+        () async {
+      String? requestedPath;
+      Map<String, dynamic>? requestedQuery;
+      bool? bypassCache;
+
+      EduHttpClientManager.instance.dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requestedPath = options.path;
+            requestedQuery = options.queryParameters;
+            bypassCache =
+                options.extra[CacheInterceptor.bypassCacheKey] == true;
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: 200,
+                data: <String, dynamic>{'payload': 'payload-123'},
+              ),
+            );
+          },
+        ),
+      );
+
+      final payload =
+          await PaymentApi.getPaymentQrCodePayload('card-1', ' pw ');
+
+      expect(requestedPath, '/Payment/card-1/qrcode');
+      expect(requestedQuery, {'password': 'pw'});
+      // 支付码有时效，缓存拦截器必须被绕过
+      expect(bypassCache, isTrue);
+      expect(payload, 'payload-123');
+    });
+
     test('LoginApi should parse map and string responses', () async {
       final client = EduHttpClient(baseUrl: 'http://api.test');
       var call = 0;
