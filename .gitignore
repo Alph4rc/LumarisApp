@@ -60,3 +60,6 @@ nul
 
 # yaml
 v1.yaml
+
+/dist
+/xx
