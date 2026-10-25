@@ -202,6 +202,10 @@
   "joinUs": "Присоединиться",
   "madeWithLove": "Made with ❤️ in Xi'an",
 
+  "easterEggTitle": "🎉 Пасхалка",
+  "easterEggFound": "Поздравляем! Вы нашли скрытую пасхалку!",
+  "easterEggContent": "Вы один из немногих, кто знает этот секрет!\n\nСпасибо за вашу любовь и поддержку Lumaris.\n\nПродолжайте исследовать — возможно, вас ждёт ещё больше сюрпризов...",
+
   "fontSetting": "Настройка шрифта",
   "fontSettingSubtitle": "Выберите шрифт для ПК (применяется при следующем запуске)",
   "systemDefault": "По умолчанию",
@@ -304,6 +308,7 @@
   "fetchFailed": "Не удалось получить данные",
   "pleaseLoginFirst": "Войдите, чтобы посмотреть оценки",
   "readingScoresSubtitle": "Чтение кэша и синхронизация оценок",
+  "foolishModeMessage": "Да, у меня GPA 5.0",
   "creditUnit": "{credit} кред.",
   "semesterRange": "{start}-{end} Семестр {num}",
   "semesterAutumnShort": "Осень",

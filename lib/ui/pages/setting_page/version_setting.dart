@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
@@ -24,7 +23,6 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
   late String version = '';
   late String buildNumber = '';
   ReleaseModel? latestRelease;
-  // Debug 专用：版本号连点彩蛋，release 构建会被 tree-shaking 移除。
   int tapCount = 0;
   DateTime? lastTapTime;
 
@@ -49,10 +47,6 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
   }
 
   void _handleTap() {
-    if (!kDebugMode) {
-      return;
-    }
-
     final now = DateTime.now();
     if (lastTapTime == null ||
         now.difference(lastTapTime!) > const Duration(seconds: 1)) {
@@ -64,8 +58,8 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
     lastTapTime = now;
 
     if (tapCount >= 5) {
-      // 显示彩蛋页面（该路由只在 Debug 构建中注册）
-      AppRouter.push('/Profile/About/Egg');
+      // 显示彩蛋页面
+      AppRouter.push(AppRoutes.egg);
 
       // 重置计数器
       tapCount = 0;
@@ -102,9 +96,7 @@ class _VersionSettingState extends ConsumerState<VersionSetting> {
             color: colors.secondaryLabel,
           ),
           onTap: () async {
-            if (kDebugMode) {
-              _handleTap();
-            }
+            _handleTap(); // 处理点击事件
 
             if (isNeedUpdate) {
               final result = await showMcConfirmDialog(

@@ -1,6 +1,5 @@
 import 'dart:async' show TimeoutException, unawaited;
 
-import 'package:flutter/foundation.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:luamris_ui/luamris_ui.dart';
 import 'package:material_ui/material_ui.dart';
@@ -32,7 +31,6 @@ class _ScorePageState extends ConsumerState<ScorePage>
     with SingleTickerProviderStateMixin {
   final List<ScoreList> _scoreList = [];
   bool _isLoading = true;
-  // Debug 专用：愚人节预览，release 构建会被 tree-shaking 移除。
   bool _isFool = false;
   final List<ScoreList> _yearList = [];
   bool _isYear = false;
@@ -178,15 +176,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
     return selectorList;
   }
 
-  /// Debug 专用：把所有成绩临时替换成满分，仅用于预览/演示。
-  ///
-  /// release 构建里 [kDebugMode] 为 `false`，方法不会被引用，连同其中的
-  /// 字符串一起被 tree-shaking 移除，不会出现在提交给 App Store 的产物中。
   void _handleFoolishMode() {
-    if (!kDebugMode) {
-      return;
-    }
-
     setState(() {
       _isFool = true;
       for (final item in _scoreList) {
@@ -200,7 +190,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
       _isYear = false;
     });
 
-    McFeedback.showMessage(context, message: '是的，在下绩点5.0');
+    McFeedback.showMessage(context, message: context.l10n.foolishModeMessage);
   }
 
   @override
@@ -317,7 +307,7 @@ class _ScorePageState extends ConsumerState<ScorePage>
           ),
           Row(
             children: [
-              if (kDebugMode && !_isFool)
+              if (!_isFool)
                 IconButton(
                   onPressed: _handleFoolishMode,
                   icon: const Icon(Icons.mood),

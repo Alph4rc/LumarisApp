@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,6 +50,7 @@ class AppRoutes {
   static const payment = '/Payment';
   static const paymentQrCode = '/Payment/QrCode';
   static const helper = '/Profile/Helper';
+  static const egg = '/Profile/About/Egg';
   static const license = '/Profile/About/License';
   static const agreement = '/Profile/About/Agreement';
   static const privacyPolicy = '/Profile/About/PrivacyPolicy';
@@ -140,10 +140,8 @@ class AppRouter {
                   parentNavigatorKey: rootNavigatorKey,
                   builder: (context, state) => const SettingPage(),
                   routes: [
-                    // Debug 专用彩蛋路由；release 构建会整体移除。
-                    if (kDebugMode)
-                      _detailRoute(
-                          'Egg', (context, state) => const EasterEggPage()),
+                    _detailRoute(
+                        'Egg', (context, state) => const EasterEggPage()),
                     _detailRoute(
                         'License', (context, state) => const LicensePage()),
                     _detailRoute(
