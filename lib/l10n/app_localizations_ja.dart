@@ -517,16 +517,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get madeWithLove => '西安で❤️を込めて作られました';
 
   @override
-  String get easterEggTitle => '🎉 イースターエッグ';
-
-  @override
-  String get easterEggFound => 'おめでとうございます！隠されたイースターエッグを見つけました！';
-
-  @override
-  String get easterEggContent =>
-      'この秘密を知る数少ない人の一人です！\n\nLumarisを愛しサポートしてくださりありがとうございます。\n\n探索を続ければ、さらなる驚きが待っているかもしれません...';
-
-  @override
   String get fontSetting => 'フォント設定';
 
   @override
@@ -850,9 +840,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get readingScoresSubtitle => 'キャッシュを読み込み、学務成績を同期中';
-
-  @override
-  String get foolishModeMessage => 'はい、GPAは5.0です';
 
   @override
   String creditUnit(String credit) {

@@ -205,10 +205,6 @@
   "joinUs": "Join Us",
   "madeWithLove": "Made with ❤️ in Xi'an",
 
-  "easterEggTitle": "🎉 Easter Egg",
-  "easterEggFound": "Congratulations! You found the hidden easter egg!",
-  "easterEggContent": "You are one of the few people who know this secret!\n\nThank you for loving and supporting Lumaris.\n\nKeep exploring, and there may be more surprises waiting for you...",
-
   "fontSetting": "Font Setting",
   "fontSettingSubtitle": "Choose a font for desktop platforms (applied on next launch)",
   "systemDefault": "System Default",
@@ -316,7 +312,6 @@
   "fetchFailed": "Failed to fetch data",
   "pleaseLoginFirst": "Please log in to view scores",
   "readingScoresSubtitle": "Reading cache and syncing academic scores",
-  "foolishModeMessage": "Yes, I have a 5.0 GPA",
   "creditUnit": "{credit} credits",
   "semesterRange": "{start}-{end} Semester {num}",
   "semesterAutumnShort": "Fall",

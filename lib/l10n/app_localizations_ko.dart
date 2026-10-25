@@ -520,16 +520,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get madeWithLove => '시안에서 ❤️를 담아 만들었습니다';
 
   @override
-  String get easterEggTitle => '🎉 이스터에그';
-
-  @override
-  String get easterEggFound => '숨겨진 이스터에그를 발견하셨습니다!';
-
-  @override
-  String get easterEggContent =>
-      '당신은 이 비밀을 아는 몇 안 되는 사람 중 하나입니다!\n\nLumaris에 대한 애정과 지지에 감사드립니다.\n\n계속 탐험하세요, 더 많은 놀라움이 기다리고 있을지도 모릅니다...';
-
-  @override
   String get fontSetting => '글꼴 설정';
 
   @override
@@ -855,9 +845,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get readingScoresSubtitle =>
       '캐시를 읽고 학사 성적을 동기화하는 중입니다. 네트워크가 느린 경우 몇 초 정도 걸릴 수 있습니다';
-
-  @override
-  String get foolishModeMessage => '네, 제 평점은 5.0입니다';
 
   @override
   String creditUnit(String credit) {

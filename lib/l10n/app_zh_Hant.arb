@@ -201,10 +201,6 @@
   "joinUs": "加入我們",
   "madeWithLove": "Made with ❤️ in Xi'an",
 
-  "easterEggTitle": "🎉 彩蛋",
-  "easterEggFound": "恭喜你發現了隱藏彩蛋！",
-  "easterEggContent": "你是少數知道這個秘密的人之一！\n\n感謝你對光序的喜愛與支援。\n\n繼續探索，也許還有更多驚喜等著你...",
-
   "fontSetting": "字型設定",
   "fontSettingSubtitle": "為桌面平台選擇字型（下次開啟時才會套用）",
   "systemDefault": "系統預設",
@@ -312,7 +308,6 @@
   "fetchFailed": "取得資料失敗",
   "pleaseLoginFirst": "請先去登入即可檢視成績",
   "readingScoresSubtitle": "正在讀取快取並同步教務成績，網路較慢時可能需要幾秒",
-  "foolishModeMessage": "是的，在下績點5.0",
   "creditUnit": "{credit} 學分",
   "gradeLabel": "成績 {grade}",
   "gpaLabel": "績點 {gpa}",

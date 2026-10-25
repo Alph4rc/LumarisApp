@@ -515,16 +515,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get madeWithLove => 'Made with ❤️ in Xi\'an';
 
   @override
-  String get easterEggTitle => '🎉 彩蛋';
-
-  @override
-  String get easterEggFound => '恭喜你发现了隐藏彩蛋！';
-
-  @override
-  String get easterEggContent =>
-      '你是少数知道这个秘密的人之一！\n\n感谢你对光序的喜爱与支持。\n\n继续探索，也许还有更多惊喜等着你...';
-
-  @override
   String get fontSetting => '字体设置';
 
   @override
@@ -848,9 +838,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get readingScoresSubtitle => '正在读取缓存并同步教务成绩，网络较慢时可能需要几秒';
-
-  @override
-  String get foolishModeMessage => '是的，在下绩点5.0';
 
   @override
   String creditUnit(String credit) {
@@ -2519,16 +2506,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get madeWithLove => 'Made with ❤️ in Xi\'an';
 
   @override
-  String get easterEggTitle => '🎉 彩蛋';
-
-  @override
-  String get easterEggFound => '恭喜你發現了隱藏彩蛋！';
-
-  @override
-  String get easterEggContent =>
-      '你是少數知道這個秘密的人之一！\n\n感謝你對光序的喜愛與支援。\n\n繼續探索，也許還有更多驚喜等著你...';
-
-  @override
   String get fontSetting => '字型設定';
 
   @override
@@ -2852,9 +2829,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get readingScoresSubtitle => '正在讀取快取並同步教務成績，網路較慢時可能需要幾秒';
-
-  @override
-  String get foolishModeMessage => '是的，在下績點5.0';
 
   @override
   String creditUnit(String credit) {

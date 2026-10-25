@@ -547,17 +547,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get madeWithLove => 'Made with ❤️ in Xi\'an';
 
   @override
-  String get easterEggTitle => '🎉 Easter Egg';
-
-  @override
-  String get easterEggFound =>
-      'Félicitations ! Vous avez trouvé l\'easter egg caché !';
-
-  @override
-  String get easterEggContent =>
-      'Vous êtes l\'une des rares personnes à connaître ce secret !\n\nMerci d\'aimer et de soutenir Lumaris.\n\nContinuez à explorer, d\'autres surprises vous attendent peut-être...';
-
-  @override
   String get fontSetting => 'Paramètre de police';
 
   @override
@@ -888,9 +877,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get readingScoresSubtitle =>
       'Lecture du cache et synchronisation des notes';
-
-  @override
-  String get foolishModeMessage => 'Oui, j\'ai un GPA de 5.0';
 
   @override
   String creditUnit(String credit) {

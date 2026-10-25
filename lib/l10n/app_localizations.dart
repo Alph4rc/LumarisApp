@@ -1096,24 +1096,6 @@ abstract class AppLocalizations {
   ///
   ///
   /// In zh, this message translates to:
-  /// **'🎉 彩蛋'**
-  String get easterEggTitle;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'恭喜你发现了隐藏彩蛋！'**
-  String get easterEggFound;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'你是少数知道这个秘密的人之一！\n\n感谢你对光序的喜爱与支持。\n\n继续探索，也许还有更多惊喜等着你...'**
-  String get easterEggContent;
-
-  ///
-  ///
-  /// In zh, this message translates to:
   /// **'字体设置'**
   String get fontSetting;
 
@@ -1728,12 +1710,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'正在读取缓存并同步教务成绩，网络较慢时可能需要几秒'**
   String get readingScoresSubtitle;
-
-  ///
-  ///
-  /// In zh, this message translates to:
-  /// **'是的，在下绩点5.0'**
-  String get foolishModeMessage;
 
   ///
   ///
